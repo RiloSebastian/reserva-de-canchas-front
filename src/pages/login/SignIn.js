@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import AuthService from '../../services/auth.service';
+
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -35,9 +37,16 @@ const SignIn = (props) => {
         const data = new FormData(event.currentTarget);
         // eslint-disable-next-line no-console
         console.log({
-            email: data.get('email'),
+            username: data.get('username'),
             password: data.get('password'),
         });
+
+
+        AuthService.login(data.get('username'), data.get('password'))
+            .then(data => console.log(data))
+
+
+
     };
 
     return (
@@ -63,10 +72,10 @@ const SignIn = (props) => {
                             margin="normal"
                             required
                             fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
+                            id="username"
+                            label="username"
+                            name="username"
+                            autoComplete="username"
                             autoFocus
                         />
                         <TextField
