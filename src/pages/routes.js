@@ -1,7 +1,13 @@
 import Home from "./home/Home";
 import ListaReserva from "./reservas/ListaReserva";
 import ListaCanchas from './canchas/ListaCanchas';
+import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
+import ListaPromociones from './promociones/ListaPromociones';
+import ListaFeedback from "./feedback/ListaFeedback";
 
+export const BASE_URL = {
+    base: '/dashboard',
+}
 
 export const PATHS = {
     login: '/login',
@@ -39,19 +45,19 @@ const InstitutionRoutes = [
     {
         id: 'promociones',
         path: '/promociones',
-        component: ListaReserva,
+        component: ListaPromociones,
         exact: true
     },
     {
         id: 'empleados',
         path: '/empleados',
-        component: ListaReserva,
+        component: ListaEmpleado,
         exact: true
     },
     {
         id: 'feedback',
         path: '/feedback',
-        component: ListaReserva,
+        component: ListaFeedback,
         exact: true
     }
 ];

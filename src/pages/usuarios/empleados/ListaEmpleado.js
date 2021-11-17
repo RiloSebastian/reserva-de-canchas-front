@@ -16,9 +16,9 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import { Delete } from '@material-ui/icons';
-import Button from '@mui/material/Button';
-import FormularioHorarioPrecioCancha from '../../components/formularios-datos/FormularioHorarioPrecioCancha';
-import UploadImage from '../../components/UploadImage';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormularioHorarioPrecioCancha from '../../../components/formularios-datos/FormularioHorarioPrecioCancha';
+import Switch from '@mui/material/Switch';
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -40,49 +40,62 @@ const tableIcons = {
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
-const ListaCanchas = () => {
+const ListaEmpleado = () => {
 
     const [open, setOpen] = useState(false);
 
+    const [activo, setActivo] = useState(false);
+
     const [columns, setColumns] = useState([
-        { title: 'Nombre Cancha', field: 'name' },
-        { title: 'Descripcion', field: 'description', initialEditValue: 'initial edit value' },
+        { title: 'Nombre', field: 'name' },
+        //{ title: 'Descripcion', field: 'description', initialEditValue: 'initial edit value' },
         //{ title: 'Birth Year', field: 'birthYear', type: 'numeric' },
         {
-            title: 'Deporte',
-            field: 'sport',
-            lookup: { 1: 'Tennis', 2: 'Futbol', 3: 'Paddle' }
+            title: 'Tipo',
+            field: 'tipo',
+            lookup: { 1: 'Empleado', 2: 'Administrador', 3: 'Entrenador' },
         },
         {
-            field: 'horarios',
-            filtering: false,
-            editComponent: props => (
-                <Button color="success" variant="contained" onClick={desplegarModal}>Agregar Horarios y Precios</Button>
-            )
-        },
-        {
-            field: 'imagenes', filtering: false,
-            editComponent: props => <UploadImage />
+            title: 'Estado', field: 'estado',
+            editComponent: (rowData) => {
+                return <FormControlLabel control={<Switch defaultChecked />} label="Activo" />;
+            },
+            render: (rowData) => {
+                return (<FormControlLabel control={<Switch defaultChecked />} label="Activo" />);
+                /*return (
+                    
+                    <Switch
+                        checked={rowData.status}
+                        onChange={handleChange}
+                        inputProps={{ "aria-label": "controlled" }}
+                        color="primary"
+                    />
+                );*/
+            }
         },
     ]);
 
     const [data, setData] = useState([
-        { name: 'Cancha 1', description: 'Cancha de Polvo de Ladrillos', sport: 1 },
-        { name: 'Cancha 2', description: 'Cancha de Cemento', sport: 1 },
-        { name: 'Futbol 1', description: 'Cancha de 5 Sintetica', sport: 2 },
-        { name: 'Futbol 2', description: 'Cancha de 9 de pasto natural', sport: 2 },
-        { name: 'Cancha 2', description: 'Cancha de Cemento', sport: 3 },
+        { name: 'Marcos', description: 'Cancha de Polvo de Ladrillos', tipo: 1, estado: true },
+        { name: 'Claudia', description: 'Cancha de Cemento', tipo: 1, estado: true },
+        { name: 'Raul', description: 'Cancha de 5 Sintetica', tipo: 2, estado: false },
+        { name: 'Susana', description: 'Cancha de 9 de pasto natural', tipo: 2, estado: true },
+        { name: 'Vanina', description: 'Cancha de Cemento', tipo: 3, estado: false },
     ]);
 
     const desplegarModal = () => {
         setOpen(true)
     }
 
+    const handleChange = () => {
+        setActivo(true);
+    };
+
     return (
         <>
             <MaterialTable
                 icons={tableIcons}
-                title="Listado de Canchas"
+                title="Listado de Empleados"
                 columns={columns}
                 data={data}
                 options={{
@@ -160,4 +173,4 @@ const ListaCanchas = () => {
     )
 }
 
-export default ListaCanchas
+export default ListaEmpleado
