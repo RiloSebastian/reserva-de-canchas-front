@@ -3,7 +3,7 @@ import "./App.css";
 import MenuBar from './components/menuBar/MenuBar';
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Route, Switch } from 'react-router';
-import InstitutionRoutes, { CustomerRoutes, PATHS } from "./pages/routes";
+import InstitutionRoutes, { CustomerRoutes, PATHS, BASE_URL } from "./pages/routes";
 import InstitutionLayout from "./layout/InstitutionLayout";
 import CustomerLayout from "./layout/CustomerLayout";
 import NotFound from './components/NotFound';
@@ -43,13 +43,13 @@ function App() {
             InstitutionRoutes.map(({ id, path, component, exact }) => (
               <PrivateRoute
                 key={id}
-                path={InstitutionRoutes.map((item) => item.path)}
+                path={InstitutionRoutes.map((item) => BASE_URL.base + item.path)}
                 isAuthenticated={true}
               >
                 <InstitutionLayout>
                   <Route
                     key={id}
-                    path={path}
+                    path={BASE_URL.base + path}
                     component={component}
                     exact={exact}
                   />
@@ -58,7 +58,7 @@ function App() {
             ))
           }
 
-          
+
 
 
           {/*

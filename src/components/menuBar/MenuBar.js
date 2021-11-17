@@ -146,8 +146,9 @@ import { List, ListItem, Collapse, Button } from '@material-ui/core';
 import ReservationMenu from './sideBarItems';
 import useStyles from './menuBarStyles';
 import { Link, NavLink as RouterLink } from 'react-router-dom';
-import ReservationsRoutes from '../../pages/routes';
+import ReservationsRoutes, { BASE_URL } from '../../pages/routes';
 import { Route, Switch } from 'react-router';
+import AuthService from '../../services/auth.service';
 
 const drawerWidth = 240;
 
@@ -263,6 +264,10 @@ const MenuBar = (props) => {
         setMenu(newData);
     }
 
+    const handleLogOut = () => {
+        AuthService.logout();
+    };
+
     const CustomRouterLink = forwardRef((props, ref) => (
         <div ref={ref} style={{ flexGrow: 1 }}>
             <RouterLink {...props} />
@@ -275,7 +280,7 @@ const MenuBar = (props) => {
             return (
                 <Link
                     style={{ color: 'inherit', textDecoration: 'inherit' }}
-                    to={url}>
+                    to={BASE_URL.base + url}>
                     <ListItem button key={name}>
 
                         <ListItemIcon>
@@ -356,7 +361,8 @@ const MenuBar = (props) => {
             onClose={handleMenuClose}
         >
             <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <MenuItem component={Link} to={'/login'} onClick={handleLogOut}>Cerrar Sesion</MenuItem>
+
         </Menu>
     );
 
@@ -521,7 +527,7 @@ const MenuBar = (props) => {
                         ReservationsRoutes.map(({ id, path, component, exact }) => (
                             <Route
                                 key={id}
-                                path={path}
+                                path={BASE_URL.base + path}
                                 component={component}
                                 exact={exact}
                             />
