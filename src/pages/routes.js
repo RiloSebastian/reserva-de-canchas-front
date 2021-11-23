@@ -4,6 +4,7 @@ import ListaCanchas from './canchas/ListaCanchas';
 import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
 import ListaPromociones from './promociones/ListaPromociones';
 import ListaFeedback from "./feedback/ListaFeedback";
+import AltaCancha from "./canchas/AltaCancha";
 
 export const BASE_URL = {
     base: '/dashboard',
@@ -40,6 +41,12 @@ const InstitutionRoutes = [
         id: 'canchas',
         path: '/canchas',
         component: ListaCanchas,
+        exact: true
+    },
+    {
+        id: 'altaCancha',
+        path: '/alta-cancha',
+        component: AltaCancha,
         exact: true
     },
     {

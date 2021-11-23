@@ -44,9 +44,6 @@ const SignIn = (props) => {
 
         AuthService.login(data.get('username'), data.get('password'))
             .then(data => console.log(data))
-
-
-
     };
 
     return (
