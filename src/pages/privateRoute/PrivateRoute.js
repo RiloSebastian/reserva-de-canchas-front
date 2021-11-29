@@ -1,22 +1,33 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Route, Redirect } from 'react-router';
 import { PATHS } from '../routes';
-const PrivateRoute = ({ children, isAuthenticated, ...rest }) => {
+import AuthService from '../../services/auth.service';
+
+function PrivateRoute({ children, ...rest }) {
+
+    const user = JSON.parse(JSON.parse(AuthService.getCurrentUser()));
+
+    console.log('private route')
+    console.log(user)
+
     return (
         <Route
             {...rest}
             render={
-                () => (
-                    isAuthenticated
-                        ? (
-                            children
-                        ) : (
-                            <Redirect
-                                to={{
-                                    pathname: PATHS.login
-                                }}
-                            />
-                        ))
+                (props) => {
+                    console.log(user)
+                    if (user) {
+                        console.log('redirect')
+                        return typeof children == 'function' ? children(props) : children
+
+                    } else {
+                        console.log('redirect')
+                        return (<Redirect to={{ pathname: PATHS.login, state: { from: props.location } }} />)
+                    }
+
+
+                }
+
             }
         />
     );
