@@ -31,6 +31,8 @@ const register = async (firstName, lastName, email, password, role) => {
 }
 
 const getCurrentUser = () => {
+    console.log('get current user')
+    console.log(JSON.stringify(localStorage.getItem('user')))
     return JSON.stringify(localStorage.getItem('user'));
     //return localStorage.getItem('user');
 }

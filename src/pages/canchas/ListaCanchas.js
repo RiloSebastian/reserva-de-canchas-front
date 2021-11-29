@@ -124,11 +124,12 @@ const ListaCanchas = () => {
                 editable={{
                     onRowAdd: newData =>
                         new Promise((resolve, reject) => {
+                            /*
                             setTimeout(() => {
                                 setData([...data, newData]);
 
                                 resolve();
-                            }, 1000)
+                            }, 1000)*/
                         }),
                     onRowUpdate: (newData, oldData) =>
                         new Promise((resolve, reject) => {
