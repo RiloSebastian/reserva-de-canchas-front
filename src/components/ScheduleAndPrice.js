@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import Stack from '@mui/material/Stack';
@@ -28,10 +28,10 @@ const ScheduleAndPrice = () => {
 
     const classes = useStyles();
 
-    const [desde, setDesde] = React.useState(moment(new Date('2018-01-01T00:00:00.000Z')));
-    const [hasta, setHasta] = React.useState(moment(new Date('2018-01-01T00:00:00.000Z')));
+    const [desde, setDesde] = useState(moment(new Date('2018-01-01T00:00:00.000Z')));
+    const [hasta, setHasta] = useState(moment(new Date('2018-01-01T00:00:00.000Z')));
 
-    const [checked, setChecked] = React.useState(true);
+    const [checked, setChecked] = useState(true);
 
     const handleChange = (event) => {
         setChecked(event.target.checked);

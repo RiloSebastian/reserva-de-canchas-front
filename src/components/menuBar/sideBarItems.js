@@ -3,27 +3,40 @@ import WhatshotIcon from '@mui/icons-material/Whatshot';
 import PeopleIcon from '@mui/icons-material/People';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import SportsScoreIcon from '@mui/icons-material/SportsScore';
+import HomeIcon from '@mui/icons-material/Home';
+import { USER_ROLE } from '../../constants/userRole';
+import { useHistory } from "react-router-dom";
 
-const ReservationMenu = [
+const reservationMenu = (user) => [
+    {
+        name: "Inicio",
+        url: "/home",
+        icon: <HomeIcon />,
+        visible: hasUserRole(user, [USER_ROLE.CUSTOMER])
+    },
     {
         name: "Reservas",
         url: "/reservas",
-        icon: <EventAvailableIcon />
+        icon: <EventAvailableIcon />,
+        visible: hasUserRole(user, [USER_ROLE.ADMIN, USER_ROLE.EMPLOYEE, USER_ROLE.COACH])
     },
     {
         name: "Canchas",
         url: "/canchas",
-        icon: <SportsScoreIcon />
+        icon: <SportsScoreIcon />,
+        visible: hasUserRole(user, [USER_ROLE.ADMIN])
     },
     {
         name: "Promociones",
         url: "/promociones",
-        icon: <WhatshotIcon />
+        icon: <WhatshotIcon />,
+        visible: hasUserRole(user, [USER_ROLE.ADMIN])
     },
     {
         name: "Empleados",
         url: "/empleados",
         icon: <PeopleIcon />,
+        visible: hasUserRole(user, [USER_ROLE.ADMIN]),
         children: [
             {
                 name: "Child31",
@@ -43,6 +56,7 @@ const ReservationMenu = [
         name: "Feedback",
         url: "/feedback",
         icon: <FeedbackIcon />,
+        visible: hasUserRole(user, [USER_ROLE.ADMIN]),
         children: [
             {
                 name: "Child41",
@@ -74,4 +88,14 @@ const ReservationMenu = [
 ];
 
 
-export default ReservationMenu;
+export default function getMenu(user) {
+
+    return reservationMenu(user);
+
+};
+
+function hasUserRole(user, roles) {
+    // return userIsAuthorized()
+
+    return user ? roles.map(role => role.role).includes(user.roles[0]) : false;
+}

@@ -4,6 +4,7 @@ import ListaCanchas from './canchas/ListaCanchas';
 import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
 import ListaPromociones from './promociones/ListaPromociones';
 import ListaFeedback from "./feedback/ListaFeedback";
+import Checkout from "./checkout/Checkout";
 
 export const BASE_URL = {
     base: '/dashboard',
@@ -15,6 +16,21 @@ export const PATHS = {
 }
 
 export const CustomerRoutes = [
+/*    {
+        id: 'home',
+        path: '/home',
+        component: Home,
+        exact: true
+    },
+    {
+        id: 'checkout',
+        path: '/checkout',
+        component: Checkout,
+        exact: true
+    }*/
+];
+
+const InstitutionRoutes = [
     {
         id: 'home',
         path: '/home',
@@ -22,14 +38,11 @@ export const CustomerRoutes = [
         exact: true
     },
     {
-        id: 'pagos',
-        path: '/pagos',
-        component: Home,
+        id: 'checkout',
+        path: '/checkout',
+        component: Checkout,
         exact: true
-    }
-];
-
-const InstitutionRoutes = [
+    },
     {
         id: 'reservas',
         path: '/reservas',

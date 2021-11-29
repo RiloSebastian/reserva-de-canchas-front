@@ -15,7 +15,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import moment from 'moment';
 
 const FormularioHorarioPrecioCancha = ({ open, setOpen }) => {
 
