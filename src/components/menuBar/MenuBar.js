@@ -1,121 +1,3 @@
-/*import React, { useState, forwardRef } from 'react';
-import { List, ListItem, Collapse, Button, Drawer } from '@material-ui/core';
-import clsx from 'clsx';
-import { ExpandLess, ExpandMore } from "@material-ui/icons";
-import { getMenu } from './sideBarItems';
-import { NavLink as RouterLink } from 'react-router-dom';
-import useStyles from './menuBarStyles';
-import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
-import Toolbar from '@mui/material/Toolbar';
-import NavBar from '../NavBar';
-
-
-const drawerWidth = 240;
-
-const MenuBar = (props) => {
-
-    const [menu, setMenu] = useState({});
-    
-    const { className, ...rest } = props;
-    
-    const classes = useStyles();
-    
-    const handleClick = (item) => {
-        let newData = { ...menu, [item]: !menu[item] };
-        setMenu(newData);
-    }
-    
-    const CustomRouterLink = forwardRef((props, ref) => (
-        <div ref={ref} style={{ flexGrow: 1 }}>
-            <RouterLink {...props} />
-        </div>
-    ));
-    
-    const handleMenu = (children, level = 0) => {
-        return children.map(({ children, name, url, links }) => {
-            if (!children) {
-                return (
-                    <List component="div" disablePadding key={name}>
-                        <ListItem
-                            className={classes.item}
-                            disableGutters
-                            style={{ padding: "0px" }}
-                            key={name}
-                        >
-                            <Button
-                                className={clsx({
-                                    [classes.btnRoot]: true,
-                                    [classes.button]: true,
-                                    [classes.subMenu]: level
-                                })}
-                                component={CustomRouterLink}
-                                to={url}
-                            >
-                                {name}
-                            </Button>
-                        </ListItem>
-                    </List>
-                )
-            }
-
-            return (
-                <div key={name}>
-                    <ListItem
-                        className={classes.item}
-                        disableGutters
-                        key={name}
-                        onClick={() => handleClick(name)}
-                    >
-                        <Button
-                            className={clsx({
-                                [classes.btnRoot]: true,
-                                [classes.button]: true,
-                                [classes.subMenu]: level
-                            })}>
-                            {name} {menu[name] ? <ExpandLess /> : <ExpandMore />}
-                        </Button>
-                    </ListItem>
-                    <Collapse
-                        in={(menu[name]) ? true : false}
-                        timeout="auto"
-                        unmountOnExit
-                    >
-                        {handleMenu(children, 1)}
-                    </Collapse>
-                </div>
-            )
-        })
-    }
-
-
-    return (
-        <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
-
-            <NavBar />
-
-            <Drawer
-                variant="permanent"
-                sx={{
-                    width: drawerWidth,
-                    flexShrink: 0,
-                    [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-                }}
-            >
-                <Toolbar />
-                <Box sx={{ overflow: 'auto' }}>
-                    <List {...rest} className={clsx(classes.root, className)} >
-                        {handleMenu(getMenu())}
-                    </List>
-                </Box>
-            </Drawer>
-        </Box>
-
-    )
-}
-export default MenuBar;*/
-
 import React, { useState, forwardRef } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -133,7 +15,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-
 import MoreIcon from '@mui/icons-material/MoreVert';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -143,7 +24,7 @@ import Menu from '@mui/material/Menu';
 import clsx from 'clsx';
 import { ExpandLess, ExpandMore } from "@material-ui/icons";
 import { List, ListItem, Collapse, Button } from '@material-ui/core';
-import ReservationMenu from './sideBarItems';
+import getMenu from './sideBarItems';
 import useStyles from './menuBarStyles';
 import { Link, NavLink as RouterLink } from 'react-router-dom';
 import ReservationsRoutes, { BASE_URL } from '../../pages/routes';
@@ -274,15 +155,20 @@ const MenuBar = (props) => {
         </div>
     ));
 
-    const handleMenu = (children, level = 0) => {
-        return children.map(({ children, name, url, links, icon }) => {
+    const handleMenu = () => {
+
+        const user = JSON.parse(JSON.parse(AuthService.getCurrentUser()));
+
+        let menu = getMenu(user);
+
+        return menu.map(({ visible, name, url, links, icon }) => {
 
             return (
+                visible &&
                 <Link
                     style={{ color: 'inherit', textDecoration: 'inherit' }}
                     to={BASE_URL.base + url}>
                     <ListItem button key={name}>
-
                         <ListItemIcon>
                             {icon}
                         </ListItemIcon>
@@ -290,57 +176,6 @@ const MenuBar = (props) => {
                     </ListItem >
                 </Link>
             )
-
-            /*
-            if (!children) {
-                return (
-                        <ListItem
-                            className={classes.item}
-                            disableGutters
-                            style={{ padding: "0px" }}
-                            key={name}
-                        >
-                            <Button
-                                className={clsx({
-                                    [classes.btnRoot]: true,
-                                    [classes.button]: true,
-                                    [classes.subMenu]: level
-                                })}
-                                component={CustomRouterLink}
-                                to={url}
-                            >
-                                {name}
-                            </Button>
-                        </ListItem>
-                )
-            }
-
-            return (
-                <div key={name}>
-                    <ListItem
-                        className={classes.item}
-                        disableGutters
-                        key={name}
-                        onClick={() => handleClick(name)}
-                    >
-                        <Button
-                            className={clsx({
-                                [classes.btnRoot]: true,
-                                [classes.button]: true,
-                                [classes.subMenu]: level
-                            })}>
-                            {name} {menu[name] ? <ExpandLess /> : <ExpandMore />}
-                        </Button>
-                    </ListItem>
-                    <Collapse
-                        in={(menu[name]) ? true : false}
-                        timeout="auto"
-                        unmountOnExit
-                    >
-                        {handleMenu(children, 1)}
-                    </Collapse>
-                </div>
-            )*/
         })
     }
 
@@ -490,33 +325,8 @@ const MenuBar = (props) => {
                     </IconButton>
                 </DrawerHeader>
                 <Divider />
-                {
-                    /*
-                    <List>
-                    {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
-                </List>
-                <Divider />
                 <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
-                </List>
-                    */
-                }
-                <List>
-                    {handleMenu(ReservationMenu)}
+                    {handleMenu()}
                 </List>
 
             </Drawer>

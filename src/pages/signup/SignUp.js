@@ -12,12 +12,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import AuthService from '../../services/auth.service'
 
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
+            <Link color="inherit" href="#">
                 Reserva Tu Cancha
             </Link>{' '}
             {new Date().getFullYear()}
@@ -37,6 +38,9 @@ const SignUp = () => {
             email: data.get('email'),
             password: data.get('password'),
         });
+
+        AuthService.register(data.get('firstName'), data.get('lastName'), data.get('email'), data.get('password'));
+
     };
 
     return (

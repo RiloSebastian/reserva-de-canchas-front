@@ -12,14 +12,14 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import { useHistory } from "react-router-dom";
 import AuthService from '../../services/auth.service';
 
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
+            <Link color="inherit" href="#">
                 Reserva Tu Cancha
             </Link>{' '}
             {new Date().getFullYear()}
@@ -32,7 +32,9 @@ const theme = createTheme();
 
 const SignIn = (props) => {
 
-    const handleSubmit = (event) => {
+    let history = useHistory();
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         // eslint-disable-next-line no-console
@@ -42,10 +44,19 @@ const SignIn = (props) => {
         });
 
 
-        AuthService.login(data.get('username'), data.get('password'))
-            .then(data => console.log(data))
+        const user = await AuthService.login(data.get('username'), data.get('password'))
+            .then(data => data)
 
 
+        console.log(user.roles[0])
+
+        if (user.roles[0] === "ROLE_CUSTOMER") {
+
+            history.push("/dashboard/home")
+        } else {
+
+            history.push("/dashboard/reservas")
+        }
 
     };
 
