@@ -1,32 +1,58 @@
-import React, { useState, forwardRef } from 'react'
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import ReservationCalendar from '../../components/ReservationCalendar';
-import TabContext from '@mui/lab/TabContext';
-import TabPanel from '@mui/lab/TabPanel';
-import TabList from '@mui/lab/TabList';
+import React, { useState, forwardRef } from "react";
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import ReservationCalendar from "../../components/ReservationCalendar";
+import TabContext from "@mui/lab/TabContext";
+import TabPanel from "@mui/lab/TabPanel";
+import TabList from "@mui/lab/TabList";
+import CardItemReserva from "../../components/items/CardItemReserva";
+import { height } from "@mui/system";
 
-const Item = styled(Paper)(({ theme }) => ({
+/* const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     padding: theme.spacing(1),
     textAlign: 'center',
     color: theme.palette.text.secondary,
-}));
+})); */
 
 const ListaReserva = () => {
+  const [data, setdata] = useState([
+    {
+      id: 1,
+      date: "9 Oct, 2021",
+      period: "08:00  -  09:00",
+      institution: "Instituto 1",
+      field: "Cancha 1",
+      state: "CANCELADA",
+    },
+    {
+      id: 2,
+      date: "15 Oct, 2021",
+      period: "09:00  -  10:00",
+      institution: "Instituto 1",
+      field: "Cancha 1",
+      state: "FINALIZADA",
+    },
+    {
+      id: 3,
+      date: "27 Oct, 2021",
+      period: "08:00  -  09:00",
+      institution: "Instituto 2",
+      field: "Cancha 2",
+      state: "FINALIZADA",
+    },
+  ]);
 
-    const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState(0);
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
-
-    return (
-        <>
+  /* { <>
             <Box sx={{ width: 1 }}>
                 <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
                     <Box gridColumn="span 8">
@@ -74,8 +100,26 @@ const ListaReserva = () => {
                     </Box>
                 </Box>
             </Box>
-        </>
-    )
-}
+        </> } */
 
-export default ListaReserva
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        height: '100vh',
+      }}
+    >
+      <div style={{width:'80%'}}>
+        <h1>Lista de Reservas</h1>
+        {data.map((reserva) => (
+          <CardItemReserva key={reserva.id} reserva={reserva} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default ListaReserva;
