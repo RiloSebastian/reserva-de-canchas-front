@@ -11,6 +11,11 @@ import TabList from "@mui/lab/TabList";
 import CardItemReserva from "../../components/items/CardItemReserva";
 import { height } from "@mui/system";
 
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import CalendarPicker from "@mui/lab/CalendarPicker";
+import Grid from "@mui/material/Grid";
+
 /* const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     padding: theme.spacing(1),
@@ -19,6 +24,8 @@ import { height } from "@mui/system";
 })); */
 
 const ListaReserva = () => {
+  const [date, setDate] = React.useState(new Date());
+
   const [data, setdata] = useState([
     {
       id: 1,
@@ -103,22 +110,32 @@ const ListaReserva = () => {
         </> } */
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        height: '100vh',
-      }}
-    >
-      <div style={{width:'80%'}}>
-        <h1>Lista de Reservas</h1>
-        {data.map((reserva) => (
-          <CardItemReserva key={reserva.id} reserva={reserva} />
-        ))}
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <CalendarPicker
+              date={date}
+              onChange={(newDate) => setDate(newDate)}
+            />
+          </Grid>
+        </Grid>
+        <div style={{ width: "80%" }}>
+          <h1>Lista de Reservas</h1>
+          {data.map((reserva) => (
+            <CardItemReserva key={reserva.id} reserva={reserva} />
+          ))}
+        </div>
       </div>
-    </div>
+    </LocalizationProvider>
   );
 };
 

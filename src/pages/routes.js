@@ -31,7 +31,8 @@ export const CustomerRoutes = [
     },{
       id:'reservas',
       path: '/reservas',
-      component: ListaReserva
+      component: ListaReserva,
+      exact: true
     }
 ];
 
