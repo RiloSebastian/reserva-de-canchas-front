@@ -15,6 +15,12 @@ const reservationMenu = (user) => [
         visible: hasUserRole(user, [USER_ROLE.CUSTOMER])
     },
     {
+        name: "Mis Reservas",
+        url: "/home/mis-reservas",
+        icon: <EventAvailableIcon />,
+        visible: hasUserRole(user, [USER_ROLE.CUSTOMER])
+    },
+    {
         name: "Reservas",
         url: "/reservas",
         icon: <EventAvailableIcon />,

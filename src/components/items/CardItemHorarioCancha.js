@@ -98,12 +98,10 @@ const CardItemHorarioCancha = ({ open, setOpen }) => {
 
     const handleAddNewSchedule = () => {
 
-        console.log('creando nuevo horario')
 
         const newSchedule = [...horarios, ScheduleAndPrice];
         setHorarios(newSchedule);
 
-        console.log(horarios)
 
     };
 

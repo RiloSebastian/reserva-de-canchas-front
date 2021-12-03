@@ -5,6 +5,7 @@ import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
 import ListaPromociones from './promociones/ListaPromociones';
 import ListaFeedback from "./feedback/ListaFeedback";
 import Checkout from "./checkout/Checkout";
+import MisReservas from "./usuarios/clientes/MisReservas";
 
 export const BASE_URL = {
     base: '/dashboard',
@@ -35,6 +36,12 @@ const InstitutionRoutes = [
         id: 'home',
         path: '/home',
         component: Home,
+        exact: true
+    },
+    {
+        id: 'mis-reservas',
+        path: '/home/mis-reservas',
+        component: MisReservas,
         exact: true
     },
     {

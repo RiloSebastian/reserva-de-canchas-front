@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useHistory } from "react-router-dom";
+import { Redirect } from 'react-router'
 import AuthService from '../../services/auth.service';
 
 function Copyright(props) {
@@ -51,10 +52,11 @@ const SignIn = (props) => {
         console.log(user.roles[0])
 
         if (user.roles[0] === "ROLE_CUSTOMER") {
-
+            //<Redirect to="/dashboard/home" />
             history.push("/dashboard/home")
         } else {
 
+            //<Redirect to="/dashboard/reservas" />
             history.push("/dashboard/reservas")
         }
 

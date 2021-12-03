@@ -16,7 +16,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
-const FormularioHorarioPrecioCancha = ({ open, setOpen }) => {
+const FormularioHorarioPrecioCancha = ({ open, setOpen, setHorariosYPrecios }) => {
 
     //const [open, setOpen] = useState(false);
 
@@ -35,22 +35,27 @@ const FormularioHorarioPrecioCancha = ({ open, setOpen }) => {
         setOpen(true);
     };*/
 
-    const handleClose = () => {
+    const handleGuardarHorariosYPrecios = () => {
 
         setLoading(true);
 
+        setHorariosYPrecios()
+
+        setOpen(false);
+
+    };
+
+    const handleClose = () => {
+
+        setLoading(true);
         setOpen(false);
 
     };
 
     const handleAddNewSchedule = () => {
 
-        console.log('creando nuevo horario')
-
         const newSchedule = [...horarios, ScheduleAndPrice];
         setHorarios(newSchedule);
-
-        console.log(horarios)
 
     };
 
@@ -105,7 +110,7 @@ const FormularioHorarioPrecioCancha = ({ open, setOpen }) => {
                 <Box textAlign='center' sx={{ m: 2 }}>
                     <LoadingButton
                         color="secondary"
-                        onClick={handleClose}
+                        onClick={handleGuardarHorariosYPrecios}
                         loading={loading}
                         loadingPosition="start"
                         startIcon={<SaveIcon />}
