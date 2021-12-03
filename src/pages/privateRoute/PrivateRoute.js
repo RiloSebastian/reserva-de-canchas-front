@@ -5,7 +5,7 @@ import AuthService from '../../services/auth.service';
 
 function PrivateRoute({ children, ...rest }) {
 
-    const user = JSON.parse(JSON.parse(AuthService.getCurrentUser()));
+    const user = true//JSON.parse(JSON.parse(AuthService.getCurrentUser()));
 
     console.log('private route')
     console.log(user)
