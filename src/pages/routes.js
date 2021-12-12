@@ -91,6 +91,12 @@ const InstitutionRoutes = [
     path: '/feedback',
     component: ListaFeedback,
     exact: true
+  },
+  {
+    id: 'configuracion',
+    path: '/configuracion',
+    component: ListaFeedback,
+    exact: true
   }
 ];
 

@@ -1,14 +1,17 @@
 import http from '../../http-common'
 import AuthHeader from '../auth-header';
+import { Redirect } from "react-router";
 
 const getAll = async (institution_id) => {
     try {
-        const listadoCanchas = await http.get(`/institutions/${institution_id}/courts`, { headers: AuthHeader() });
+        const listadoCanchas = await http.get(`/institutions/${institution_id}/courts`);
         console.log('listadoCanchas');
         console.log(listadoCanchas);
         return listadoCanchas;
     } catch (err) {
+        console.log(' error al obtener todas las canchas');
         console.log(err);
+        return Promise.reject(err);
     }
 };
 
@@ -34,12 +37,9 @@ const create = async (institution_id, data) => {
     }
 };
 
-const update = async (institution_id, court_id, data) => {
+const update = async (institution_id, data) => {
     try {
-        return await http.put(`/institutions/${institution_id}/courts/${court_id}`, data,
-            {
-                headers: AuthHeader(),
-            });
+        return await http.patch(`/institutions/${institution_id}/courts/${data.id}`, data);
     } catch (err) {
         console.log(err);
     }

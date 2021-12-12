@@ -76,8 +76,7 @@ function App() {
                 ))}
               </Switch>
             </InstitutionLayout>
-          </PrivateRoute>{" "}
-          */}
+          </PrivateRoute>
           {/*
             InstitutionRoutes.map(({ id, path, component, exact }) => (
               <PrivateRoute

@@ -6,7 +6,7 @@ import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import HomeIcon from "@mui/icons-material/Home";
 import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
 import { USER_ROLE } from "../../constants/userRole";
-import { useHistory } from "react-router-dom";
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const reservationMenu = (user) => [
   {
@@ -37,7 +37,7 @@ const reservationMenu = (user) => [
     name: "Instituciones",
     url: "/instituciones",
     icon: <EditLocationAltIcon />,
-    visible: true, // hasUserRole(user, [USER_ROLE.ADMIN])
+    visible: hasUserRole(user, [USER_ROLE.SUPER_ADMIN])
   },
   {
     name: "Promociones",
@@ -55,6 +55,12 @@ const reservationMenu = (user) => [
     name: "Feedback",
     url: "/feedback",
     icon: <FeedbackIcon />,
+    visible: hasUserRole(user, [USER_ROLE.ADMIN]),
+  },
+  {
+    name: "Configuracion",
+    url: "/configuracion",
+    icon: <SettingsIcon />,
     visible: hasUserRole(user, [USER_ROLE.ADMIN]),
   }
 ];

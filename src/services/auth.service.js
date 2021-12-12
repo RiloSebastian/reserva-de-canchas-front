@@ -20,19 +20,25 @@ const logout = () => {
     localStorage.removeItem("user");
 }
 
-const register = async (firstName, lastName, email, password, role) => {
-    return await axios.post(API_URL + "signup", {
-        firstName,
-        lastName,
-        email,
-        password,
-        role: "role_customer"
-    });
+const register = async (firstName, lastName, role, email, password) => {
+
+    try {
+        return await axios.post(API_URL + "signup", {
+            firstName,
+            lastName,
+            role,
+            email,
+            password,
+        });
+    } catch (err) {
+        console.log('error al registrar usuario')
+        return Promise.reject(err);
+    }
+
+
 }
 
 const getCurrentUser = () => {
-    console.log('get current user')
-    console.log(JSON.stringify(localStorage.getItem('user')))
     return JSON.stringify(localStorage.getItem('user'));
     //return localStorage.getItem('user');
 }

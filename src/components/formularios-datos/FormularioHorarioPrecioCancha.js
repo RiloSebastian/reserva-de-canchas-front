@@ -15,31 +15,75 @@ import SaveIcon from '@mui/icons-material/Save';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import moment from 'moment';
+import Grid from '@mui/material/Grid';
 
-const FormularioHorarioPrecioCancha = ({ open, setOpen, setHorariosYPrecios }) => {
+const FormularioHorarioPrecioCancha = ({ open, setOpen, horariosYPrecios, setHorariosYPrecios, isMultipleEdit }) => {
+
+    const { excluirDiasNoLaborales, porcentajeSenia } = horariosYPrecios;
 
     //const [open, setOpen] = useState(false);
 
     const [loading, setLoading] = useState(false);
 
+    const [withSenia, setWithSenia] = useState(false);
+
+    const [horario, setHorario] = useState({
+        id: "",
+        desde: moment(new Date('2018-01-01T00:00:00.000Z')),
+        hasta: moment(new Date('2018-01-01T00:00:00.000Z')),
+        precio: "",
+        horarioHabilitado: true,
+    });
+
+    const [senia, setSenia] = useState();
+
     const [horarios, setHorarios] = useState([]);
 
     const [dates, setDates] = useState([]);
 
+    const nuevoHorario = {
+        id: "",
+        desde: new Date(),
+        hasta: new Date(new Date().setHours(new Date().getHours() + 1)),
+        precio: "",
+        horarioHabilitado: true,
+    }
+
     useEffect(() => {
-        const newSchedule = [...horarios, ScheduleAndPrice];
+
+        //traer los horarios guardados por la institucion
+        //getHorarios();
+
+        const newSchedule = [...horarios, nuevoHorario];
         setHorarios(newSchedule);
     }, [])
 
-    /*const handleClickOpen = () => {
-        setOpen(true);
-    };*/
+    const handleChange = (e) => {
+
+        if (e.target.type === 'checkbox') {
+            setHorariosYPrecios((form) => {
+                return { ...form, [e.target.name]: e.target.checked };
+            });
+        } else {
+            setHorariosYPrecios((form) => {
+                return { ...form, [e.target.name]: e.target.value };
+            });
+        }
+
+    }
 
     const handleGuardarHorariosYPrecios = () => {
 
         setLoading(true);
 
-        setHorariosYPrecios()
+        setHorariosYPrecios((body) => {
+            return { ...body, ['horarios']: horarios };
+        });
+
+        // saveHorarios(horarios);
 
         setOpen(false);
 
@@ -54,10 +98,25 @@ const FormularioHorarioPrecioCancha = ({ open, setOpen, setHorariosYPrecios }) =
 
     const handleAddNewSchedule = () => {
 
-        const newSchedule = [...horarios, ScheduleAndPrice];
+        const newSchedule = [...horarios, nuevoHorario];
         setHorarios(newSchedule);
 
     };
+
+    const removeHorario = (id) => {
+
+        if (window.confirm("Esta Seguro que desea eliminar este horario?" + id)) {
+
+            setHorarios(
+                (horarios) => {
+
+                    return horarios.filter((horario) => horario.id !== id);
+
+                }
+            )
+        }
+
+    }
 
     return (
         <div>
@@ -73,29 +132,45 @@ const FormularioHorarioPrecioCancha = ({ open, setOpen, setHorariosYPrecios }) =
                     </DialogContentText>
 
                     <Box textAlign='center' sx={{ m: 4 }}>
-                        <SelectDate setDates={setDates} />
+                        <SelectDate setHorariosYPrecios={setHorariosYPrecios} />
                     </Box>
 
-                    <Box textAlign='center' sx={{ m: 4 }}>
-                        <FormGroup>
-                            <FormControlLabel control={<Checkbox defaultChecked />} label="Excluir dias no Laborales" />
-                        </FormGroup>
-                    </Box>
+                    <Grid sx={{ flexGrow: 1 }} container spacing={2}>
+                        <Box textAlign='center' sx={{ m: 1 }}>
+                            <FormGroup>
+                                <FormControlLabel control={<Checkbox name="excluirDiasNoLaborales" checked={excluirDiasNoLaborales} onChange={handleChange} defaultChecked />} label="Excluir dias no Laborales" />
+                            </FormGroup>
+                        </Box>
+
+                    </Grid>
+                    {
+                        isMultipleEdit && <Box textAlign='left' sx={{ m: 4 }}>
+                            <TextField
+                                disabled={withSenia}
+                                label="Porcentaje de Seña"
+                                id="porcentaje"
+                                sx={{ m: 1, width: '25ch' }}
+                                name="senia"
+                                onChange={handleChange}
+                                value={senia}
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start">%</InputAdornment>,
+                                }}
+                            />
+                        </Box>
+                    }
 
                     {
-                        horarios.length === 0 ? (
-                            <Box textAlign='center' sx={{ m: 4 }}>
-                                <ScheduleAndPrice />
-                            </Box>
-                        )
-                            : (
-                                horarios.map((ScheduleAndPrice, i) => {
-                                    return (
-                                        <Box textAlign='center' sx={{ m: 4 }}>
-                                            <ScheduleAndPrice key={i} />
-                                        </Box>
-                                    )
-                                }))
+
+                        horarios.map((horario, key) => {
+                            horario.id = key;
+
+                            return (
+                                <Box key={key} textAlign='center' sx={{ m: 4 }}>
+                                    <ScheduleAndPrice key={key} horario={horario} removeHorario={removeHorario} setHorarios={setHorarios} setHorariosYPrecios={setHorariosYPrecios} />
+                                </Box>
+                            )
+                        })
                     }
 
 
