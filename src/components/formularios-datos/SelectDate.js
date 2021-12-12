@@ -8,27 +8,35 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import moment from 'moment';
 import Grid from '@mui/material/Grid';
 
-const SelectDate = ({ setDates }) => {
+const SelectDate = ({ setHorariosYPrecios }) => {
 
-    const [desde, setDesde] = useState(moment(new Date()));
-    const [hasta, setHasta] = useState(moment(new Date()));
+    const [desde, setDesde] = useState(moment(new Date()).format('YYYY-MM-DD'));
+    const [hasta, setHasta] = useState(moment(new Date()).format('YYYY-MM-DD'));
 
     useEffect(() => {
 
         let dates = getDates(desde, hasta);
 
-        setDates(dates);
+        setHorariosYPrecios((body) => {
+            return { ...body, ['dates']: dates };
+        });
 
     }, [desde, hasta]);
 
     const getDates = (startDate, stopDate) => {
-        let dateArray = [];
-        let currentDate = moment(startDate);
-        let lastDate = moment(stopDate);
-        while (currentDate <= lastDate) {
-            dateArray.push(moment(currentDate).format('YYYY-MM-DD'))
-            currentDate = moment(currentDate).add(1, 'days');
+        var dateArray = [];
+
+        var currentDate = moment(startDate).clone();
+        var lastDate = moment(stopDate);
+
+        while (currentDate.isSameOrBefore(lastDate)) {
+            dateArray.push(currentDate.format('YYYY-MM-DD'))
+            currentDate.add(1, "day");
         }
+
+        console.log('array dates')
+        console.log(dateArray)
+
         return dateArray;
     }
 

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState, forwardRef } from 'react'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,7 +12,46 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import AuthService from '../../services/auth.service'
+import AuthService from '../../services/auth.service';
+import { useTheme } from '@mui/material/styles';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import TipoUsuarioService from '../../services/tipoUsuarios/TipoUsuarioService';
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+};
+
+const tiposDeUsuarios = [
+    {
+        key: 'ROLE_CUSTOMER',
+        name: 'Cliente'
+    },
+    {
+        key: 'ROLE_ADMIN',
+        name: 'Administrador de Institucion'
+    }
+];
+
+function getStyles(name, tipoUsuario, theme) {
+    return {
+        fontWeight:
+            tipoUsuario.indexOf(name) === -1
+                ? theme.typography.fontWeightRegular
+                : theme.typography.fontWeightMedium,
+    };
+}
+
 
 function Copyright(props) {
     return (
@@ -30,6 +69,16 @@ function Copyright(props) {
 const theme = createTheme();
 
 const SignUp = () => {
+
+    const theme = useTheme();
+    const [tipoUsuario, setTipoUsuario] = useState([]);
+
+    const handleChange = (event) => {
+
+        console.log(event.target)
+        setTipoUsuario(event.target.value);
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -39,7 +88,11 @@ const SignUp = () => {
             password: data.get('password'),
         });
 
-        AuthService.register(data.get('firstName'), data.get('lastName'), data.get('email'), data.get('password'));
+        try {
+            AuthService.register(data.get('firstName'), data.get('lastName'), data.get('tipoUsuario'), data.get('email'), data.get('password'));
+        } catch (error) {
+            console.log('error al registrar usuario')
+        }
 
     };
 
@@ -95,6 +148,29 @@ const SignUp = () => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label">Tipo de Usuario</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={tipoUsuario}
+                                        label="Tipo de Usuario"
+                                        name="tipoUsuario"
+                                        onChange={handleChange}
+                                    >
+                                        {tiposDeUsuarios.map((tipo) => (
+                                            <MenuItem
+                                                key={tipo.key}
+                                                value={tipo.key}
+                                                style={getStyles(tipo.name, tipo.name, theme)}
+                                            >
+                                                {tipo.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
                                 <TextField
                                     required
                                     fullWidth
@@ -127,7 +203,7 @@ const SignUp = () => {
                         </Button>
                         <Grid container justifyContent="flex-end">
                             <Grid item>
-                                <Link href="#" variant="body2">
+                                <Link href="/login" variant="body2">
                                     Already have an account? Sign in
                                 </Link>
                             </Grid>

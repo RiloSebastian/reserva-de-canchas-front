@@ -37,6 +37,12 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import DeleteIcon from '@mui/icons-material/Delete';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { useHistory } from "react-router-dom";
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Input from '@mui/material/Input';
 
 /*const useStyles = makeStyles(() =>
   createStyles({
@@ -89,120 +95,128 @@ const itemData = [
         title: 'Camera',
         author: '@helloimnik',
     },
-    {
-        img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-        title: 'Coffee',
-        author: '@nolanissac',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-        title: 'Hats',
-        author: '@hjrc33',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
-        title: 'Honey',
-        author: '@arwinneil',
-        featured: true,
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
-        title: 'Basketball',
-        author: '@tjdragotta',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
-        title: 'Fern',
-        author: '@katie_wasserman',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
-        title: 'Mushrooms',
-        author: '@silverdalex',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af',
-        title: 'Tomato basil',
-        author: '@shelleypauls',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1471357674240-e1a485acb3e1',
-        title: 'Sea star',
-        author: '@peterlaster',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
-        title: 'Bike',
-        author: '@southside_customs',
-    },
 ];
 
-const Input = styled('input')({
+const InputImage = styled('input')({
     display: 'none',
 });
 
-const tableIcons = {
-    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
-    Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
-    Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
-    DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
-    Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
-    Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
-    FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
-    LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
-    NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
-    ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
-    SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
-    ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
-};
+
 
 const ListaCanchas = ({ institutionId }) => {
+
+    const tableIcons = {
+        Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
+        Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
+        Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+        Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
+        DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+        Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
+        Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
+        Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
+        FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
+        LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
+        NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+        PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
+        ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+        Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
+        SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
+        ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
+        ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
+    };
+
+    const history = useHistory();
 
     const classes = useStyles();
 
     const [open, setOpen] = useState(false);
 
+    const [isMultipleEdit, setIsMultipleEdit] = useState(false);
+
+    const [enableButtons, setEnableButtons] = useState(true);
+
     const [data, setData] = useState([]);
 
     const [images, setImages] = useState([]);
 
-    const [horariosYPrecios, setHorariosYPrecios] = useState({});
+    const [horariosYPrecios, setHorariosYPrecios] = useState({
+        excluirDiasNoLaborales: true
+    });
 
     const [sport, setSport] = useState({});
 
+    const [switchState, setSwitchState] = useState(false);
+
+    const handleSwitchChange = (oldRow, e) => {
+        const changeData = { [e.target.name]: e.target.checked };
+        const newRow = { ...oldRow, ...changeData };
+
+        console.log('habilitando canchsa')
+        console.log(changeData)
+        console.log(oldRow)
+        console.log(newRow)
+    };
+
+    const ariaLabel = { 'aria-label': 'description' };
+
     const columns = [
-        { title: 'Nombre Cancha', field: 'name' },
+        { title: 'Nombre Cancha', field: 'name', validate: rowData => rowData.name === undefined || rowData.name === '' ? { isValid: false, helperText: 'El nombre de la cancha no puede estar vacio' } : true, },
         { title: 'Descripcion', field: 'description' },
         //{ title: 'Birth Year', field: 'birthYear', type: 'numeric' },
         {
             title: 'Deporte',
             field: 'sport',
-            lookup: sport
+            validate: rowData => rowData.sport === undefined ? { isValid: false, helperText: 'Debe seleccionar un deporte para la cancha' } : true,
+            lookup: sport,
+            render: rowData => rowData.sport.name,
+        },
+        {
+            title: 'Seña',
+            field: 'signPercentage',
+            type: 'numeric',
+            // validate: rowData => rowData.signPercentage === undefined || (rowData.sensignPercentageia >= 0 && rowData.signPercentage <= 100),
+            render: rowData => rowData.signPercentage === undefined || rowData.signPercentage === 0 ? 'no requiere seña' : '% ' + rowData.signPercentage,
+            editComponent: (props) => (
+                <TextField
+                    id="standard-start-adornment"
+                    type="number"
+                    size="small"
+                    value={props.value}
+                    helperText={props.value < 0 || props.value > 100 ? 'La Seña debe ser entre 0 y 100' : ''}
+                    onChange={e => props.onChange(e.target.value)}
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">%</InputAdornment>,
+                    }}
+                    variant="standard"
+                />
+            )
+        },
+        {
+            title: 'Estado',
+            field: 'enabled',
+            render: rowData => rowData.enabled ? 'Habilidata' : 'Deshabilitada',
+            editComponent: (props) => (<FormControlLabel control={<Switch onChange={e => props.onChange(e.target.checked)} checked={props.value} />} label={props.value ? 'Habilitada' : 'Deshabilitada'} />),
         },
         {
             field: 'horarios',
             filtering: false,
-            editComponent: (props) => (
+            editComponent: props => (
                 <Button
                     color="info"
                     variant="contained"
                     onClick={desplegarModal}>
                     Agregar Horarios y Precios
-                </Button>
-            )
+                </Button >)
+
         },
         {
-            field: 'imagenes',
+            field: 'images',
             filtering: false,
             editComponent: props => (
                 <label htmlFor="icon-button-file">
-                    <Input
+                    <InputImage
                         accept="image/*"
+                        multiple
                         id="icon-button-file"
                         type="file"
                         //value={props.value}
@@ -216,110 +230,143 @@ const ListaCanchas = ({ institutionId }) => {
         },
     ];
 
-    /*const [data, setData] = useState([
-        { name: 'Cancha 1', description: 'Cancha de Polvo de Ladrillos', sport: 1 },
-        { name: 'Cancha 2', description: 'Cancha de Cemento', sport: 1 },
-        { name: 'Futbol 1', description: 'Cancha de 5 Sintetica', sport: 2 },
-        { name: 'Futbol 2', description: 'Cancha de 9 de pasto natural', sport: 2 },
-        { name: 'Cancha 2', description: 'Cancha de Cemento', sport: 3 },
-    ]);*/
-
-
-
     useEffect(() => {
 
         retrieveCourts("61a6d2b35df5ed18eec54355");
         retrieveSportsList();
 
-    }, []);
-
-    useEffect(() => {
-        console.log('trayendo deportes');
-        //retrieveSportsList();
-        const listadoDeportes = DeporteService.getAll();
-
-        const data = listadoDeportes.data;
-
-        if (data) {
-            console.log('before set sports');
-            console.log(data);
-
-            const sport = {};
-            data.map(s => sport[0] = s.name);
-
-            console.log('converted');
-            console.log(sport);
-
-            // setSport({ 0: 'hockeuy' })
-
-
-        }
 
     }, []);
 
     const handleUploadImage = (event) => {
 
-        let file = event.target.files[0];
-        let imageData = new FormData();
-        imageData.append('imageFile', event.target.files[0])
+        let images = [];
 
-        console.log('guardando imagen');
-        console.log(imageData.values);
-        console.log(file);
-        console.log(URL.createObjectURL(file));
+        for (let i = 0; i < event.target.files.length; i++) {
+            images.push(URL.createObjectURL(event.target.files[i]))
+        }
+
+        setImages({
+            progressInfos: [],
+            message: [],
+            selectedFiles: event.target.files,
+            previewImages: images
+        });
+
+
+        /*    let file = event.target.files[0];
+            let imageData = new FormData();
+            imageData.append('imageFile', event.target.files[0])
+        
+            console.log('guardando imagen');
+            console.log(imageData.values);
+            console.log(file);
+            console.log(URL.createObjectURL(file));
+            setImages(file)*/
 
     }
 
     const retrieveCourts = async (institutionId) => {
-        const listadoCanchas = await CanchaService.getAll(institutionId);
 
-        const data = listadoCanchas.data;
+        try {
+            const listadoCanchas = await CanchaService.getAll(institutionId);
 
-        console.log('courts')
-        console.log(data)
+            console.log('listadoCanchas');
+            console.log(listadoCanchas);
 
-        if (data) {
-            setData(data);
+            const data = listadoCanchas.data;
+
+            if (data) {
+                setData(data);
+            }
+        } catch (err) {
+            history.push("/login");
         }
+
 
     };
 
     const retrieveSportsList = async () => {
-        const listadoDeportes = await DeporteService.getAll();
 
-        const data = listadoDeportes.data;
+        try {
+            const listadoDeportes = await DeporteService.getAll();
 
-        if (data) {
-            console.log('before set sports');
-            console.log(data);
+            console.log('listadoDeportes');
+            console.log(listadoDeportes);
 
-            const sport = {};
-            data.map(s => sport[s.sport_id] = s.name);
+            const data = listadoDeportes.data;
 
-            console.log('converted');
-            console.log(sport);
+            if (data) {
 
-            setSport(sport)
+                const sport = {};
+                data.map(s => sport[s.id] = s.name);
+
+                console.log(sport);
+
+                setSport(sport)
+            }
+        } catch (err) {
+            history.push("/login");
         }
+
 
     };
 
 
     const desplegarModal = (props) => {
-
-        // horarios
-
+        setIsMultipleEdit(false)
         setOpen(true)
+
+    }
+
+    const desplegarModalForMultipleEdit = (props) => {
+
+        setIsMultipleEdit(true)
+        setOpen(true)
+
     }
 
     const createCancha = async (newCancha) => {
 
         console.log('newCancha')
-        console.log(newCancha)
 
-        // const cancha = await CanchaService.create("61a6d2b35df5ed18eec54355", newCancha);
-        //const data = cancha.data;
-        return newCancha;
+        //const cancha = { ...newCancha, ['horarios']: horariosYPrecios, ['images']: images }
+        const cancha = { ...newCancha, ['horarios']: horariosYPrecios }
+
+        console.log(cancha)
+
+        const canchaCreated = await CanchaService.create("61a6d2b35df5ed18eec54355", cancha);
+        const data = canchaCreated.data;
+
+        console.log('cancha creada')
+        console.log(canchaCreated)
+        console.log(data)
+        return data;
+    }
+
+    const updateCancha = async (canchaToUpdated) => {
+
+        console.log('canchaToUpdated')
+
+        //const cancha = { ...newCancha, ['horarios']: horariosYPrecios, ['images']: images }
+        const cancha = { ...canchaToUpdated, ['horarios']: horariosYPrecios }
+
+        console.log(cancha)
+
+        const canchaUpdated = await CanchaService.update("61a6d2b35df5ed18eec54355", cancha);
+        const data = canchaUpdated.data;
+
+        console.log('cancha actualizada')
+        console.log(canchaUpdated)
+        console.log(data)
+        return data;
+    }
+
+    const deleteCancha = async (id) => {
+
+        const canchaCreated = await CanchaService.remove("61a6d2b35df5ed18eec54355", id);
+        const data = canchaCreated.data;
+        return data;
     }
 
     return (
@@ -329,19 +376,36 @@ const ListaCanchas = ({ institutionId }) => {
                 title="Listado de Canchas"
                 localization={{
                     pagination: {
-                        labelDisplayedRows: '{from}-{to} de {count}'
+                        labelDisplayedRows: '{from}-{to} de {count}',
+                        labelRowsSelect: 'canchas',
+                        nextTooltip: 'Proxima Pagina',
+                        previousTooltip: 'Pagina Previa',
+                        firstTooltip: 'Primer Pagina',
+                        lastTooltip: 'Ultima Pagina'
                     },
                     toolbar: {
-                        nRowsSelected: '{0} cancha(s) seleccionada(s)'
+                        nRowsSelected: '{0} cancha(s) seleccionada(s)',
+                        searchTooltip: 'Buscar',
+                        searchPlaceholder: 'Buscar Cancha'
                     },
                     header: {
                         actions: 'Opciones'
                     },
                     body: {
+                        addTooltip: 'Agregar Nueva Cancha',
+                        editTooltip: 'Editar Cancha',
+                        deleteTooltip: 'Eliminar Cancha',
                         emptyDataSourceMessage: 'Aun no existen canchas asociadas a la institucion',
                         filterRow: {
                             filterTooltip: 'Filter'
+                        },
+                        editRow: {
+                            saveTooltip: 'Guardar Cancha',
+                            cancelTooltip: 'Cancelar'
                         }
+                    },
+                    grouping: {
+                        placeholder: 'Arrastre los encabezados aquí para agruparlos'
                     }
                 }}
                 columns={columns}
@@ -353,7 +417,7 @@ const ListaCanchas = ({ institutionId }) => {
                 }}
                 detailPanel={[
                     {
-                        tooltip: 'Show Name',
+                        tooltip: 'Mostrar Imagenes',
                         render: rowData => {
                             return (
                                 <ImageList style={{ display: 'flex', flexDirection: 'row', padding: 0 }} rowHeight={164}>
@@ -393,12 +457,12 @@ const ListaCanchas = ({ institutionId }) => {
                     {
                         tooltip: 'Eliminar todas las canchas seleccionadas',
                         icon: Delete,
-                        onClick: (evt, data) => alert('You want to delete ' + data.length + ' rows')
+                        onClick: (evt, data) => alert('Quieres eliminar ' + data.length + ' Canchas')
                     },
                     {
                         tooltip: 'Editar Horarios',
                         icon: Edit,
-                        onClick: (evt, data) => alert('You want to delete ' + data.length + ' rows')
+                        onClick: (evt, data) => desplegarModalForMultipleEdit()
                     }
                 ]}
                 editable={{
@@ -411,46 +475,43 @@ const ListaCanchas = ({ institutionId }) => {
                             console.log('agregar cancha a la lista')
                             console.log(cancha)
 
-                            setData([...data, newData]);
+                            setData([...data, cancha]);
 
                             resolve();
-                        })
-
-                        /*new Promise((resolve, reject) => {
-
-                            const cancha = createCancha(newData);
-                            
-                            setTimeout(() => {
-                                setData([...data, newData]);
-
-                                resolve();
-                            }, 1000)
-                        })*/,
+                        }),
                     onRowUpdate: (newData, oldData) =>
-                        new Promise((resolve, reject) => {
-                            setTimeout(() => {
-                                const dataUpdate = [...data];
-                                const index = oldData.tableData.id;
-                                dataUpdate[index] = newData;
-                                setData([...dataUpdate]);
+                        new Promise(async (resolve, reject) => {
 
-                                resolve();
-                            }, 1000)
+                            const cancha = await updateCancha(newData);
+
+                            console.log('actualizar cancha')
+                            console.log(cancha)
+
+                            const dataUpdate = [...data];
+                            const index = oldData.tableData.id;
+                            dataUpdate[index] = cancha;
+                            setData([...dataUpdate]);
+
+                            resolve();
                         }),
                     onRowDelete: oldData =>
-                        new Promise((resolve, reject) => {
-                            setTimeout(() => {
-                                const dataDelete = [...data];
-                                const index = oldData.tableData.id;
-                                dataDelete.splice(index, 1);
-                                setData([...dataDelete]);
+                        new Promise(async (resolve, reject) => {
 
-                                resolve()
-                            }, 1000)
+                            console.log('eliminando cancha')
+                            console.log(oldData)
+
+                            const cancha = await deleteCancha(oldData.id);
+
+                            const dataDelete = [...data];
+                            const index = oldData.tableData.id;
+                            dataDelete.splice(index, 1);
+                            setData([...dataDelete]);
+
+                            resolve()
                         }),
                 }}
             />
-            {open && <FormularioHorarioPrecioCancha open={open} setOpen={setOpen} setHorariosYPrecios={setHorariosYPrecios} />}
+            {open && <FormularioHorarioPrecioCancha open={open} setOpen={setOpen} horariosYPrecios={horariosYPrecios} setHorariosYPrecios={setHorariosYPrecios} isMultipleEdit={isMultipleEdit} />}
 
         </>
     )

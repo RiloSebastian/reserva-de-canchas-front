@@ -30,6 +30,7 @@ import { Link, NavLink as RouterLink } from 'react-router-dom';
 import ReservationsRoutes, { BASE_URL } from '../../pages/routes';
 import { Route, Switch } from 'react-router';
 import AuthService from '../../services/auth.service';
+import { USER_ROLE } from '../../constants/userRole';
 
 const drawerWidth = 240;
 

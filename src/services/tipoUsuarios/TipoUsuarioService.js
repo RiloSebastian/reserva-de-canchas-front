@@ -1,9 +1,9 @@
 import http from '../../http-common'
 import AuthHeader from '../auth-header';
 
-const getAll = async () => {
+const getAllForSignUp = async () => {
     try {
-        const listadoDeportes = await http.get(`/sports`, { headers: AuthHeader() });
+        const listadoDeportes = await http.get(`/roles`);
         console.log('listado de deportes');
         console.log(listadoDeportes);
         return listadoDeportes;
@@ -14,5 +14,5 @@ const getAll = async () => {
 };
 
 export default {
-    getAll,
+    getAllForSignUp,
 };
