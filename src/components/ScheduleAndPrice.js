@@ -15,6 +15,35 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import NumberFormat from 'react-number-format';
+import PropTypes from 'prop-types';
+
+const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
+    const { onChange, ...other } = props;
+
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={ref}
+            onValueChange={(values) => {
+                onChange({
+                    target: {
+                        name: props.name,
+                        value: values.value,
+                    },
+                });
+            }}
+            thousandSeparator
+            isNumericString
+            prefix="$"
+        />
+    );
+});
+
+NumberFormatCustom.propTypes = {
+    name: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+};
 
 const useStyles = makeStyles((theme) => ({
     ...theme.typography.body2,
@@ -26,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ScheduleAndPrice = ({ horario, removeHorario, setHorarios, setHorariosYPrecios }) => {
 
-    const { id, precio, horarioHabilitado, desde, hasta } = horario;
+    const { id, precio, enabled, from, to } = horario;
 
     const classes = useStyles();
 
@@ -42,13 +71,7 @@ const ScheduleAndPrice = ({ horario, removeHorario, setHorarios, setHorariosYPre
         if (e.target.type === 'checkbox') {
             setHorarios((horarios) => {
 
-                console.log('modificando horarios')
-                console.log(horarios)
-
                 let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, [e.target.name]: e.target.checked } : horario);
-
-                console.log('despues de modificarlos')
-                console.log(horariosUpdated)
 
                 return [...horariosUpdated];
 
@@ -57,13 +80,7 @@ const ScheduleAndPrice = ({ horario, removeHorario, setHorarios, setHorariosYPre
 
             setHorarios((horarios) => {
 
-                console.log('modificando horarios')
-                console.log(horarios)
-
                 let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, [e.target.name]: e.target.value } : horario);
-
-                console.log('despues de modificarlos')
-                console.log(horariosUpdated)
 
                 return [...horariosUpdated];
             });
@@ -71,35 +88,48 @@ const ScheduleAndPrice = ({ horario, removeHorario, setHorarios, setHorariosYPre
 
     }
 
+    /* useEffect(() => {
+ 
+         let fromTime = moment(moment(from, 'HH:mm'));
+         let toTime = moment(moment(to, 'HH:mm'));
+ 
+         console.log(fromTime)
+         console.log(toTime)
+ 
+         let duration = moment.duration(toTime.diff(fromTime));
+ 
+         console.log(duration)
+ 
+         let diff = duration.hours();
+         let array = [];
+ 
+         for (var i = 0; diff > i; i++) {
+             let result = moment(fromTime).add(i, 'hours').format('HH:mm')
+             array.push({
+                 result
+             })
+         }
+ 
+         console.log(array)
+     }, [from, to])*/
+
     useEffect(() => {
 
-        let fromTime = moment(moment(desde, 'HH:mm'));
-        let toTime = moment(moment(hasta, 'HH:mm'));
+        setHorarios((horarios) => {
 
-        console.log(fromTime)
-        console.log(toTime)
+            let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['from']: from } : horario);
 
-        let duration = moment.duration(toTime.diff(fromTime));
+            return [...horariosUpdated];
+        });
 
-        console.log(duration)
+        setHorarios((horarios) => {
 
-        let diff = duration.hours();
-        let array = [];
+            let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['to']: to } : horario);
 
-        for (var i = 0; diff > i; i++) {
-            let result = moment(fromTime).add(i, 'hours').format('HH:mm')
-            array.push({
-                result
-            })
-        }
+            return [...horariosUpdated];
+        });
 
-        console.log(array)
-    }, [desde, hasta])
-
-    useEffect(() => {
-        console.log('en useeffect')
-        console.log(horario)
-    }, [])
+    }, []);
 
     return (
         <Paper className={classes}>
@@ -108,12 +138,17 @@ const ScheduleAndPrice = ({ horario, removeHorario, setHorarios, setHorariosYPre
                     <Grid item xs>
                         <MobileTimePicker
                             label="Desde"
-                            name="desde"
-                            value={desde}
+                            name="from"
+                            value={from}
                             onChange={(newValue) => {
+
+                                /* setHorariosYPrecios((body) => {
+                                     return { ...body, ['schedules']: horarios };
+                                 });*/
+
                                 setHorarios((horarios) => {
 
-                                    let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['desde']: newValue } : horario);
+                                    let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['from']: newValue } : horario);
 
                                     return [...horariosUpdated];
                                 });
@@ -124,42 +159,47 @@ const ScheduleAndPrice = ({ horario, removeHorario, setHorarios, setHorariosYPre
                     <Grid item xs>
                         <MobileTimePicker
                             label="Hasta"
-                            name="hasta"
-                            value={hasta}
+                            name="to"
+                            value={to}
                             onChange={(newValue) => {
+
                                 setHorarios((horarios) => {
 
-                                    let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['hasta']: newValue } : horario);
+                                    let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['to']: newValue } : horario);
 
                                     return [...horariosUpdated];
                                 });
+
+                                /*     setHorariosYPrecios((body) => {
+     
+                                         return { ...body, ['schedules']: horarios };
+                                     });*/
                             }}
                             renderInput={(params) => <TextField {...params} />}
                             shouldDisableTime={(timeValue, clockType) => {
 
-                                console.log('desde')
-                                console.log(desde)
-                                if (clockType === 'minutes' && timeValue !== desde.getMinutes()) {
+                                if (clockType === 'minutes' && timeValue !== from.getMinutes()) {
                                     return true;
                                 }
 
                                 return false;
                             }}
-                            minTime={new Date(new Date(desde).setHours(desde.getHours() + 1))}
+                            minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
                         />
                     </Grid>
                 </LocalizationProvider >
 
                 <Grid item xs>
                     <TextField
-                        name='precio'
+                        name='price'
                         value={precio}
+                        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                         label="Precio /hr"
                         onChange={handleChange}
                         id="outlined-start-adornment"
                         sx={{ m: 1, width: '25ch' }}
                         InputProps={{
-                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                            inputComponent: NumberFormatCustom,
                         }}
                     />
                 </Grid>
@@ -170,8 +210,8 @@ const ScheduleAndPrice = ({ horario, removeHorario, setHorarios, setHorariosYPre
                         inputProps={{ 'aria-label': 'controlled' }}
                     />*/}
                     <FormControlLabel
-                        control={<Switch name='horarioHabilitado' onChange={handleChange} checked={horarioHabilitado} color="primary" />}
-                        label={horarioHabilitado ? 'Activo' : 'Inactivo'}
+                        control={<Switch name='enabled' onChange={handleChange} checked={enabled} color="primary" />}
+                        label={enabled ? 'Activo' : 'Inactivo'}
                         labelPlacement="activo"
                     />
                 </Grid >

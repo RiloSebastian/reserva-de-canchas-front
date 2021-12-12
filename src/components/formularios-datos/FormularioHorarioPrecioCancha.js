@@ -46,10 +46,10 @@ const FormularioHorarioPrecioCancha = ({ open, setOpen, horariosYPrecios, setHor
 
     const nuevoHorario = {
         id: "",
-        desde: new Date(),
-        hasta: new Date(new Date().setHours(new Date().getHours() + 1)),
-        precio: "",
-        horarioHabilitado: true,
+        from: new Date(),
+        to: new Date(new Date().setHours(new Date().getHours() + 1)),
+        price: "",
+        enabled: true,
     }
 
     useEffect(() => {
@@ -80,7 +80,7 @@ const FormularioHorarioPrecioCancha = ({ open, setOpen, horariosYPrecios, setHor
         setLoading(true);
 
         setHorariosYPrecios((body) => {
-            return { ...body, ['horarios']: horarios };
+            return { ...body, ['schedules']: horarios };
         });
 
         // saveHorarios(horarios);
@@ -98,7 +98,12 @@ const FormularioHorarioPrecioCancha = ({ open, setOpen, horariosYPrecios, setHor
 
     const handleAddNewSchedule = () => {
 
+        console.log('agregando nuevo horario')
+        console.log(nuevoHorario)
+
         const newSchedule = [...horarios, nuevoHorario];
+
+        console.log(newSchedule);
         setHorarios(newSchedule);
 
     };

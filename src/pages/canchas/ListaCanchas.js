@@ -43,6 +43,7 @@ import { useHistory } from "react-router-dom";
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Input from '@mui/material/Input';
+import moment from 'moment';
 
 /*const useStyles = makeStyles(() =>
   createStyles({
@@ -198,7 +199,7 @@ const ListaCanchas = ({ institutionId }) => {
             editComponent: (props) => (<FormControlLabel control={<Switch onChange={e => props.onChange(e.target.checked)} checked={props.value} />} label={props.value ? 'Habilitada' : 'Deshabilitada'} />),
         },
         {
-            field: 'horarios',
+            field: 'schedule',
             filtering: false,
             editComponent: props => (
                 <Button
@@ -331,7 +332,12 @@ const ListaCanchas = ({ institutionId }) => {
         console.log('newCancha')
 
         //const cancha = { ...newCancha, ['horarios']: horariosYPrecios, ['images']: images }
-        const cancha = { ...newCancha, ['horarios']: horariosYPrecios }
+        //let cancha = { ...newCancha, ['schedule']: horariosYPrecios }
+
+        const horarios = horariosYPrecios.schedules.map(s => s ? { ...s, ['from']: moment(s.from).format('HH:mm'), ['to']: moment(s.to).format('HH:mm') } : s)
+        horariosYPrecios.schedules = horarios;
+
+        const cancha = { ...newCancha, ['schedule']: horariosYPrecios }
 
         console.log(cancha)
 
@@ -349,7 +355,7 @@ const ListaCanchas = ({ institutionId }) => {
         console.log('canchaToUpdated')
 
         //const cancha = { ...newCancha, ['horarios']: horariosYPrecios, ['images']: images }
-        const cancha = { ...canchaToUpdated, ['horarios']: horariosYPrecios }
+        const cancha = { ...canchaToUpdated, ['schedule']: horariosYPrecios }
 
         console.log(cancha)
 
