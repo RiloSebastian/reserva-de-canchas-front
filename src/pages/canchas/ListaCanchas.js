@@ -44,6 +44,8 @@ import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Input from '@mui/material/Input';
 import moment from 'moment';
+import PhotoService from '../../services/photos/PhotoService';
+import MuiAlert from '@mui/material/Alert';
 
 /*const useStyles = makeStyles(() =>
   createStyles({
@@ -53,6 +55,10 @@ import moment from 'moment';
     },
   })
 );*/
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 function srcset(image, width, height) {
     return {
@@ -138,7 +144,16 @@ const ListaCanchas = ({ institutionId }) => {
 
     const [data, setData] = useState([]);
 
-    const [images, setImages] = useState([]);
+    const [photoData, setPhotoData] = useState([]);
+
+    const [images, setImages] = useState({
+        selectedFiles: undefined,
+        previewImages: [],
+        progressInfos: [],
+        message: [],
+
+        imageInfos: [],
+    });
 
     const [horariosYPrecios, setHorariosYPrecios] = useState({
         excluirDiasNoLaborales: true
@@ -278,6 +293,42 @@ const ListaCanchas = ({ institutionId }) => {
             const data = listadoCanchas.data;
 
             if (data) {
+
+                data.forEach(court => {
+
+                    console.log('obteniendo imagenes')
+                    console.log(court)
+
+                    if (court.images_id !== null) {
+                        let photos = [];
+
+                        court.images_id.forEach(image_id => {
+
+                            photos.push({
+                                img: 'http://localhost:8080/api/photos/' + image_id,
+                                title: 'Breakfast',
+                                author: '@bkristastucchio',
+                                featured: true,
+                            })
+
+                        })
+
+
+                        console.log('array de photos')
+                        console.log(photos)
+
+                        court.photos = photos;
+
+
+                    } else {
+
+                    }
+
+                });
+
+                console.log('final data')
+                console.log(data)
+
                 setData(data);
             }
         } catch (err) {
@@ -343,6 +394,22 @@ const ListaCanchas = ({ institutionId }) => {
 
         const canchaCreated = await CanchaService.create("61a6d2b35df5ed18eec54355", cancha);
         const data = canchaCreated.data;
+
+
+        for (let i = 0; i < images.selectedFiles.length; i++) {
+            const photoAdded = await PhotoService.upload(data.id, images.selectedFiles[i]);
+
+            console.log('photoAdded');
+            console.log(photoAdded);
+
+            setPhotoData((photos) => [...photos, {
+                img: photoAdded.data,
+                title: 'Breakfast',
+                author: '@bkristastucchio',
+                featured: true,
+            }])
+
+        }
 
         console.log('cancha creada')
         console.log(canchaCreated)
@@ -426,11 +493,13 @@ const ListaCanchas = ({ institutionId }) => {
                         tooltip: 'Mostrar Imagenes',
                         render: rowData => {
                             return (
-                                <ImageList style={{ display: 'flex', flexDirection: 'row', padding: 0 }} rowHeight={164}>
-                                    {itemData.map((item) => (
+                                <ImageList sx={{ width: 500, height: 500 }} style={{ display: 'flex', flexDirection: 'row', padding: 0 }} rowHeight={164}>
+                                    {rowData.photos.length > 0 ? (rowData.photos.map((item) => (
                                         <ImageListItem key={item.img} >
                                             <img
-                                                {...srcset(item.img, 250, 250, 0, 0)}
+                                                //{...srcset(item.img, 250, 250, 0, 0)}
+                                                src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
+                                                srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
                                                 alt={item.title}
                                                 loading="lazy"
                                             />
@@ -453,7 +522,13 @@ const ListaCanchas = ({ institutionId }) => {
                                                 actionPosition="left"
                                             />
                                         </ImageListItem>
-                                    ))}
+                                    ))) :
+                                        (
+                                            <Grid container justifyContent="center">
+                                                <Alert severity="warning">no hay imagenes cargadas para esta cancha</Alert>
+                                            </Grid>
+                                        )
+                                    }
                                 </ImageList>
                             )
                         },
