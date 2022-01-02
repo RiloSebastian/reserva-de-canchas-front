@@ -493,43 +493,42 @@ const ListaCanchas = ({ institutionId }) => {
                         tooltip: 'Mostrar Imagenes',
                         render: rowData => {
                             return (
-                                <ImageList sx={{ width: 500, height: 500 }} style={{ display: 'flex', flexDirection: 'row', padding: 0 }} rowHeight={164}>
-                                    {rowData.photos.length > 0 ? (rowData.photos.map((item) => (
-                                        <ImageListItem key={item.img} >
-                                            <img
-                                                //{...srcset(item.img, 250, 250, 0, 0)}
-                                                src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                                                srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                                                alt={item.title}
-                                                loading="lazy"
-                                            />
-                                            <ImageListItemBar
-                                                sx={{
-                                                    background:
-                                                        'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
-                                                        'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-                                                }}
-                                                title={item.title}
-                                                position="top"
-                                                actionIcon={
-                                                    <IconButton
-                                                        sx={{ color: 'white' }}
-                                                        aria-label={`star ${item.title}`}
-                                                    >
-                                                        <DeleteIcon />
-                                                    </IconButton>
-                                                }
-                                                actionPosition="left"
-                                            />
-                                        </ImageListItem>
-                                    ))) :
-                                        (
-                                            <Grid container justifyContent="center">
-                                                <Alert severity="warning">no hay imagenes cargadas para esta cancha</Alert>
-                                            </Grid>
-                                        )
-                                    }
-                                </ImageList>
+                                rowData.photos.length > 0 ? (
+                                    <ImageList sx={{ width: 500, height: 500 }} style={{ display: 'flex', flexDirection: 'row', padding: 0 }} rowHeight={164}>
+                                        {rowData.photos.map((item) => (
+                                            <ImageListItem key={item.img} >
+                                                <img
+                                                    //{...srcset(item.img, 250, 250, 0, 0)}
+                                                    src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
+                                                    srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                                                    alt={item.title}
+                                                    loading="lazy"
+                                                />
+                                                <ImageListItemBar
+                                                    sx={{
+                                                        background:
+                                                            'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
+                                                            'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+                                                    }}
+                                                    title={item.title}
+                                                    position="top"
+                                                    actionIcon={
+                                                        <IconButton
+                                                            sx={{ color: 'white' }}
+                                                            aria-label={`star ${item.title}`}
+                                                        >
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                    }
+                                                    actionPosition="left"
+                                                />
+                                            </ImageListItem>))}
+                                    </ImageList>
+                                ) : (
+                                    <Grid container justifyContent="center">
+                                        <Alert severity="warning">no hay imagenes cargadas para esta cancha</Alert>
+                                    </Grid>
+                                )
                             )
                         },
                     },
