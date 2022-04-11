@@ -45,9 +45,7 @@ const tableIcons = {
   Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
   Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
   Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
-  DetailPanel: forwardRef((props, ref) => (
-    <ChevronRight {...props} ref={ref} />
-  )),
+  DetailPanel: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
   Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
   Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
   Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
@@ -64,36 +62,19 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
-const CardItemHorarioCancha = ({ open, setOpen }) => {
+const CardItemHorarioCanchaPrueba = ({ open, setOpen }) => {
   const history = useHistory();
-
-  const tableRef = useRef();
-
-  const [selection, setSelection] = useState();
-
-  const [loading, setLoading] = useState(false);
-
-  const [enabled, setEnabled] = useState(true);
-
-  const [horarios, setHorarios] = useState([]);
-
   const [date, setDate] = useState(moment(new Date()));
 
-  useEffect(() => {
-    const newSchedule = [...horarios, ScheduleAndPrice];
-    setHorarios(newSchedule);
-  }, []);
+  const [enabled, setEnabled] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setEnabled(!enabled);
-    /*
-    if (rows.length !== 0) {
-      setEnabled(false);
-    } else {
-      setEnabled(true);
-    }
-    */
-  }, [selection]);
+  const tableRef = useRef();
+  const [selection, setSelection] = useState([]);
+  const [data, setData] = useState([
+    { horario: "20 : 00", precio: 1200.0 },
+    { horario: "21 : 00", precio: 1400.0 },
+  ]);
 
   const handleClose = () => {
     setLoading(true);
@@ -112,10 +93,13 @@ const CardItemHorarioCancha = ({ open, setOpen }) => {
     });
   };
 
-  const handleAddNewSchedule = () => {
-    const newSchedule = [...horarios, ScheduleAndPrice];
-    setHorarios(newSchedule);
-  };
+  useEffect(() => {
+    if (selection.length !== 0) {
+      setEnabled(false);
+    } else {
+      setEnabled(true);
+    }
+  }, [selection]);
 
   return (
     <div>
@@ -139,25 +123,28 @@ const CardItemHorarioCancha = ({ open, setOpen }) => {
             </LocalizationProvider>
           </Box>
           <MaterialTable
+            options={{
+              selection: true,
+              showTitle: false,
+              draggable: false,
+              search: false,
+              paging: false,
+              toolbar: false,
+              detailPanelColumnAlignment: "right",
+              toolbarButtonAlignment: "right",
+            }}
+            onSelectionChange={(rows) => {
+              console.log(selection);
+              setSelection(rows);
+            }}
+            tableRef={tableRef}
             icons={tableIcons}
             columns={[
               { title: "Horario (hs)", field: "horario" },
               { title: "Precio ($)", field: "precio" },
             ]}
-            data={[
-              { horario: "20 : 00", precio: 1200.0 },
-              { horario: "21 : 00", precio: 1400.0 },
-            ]}
-            options={{
-              selection: true,
-              search: false,
-              toolbar: false,
-            }}
-            //onSelectionChange={(rows) => setSelectionRows(rows)}
-            onSelectionChange={(rows) => {
-              setSelection(rows);
-            }}
-            tableRef={tableRef}
+            data={data}
+            title="Remote Data Example"
           />
         </DialogContent>
 
@@ -178,5 +165,4 @@ const CardItemHorarioCancha = ({ open, setOpen }) => {
     </div>
   );
 };
-
-export default CardItemHorarioCancha;
+export default CardItemHorarioCanchaPrueba;
