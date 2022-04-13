@@ -230,7 +230,6 @@ const PrioritySelectorItem = ({ color, text: resourceTitle }) => {
     >
       <span className={classes.bullet} />
       <span className={classes.priorityText}>{text}</span>
-      <span className={classes.priorityShortText}>{shortText}</span>
     </StyledPrioritySelectorItem>
   );
 };
