@@ -5,12 +5,13 @@ import Box from "@mui/material/Box";
 import Tabs, { tabsClasses } from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { alpha, styled } from "@mui/material/styles";
-import { green, orange, red, yellow } from "@mui/material/colors";
+import { green, orange, red, yellow, blue } from "@mui/material/colors";
 import LowPriority from "@mui/icons-material/LowPriority";
 import PriorityHigh from "@mui/icons-material/PriorityHigh";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import TextEditor from "./TextEditor";
 import {
   ViewState,
   GroupingState,
@@ -41,6 +42,11 @@ import {
 import { teal, indigo } from "@mui/material/colors";
 
 import { reservations } from "./appointments/appointments";
+import { EditRecurrenceMenuMessages } from "./localization-messages/EditRecurrenceMenuMessages";
+import { ConfirmationDialogMessages } from "./localization-messages/ConfirmationDialogMessages";
+import { AppointmentFormMessages } from "./localization-messages/AppointmentFormMessages";
+import AppointmentFormContainerBasic from "./appointments/appointment-form-components/AppointmentFormContainerBasic";
+import CommandLayoutPropsComponent from "./appointments/appointment-form-components/CommandLayoutPropsComponent";
 
 const courts = [
   {
@@ -51,6 +57,21 @@ const courts = [
   {
     text: "Cancha 2",
     id: 2,
+    color: green,
+  },
+  {
+    text: "Cancha 3",
+    id: 3,
+    color: green,
+  },
+  {
+    text: "Cancha 4",
+    id: 4,
+    color: green,
+  },
+  {
+    text: "Cancha 5",
+    id: 5,
     color: green,
   },
 ];
@@ -69,6 +90,7 @@ const priorityData = [
 
 const findColorByGroupId = (id) =>
   priorityData.find((item) => item.id === id).color;
+
 const getIconById = (id) => (id === 1 ? LowPriority : PriorityHigh);
 
 const PREFIX = "Demo";
@@ -114,7 +136,7 @@ const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
 }));
 
 const useGroupingStyles = (Component, group) => {
-  const color = green;
+  const color = blue;
   return styled(Component)(({ theme }) => ({
     [`&.${classes.cell}`]: {
       backgroundColor: alpha(color[400], 0.1),
@@ -126,6 +148,7 @@ const useGroupingStyles = (Component, group) => {
       },
     },
     [`&.${classes.headerCell}`]: {
+      textAlign: "center",
       backgroundColor: alpha(color[400], 0.1),
       "&:hover": {
         backgroundColor: alpha(color[400], 0.1),
@@ -182,7 +205,7 @@ const AllDayCell = React.memo(({ groupingInfo, ...restProps }) => {
 
 const GroupingPanelCell = React.memo(({ group, ...restProps }) => {
   const StyledComponent = useGroupingStyles(GroupingPanel.Cell, group);
-  const Icon = getIconById(group.id);
+  //const Icon = getIconById(group.id);
   return (
     <StyledComponent
       className={classes.headerCell}
@@ -220,8 +243,8 @@ const StyledPrioritySelectorItem = styled("div")(
 );
 
 const PrioritySelectorItem = ({ color, text: resourceTitle }) => {
-  const text = resourceTitle || "All Tasks";
-  const shortText = resourceTitle ? text.substring(0, 1) : "All";
+  const text = resourceTitle || "Todos los Deportes";
+  const shortText = resourceTitle ? text.substring(0, 1) : "Todos";
 
   return (
     <StyledPrioritySelectorItem
@@ -246,26 +269,26 @@ const StyledFormControl = styled(FormControl)(({ theme: { spacing } }) => ({
   },
 }));
 
-const FlexibleSpace = ({ priority, priorityChange, ...restProps }) => (
+const FlexibleSpace = ({ sport, sportChange, ...restProps }) => (
   <StyledToolbarFlexibleSpace {...restProps} className={classes.flexibleSpace}>
-    <PrioritySelector priority={priority} priorityChange={priorityChange} />
+    <PrioritySelector sport={sport} sportChange={sportChange} />
   </StyledToolbarFlexibleSpace>
 );
 
-const PrioritySelector = ({ priorityChange, priority }) => {
-  const currentPriority = priority > 0 ? sports[priority - 1] : {};
+const PrioritySelector = ({ sportChange, sport }) => {
+  const currentSport = sport > 0 ? sports[sport - 1] : {};
   return (
     <StyledFormControl className={classes.prioritySelector} variant="standard">
       <Select
         disableUnderline
-        value={priority}
+        value={sport}
         onChange={(e) => {
-          priorityChange(e.target.value);
+          sportChange(e.target.value);
         }}
         renderValue={() => (
           <PrioritySelectorItem
-            text={currentPriority.text}
-            color={currentPriority.color}
+            text={currentSport.text}
+            color={currentSport.color}
           />
         )}
       >
@@ -285,17 +308,24 @@ const PrioritySelector = ({ priorityChange, priority }) => {
 const ReservaGrid = () => {
   const [data, setData] = useState(reservations);
 
-  const [currentPriority, setCurrentPriority] = useState(0);
+  const [currentSport, setCurrentSport] = useState(0);
 
-  const priorityChange = (value) => {
+  const sportChange = (value) => {
     const nextResources = [
       {
-        ...resources[0],
-        instances: value > 0 ? [reservations[value - 1]] : reservations,
+        fieldName: "courtId",
+        title: "Courts",
+        instances: courts,
+        allowMultiple: true,
+      },
+      {
+        fieldName: "sportId",
+        title: "Sport",
+        instances: value > 0 ? [sports[value - 1]] : sports,
       },
     ];
 
-    setCurrentPriority(value);
+    setCurrentSport(value);
     setResources(nextResources);
   };
 
@@ -307,8 +337,8 @@ const ReservaGrid = () => {
 
   const flexibleSpace = connectProps(FlexibleSpace, () => {
     return {
-      priority: currentPriority,
-      priorityChange: priorityChange,
+      sport: currentSport,
+      sportChange: sportChange,
     };
   });
 
@@ -371,21 +401,27 @@ const ReservaGrid = () => {
   };
 
   const handleChangeAddedAppointment = (addedAppointment) => {
+    console.log("handleChangeAddedAppointment");
+    console.log(addedAppointment);
     setAddedAppointment(addedAppointment);
   };
 
   const handleChangeAppointmentChanges = (appointmentChanges) => {
+    console.log("handleChangeAppointmentChanges");
+    console.log(appointmentChanges);
     setAppointmentChanges(appointmentChanges);
   };
 
   const handleChangeEditingAppointment = (editingAppointment) => {
+    console.log("handleChangeEditingAppointment");
+    console.log(editingAppointment);
     setEditingAppointment(editingAppointment);
   };
 
   return (
     <Paper>
       <Scheduler
-        data={filterTasks(data, currentPriority)}
+        data={filterTasks(data, currentSport)}
         height={660}
         locale={"es-ES"}
       >
@@ -404,7 +440,7 @@ const ReservaGrid = () => {
           editingAppointment={editingAppointment}
           onEditingAppointmentChange={handleChangeEditingAppointment}
         />
-        <EditRecurrenceMenu />
+        <EditRecurrenceMenu messages={EditRecurrenceMenuMessages} />
         <IntegratedEditing />
         <GroupingState grouping={grouping} groupByDate={() => true} />
         <WeekView startDayHour={9} endDayHour={19} />
@@ -426,14 +462,19 @@ const ReservaGrid = () => {
         <DateNavigator />
         <TodayButton />
         <ViewSwitcher />
-        <ConfirmationDialog />
+        <ConfirmationDialog messages={ConfirmationDialogMessages} />
         <Appointments />
-        <Resources data={resources} mainResourceName="courtId" />
+        <Resources data={resources} mainResourceName="sportId" />
 
         <IntegratedGrouping />
 
-        <AppointmentTooltip showOpenButton showDeleteButton />
-        <AppointmentForm />
+        <AppointmentTooltip showOpenButton showCloseButton showDeleteButton />
+        <AppointmentForm
+          messages={AppointmentFormMessages}
+          //commandLayoutComponent={CommandLayoutPropsComponent}
+          basicLayoutComponent={AppointmentFormContainerBasic}
+          textEditorComponent={TextEditor}
+        />
         <GroupingPanel cellComponent={GroupingPanelCell} />
         <DragDropProvider />
       </Scheduler>
