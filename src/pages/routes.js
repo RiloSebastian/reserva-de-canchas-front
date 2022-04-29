@@ -17,6 +17,7 @@ export const BASE_URL = {
 export const PATHS = {
   login: "/login",
   signup: "/signup",
+  forgotpass: "/forgot-pass",
 };
 
 export const CustomerRoutes = [

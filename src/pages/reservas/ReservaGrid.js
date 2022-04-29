@@ -48,6 +48,8 @@ import { AppointmentFormMessages } from "./localization-messages/AppointmentForm
 import AppointmentFormContainerBasic from "./appointments/appointment-form-components/AppointmentFormContainerBasic";
 import CommandLayoutPropsComponent from "./appointments/appointment-form-components/CommandLayoutPropsComponent";
 
+import withRoot from "../home/modules/withRoot";
+
 const courts = [
   {
     text: "Cancha 1",
@@ -482,4 +484,4 @@ const ReservaGrid = () => {
   );
 };
 
-export default ReservaGrid;
+export default withRoot(ReservaGrid);

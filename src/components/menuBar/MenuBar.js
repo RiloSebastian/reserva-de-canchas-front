@@ -32,6 +32,7 @@ import { Route, Switch } from "react-router";
 import AuthService from "../../services/auth.service";
 import { USER_ROLE } from "../../constants/userRole";
 import Tooltip from "@mui/material/Tooltip";
+import withRoot from "../../pages/home/modules/withRoot";
 
 const drawerWidth = 240;
 
