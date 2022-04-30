@@ -8,29 +8,50 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import moment from 'moment';
 import Grid from '@mui/material/Grid';
 
-const SelectDate = ({ setDates }) => {
+const SelectDate = ({ setHorariosYPrecios }) => {
 
-    const [desde, setDesde] = useState(moment(new Date()));
-    const [hasta, setHasta] = useState(moment(new Date()));
+    const [desde, setDesde] = useState(moment(new Date()).format('YYYY-MM-DD'));
+    const [hasta, setHasta] = useState(moment(new Date()).format('YYYY-MM-DD'));
+
+    /*  useEffect(() => {
+  
+          let dates = getDates(desde, hasta);
+  
+          setHorariosYPrecios((body) => {
+              return { ...body, ['dates']: dates };
+          });
+  
+          setHorariosYPrecios((body) => {
+              return { ...body, ['from']: desde, ['to']: hasta };
+          });
+  
+      }, [desde, hasta]);*/
+
+    /*
+        const getDates = (startDate, stopDate) => {
+            var dateArray = [];
+    
+            var currentDate = moment(startDate).clone();
+            var lastDate = moment(stopDate);
+    
+            while (currentDate.isSameOrBefore(lastDate)) {
+                dateArray.push(currentDate.format('YYYY-MM-DD'))
+                currentDate.add(1, "day");
+            }
+    
+            console.log('array dates')
+            console.log(dateArray)
+    
+            return dateArray;
+        }*/
 
     useEffect(() => {
 
-        let dates = getDates(desde, hasta);
+        setHorariosYPrecios((body) => {
+            return { ...body, ['from']: desde, ['to']: hasta };
+        });
 
-        setDates(dates);
-
-    }, [desde, hasta]);
-
-    const getDates = (startDate, stopDate) => {
-        let dateArray = [];
-        let currentDate = moment(startDate);
-        let lastDate = moment(stopDate);
-        while (currentDate <= lastDate) {
-            dateArray.push(moment(currentDate).format('YYYY-MM-DD'))
-            currentDate = moment(currentDate).add(1, 'days');
-        }
-        return dateArray;
-    }
+    }, []);
 
     return (
         <LocalizationProvider dateAdapter={DateAdapter}>
@@ -41,6 +62,10 @@ const SelectDate = ({ setDates }) => {
                         value={desde}
                         onChange={(newValue) => {
                             setDesde(newValue);
+                            setHorariosYPrecios((body) => {
+                                return { ...body, ['from']: newValue.format('YYYY-MM-DD') };
+                            });
+
                         }}
                         renderInput={(params) => <TextField {...params} />}
                     />
@@ -51,6 +76,10 @@ const SelectDate = ({ setDates }) => {
                         value={hasta}
                         onChange={(newValue) => {
                             setHasta(newValue);
+                            setHorariosYPrecios((body) => {
+                                return { ...body, ['to']: newValue.format('YYYY-MM-DD') };
+                            });
+
                         }}
                         renderInput={(params) => <TextField {...params} />}
                     />

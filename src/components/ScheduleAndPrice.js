@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import Stack from '@mui/material/Stack';
@@ -14,7 +14,36 @@ import moment from 'moment';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { makeStyles } from '@material-ui/core/styles';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import NumberFormat from 'react-number-format';
+import PropTypes from 'prop-types';
 
+const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
+    const { onChange, ...other } = props;
+
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={ref}
+            onValueChange={(values) => {
+                onChange({
+                    target: {
+                        name: props.name,
+                        value: values.value,
+                    },
+                });
+            }}
+            thousandSeparator
+            isNumericString
+            prefix="$"
+        />
+    );
+});
+
+NumberFormatCustom.propTypes = {
+    name: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+};
 
 const useStyles = makeStyles((theme) => ({
     ...theme.typography.body2,
@@ -24,18 +53,83 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: '30px',
 }));
 
-const ScheduleAndPrice = () => {
+const ScheduleAndPrice = ({ horario, removeHorario, setHorarios, setHorariosYPrecios }) => {
+
+    const { id, precio, enabled, from, to } = horario;
 
     const classes = useStyles();
 
-    const [desde, setDesde] = React.useState(moment(new Date('2018-01-01T00:00:00.000Z')));
-    const [hasta, setHasta] = React.useState(moment(new Date('2018-01-01T00:00:00.000Z')));
+    //const [desde, setDesde] = useState(moment());
+    //const [hasta, setHasta] = useState(moment());
 
-    const [checked, setChecked] = React.useState(true);
+    //const handleChange = (event) => {
+    // setHorarioHabilitado(event.target.checked);
+    //};
 
-    const handleChange = (event) => {
-        setChecked(event.target.checked);
-    };
+    const handleChange = (e) => {
+
+        if (e.target.type === 'checkbox') {
+            setHorarios((horarios) => {
+
+                let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, [e.target.name]: e.target.checked } : horario);
+
+                return [...horariosUpdated];
+
+            });
+        } else {
+
+            setHorarios((horarios) => {
+
+                let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, [e.target.name]: e.target.value } : horario);
+
+                return [...horariosUpdated];
+            });
+        }
+
+    }
+
+    /* useEffect(() => {
+ 
+         let fromTime = moment(moment(from, 'HH:mm'));
+         let toTime = moment(moment(to, 'HH:mm'));
+ 
+         console.log(fromTime)
+         console.log(toTime)
+ 
+         let duration = moment.duration(toTime.diff(fromTime));
+ 
+         console.log(duration)
+ 
+         let diff = duration.hours();
+         let array = [];
+ 
+         for (var i = 0; diff > i; i++) {
+             let result = moment(fromTime).add(i, 'hours').format('HH:mm')
+             array.push({
+                 result
+             })
+         }
+ 
+         console.log(array)
+     }, [from, to])*/
+
+    useEffect(() => {
+
+        setHorarios((horarios) => {
+
+            let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['from']: from } : horario);
+
+            return [...horariosUpdated];
+        });
+
+        setHorarios((horarios) => {
+
+            let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['to']: to } : horario);
+
+            return [...horariosUpdated];
+        });
+
+    }, []);
 
     return (
         <Paper className={classes}>
@@ -44,9 +138,20 @@ const ScheduleAndPrice = () => {
                     <Grid item xs>
                         <MobileTimePicker
                             label="Desde"
-                            value={desde}
+                            name="from"
+                            value={from}
                             onChange={(newValue) => {
-                                setDesde(newValue);
+
+                                /* setHorariosYPrecios((body) => {
+                                     return { ...body, ['schedules']: horarios };
+                                 });*/
+
+                                setHorarios((horarios) => {
+
+                                    let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['from']: newValue } : horario);
+
+                                    return [...horariosUpdated];
+                                });
                             }}
                             renderInput={(params) => <TextField {...params} />}
                         />
@@ -54,37 +159,67 @@ const ScheduleAndPrice = () => {
                     <Grid item xs>
                         <MobileTimePicker
                             label="Hasta"
-                            value={hasta}
+                            name="to"
+                            value={to}
                             onChange={(newValue) => {
-                                setHasta(newValue);
+
+                                setHorarios((horarios) => {
+
+                                    let horariosUpdated = horarios.map((horario) => horario.id === id ? { ...horario, ['to']: newValue } : horario);
+
+                                    return [...horariosUpdated];
+                                });
+
+                                /*     setHorariosYPrecios((body) => {
+     
+                                         return { ...body, ['schedules']: horarios };
+                                     });*/
                             }}
                             renderInput={(params) => <TextField {...params} />}
+                            shouldDisableTime={(timeValue, clockType) => {
+
+                                if (clockType === 'minutes' && timeValue !== from.getMinutes()) {
+                                    return true;
+                                }
+
+                                return false;
+                            }}
+                            minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
                         />
                     </Grid>
                 </LocalizationProvider >
 
                 <Grid item xs>
                     <TextField
+                        name='price'
+                        value={precio}
+                        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                         label="Precio /hr"
+                        onChange={handleChange}
                         id="outlined-start-adornment"
                         sx={{ m: 1, width: '25ch' }}
                         InputProps={{
-                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                            inputComponent: NumberFormatCustom,
                         }}
                     />
                 </Grid>
                 <Grid item xs>
-                    <IconButton aria-label="delete" size="large">
-                        <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
-                    </IconButton>
-                </Grid>
-                <Grid item xs>
-                    <Switch
+                    {/*<Switch
                         checked={checked}
                         onChange={handleChange}
                         inputProps={{ 'aria-label': 'controlled' }}
+                    />*/}
+                    <FormControlLabel
+                        control={<Switch name='enabled' onChange={handleChange} checked={enabled} color="primary" />}
+                        label={enabled ? 'Activo' : 'Inactivo'}
+                        labelPlacement="activo"
                     />
                 </Grid >
+                <Grid item xs>
+                    <IconButton onClick={() => { removeHorario(id) }} aria-label="delete" size="large">
+                        <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
+                    </IconButton>
+                </Grid>
             </Grid >
         </Paper>
     )

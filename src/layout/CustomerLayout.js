@@ -1,10 +1,9 @@
 import React from 'react'
+import MenuBar from '../components/menuBar/MenuBar'
 
 const CustomerLayout = () => {
     return (
-        <div>
-            Hola Customer
-        </div>
+        <MenuBar />
     )
 }
 
