@@ -204,7 +204,7 @@ const MenuBar = (props) => {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Perfil</MenuItem>
-      <MenuItem component={Link} to={"/login"} onClick={handleLogOut}>
+      <MenuItem component={Link} to={"/homepage"} onClick={handleLogOut}>
         Cerrar Sesion
       </MenuItem>
     </Menu>
@@ -232,7 +232,7 @@ const MenuBar = (props) => {
             <MailIcon />
           </Badge>
         </IconButton>
-        <p>Messages</p>
+        <p>Mensajes</p>
       </MenuItem>
       <MenuItem>
         <IconButton
@@ -244,7 +244,7 @@ const MenuBar = (props) => {
             <NotificationsIcon />
           </Badge>
         </IconButton>
-        <p>Notifications</p>
+        <p>Notificaciones</p>
       </MenuItem>
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton

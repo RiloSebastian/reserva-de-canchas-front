@@ -13,7 +13,7 @@ import CustomerLayout from "./layout/CustomerLayout";
 import NotFound from "./components/NotFound";
 import SignIn from "./pages/login/SignIn";
 import SignUp from "./pages/signup/SignUp";
-import Index from "./pages/home/Home";
+import Index from "./pages/home/HomePage";
 import PrivateRoute from "./pages/privateRoute/PrivateRoute";
 import authService from "./services/auth.service";
 import ListaReserva from "./pages/reservas/ListaReserva";
@@ -36,12 +36,14 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import CssBaseline from "@mui/material/CssBaseline";
 import ForgotPassword from "./pages/home/ForgotPassword";
+import HomePage from "./pages/home/HomePage";
+import Home from "./pages/home/Home";
 
 const pages = ["Home", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const App = () => {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
   const [showAdminBoard, setShowAdminBoard] = useState(false);
@@ -199,7 +201,7 @@ const App = () => {
           <Route exact path={PATHS.signup} component={SignUp} />
           <Route exact path={PATHS.forgotpass} component={ForgotPassword} />
           <Route exact path="/">
-            {loggedIn ? <Redirect to="/dashboard/reservas" /> : <SignIn />}
+            {loggedIn ? <Redirect to="/dashboard/reservas" /> : <HomePage />}
           </Route>
           <PrivateRoute path={CustomerRoutes.map((item) => item.path)}>
             <CustomerLayout>
@@ -231,7 +233,7 @@ const App = () => {
               </Switch>
             </InstitutionLayout>
           </PrivateRoute>
-          <Route path="/homepage" component={Index} />
+          <Route path="/homepage" component={HomePage} />
           <Route path="*" component={NotFound} />
         </Switch>
       </Router>

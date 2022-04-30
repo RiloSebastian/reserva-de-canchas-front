@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CardCancha from "./items/CardCancha";
 import Stack from "@mui/material/Stack";
-import { institutions as i } from "./../assets/mocks/Institutions";
+import { institutionsFounded as i } from "./../assets/mocks/institutionsFounded";
 
 const CardCanchaLista = () => {
   const [institutions, setInstitutions] = useState(i);

@@ -1,4 +1,4 @@
-import * as React from "react";
+/* import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -125,7 +125,7 @@ const NavBar = () => {
             <MailIcon />
           </Badge>
         </IconButton>
-        <p>Messages</p>
+        <p>Mensajes</p>
       </MenuItem>
       <MenuItem>
         <IconButton
@@ -137,7 +137,7 @@ const NavBar = () => {
             <NotificationsIcon />
           </Badge>
         </IconButton>
-        <p>Notifications</p>
+        <p>Notificaciones</p>
       </MenuItem>
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
@@ -239,3 +239,4 @@ const NavBar = () => {
   );
 };
 export default NavBar;
+ */

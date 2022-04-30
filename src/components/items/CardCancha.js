@@ -23,7 +23,14 @@ import Box from "@mui/material/Box";
 const CardCancha = ({ institution }) => {
   const [open, setOpen] = useState(false);
 
-  const desplegarModal = () => {
+  const [schedule, setSchedule] = useState([]);
+
+  const desplegarModal = (schedule) => {
+    console.log("schedule");
+    console.log(schedule);
+
+    setSchedule(schedule);
+
     setOpen(true);
   };
 
@@ -64,16 +71,32 @@ const CardCancha = ({ institution }) => {
             </Typography>
           </CardContent>
         </CardActionArea>
-        <CardActions disableSpacing>
-          <Button variant="contained" disableElevation onClick={desplegarModal}>
+        <CardActions alignItems="center">
+          {institution.sport.schedules.map((schedule) => (
+            <Button
+              alignItems="center"
+              variant="contained"
+              disableElevation
+              onClick={() => desplegarModal(schedule)}
+            >
+              {schedule.schedule}
+            </Button>
+          ))}
+          {/*<Button variant="contained" disableElevation onClick={desplegarModal}>
             Consultar Horarios
-          </Button>
+          </Button>*/}
         </CardActions>
       </Card>
 
       {/*open && <CardItemHorarioCancha open={open} setOpen={setOpen} />*/}
 
-      {open && <CardItemHorarioCanchaPrueba open={open} setOpen={setOpen} />}
+      {open && (
+        <CardItemHorarioCanchaPrueba
+          open={open}
+          setOpen={setOpen}
+          schedule={schedule}
+        />
+      )}
     </>
   );
 };

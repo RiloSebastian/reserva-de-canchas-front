@@ -1,3 +1,4 @@
+import HomePage from "./home/HomePage";
 import Home from "./home/Home";
 import ListaReserva from "./reservas/ListaReserva";
 import ReservaGrid from "./reservas/ReservaGrid";

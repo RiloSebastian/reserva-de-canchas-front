@@ -1,4 +1,4 @@
-export const institutions = [
+export const institutionsFounded = [
   {
     id: 1,
     institution_name: "Palermo Tenis",
