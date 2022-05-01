@@ -21,6 +21,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 import Stack from "@mui/material/Stack";
 import { green, grey, red } from "@mui/material/colors";
+import MisReservas from "./../usuarios/clientes/MisReservas";
+import { BASE_URL_CUSTOMERS } from "../routes";
 
 function Copyright() {
   return (
@@ -38,6 +40,8 @@ function Copyright() {
 const steps = ["Tu Reserva", "Forma de Pago", "Revise Su Reserva"];
 
 function getStepContent(step) {
+  console.log("step");
+  console.log(step);
   switch (step) {
     case 0:
       return <PreReview />;
@@ -45,6 +49,8 @@ function getStepContent(step) {
       return <PaymentForm />;
     case 2:
       return <Review />;
+    case 3:
+      return <MisReservas />;
     default:
       throw new Error("Unknown step");
   }
@@ -68,6 +74,16 @@ const Checkout = () => {
   React.useEffect(() => {
     console.log(history.location.state);
   });
+
+  const handleBackToHome = () => {
+    let path = "/home";
+    history.push(BASE_URL_CUSTOMERS.base + path);
+  };
+
+  const handleMisReservas = () => {
+    let path = "/mis-reservas";
+    history.push(BASE_URL_CUSTOMERS.base + path);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -107,14 +123,14 @@ const Checkout = () => {
                 </Typography>
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   {activeStep !== 0 && (
-                    <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
-                      Atras
+                    <Button onClick={handleBackToHome} sx={{ mt: 3, ml: 1 }}>
+                      Volver al Inicio
                     </Button>
                   )}
 
                   <Button
                     variant="contained"
-                    onClick={handleNext}
+                    onClick={handleMisReservas}
                     sx={{ mt: 3, ml: 1 }}
                   >
                     {activeStep === steps.length - 1

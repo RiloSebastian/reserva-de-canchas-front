@@ -18,6 +18,7 @@ import AuthService from "../../services/auth.service";
 import withRoot from "./../home/modules/withRoot";
 import AppAppBar from "./../home/modules/views/AppAppBar";
 import { green, grey, red } from "@mui/material/colors";
+import { BASE_URL_CUSTOMERS } from "../routes";
 
 function Copyright(props) {
   return (
@@ -57,7 +58,7 @@ const SignIn = (props) => {
       password: data.get("password"),
     });
 
-    const user = await AuthService.login(
+    /*const user = await AuthService.login(
       data.get("username"),
       data.get("password")
     ).then((data) => data);
@@ -65,12 +66,26 @@ const SignIn = (props) => {
     console.log(user.roles[0]);
 
     if (user.roles[0] === "ROLE_CUSTOMER") {
-      //<Redirect to="/dashboard/home" />;
       history.push("/dashboard/home");
     } else {
-      //<Redirect to="/dashboard/reservas" />;
       history.push("/dashboard/reservas");
-    }
+    }*/
+    AuthService.login(data.get("username"), data.get("password")).then(
+      (data) => {
+        console.log(data);
+        if (data.roles[0] === "ROLE_CUSTOMER") {
+          history.push({
+            pathname: "/customer/home",
+            state: "data sended",
+          });
+        } else {
+          history.push({
+            pathname: "/dashboard/reservas",
+            state: "data sended",
+          });
+        }
+      }
+    );
   };
 
   return (

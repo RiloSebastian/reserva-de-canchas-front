@@ -1,10 +1,13 @@
-import React from 'react'
-import MenuBar from '../components/menuBar/MenuBar'
+import React from "react";
+import MenuBar from "../components/menuBar/MenuBar";
 
-const InstitutionLayout = () => {
-    return (
-            <MenuBar />
-    )
-}
-
-export default InstitutionLayout
+const InstitutionLayout = ({ children }) => {
+  //return <MenuBar />;
+  return (
+    <React.Fragment>
+      <MenuBar />
+      {children}
+    </React.Fragment>
+  );
+};
+export default InstitutionLayout;

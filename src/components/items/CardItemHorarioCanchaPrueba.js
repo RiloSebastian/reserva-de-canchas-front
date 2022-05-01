@@ -54,6 +54,7 @@ import FormLabel from "@mui/material/FormLabel";
 import { Visibility } from "@mui/icons-material/Visibility";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { BASE_URL_CUSTOMERS } from "../../pages/routes";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -148,7 +149,7 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
     setOpen(false);
 
     history.push({
-      pathname: "/dashboard/checkout",
+      pathname: BASE_URL_CUSTOMERS.base + "/checkout",
       state: court,
     });
   };

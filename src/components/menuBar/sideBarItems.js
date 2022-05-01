@@ -4,46 +4,50 @@ import PeopleIcon from "@mui/icons-material/People";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import HomeIcon from "@mui/icons-material/Home";
-import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
+import EditLocationAltIcon from "@mui/icons-material/EditLocationAlt";
 import { USER_ROLE } from "../../constants/userRole";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const reservationMenu = (user) => [
   {
     name: "Inicio",
     url: "/home",
     icon: <HomeIcon />,
-    visible: hasUserRole(user, [USER_ROLE.CUSTOMER])
+    visible: hasUserRole(user, [USER_ROLE.CUSTOMER]),
   },
   {
     name: "Mis Reservas",
-    url: "/home/mis-reservas",
+    url: "/mis-reservas",
     icon: <EventAvailableIcon />,
-    visible: hasUserRole(user, [USER_ROLE.CUSTOMER])
+    visible: hasUserRole(user, [USER_ROLE.CUSTOMER]),
   },
   {
     name: "Reservas",
     url: "/reservas",
     icon: <EventAvailableIcon />,
-    visible: hasUserRole(user, [USER_ROLE.ADMIN, USER_ROLE.EMPLOYEE, USER_ROLE.COACH])
+    visible: hasUserRole(user, [
+      USER_ROLE.ADMIN,
+      USER_ROLE.EMPLOYEE,
+      USER_ROLE.COACH,
+    ]),
   },
   {
     name: "Canchas",
     url: "/canchas",
     icon: <SportsScoreIcon />,
-    visible: hasUserRole(user, [USER_ROLE.ADMIN])
+    visible: hasUserRole(user, [USER_ROLE.ADMIN]),
   },
   {
     name: "Instituciones",
     url: "/instituciones",
     icon: <EditLocationAltIcon />,
-    visible: hasUserRole(user, [USER_ROLE.SUPER_ADMIN])
+    visible: hasUserRole(user, [USER_ROLE.SUPER_ADMIN]),
   },
   {
     name: "Promociones",
     url: "/promociones",
     icon: <WhatshotIcon />,
-    visible: hasUserRole(user, [USER_ROLE.ADMIN])
+    visible: hasUserRole(user, [USER_ROLE.ADMIN]),
   },
   {
     name: "Empleados",
@@ -62,7 +66,7 @@ const reservationMenu = (user) => [
     url: "/configuracion",
     icon: <SettingsIcon />,
     visible: hasUserRole(user, [USER_ROLE.ADMIN]),
-  }
+  },
 ];
 
 export default function getMenu(user) {

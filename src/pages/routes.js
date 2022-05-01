@@ -11,8 +11,12 @@ import MisReservas from "./usuarios/clientes/MisReservas";
 import Listainstitucions from "./instituciones/ListaInstituciones";
 import ConfiguracionInstituciones from "./instituciones/ConfiguracionInstituciones";
 
-export const BASE_URL = {
+export const BASE_URL_INSTITUTIONS = {
   base: "/dashboard",
+};
+
+export const BASE_URL_CUSTOMERS = {
+  base: "/customer",
 };
 
 export const PATHS = {
@@ -20,6 +24,7 @@ export const PATHS = {
   signup: "/signup",
   signupinstitution: "/signup/institution",
   forgotpass: "/forgot-pass",
+  homepage: "/homepage",
 };
 
 export const CustomerRoutes = [
@@ -30,29 +35,8 @@ export const CustomerRoutes = [
     exact: true,
   },
   {
-    id: "checkout",
-    path: "/checkout",
-    component: Checkout,
-    exact: true,
-  },
-  {
-    id: "reservas",
-    path: "/reservas",
-    component: ReservaGrid,
-    exact: true,
-  },
-];
-
-const InstitutionRoutes = [
-  {
-    id: "home",
-    path: "/home",
-    component: Home,
-    exact: true,
-  },
-  {
     id: "mis-reservas",
-    path: "/home/mis-reservas",
+    path: "/mis-reservas",
     component: MisReservas,
     exact: true,
   },
@@ -62,6 +46,9 @@ const InstitutionRoutes = [
     component: Checkout,
     exact: true,
   },
+];
+
+const InstitutionRoutes = [
   {
     id: "reservas",
     path: "/reservas",
