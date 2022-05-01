@@ -24,7 +24,7 @@ function AppAppBar() {
             href="/homepage"
             sx={{ fontSize: 24 }}
           >
-            {"reserva tu cancha"}
+            {"RESERVA TU CANCHA"}
           </Link>
           <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
             <Link
@@ -34,7 +34,7 @@ function AppAppBar() {
               href="/signup/institution"
               sx={rightLink}
             >
-              {"Registra tu Club"}
+              {"REGISTRA TU CLUB"}
             </Link>
             <Divider
               orientation="vertical"
@@ -47,9 +47,9 @@ function AppAppBar() {
               variant="h6"
               underline="none"
               href="/login"
-              sx={{ ...rightLink, color: "secondary.main" }}
+              sx={{ ...rightLink }}
             >
-              {"Iniciar Sesion"}
+              {"INICIAR SESION"}
             </Link>
           </Box>
         </Toolbar>

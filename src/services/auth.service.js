@@ -31,6 +31,7 @@ const register = async (firstName, lastName, role, email, password) => {
     });
   } catch (err) {
     console.log("error al registrar usuario");
+    console.log(err);
     return Promise.reject(err);
   }
 };
