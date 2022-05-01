@@ -18,6 +18,7 @@ import AuthService from "../../services/auth.service";
 import withRoot from "./../home/modules/withRoot";
 import AppAppBar from "./../home/modules/views/AppAppBar";
 import { green, grey, red } from "@mui/material/colors";
+import { BASE_URL_CUSTOMERS } from "../routes";
 
 function Copyright(props) {
   return (
@@ -74,7 +75,7 @@ const SignIn = (props) => {
         console.log(data);
         if (data.roles[0] === "ROLE_CUSTOMER") {
           history.push({
-            pathname: "/dashboard/home",
+            pathname: "/customer/home",
             state: "data sended",
           });
         } else {

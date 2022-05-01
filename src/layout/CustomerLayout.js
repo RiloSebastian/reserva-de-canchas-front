@@ -1,10 +1,8 @@
-import React from 'react'
-import MenuBar from '../components/menuBar/MenuBar'
+import React from "react";
+import MenuBar from "../components/menuBar/MenuBar";
 
 const CustomerLayout = () => {
-    return (
-        <MenuBar />
-    )
-}
+  return <MenuBar />;
+};
 
-export default CustomerLayout
+export default CustomerLayout;
