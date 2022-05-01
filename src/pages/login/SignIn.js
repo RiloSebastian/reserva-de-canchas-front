@@ -29,7 +29,7 @@ function Copyright(props) {
     >
       {"Copyright © "}
       <Link color="inherit" href="#">
-        Reserva Tu Cancha
+        RESERVA TU CANCHA
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -38,6 +38,12 @@ function Copyright(props) {
 }
 
 const theme = createTheme();
+
+const rightLink = {
+  fontSize: 16,
+  color: "common.white",
+  ml: 3,
+};
 
 const SignIn = (props) => {
   let history = useHistory();
@@ -84,8 +90,8 @@ const SignIn = (props) => {
             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
               <LockOutlinedIcon />
             </Avatar>
-            <Typography component="h1" variant="h5">
-              Iniciar Sesion
+            <Typography sx={{ ...rightLink.color }} component="h1" variant="h5">
+              {"Iniciar Sesion"}
             </Typography>
             <Box
               component="form"
@@ -121,9 +127,9 @@ const SignIn = (props) => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ ...rightLink.color, mt: 3, mb: 2 }}
               >
-                Iniciar Sesion
+                {"Iniciar Sesion"}
               </Button>
               <Grid container>
                 <Grid item xs>

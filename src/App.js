@@ -38,6 +38,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import ForgotPassword from "./pages/home/ForgotPassword";
 import HomePage from "./pages/home/HomePage";
 import Home from "./pages/home/Home";
+import SignUpInstitution from "./pages/signup/SignUpInstitution";
 
 const pages = ["Home", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -199,6 +200,11 @@ const App = () => {
         <Switch>
           <Route exact path={PATHS.login} component={SignIn} />
           <Route exact path={PATHS.signup} component={SignUp} />
+          <Route
+            exact
+            path={PATHS.signupinstitution}
+            component={SignUpInstitution}
+          />
           <Route exact path={PATHS.forgotpass} component={ForgotPassword} />
           <Route exact path="/">
             {loggedIn ? <Redirect to="/dashboard/reservas" /> : <HomePage />}
