@@ -22,6 +22,15 @@ import Select from "@mui/material/Select";
 import TipoUsuarioService from "../../services/tipoUsuarios/TipoUsuarioService";
 import AppAppBar from "../home/modules/views/AppAppBar";
 import { green, grey, red } from "@mui/material/colors";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import Stack from "@mui/material/Stack";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -64,7 +73,7 @@ function Copyright(props) {
     >
       {"Copyright © "}
       <Link color="inherit" href="#">
-        Reserva Tu Cancha
+        RESERVA TU CANCHA
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -76,7 +85,19 @@ const theme = createTheme();
 
 const SignUp = () => {
   const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+
   const [tipoUsuario, setTipoUsuario] = useState([]);
+
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
   const handleChange = (event) => {
     console.log(event.target);
@@ -92,17 +113,19 @@ const SignUp = () => {
       password: data.get("password"),
     });
 
-    try {
-      AuthService.register(
-        data.get("firstName"),
-        data.get("lastName"),
-        data.get("tipoUsuario"),
-        data.get("email"),
-        data.get("password")
-      );
-    } catch (error) {
-      console.log("error al registrar usuario");
-    }
+    AuthService.register(
+      data.get("firstName"),
+      data.get("lastName"),
+      data.get("tipoUsuario"),
+      data.get("email"),
+      data.get("password")
+    )
+      .then()
+      .catch(function (rej) {
+        //here when you reject the promise
+        console.log(rej);
+        handleOpen();
+      });
   };
 
   return (
@@ -231,6 +254,22 @@ const SignUp = () => {
           <Copyright sx={{ mt: 5 }} />
         </Container>
       </ThemeProvider>
+
+      <Dialog
+        fullWidth={true}
+        fullScreen={fullScreen}
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogContent sx={{ padding: 0 }}>
+          <Stack sx={{ width: "100%" }} spacing={2}>
+            <Alert onClose={handleClose} severity="error" variant="filled">
+              <AlertTitle>Error</AlertTitle>
+              No se ha podido registrar el usuario !
+            </Alert>
+          </Stack>
+        </DialogContent>
+      </Dialog>
     </React.Fragment>
   );
 };
