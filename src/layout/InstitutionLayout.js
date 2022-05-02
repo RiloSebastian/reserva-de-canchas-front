@@ -3,11 +3,6 @@ import MenuBar from "../components/menuBar/MenuBar";
 
 const InstitutionLayout = ({ children }) => {
   //return <MenuBar />;
-  return (
-    <React.Fragment>
-      <MenuBar />
-      {children}
-    </React.Fragment>
-  );
+  return <MenuBar />;
 };
 export default InstitutionLayout;
