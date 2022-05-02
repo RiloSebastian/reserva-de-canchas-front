@@ -126,6 +126,7 @@ const SignUpInstitution = () => {
     console.log({
       email: data.get("email"),
       password: data.get("password"),
+      horarioApertura: data.get("horarioApertura"),
     });
 
     AuthService.register(
@@ -229,6 +230,7 @@ const SignUpInstitution = () => {
                           <Stack spacing={3}>
                             <TimePicker
                               label="Horario Apertura"
+                              name="horarioApertura"
                               value={openInstitution}
                               onChange={handleChangeOpen}
                               renderInput={(params) => (
@@ -241,6 +243,7 @@ const SignUpInstitution = () => {
                           <Stack spacing={3}>
                             <TimePicker
                               label="Horario Clausura"
+                              name="horarioClausura"
                               value={closeInstitution}
                               onChange={handleChangeClose}
                               renderInput={(params) => (
@@ -334,7 +337,7 @@ const SignUpInstitution = () => {
                   <LoadingButton
                     fullWidth
                     color="secondary"
-                    onClick={handleClick}
+                    onClick={handleSubmit}
                     loading={loading}
                     loadingPosition="start"
                     startIcon={<SaveIcon />}
