@@ -49,6 +49,7 @@ import AppointmentFormContainerBasic from "./appointments/appointment-form-compo
 import CommandLayoutPropsComponent from "./appointments/appointment-form-components/CommandLayoutPropsComponent";
 
 import withRoot from "../home/modules/withRoot";
+import InstitutionLayout from "../../layout/InstitutionLayout";
 
 const courts = [
   {
@@ -484,4 +485,6 @@ const ReservaGrid = () => {
   );
 };
 
-export default withRoot(ReservaGrid);
+ReservaGrid.getLayout = (page) => <InstitutionLayout>{page}</InstitutionLayout>;
+
+export default ReservaGrid;
