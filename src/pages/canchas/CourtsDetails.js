@@ -12,6 +12,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Typography from "@mui/material/Typography";
 import ScheduleAndPrice from "./../../components/ScheduleAndPrice";
 import moment from "moment";
+import Button from "@mui/material/Button";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -99,18 +100,7 @@ const CourtsDetails = ({ rowData }) => {
           {[0, 1].map((value) => {
             const labelId = `checkbox-list-secondary-label-${value}`;
             return (
-              <ListItem
-                key={value}
-                secondaryAction={
-                  <Checkbox
-                    edge="end"
-                    onChange={handleToggle(value)}
-                    checked={checked.indexOf(value) !== -1}
-                    inputProps={{ "aria-labelledby": labelId }}
-                  />
-                }
-                disablePadding
-              >
+              <ListItem key={value} disablePadding>
                 <ScheduleAndPrice horario={horario} setHorarios={setHorarios} />
               </ListItem>
             );

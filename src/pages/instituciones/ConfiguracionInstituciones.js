@@ -20,6 +20,9 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
+import { InstitutionDetails } from "../../components/settings/InstitutionDetails";
+import { NonWorkingDays } from "../../components/settings/NonWorkingDays";
+import { OpenAndCloseTimes } from "../../components/settings/OpenAndCloseTimes";
 
 function Copyright() {
   return (
@@ -54,13 +57,13 @@ const ConfiguracionInstituciones = () => {
               maxWidth="lg"
             >
               <Typography sx={{ mb: 3 }} variant="h4">
-                Configuraciones
+                <InstitutionDetails />
               </Typography>
               {/*<SettingsNotifications />*/}
-              componentes
+              <NonWorkingDays />
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}
-                componentes
+                <OpenAndCloseTimes />
               </Box>
             </Container>
           </Box>
