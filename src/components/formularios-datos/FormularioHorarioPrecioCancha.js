@@ -19,6 +19,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import moment from "moment";
 import Grid from "@mui/material/Grid";
+import SelectWeekDays from "./SelectWeekDays";
 
 const FormularioHorarioPrecioCancha = ({
   open,
@@ -118,15 +119,24 @@ const FormularioHorarioPrecioCancha = ({
         <DialogTitle>Precios Y Horarios</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Configure los horarios y precios para las canchas seleccionadas.
+            Configure las fechas, horarios y precios para las canchas
+            seleccionadas.
           </DialogContentText>
 
-          <Box textAlign="center" sx={{ m: 4 }}>
+          <Box textAlign="center" sx={{ mt: 4 }}>
             {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
+            <p>Dias de la Semana</p>
+            <SelectWeekDays setHorariosYPrecios={setHorariosYPrecios} />
           </Box>
 
-          <Grid sx={{ flexGrow: 1 }} container spacing={2}>
-            <Box textAlign="center" sx={{ m: 1 }}>
+          <Grid
+            container
+            spacing={0}
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Box sx={{ m: 1 }}>
               <FormGroup>
                 <FormControlLabel
                   control={
