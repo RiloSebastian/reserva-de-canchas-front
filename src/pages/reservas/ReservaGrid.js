@@ -308,6 +308,10 @@ const PrioritySelector = ({ sportChange, sport }) => {
   );
 };
 
+const appointmentComponent = (props) => {
+  return <Appointments.Appointment {...props} />;
+};
+
 const ReservaGrid = () => {
   const [data, setData] = useState(reservations);
 
@@ -336,7 +340,7 @@ const ReservaGrid = () => {
 
   const [appointmentChanges, setAppointmentChanges] = useState({});
 
-  const [editingAppointment, setEditingAppointment] = useState(undefined);
+  const [editingAppointment, setEditingAppointment] = useState({});
 
   const flexibleSpace = connectProps(FlexibleSpace, () => {
     return {
@@ -384,23 +388,25 @@ const ReservaGrid = () => {
   };
 
   const handleCommitChanges = ({ added, changed, deleted }) => {
-    let dataChange = data;
     if (added) {
+      console.log("added");
       const startingAddedId =
         data.length > 0 ? data[data.length - 1].id + 1 : 0;
-      dataChange = [...data, { id: startingAddedId, ...added }];
+      data = [...data, { id: startingAddedId, ...added }];
     }
     if (changed) {
-      dataChange = data.map((appointment) =>
+      console.log("changed");
+      data = data.map((appointment) =>
         changed[appointment.id]
           ? { ...appointment, ...changed[appointment.id] }
           : appointment
       );
     }
     if (deleted !== undefined) {
-      dataChange = data.filter((appointment) => appointment.id !== deleted);
+      console.log("deleted");
+      data = data.filter((appointment) => appointment.id !== deleted);
     }
-    setData(dataChange);
+    setData(data);
   };
 
   const handleChangeAddedAppointment = (addedAppointment) => {
@@ -466,7 +472,7 @@ const ReservaGrid = () => {
         <TodayButton />
         <ViewSwitcher />
         <ConfirmationDialog messages={ConfirmationDialogMessages} />
-        <Appointments />
+        <Appointments appointmentComponent={appointmentComponent} />
         <Resources data={resources} mainResourceName="sportId" />
 
         <IntegratedGrouping />
