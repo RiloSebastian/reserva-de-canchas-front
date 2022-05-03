@@ -36,6 +36,7 @@ import InstitutionRoutes, {
   BASE_URL_INSTITUTIONS,
   BASE_URL_CUSTOMERS,
   CustomerRoutes,
+  BASE_URL_ACCOUNT,
 } from "./../../pages/routes";
 
 const drawerWidth = 240;
@@ -156,7 +157,6 @@ const MenuBar = (props) => {
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
-    //ir al perfil del usuario
   };
 
   const handleDrawerOpen = () => {
@@ -177,6 +177,8 @@ const MenuBar = (props) => {
   const handleLogOut = () => {
     AuthService.logout();
   };
+
+  const handleOpenProfile = () => {};
 
   const CustomRouterLink = forwardRef((props, ref) => (
     <div ref={ref} style={{ flexGrow: 1 }}>
@@ -232,7 +234,13 @@ const MenuBar = (props) => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Perfil</MenuItem>
+      <MenuItem
+        component={Link}
+        to={"/dashboard/perfil"}
+        onClick={handleOpenProfile}
+      >
+        Perfil
+      </MenuItem>
       <MenuItem component={Link} to={"/homepage"} onClick={handleLogOut}>
         Cerrar Sesion
       </MenuItem>

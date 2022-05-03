@@ -1,7 +1,5 @@
 import HomePage from "./home/HomePage";
 import Home from "./home/Home";
-import ListaReserva from "./reservas/ListaReserva";
-import ReservaGrid from "./reservas/ReservaGrid";
 import ListaCanchas from "./canchas/ListaCanchas";
 import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
 import ListaPromociones from "./promociones/ListaPromociones";
@@ -10,6 +8,9 @@ import Checkout from "./checkout/Checkout";
 import MisReservas from "./usuarios/clientes/MisReservas";
 import Listainstitucions from "./instituciones/ListaInstituciones";
 import ConfiguracionInstituciones from "./instituciones/ConfiguracionInstituciones";
+import CustomerProfile from "./usuarios/profile/CustomerProfile";
+import AdminProfile from "./usuarios/profile/AdminProfile";
+import ReservaGrid from "./reservas/ReservaGrid";
 
 export const BASE_URL_INSTITUTIONS = {
   base: "/dashboard",
@@ -34,6 +35,13 @@ export const CustomerRoutes = [
     component: Home,
     exact: true,
   },
+
+  {
+    id: "perfil",
+    path: "/perfil",
+    component: CustomerProfile,
+    exact: true,
+  },
   {
     id: "mis-reservas",
     path: "/mis-reservas",
@@ -49,6 +57,12 @@ export const CustomerRoutes = [
 ];
 
 const InstitutionRoutes = [
+  {
+    id: "perfil",
+    path: "/perfil",
+    component: AdminProfile,
+    exact: true,
+  },
   {
     id: "reservas",
     path: "/reservas",
