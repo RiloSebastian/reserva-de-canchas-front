@@ -12,7 +12,6 @@ import InstitutionRoutes, {
 } from "./pages/routes";
 import InstitutionLayout from "./layout/InstitutionLayout";
 import CustomerLayout from "./layout/CustomerLayout";
-import NotFound from "./components/NotFound";
 import SignIn from "./pages/login/SignIn";
 import SignUp from "./pages/signup/SignUp";
 import Index from "./pages/home/HomePage";
@@ -42,6 +41,7 @@ import HomePage from "./pages/home/HomePage";
 import Home from "./pages/home/Home";
 import SignUpInstitution from "./pages/signup/SignUpInstitution";
 import ReservaGrid from "./pages/reservas/ReservaGrid";
+import NotFound from "./pages/notfound/NotFound";
 
 const pages = ["Home", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];

@@ -156,6 +156,7 @@ const MenuBar = (props) => {
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
+    //ir al perfil del usuario
   };
 
   const handleDrawerOpen = () => {
