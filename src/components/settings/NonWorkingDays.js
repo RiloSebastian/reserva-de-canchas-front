@@ -83,6 +83,7 @@ export const NonWorkingDays = (props) => {
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
+          <Grid item md={6} xs={12}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <StaticDatePicker
                 displayStaticWrapperAs="desktop"
@@ -106,6 +107,7 @@ export const NonWorkingDays = (props) => {
                 inputFormat="'Week of' MMM d"
               />
             </LocalizationProvider>
+            </Grid>
           </Grid>
         </CardContent>
         <Divider />

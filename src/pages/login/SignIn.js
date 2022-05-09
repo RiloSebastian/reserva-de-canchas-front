@@ -58,7 +58,15 @@ const SignIn = (props) => {
       password: data.get("password"),
     });
 
-    /*const user = await AuthService.login(
+    localStorage.setItem("user", JSON.stringify({
+      roles:[
+        "ROLE_ADMIN"
+      ]
+    }));
+
+    history.push("/dashboard/reservas");
+
+    /* const user = await AuthService.login(
       data.get("username"),
       data.get("password")
     ).then((data) => data);
@@ -69,23 +77,7 @@ const SignIn = (props) => {
       history.push("/dashboard/home");
     } else {
       history.push("/dashboard/reservas");
-    }*/
-    AuthService.login(data.get("username"), data.get("password")).then(
-      (data) => {
-        console.log(data);
-        if (data.roles[0] === "ROLE_CUSTOMER") {
-          history.push({
-            pathname: "/customer/home",
-            state: "data sended",
-          });
-        } else {
-          history.push({
-            pathname: "/dashboard/reservas",
-            state: "data sended",
-          });
-        }
-      }
-    );
+    } */
   };
 
   return (
