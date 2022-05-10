@@ -23,6 +23,8 @@ import CardContent from "@mui/material/CardContent";
 import { InstitutionDetails } from "../../components/settings/InstitutionDetails";
 import { NonWorkingDays } from "../../components/settings/NonWorkingDays";
 import { OpenAndCloseTimes } from "../../components/settings/OpenAndCloseTimes";
+import AdvancePaymentConfig from "../../components/settings/AdvancePaymentConfig";
+
 
 function Copyright() {
   return (
@@ -60,10 +62,18 @@ const ConfiguracionInstituciones = () => {
                 <InstitutionDetails />
               </Typography>
               {/*<SettingsNotifications />*/}
-              <NonWorkingDays />
+              
+              <Box sx={{ pt: 3 }}>
+                {/*<SettingsNotifications />*/}
+                <NonWorkingDays />
+              </Box>
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}
                 <OpenAndCloseTimes />
+              </Box>
+              <Box sx={{ pt: 3 }}>
+                {/*<SettingsNotifications />*/}
+                <AdvancePaymentConfig />
               </Box>
             </Container>
           </Box>

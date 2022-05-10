@@ -32,3 +32,25 @@ export const reservations = [
     endDate: new Date(2022, 3, 6, 10, 0),
   },
 ];
+
+export const priorityData = [{
+  text: 'Low Priority',
+  id: 1,
+  color: '#fcb65e',
+}, {
+  text: 'High Priority',
+  id: 2,
+  color: '#e18e92',
+},
+];
+
+export const typeData = [{
+  text: 'Home',
+  id: 1,
+  color: '#b6d623',
+}, {
+  text: 'Work',
+  id: 2,
+  color: '#679ec5',
+},
+];

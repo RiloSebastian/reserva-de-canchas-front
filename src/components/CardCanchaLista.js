@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CardCancha from "./items/CardCancha";
 import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 import { institutionsFounded as i } from "./../assets/mocks/institutionsFounded";
 
 const CardCanchaLista = () => {
@@ -12,6 +13,9 @@ const CardCanchaLista = () => {
         direction={{ xs: "column", sm: "row" }}
         spacing={{ xs: 1, sm: 2, md: 4 }}
       >
+        {/*institutions.map((institution) => (
+          <CardCancha institution={institution} />
+        ))*/}
         {institutions.map((institution) => (
           <CardCancha institution={institution} />
         ))}

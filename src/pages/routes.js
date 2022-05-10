@@ -11,6 +11,7 @@ import ConfiguracionInstituciones from "./instituciones/ConfiguracionInstitucion
 import CustomerProfile from "./usuarios/profile/CustomerProfile";
 import AdminProfile from "./usuarios/profile/AdminProfile";
 import ReservaGrid from "./reservas/ReservaGrid";
+import ReservaGridCustom from "./reservas/ReservaGridCustom";
 
 export const BASE_URL_INSTITUTIONS = {
   base: "/dashboard",
@@ -66,7 +67,8 @@ const InstitutionRoutes = [
   {
     id: "reservas",
     path: "/reservas",
-    component: ReservaGrid,
+    //component: ReservaGrid,
+    component: ReservaGridCustom,
     exact: true,
   },
   {
