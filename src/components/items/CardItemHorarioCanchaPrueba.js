@@ -53,8 +53,28 @@ import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import { Visibility } from "@mui/icons-material/Visibility";
 
+import PropTypes from "prop-types";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import { styled } from "@mui/material/styles";
+import MuiGrid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardActionArea from "@mui/material/CardActionArea";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+
+import Divider from "@mui/material/Divider";
+
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { BASE_URL_CUSTOMERS } from "../../pages/routes";
+
+const GridDescription = styled(MuiGrid)(({ theme }) => ({
+  width: "100%",
+  ...theme.typography.body2,
+  '& [role="separator"]': {
+    margin: theme.spacing(0, 2),
+  },
+}));
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -206,7 +226,7 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
                 </Box>*/}
             <List
               dense
-              sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+              sx={{ width: "100%", maxWidth: 500, bgcolor: "background.paper" }}
             >
               {courts.map((court) => {
                 const labelId = `checkbox-list-secondary-label-${court.court_id}`;
@@ -219,18 +239,101 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
                         onClick={handleToggle(court)}
                         dense
                       >
-                        <ListItemAvatar>
-                          <Avatar
-                            alt={`Avatar n°${court.court_id + 1}`}
-                            src={`/static/images/avatar/${
-                              court.court_id + 1
-                            }.jpg`}
-                          />
-                        </ListItemAvatar>
                         <ListItemText
                           id={labelId}
-                          primary={` ${court.name}`}
-                          secondary={`$ ${court.price}`}
+                          primary={
+                            <Grid container alignItems="center">
+                              <Grid item xs>
+                                <Typography gutterBottom variant="h6">
+                                  {court.name}
+                                </Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography gutterBottom variant="h6">
+                                  {`$ ${court.price}`}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          }
+                          secondary={
+                            <div>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  width: "fit-content",
+                                  color: "text.secondary",
+                                  "& svg": {
+                                    m: 1.5,
+                                  },
+                                  "& hr": {
+                                    mx: 0.5,
+                                  },
+                                }}
+                              >
+                                <Typography
+                                  variant="subtitle2"
+                                  gutterBottom
+                                  component="div"
+                                >
+                                  {court.surface}
+                                </Typography>
+                                <Divider
+                                  orientation="vertical"
+                                  variant="middle"
+                                  flexItem
+                                />
+                                <Typography
+                                  variant="subtitle2"
+                                  gutterBottom
+                                  component="div"
+                                >
+                                  {court.isCovered ? "Techada" : "Descubierta"}
+                                </Typography>
+                                <Divider
+                                  orientation="vertical"
+                                  variant="middle"
+                                  flexItem
+                                />
+                                <Typography
+                                  variant="subtitle2"
+                                  gutterBottom
+                                  component="div"
+                                >
+                                  {court.isLighting
+                                    ? "Con Iluminacion"
+                                    : "Sin Iluminacion"}
+                                </Typography>
+                              </Box>
+                            </div>
+                            /*<GridDescription container>
+                              <GridDescription item xs>
+                                <div>{court.surface}</div>
+                              </GridDescription>
+                              <Divider
+                                orientation="vertical"
+                                variant="middle"
+                                flexItem
+                              />
+                              <GridDescription item xs>
+                                <div>
+                                  {court.isCovered ? "Techada" : "Descubierta"}
+                                </div>
+                              </GridDescription>
+                              <Divider
+                                orientation="vertical"
+                                variant="middle"
+                                flexItem
+                              />
+                              <GridDescription item xs>
+                                <div>
+                                  {court.isLighting
+                                    ? "Con Iluminacion"
+                                    : "Sin Iluminacion"}
+                                </div>
+                              </GridDescription>
+                            </GridDescription>*/
+                          }
                         />
                       </ListItemButton>
                     </ListItem>

@@ -19,6 +19,10 @@ import StarIcon from "@mui/icons-material/Star";
 import { Icon } from "@mui/material";
 import SportsTennisIcon from "@mui/icons-material/SportsTennis";
 import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
+import Rating from "@mui/material/Rating";
 
 const CardCancha = ({ institution }) => {
   const [open, setOpen] = useState(false);
@@ -36,7 +40,7 @@ const CardCancha = ({ institution }) => {
 
   return (
     <>
-      <Card sx={{ maxWidth: 345 }}>
+      {/*<Card sx={{ maxWidth: 345 }}>
         <CardActionArea>
           <CardHeader
             avatar={
@@ -82,13 +86,76 @@ const CardCancha = ({ institution }) => {
               {schedule.schedule}
             </Button>
           ))}
+          {<Button variant="contained" disableElevation onClick={desplegarModal}>
+            Consultar Horarios
+          </Button>}
+        </CardActions>
+      </Card>*/}
+
+      {/*open && <CardItemHorarioCancha open={open} setOpen={setOpen} />*/}
+
+      <Card sx={{ maxWidth: 345 }}>
+        <CardActionArea>
+          <CardMedia
+            component="img"
+            height="194"
+            width="400"
+            image={institution.image}
+            alt="courts"
+          />
+          <CardHeader
+            title={institution.institution_name}
+            subheader={institution.address}
+            sx={{
+              pb: 0,
+            }}
+          />
+          <CardContent>
+            <Box
+              sx={{
+                width: 200,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Rating
+                name="text-feedback"
+                value={institution.institution_rating}
+                readOnly
+                precision={0.5}
+                emptyIcon={
+                  <StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />
+                }
+              />
+              <Box sx={{ ml: 1 }}>
+                <Typography variant="body1">
+                  {institution.institution_rating}
+                </Typography>
+              </Box>
+            </Box>
+          </CardContent>
+        </CardActionArea>
+        <Divider variant="middle" />
+        <CardActions alignItems="center">
+          <Box sx={{ m: 2 }}>
+            <Typography gutterBottom variant="body1">
+              Seleccione el horario
+            </Typography>
+            <Stack direction="row" spacing={1}>
+              {institution.sport.schedules.map((schedule) => (
+                <Chip
+                  label={schedule.schedule + ` pm`}
+                  onClick={() => desplegarModal(schedule)}
+                />
+              ))}
+            </Stack>
+          </Box>
+
           {/*<Button variant="contained" disableElevation onClick={desplegarModal}>
             Consultar Horarios
           </Button>*/}
         </CardActions>
       </Card>
-
-      {/*open && <CardItemHorarioCancha open={open} setOpen={setOpen} />*/}
 
       {open && (
         <CardItemHorarioCanchaPrueba

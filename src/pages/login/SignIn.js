@@ -58,11 +58,12 @@ const SignIn = (props) => {
       password: data.get("password"),
     });
 
-    localStorage.setItem("user", JSON.stringify({
-      roles:[
-        "ROLE_ADMIN"
-      ]
-    }));
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        roles: ["ROLE_CUSTOMER"],
+      })
+    );
 
     history.push("/dashboard/reservas");
 
