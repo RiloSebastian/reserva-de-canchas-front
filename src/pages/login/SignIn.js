@@ -58,16 +58,16 @@ const SignIn = (props) => {
       password: data.get("password"),
     });
 
-    localStorage.setItem(
+    /* localStorage.setItem(
       "user",
       JSON.stringify({
         roles: ["ROLE_CUSTOMER"],
       })
     );
 
-    history.push("/dashboard/reservas");
+    history.push("/dashboard/reservas");*/
 
-    /* const user = await AuthService.login(
+    const user = await AuthService.login(
       data.get("username"),
       data.get("password")
     ).then((data) => data);
@@ -75,10 +75,10 @@ const SignIn = (props) => {
     console.log(user.roles[0]);
 
     if (user.roles[0] === "ROLE_CUSTOMER") {
-      history.push("/dashboard/home");
+      history.push("/customer/home");
     } else {
       history.push("/dashboard/reservas");
-    } */
+    }
   };
 
   return (
