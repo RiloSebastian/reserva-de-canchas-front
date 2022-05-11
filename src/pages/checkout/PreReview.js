@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -93,11 +93,30 @@ const percentages = Array.from({ length: 3 }, (_, i) => {
   console.log("cargando porcentaje de señas");
   const percentage = 0.25 * i + TAX_RATE_1;
   console.log(percentage);
-  return `${percentage < 10 ? "0" : ""}${percentage}`;
+  return percentage;
 });
 
 const PreReview = () => {
-  const [selectedPercentages, setSelectedPercentages] = useState("2");
+  const [selectedPercentages, setSelectedPercentages] = useState();
+  const [chipColor, setChipColor] = useState("info");
+
+  const handleSelectPercemtage = (newPercentageSelected) => {
+
+    setSelectedPercentages(newPercentageSelected);
+
+    if (newPercentageSelected === 1) {
+      setChipColor("success")
+    } else {
+      setChipColor("info")
+    }
+  };
+
+  useEffect(() => {
+    let selectedPercentages = percentages.filter(percentage => percentage === 0.5);
+    setSelectedPercentages(selectedPercentages[0]);
+
+  }, []);
+
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
@@ -148,14 +167,17 @@ const PreReview = () => {
                         control={
                           <ThemeProvider theme={theme}>
                             <Chip
-                              color="info"
                               key={percentage}
+                              onClick={() => handleSelectPercemtage(percentage)}
+                              //onClick={() => setSelected((s) => !s)}
+                              onDelete={selectedPercentages === percentage && (() => { })}
+                              color={selectedPercentages === percentage ? chipColor : "default"}
+                              variant={selectedPercentages === percentage ? "default" : "outlined"}
                               deleteIcon={<DoneIcon />}
-                              onDelete={handleDelete}
                               label={`${parseFloat(percentage * 100).toFixed(
                                 0
                               )} %`}
-                              onClick={() => setSelectedPercentages(percentage)}
+                            //onClick={() => setSelectedPercentages(percentage)}
                             />
                           </ThemeProvider>
                         }
