@@ -50,6 +50,7 @@ import CommandLayoutPropsComponent from "./appointments/appointment-form-compone
 
 import withRoot from "../home/modules/withRoot";
 import InstitutionLayout from "../../layout/InstitutionLayout";
+import { Card } from "@mui/material";
 
 const courts = [
   {
@@ -312,13 +313,19 @@ const appointmentComponent = (props) => {
   return <Appointments.Appointment {...props} />;
 };
 
-const ReservaGrid = () => {
+const ReservaGridCustom = () => {
   const [data, setData] = useState(reservations);
 
   const [currentSport, setCurrentSport] = useState(0);
 
   const sportChange = (value) => {
     const nextResources = [
+      {
+        fieldName: "id",
+        title: "Reservations",
+        instances: reservations,
+        allowMultiple: true,
+      },
       {
         fieldName: "courtId",
         title: "Courts",
@@ -351,10 +358,15 @@ const ReservaGrid = () => {
 
   const [resources, setResources] = useState([
     {
+      fieldName: "id",
+      title: "Reservations",
+      instances: reservations,
+      allowMultiple: true,
+    },
+    {
       fieldName: "courtId",
       title: "Courts",
       instances: courts,
-      allowMultiple: true,
     },
     {
       fieldName: "sportId",
@@ -388,15 +400,16 @@ const ReservaGrid = () => {
   };
 
   const handleCommitChanges = ({ added, changed, deleted }) => {
+    let newData = data;
     if (added) {
       console.log("added");
       const startingAddedId =
         data.length > 0 ? data[data.length - 1].id + 1 : 0;
-      data = [...data, { id: startingAddedId, ...added }];
+        newData = [...data, { id: startingAddedId, ...added }];
     }
     if (changed) {
       console.log("changed");
-      data = data.map((appointment) =>
+      newData = data.map((appointment) =>
         changed[appointment.id]
           ? { ...appointment, ...changed[appointment.id] }
           : appointment
@@ -404,9 +417,9 @@ const ReservaGrid = () => {
     }
     if (deleted !== undefined) {
       console.log("deleted");
-      data = data.filter((appointment) => appointment.id !== deleted);
+      newData = data.filter((appointment) => appointment.id !== deleted);
     }
-    setData(data);
+    setData(newData);
   };
 
   const handleChangeAddedAppointment = (addedAppointment) => {
@@ -428,7 +441,7 @@ const ReservaGrid = () => {
   };
 
   return (
-    <Paper>
+    <Card>
       <Scheduler
         data={filterTasks(data, currentSport)}
         height={660}
@@ -487,8 +500,8 @@ const ReservaGrid = () => {
         <GroupingPanel cellComponent={GroupingPanelCell} />
         <DragDropProvider />
       </Scheduler>
-    </Paper>
+    </Card>
   );
 };
 
-export default ReservaGrid;
+export default ReservaGridCustom;

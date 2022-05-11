@@ -1,7 +1,5 @@
 import HomePage from "./home/HomePage";
 import Home from "./home/Home";
-import ListaReserva from "./reservas/ListaReserva";
-import ReservaGrid from "./reservas/ReservaGrid";
 import ListaCanchas from "./canchas/ListaCanchas";
 import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
 import ListaPromociones from "./promociones/ListaPromociones";
@@ -10,9 +8,17 @@ import Checkout from "./checkout/Checkout";
 import MisReservas from "./usuarios/clientes/MisReservas";
 import Listainstitucions from "./instituciones/ListaInstituciones";
 import ConfiguracionInstituciones from "./instituciones/ConfiguracionInstituciones";
+import CustomerProfile from "./usuarios/profile/CustomerProfile";
+import AdminProfile from "./usuarios/profile/AdminProfile";
+import ReservaGrid from "./reservas/ReservaGrid";
+import ReservaGridCustom from "./reservas/ReservaGridCustom";
 
-export const BASE_URL = {
+export const BASE_URL_INSTITUTIONS = {
   base: "/dashboard",
+};
+
+export const BASE_URL_CUSTOMERS = {
+  base: "/customer",
 };
 
 export const PATHS = {
@@ -20,6 +26,7 @@ export const PATHS = {
   signup: "/signup",
   signupinstitution: "/signup/institution",
   forgotpass: "/forgot-pass",
+  homepage: "/homepage",
 };
 
 export const CustomerRoutes = [
@@ -29,30 +36,16 @@ export const CustomerRoutes = [
     component: Home,
     exact: true,
   },
-  {
-    id: "checkout",
-    path: "/checkout",
-    component: Checkout,
-    exact: true,
-  },
-  {
-    id: "reservas",
-    path: "/reservas",
-    component: ReservaGrid,
-    exact: true,
-  },
-];
 
-const InstitutionRoutes = [
   {
-    id: "home",
-    path: "/home",
-    component: Home,
+    id: "perfil",
+    path: "/perfil",
+    component: CustomerProfile,
     exact: true,
   },
   {
     id: "mis-reservas",
-    path: "/home/mis-reservas",
+    path: "/mis-reservas",
     component: MisReservas,
     exact: true,
   },
@@ -62,10 +55,20 @@ const InstitutionRoutes = [
     component: Checkout,
     exact: true,
   },
+];
+
+const InstitutionRoutes = [
+  {
+    id: "perfil",
+    path: "/perfil",
+    component: AdminProfile,
+    exact: true,
+  },
   {
     id: "reservas",
     path: "/reservas",
-    component: ReservaGrid,
+    //component: ReservaGrid,
+    component: ReservaGridCustom,
     exact: true,
   },
   {

@@ -3,9 +3,7 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
+import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -31,6 +29,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useHistory } from "react-router-dom";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -84,6 +83,8 @@ function Copyright(props) {
 const theme = createTheme();
 
 const SignUp = () => {
+  let history = useHistory();
+
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -111,16 +112,17 @@ const SignUp = () => {
     console.log({
       email: data.get("email"),
       password: data.get("password"),
+      role: data.get("role"),
     });
 
     AuthService.register(
       data.get("firstName"),
       data.get("lastName"),
-      data.get("tipoUsuario"),
+      data.get("role"),
       data.get("email"),
       data.get("password")
     )
-      .then()
+      .then(history.push("/dashboard/home"))
       .catch(function (rej) {
         //here when you reject the promise
         console.log(rej);
@@ -234,6 +236,13 @@ const SignUp = () => {
                   />
                 </Grid>
               </Grid>
+              <TextField
+                sx={{ mt: 3, mb: 2 }}
+                name="role"
+                id="role"
+                value="ROLE_CUSTOMER"
+                type="hidden"
+              />
               <Button
                 type="submit"
                 fullWidth
@@ -244,7 +253,7 @@ const SignUp = () => {
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link href="/login" variant="body2">
+                  <Link to="/login" variant="body2">
                     Ya tenes una Cuenta? Inicia Sesion
                   </Link>
                 </Grid>

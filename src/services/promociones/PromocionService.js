@@ -79,12 +79,6 @@ const removeAll = async (institution_id) => {
   }
 };
 
-/*
-const findByTitle = title => {
-    return http.get(`/tutorials?title=${title}`);
-};
-*/
-
 export default {
   getAll,
   get,

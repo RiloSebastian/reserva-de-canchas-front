@@ -27,12 +27,17 @@ import { List, ListItem, Collapse, Button } from "@material-ui/core";
 import getMenu from "./sideBarItems";
 import useStyles from "./menuBarStyles";
 import { Link, NavLink as RouterLink } from "react-router-dom";
-import ReservationsRoutes, { BASE_URL } from "../../pages/routes";
 import { Route, Switch } from "react-router";
 import AuthService from "../../services/auth.service";
 import { USER_ROLE } from "../../constants/userRole";
 import Tooltip from "@mui/material/Tooltip";
 import withRoot from "../../pages/home/modules/withRoot";
+import InstitutionRoutes, {
+  BASE_URL_INSTITUTIONS,
+  BASE_URL_CUSTOMERS,
+  CustomerRoutes,
+  BASE_URL_ACCOUNT,
+} from "./../../pages/routes";
 
 const drawerWidth = 240;
 
@@ -105,6 +110,26 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
+const getBaseUrl = (role) => {
+  switch (role) {
+    case USER_ROLE.CUSTOMER.role:
+      return BASE_URL_CUSTOMERS;
+
+    case USER_ROLE.ADMIN.role:
+      return BASE_URL_INSTITUTIONS;
+  }
+};
+
+const getRoleRoutes = (role) => {
+  switch (role) {
+    case USER_ROLE.CUSTOMER.role:
+      return CustomerRoutes;
+
+    case USER_ROLE.ADMIN.role:
+      return InstitutionRoutes;
+  }
+};
+
 const MenuBar = (props) => {
   const classes = useStyles();
   const theme = useTheme();
@@ -153,11 +178,19 @@ const MenuBar = (props) => {
     AuthService.logout();
   };
 
+  const handleOpenProfile = () => {
+    handleMenuClose();
+  };
+
   const CustomRouterLink = forwardRef((props, ref) => (
     <div ref={ref} style={{ flexGrow: 1 }}>
       <RouterLink {...props} />
     </div>
   ));
+
+  const user = JSON.parse(JSON.parse(AuthService.getCurrentUser()));
+
+  const BASE_URL = getBaseUrl(user.roles[0]);
 
   const handleMenu = () => {
     const user = JSON.parse(JSON.parse(AuthService.getCurrentUser()));
@@ -203,7 +236,13 @@ const MenuBar = (props) => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Perfil</MenuItem>
+      <MenuItem
+        component={Link}
+        to={"/dashboard/perfil"}
+        onClick={handleOpenProfile}
+      >
+        Perfil
+      </MenuItem>
       <MenuItem component={Link} to={"/homepage"} onClick={handleLogOut}>
         Cerrar Sesion
       </MenuItem>
@@ -345,14 +384,16 @@ const MenuBar = (props) => {
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
         <Switch>
-          {ReservationsRoutes.map(({ id, path, component, exact }) => (
-            <Route
-              key={id}
-              path={BASE_URL.base + path}
-              component={component}
-              exact={exact}
-            />
-          ))}
+          {getRoleRoutes(user.roles[0]).map(
+            ({ id, path, component, exact }) => (
+              <Route
+                key={id}
+                path={BASE_URL.base + path}
+                component={component}
+                exact={exact}
+              />
+            )
+          )}
         </Switch>
       </Box>
     </Box>

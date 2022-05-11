@@ -5,7 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
+import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -18,6 +18,7 @@ import AuthService from "../../services/auth.service";
 import withRoot from "./../home/modules/withRoot";
 import AppAppBar from "./../home/modules/views/AppAppBar";
 import { green, grey, red } from "@mui/material/colors";
+import { BASE_URL_CUSTOMERS } from "../routes";
 
 function Copyright(props) {
   return (
@@ -57,6 +58,15 @@ const SignIn = (props) => {
       password: data.get("password"),
     });
 
+    /* localStorage.setItem(
+      "user",
+      JSON.stringify({
+        roles: ["ROLE_CUSTOMER"],
+      })
+    );
+
+    history.push("/dashboard/reservas");*/
+
     const user = await AuthService.login(
       data.get("username"),
       data.get("password")
@@ -65,10 +75,8 @@ const SignIn = (props) => {
     console.log(user.roles[0]);
 
     if (user.roles[0] === "ROLE_CUSTOMER") {
-      //<Redirect to="/dashboard/home" />;
-      history.push("/dashboard/home");
+      history.push("/customer/home");
     } else {
-      //<Redirect to="/dashboard/reservas" />;
       history.push("/dashboard/reservas");
     }
   };
@@ -119,10 +127,10 @@ const SignIn = (props) => {
                 id="password"
                 autoComplete="current-password"
               />
-              <FormControlLabel
+              {/*<FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Recordarme"
-              />
+          />*/}
               <Button
                 type="submit"
                 fullWidth
@@ -132,13 +140,13 @@ const SignIn = (props) => {
                 {"Iniciar Sesion"}
               </Button>
               <Grid container>
-                <Grid item xs>
-                  <Link href="/forgot-pass" variant="body2">
+                {/*<Grid item xs>
+                  <Link to="/forgot-pass" variant="body2">
                     Olvidaste la Contraseña?
                   </Link>
-                </Grid>
+        </Grid>*/}
                 <Grid item>
-                  <Link href="/signup" variant="body2">
+                  <Link to="/signup" variant="body2">
                     {"Aun no tienes una Cuenta? Registrarse"}
                   </Link>
                 </Grid>

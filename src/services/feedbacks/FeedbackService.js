@@ -2,7 +2,7 @@ import http from "../../http-common";
 import AuthHeader from "../auth-header";
 import { Redirect } from "react-router";
 
-const getAll = async (institution_id) => {
+const getAllByInstitution = async (institution_id) => {
   try {
     const listadoCanchas = await http.get(
       `/institutions/${institution_id}/courts`
@@ -59,7 +59,7 @@ const update = async (institution_id, data) => {
 const remove = async (institution_id, court_id) => {
   try {
     return await http.delete(
-      `/institutions/${institution_id}/courts/${court_id}`,
+      `/institutions/${institution_id}/promotions/${court_id}`,
       {
         headers: AuthHeader(),
       }
@@ -69,9 +69,9 @@ const remove = async (institution_id, court_id) => {
   }
 };
 
-const removeAll = async (institution_id) => {
+const removeAllByInstitution = async (institution_id) => {
   try {
-    return await http.delete(`/institutions/${institution_id}/courts`, {
+    return await http.delete(`/institutions/${institution_id}/promotions`, {
       headers: AuthHeader(),
     });
   } catch (err) {
@@ -79,17 +79,11 @@ const removeAll = async (institution_id) => {
   }
 };
 
-/*
-const findByTitle = title => {
-    return http.get(`/tutorials?title=${title}`);
-};
-*/
-
 export default {
-  getAll,
+  getAllByInstitution,
   get,
   create,
   update,
   remove,
-  removeAll,
+  removeAllByInstitution,
 };

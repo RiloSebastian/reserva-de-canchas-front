@@ -36,7 +36,7 @@ export default function ProductHero() {
       </Typography>
 
       <Link
-        to="/login"
+        to="/signup"
         style={{
           color: "inherit",
           variant: "h6",
@@ -47,8 +47,6 @@ export default function ProductHero() {
           color="secondary"
           variant="contained"
           size="large"
-          component="a"
-          href="/signup"
           sx={{ minWidth: 200 }}
         >
           registrate

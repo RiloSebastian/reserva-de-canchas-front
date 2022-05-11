@@ -39,6 +39,7 @@ import FormularioHorarioPrecioCancha from "../../components/formularios-datos/Fo
 import UploadImage from "../../components/UploadImage";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import { useHistory } from "react-router-dom";
+import { BASE_URL_CUSTOMERS } from "../../pages/routes";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -107,7 +108,7 @@ const CardItemHorarioCancha = ({ open, setOpen }) => {
     setOpen(false);
 
     history.push({
-      pathname: "/dashboard/checkout",
+      pathname: BASE_URL_CUSTOMERS.base + "/checkout",
       state: "data sended",
     });
   };
