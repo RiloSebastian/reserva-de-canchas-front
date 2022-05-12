@@ -4,7 +4,6 @@ import {
   Radio,
   Stack,
   Button,
-  Drawer,
   Rating,
   Divider,
   Checkbox,
@@ -18,9 +17,49 @@ import ScrollBar from "./ScrollBar";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import CloseIcon from '@mui/icons-material/Close';
-import { useTheme } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
+import MuiDrawer from "@mui/material/Drawer";
+import Drawer from "@mui/material/Drawer";
 //import { ColorManyPicker } from "../../../components/color-utils";
+const drawerWidth = 240;
 
+const openedMixin = (theme) => ({
+  width: drawerWidth,
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: "hidden",
+});
+
+const closedMixin = (theme) => ({
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  overflowX: "hidden",
+  width: `calc(${theme.spacing(7)} + 1px)`,
+  [theme.breakpoints.up("sm")]: {
+    width: `calc(${theme.spacing(9)} + 1px)`,
+  },
+});
+
+/* const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "isOpenFilter",
+})(({ theme, isOpenFilter }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(isOpenFilter && {
+    ...openedMixin(theme),
+    "& .MuiDrawer-paper": openedMixin(theme),
+  }),
+  ...(!isOpenFilter && {
+    ...closedMixin(theme),
+    "& .MuiDrawer-paper": closedMixin(theme),
+  }),
+})); */
 
  const SORT_BY_OPTIONS = [
   { value: "featured", label: "Destacadas" },
