@@ -139,7 +139,7 @@ const FormularioFiltroCanchas = () => {
           ))}
         </Select>
       </FormControl>
-      <FormControl fullWidth>
+      {/*<FormControl fullWidth>
         <InputLabel htmlFor="outlined-adornment-password">
           Institucion
         </InputLabel>
@@ -155,10 +155,10 @@ const FormularioFiltroCanchas = () => {
           }
           label="Password"
         />
-      </FormControl>
+        </FormControl>*/}
 
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <FormControl sx={{ width: "25ch" }}>
+        <FormControl fullWidth>
           <MobileDatePicker
             label="Fecha"
             value={value}
@@ -181,7 +181,7 @@ const FormularioFiltroCanchas = () => {
       </LocalizationProvider>
 
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <FormControl sx={{ width: "25ch" }}>
+        <FormControl fullWidth>
           <MobileTimePicker
             label="Horario"
             value={value}

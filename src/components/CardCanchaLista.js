@@ -3,15 +3,26 @@ import CardCancha from "./items/CardCancha";
 import Box from "@mui/material/Box";
 import { Container, Stack, Typography } from "@mui/material";
 import { institutionsFounded as i } from "./../assets/mocks/institutionsFounded";
-import CourtFilterSidebar from "./courts/CourtFilterSidebar";
+import CourtFilterSideBar from "./courts/CourtFilterSideBar";
+import CourtSort from "./courts/CourtSort";
 
 const CardCanchaLista = () => {
   const [institutions, setInstitutions] = useState(i);
 
+  const [openFilter, setOpenFilter] = useState(false);
+
+  const handleOpenFilter = () => {
+    setOpenFilter(true);
+  };
+
+  const handleCloseFilter = () => {
+    setOpenFilter(false);
+  };
+
   return (
     <Container>
-      <Typography variant="h4" sx={{ mb: 5 }}>
-        Products
+      <Typography variant="h4">
+        Instituciones Encontradas
       </Typography>
 
       <Stack
@@ -22,12 +33,12 @@ const CardCanchaLista = () => {
         sx={{ mb: 5 }}
       >
         <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
-          <CourtFilterSidebar
+          <CourtFilterSideBar
             isOpenFilter={openFilter}
             onOpenFilter={handleOpenFilter}
             onCloseFilter={handleCloseFilter}
           />
-          <ProductSort />
+          <CourtSort />
         </Stack>
       </Stack>
 
@@ -42,7 +53,6 @@ const CardCanchaLista = () => {
           <CardCancha institution={institution} />
         ))}
       </Stack>
-      <ProductCartWidget />
     </Container>
   );
 };

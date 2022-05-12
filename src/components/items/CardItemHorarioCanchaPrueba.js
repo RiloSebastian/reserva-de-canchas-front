@@ -99,7 +99,7 @@ const tableIcons = {
 };
 
 const colors = {
-  primary: "#ff0000",
+  primary: "#FF5733",
 };
 
 const theme = createTheme({

@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-// material
 import {
   Box,
   Radio,
@@ -15,38 +14,38 @@ import {
   RadioGroup,
   FormControlLabel,
 } from "@mui/material";
-// components
-//import Iconify from "../../../components/Iconify";
-//import Scrollbar from "../../../components/Scrollbar";
+import ScrollBar from "./ScrollBar";
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ClearAllIcon from '@mui/icons-material/ClearAll';
+import CloseIcon from '@mui/icons-material/Close';
+import { useTheme } from '@mui/material/styles';
 //import { ColorManyPicker } from "../../../components/color-utils";
 
-// ----------------------------------------------------------------------
 
-export const SORT_BY_OPTIONS = [
-  { value: "featured", label: "Featured" },
-  { value: "newest", label: "Newest" },
-  { value: "priceDesc", label: "Price: High-Low" },
-  { value: "priceAsc", label: "Price: Low-High" },
+ const SORT_BY_OPTIONS = [
+  { value: "featured", label: "Destacadas" },
+  { value: "priceDesc", label: "Precio: Mayor-Menor" },
+  { value: "priceAsc", label: "Precio: Menor-Mayor" },
 ];
-export const FILTER_GENDER_OPTIONS = ["Men", "Women", "Kids"];
-export const FILTER_CATEGORY_OPTIONS = [
+ const FILTER_GENDER_OPTIONS = ["Men", "Women", "Kids"];
+ const FILTER_CATEGORY_OPTIONS = [
   "All",
   "Shose",
   "Apparel",
   "Accessories",
 ];
-export const FILTER_RATING_OPTIONS = [
+ const FILTER_RATING_OPTIONS = [
   "up4Star",
   "up3Star",
   "up2Star",
   "up1Star",
 ];
-export const FILTER_PRICE_OPTIONS = [
+ const FILTER_PRICE_OPTIONS = [
   { value: "below", label: "Below $25" },
   { value: "between", label: "Between $25 - $75" },
   { value: "above", label: "Above $75" },
 ];
-export const FILTER_COLOR_OPTIONS = [
+ const FILTER_COLOR_OPTIONS = [
   "#00AB55",
   "#000000",
   "#FFFFFF",
@@ -57,18 +56,25 @@ export const FILTER_COLOR_OPTIONS = [
   "#FFC107",
 ];
 
-// ----------------------------------------------------------------------
+const CourtFilterSideBar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
 
-const CourtFilterSidebar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
+  const theme = useTheme();
+
+  CourtFilterSideBar.propTypes = {
+    isOpenFilter: PropTypes.bool,
+    onOpenFilter: PropTypes.func,
+    onCloseFilter: PropTypes.func,
+  };
+
   return (
-    <>
+    <div>
       <Button
         disableRipple
         color="inherit"
-        //endIcon={<Iconify icon="ic:round-filter-list" />}
+        endIcon={<FilterListIcon/>}
         onClick={onOpenFilter}
       >
-        Filters&nbsp;
+        Filtros&nbsp;
       </Button>
 
       <Drawer
@@ -76,7 +82,7 @@ const CourtFilterSidebar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
         open={isOpenFilter}
         onClose={onCloseFilter}
         PaperProps={{
-          sx: { width: 280, border: "none", overflow: "hidden" },
+          sx: { width: 280, border: "none", zIndex: theme.zIndex.speedDial },
         }}
       >
         <Stack
@@ -86,16 +92,16 @@ const CourtFilterSidebar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
           sx={{ px: 1, py: 2 }}
         >
           <Typography variant="subtitle1" sx={{ ml: 1 }}>
-            Filters
+            Filtros
           </Typography>
           <IconButton onClick={onCloseFilter}>
-            {/*<Iconify icon="eva:close-fill" width={20} height={20} />*/}
+            <CloseIcon />
           </IconButton>
         </Stack>
 
         <Divider />
 
-        <Scrollbar>
+        <ScrollBar>
           <Stack spacing={3} sx={{ p: 3 }}>
             <div>
               <Typography variant="subtitle1" gutterBottom>
@@ -189,7 +195,7 @@ const CourtFilterSidebar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
               </RadioGroup>
             </div>
           </Stack>
-        </Scrollbar>
+        </ScrollBar>
 
         <Box sx={{ p: 3 }}>
           <Button
@@ -198,14 +204,14 @@ const CourtFilterSidebar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
             type="submit"
             color="inherit"
             variant="outlined"
-            //startIcon={/*<Iconify icon="ic:round-clear-all" />*/}
+            startIcon={<ClearAllIcon />}
           >
-            Clear All
+            Limpiar Filtros
           </Button>
         </Box>
       </Drawer>
-    </>
+    </div>
   );
 };
 
-export default CourtFilterSidebar;
+export default CourtFilterSideBar;
