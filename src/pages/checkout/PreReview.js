@@ -40,7 +40,7 @@ const theme = createTheme({
   },
 });
 
-const reservas = [
+/* const reservas = [
   {
     cancha: "Cancha 1",
     institucion: "Institucion",
@@ -48,7 +48,7 @@ const reservas = [
     horario: "20:00",
     precio: 1200.0,
   },
-];
+]; */
 
 const TAX_RATE_1 = 0.5;
 const TAX_RATE_2 = 0.75;
@@ -67,19 +67,11 @@ function createRow(desc, qty, unit) {
   return { desc, qty, unit, price };
 }
 
-function subtotal(items) {
-  return reservas.map(({ precio }) => precio).reduce((sum, i) => sum + i, 0);
-}
-
 const rows = [
   createRow("Paperclips (Box)", 100, 1.15),
   createRow("Paper (Case)", 10, 45.99),
   createRow("Waste Basket", 2, 17.99),
 ];
-
-const invoiceSubtotal = subtotal(rows);
-const invoiceTaxes = TAX_RATE_1 * invoiceSubtotal;
-const invoiceTotal = invoiceSubtotal - invoiceTaxes;
 
 const handlePercentage = () => {
   console.log("Percentage");
@@ -96,25 +88,37 @@ const percentages = Array.from({ length: 3 }, (_, i) => {
   return percentage;
 });
 
-const PreReview = () => {
+const PreReview = ({ reservation }) => {
   const [selectedPercentages, setSelectedPercentages] = useState();
   const [chipColor, setChipColor] = useState("info");
+  //const [reservations, setReservations] = useState(reservation);
+
+  const subtotal = (items) => {
+    return items.map(({ price }) => price).reduce((sum, i) => sum + i, 0);
+  };
+
+  const [invoiceSubtotal, setInvoiceSubtotal] = useState(subtotal(rows));
+  const invoiceTaxes = TAX_RATE_1 * invoiceSubtotal;
+  const invoiceTotal = invoiceSubtotal - invoiceTaxes;
 
   const handleSelectPercemtage = (newPercentageSelected) => {
-
     setSelectedPercentages(newPercentageSelected);
 
     if (newPercentageSelected === 1) {
-      setChipColor("success")
+      setChipColor("success");
     } else {
-      setChipColor("info")
+      setChipColor("info");
     }
   };
 
   useEffect(() => {
-    let selectedPercentages = percentages.filter(percentage => percentage === 0.5);
-    setSelectedPercentages(selectedPercentages[0]);
+    console.log("loading preview");
+    console.log(reservation);
 
+    let selectedPercentages = percentages.filter(
+      (percentage) => percentage === 0.5
+    );
+    setSelectedPercentages(selectedPercentages[0]);
   }, []);
 
   return (
@@ -138,14 +142,22 @@ const PreReview = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {reservas.map((reserva) => (
+            {/*reservations.map((reserva) => (
               <TableRow key={reserva.cancha}>
                 <TableCell>{reserva.cancha}</TableCell>
                 <TableCell align="right">{reserva.fecha}</TableCell>
                 <TableCell align="right">{reserva.horario}</TableCell>
                 <TableCell align="right">{ccyFormat(reserva.precio)}</TableCell>
               </TableRow>
-            ))}
+            ))*/}
+            <TableRow key={reservation.name}>
+              <TableCell>{reservation.name}</TableCell>
+              <TableCell align="right">{reservation.fecha}</TableCell>
+              <TableCell align="right">{reservation.horario}</TableCell>
+              <TableCell align="right">
+                {ccyFormat(reservation.price)}
+              </TableCell>
+            </TableRow>
 
             <TableRow>
               <TableCell rowSpan={3} />
@@ -170,14 +182,24 @@ const PreReview = () => {
                               key={percentage}
                               onClick={() => handleSelectPercemtage(percentage)}
                               //onClick={() => setSelected((s) => !s)}
-                              onDelete={selectedPercentages === percentage && (() => { })}
-                              color={selectedPercentages === percentage ? chipColor : "default"}
-                              variant={selectedPercentages === percentage ? "default" : "outlined"}
+                              onDelete={
+                                selectedPercentages === percentage && (() => {})
+                              }
+                              color={
+                                selectedPercentages === percentage
+                                  ? chipColor
+                                  : "default"
+                              }
+                              variant={
+                                selectedPercentages === percentage
+                                  ? "default"
+                                  : "outlined"
+                              }
                               deleteIcon={<DoneIcon />}
                               label={`${parseFloat(percentage * 100).toFixed(
                                 0
                               )} %`}
-                            //onClick={() => setSelectedPercentages(percentage)}
+                              //onClick={() => setSelectedPercentages(percentage)}
                             />
                           </ThemeProvider>
                         }

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -39,12 +39,12 @@ function Copyright() {
 
 const steps = ["Tu Reserva", "Forma de Pago", "Revise Su Reserva"];
 
-function getStepContent(step) {
+function getStepContent(step, courtSelected) {
   console.log("step");
   console.log(step);
   switch (step) {
     case 0:
-      return <PreReview />;
+      return <PreReview reservation={courtSelected} />;
     case 1:
       return <PaymentForm />;
     case 2:
@@ -61,7 +61,9 @@ const theme = createTheme();
 const Checkout = () => {
   const history = useHistory();
 
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
+
+  const [courtSelected, setCourtSelected] = useState(history.location.state);
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -72,6 +74,7 @@ const Checkout = () => {
   };
 
   React.useEffect(() => {
+    console.log("selected court");
     console.log(history.location.state);
   });
 
@@ -141,7 +144,7 @@ const Checkout = () => {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {getStepContent(activeStep)}
+                {getStepContent(activeStep, courtSelected)}
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   {activeStep !== 0 && (
                     <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>

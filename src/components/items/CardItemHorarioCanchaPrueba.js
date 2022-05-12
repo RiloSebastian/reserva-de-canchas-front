@@ -128,7 +128,7 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
 
   const [courts, setCourts] = useState(schedule.courts);
 
-  const [courtSelected, setCourtSelected] = useState(schedule.courts);
+  const [courtSelected, setCourtSelected] = useState(schedule.courts[0]);
 
   const [date, setDate] = useState(moment(new Date()));
 
@@ -167,6 +167,9 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
     setLoading(true);
 
     setOpen(false);
+
+    console.log("before checkout - sending court selected");
+    console.log(court);
 
     history.push({
       pathname: BASE_URL_CUSTOMERS.base + "/checkout",
