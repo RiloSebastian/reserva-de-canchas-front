@@ -14,13 +14,14 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import ScrollBar from "./ScrollBar";
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ClearAllIcon from '@mui/icons-material/ClearAll';
-import CloseIcon from '@mui/icons-material/Close';
-import { styled, useTheme } from '@mui/material/styles';
+import FilterListIcon from "@mui/icons-material/FilterList";
+import ClearAllIcon from "@mui/icons-material/ClearAll";
+import CloseIcon from "@mui/icons-material/Close";
+import { styled, useTheme } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
 import Drawer from "@mui/material/Drawer";
 //import { ColorManyPicker } from "../../../components/color-utils";
+
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -61,30 +62,20 @@ const closedMixin = (theme) => ({
   }),
 })); */
 
- const SORT_BY_OPTIONS = [
+const SORT_BY_OPTIONS = [
   { value: "featured", label: "Destacadas" },
   { value: "priceDesc", label: "Precio: Mayor-Menor" },
   { value: "priceAsc", label: "Precio: Menor-Mayor" },
 ];
- const FILTER_GENDER_OPTIONS = ["Men", "Women", "Kids"];
- const FILTER_CATEGORY_OPTIONS = [
-  "All",
-  "Shose",
-  "Apparel",
-  "Accessories",
-];
- const FILTER_RATING_OPTIONS = [
-  "up4Star",
-  "up3Star",
-  "up2Star",
-  "up1Star",
-];
- const FILTER_PRICE_OPTIONS = [
+const FILTER_GENDER_OPTIONS = ["Men", "Women", "Kids"];
+const FILTER_CATEGORY_OPTIONS = ["All", "Shose", "Apparel", "Accessories"];
+const FILTER_RATING_OPTIONS = ["up4Star", "up3Star", "up2Star", "up1Star"];
+const FILTER_PRICE_OPTIONS = [
   { value: "below", label: "Below $25" },
   { value: "between", label: "Between $25 - $75" },
   { value: "above", label: "Above $75" },
 ];
- const FILTER_COLOR_OPTIONS = [
+const FILTER_COLOR_OPTIONS = [
   "#00AB55",
   "#000000",
   "#FFFFFF",
@@ -96,7 +87,6 @@ const closedMixin = (theme) => ({
 ];
 
 const CourtFilterSideBar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
-
   const theme = useTheme();
 
   CourtFilterSideBar.propTypes = {
@@ -110,7 +100,7 @@ const CourtFilterSideBar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
       <Button
         disableRipple
         color="inherit"
-        endIcon={<FilterListIcon/>}
+        endIcon={<FilterListIcon />}
         onClick={onOpenFilter}
       >
         Filtros&nbsp;

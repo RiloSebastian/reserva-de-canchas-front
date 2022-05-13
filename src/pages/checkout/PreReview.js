@@ -136,8 +136,8 @@ const PreReview = ({ reservation }) => {
             </TableRow>
             <TableRow>
               <TableCell>Cancha</TableCell>
-              <TableCell align="right">Fecha</TableCell>
-              <TableCell align="right">Horario</TableCell>
+              <TableCell>Fecha</TableCell>
+              <TableCell>Horario</TableCell>
               <TableCell align="right">Precio</TableCell>
             </TableRow>
           </TableHead>
@@ -152,8 +152,8 @@ const PreReview = ({ reservation }) => {
             ))*/}
             <TableRow key={reservation.name}>
               <TableCell>{reservation.name}</TableCell>
-              <TableCell align="right">{reservation.fecha}</TableCell>
-              <TableCell align="right">{reservation.horario}</TableCell>
+              <TableCell>{reservation.fecha}</TableCell>
+              <TableCell>{reservation.horario}</TableCell>
               <TableCell align="right">
                 {ccyFormat(reservation.price)}
               </TableCell>

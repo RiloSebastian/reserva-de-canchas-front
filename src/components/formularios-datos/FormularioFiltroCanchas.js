@@ -58,13 +58,27 @@ function getStyles(name, ubicacion, theme) {
 
 const FormularioFiltroCanchas = () => {
   const theme = useTheme();
+
+  const [searchFilters, setSearchFilters] = useState({});
+
   const [deporte, setDeporte] = useState();
   const [ubicacion, setUbicacion] = useState([]);
   const [institucion, setInstitucion] = useState();
   const [value, setValue] = useState(new Date());
 
   const handleChange = (event) => {
-    setDeporte(event.target.value);
+    setSearchFilters((prevState) => {
+      return {
+        ...prevState,
+        [event.target.name]: event.target.value,
+      };
+    });
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log("handleSubmit");
+    console.log(searchFilters);
   };
 
   const handleUbicacion = (event) => {
@@ -93,6 +107,7 @@ const FormularioFiltroCanchas = () => {
       sx={{
         "& > :not(style)": { m: 1 },
       }}
+      onSubmit={handleSubmit}
       noValidate
       autoComplete="off"
     >
@@ -117,7 +132,7 @@ const FormularioFiltroCanchas = () => {
           id="demo-multiple-chip"
           multiple
           value={ubicacion}
-          onChange={handleUbicacion}
+          onChange={handleChange}
           input={<OutlinedInput id="select-multiple-chip" label="Ubicacion" />}
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -162,9 +177,7 @@ const FormularioFiltroCanchas = () => {
           <MobileDatePicker
             label="Fecha"
             value={value}
-            onChange={(newValue) => {
-              setValue(newValue);
-            }}
+            onChange={handleChange}
             renderInput={(params) => <TextField {...params} />}
           />
         </FormControl>
@@ -185,9 +198,7 @@ const FormularioFiltroCanchas = () => {
           <MobileTimePicker
             label="Horario"
             value={value}
-            onChange={(newValue) => {
-              setValue(newValue);
-            }}
+            onChange={handleChange}
             renderInput={(params) => <TextField {...params} />}
           />
         </FormControl>

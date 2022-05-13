@@ -168,12 +168,18 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
 
     setOpen(false);
 
+    let courtFinalSelected = {
+      ...court,
+      fecha: date,
+      horario: date,
+    };
+
     console.log("before checkout - sending court selected");
-    console.log(court);
+    console.log(courtFinalSelected);
 
     history.push({
       pathname: BASE_URL_CUSTOMERS.base + "/checkout",
-      state: court,
+      state: courtFinalSelected,
     });
   };
 

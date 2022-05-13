@@ -17,6 +17,11 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import { Delete } from "@material-ui/icons";
 import Button from "@mui/material/Button";
+import { Divider } from "@mui/material";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -71,61 +76,135 @@ const MisReservas = () => {
   ]);
 
   return (
-    <MaterialTable
-      title="Mis Reservas"
-      localization={{
-        pagination: {
-          labelDisplayedRows: "{from}-{to} de {count}",
-        },
-        toolbar: {
-          nRowsSelected: "{0} fila(s) seleccionada(s)",
-        },
-        header: {
-          actions: "Opciones",
-        },
-        body: {
-          emptyDataSourceMessage: "Aun no tiene Reservas realizadas",
-          filterRow: {
-            filterTooltip: "Filter",
-          },
-        },
-      }}
-      icons={tableIcons}
-      columns={columns}
-      data={data}
-      editable={{
-        onRowAdd: (newData) =>
-          new Promise((resolve, reject) => {
-            setTimeout(() => {
-              setData([...data, newData]);
+    <>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          pt: 2,
+          pb: 8,
+        }}
+      >
+        <Container
+          sx={{
+            margin: 0,
+          }}
+          maxWidth="lg"
+        >
+          <MaterialTable
+            title="Mis Proximos Turnos"
+            localization={{
+              pagination: {
+                labelDisplayedRows: "{from}-{to} de {count}",
+              },
+              toolbar: {
+                nRowsSelected: "{0} fila(s) seleccionada(s)",
+              },
+              header: {
+                actions: "Opciones",
+              },
+              body: {
+                emptyDataSourceMessage: "Aun no tiene Reservas realizadas",
+                filterRow: {
+                  filterTooltip: "Filter",
+                },
+              },
+            }}
+            icons={tableIcons}
+            columns={columns}
+            data={data}
+            editable={{
+              onRowUpdate: (newData, oldData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    const dataUpdate = [...data];
+                    const index = oldData.tableData.id;
+                    dataUpdate[index] = newData;
+                    setData([...dataUpdate]);
 
-              resolve();
-            }, 1000);
-          }),
-        onRowUpdate: (newData, oldData) =>
-          new Promise((resolve, reject) => {
-            setTimeout(() => {
-              const dataUpdate = [...data];
-              const index = oldData.tableData.id;
-              dataUpdate[index] = newData;
-              setData([...dataUpdate]);
+                    resolve();
+                  }, 1000);
+                }),
+              onRowDelete: (oldData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    const dataDelete = [...data];
+                    const index = oldData.tableData.id;
+                    dataDelete.splice(index, 1);
+                    setData([...dataDelete]);
 
-              resolve();
-            }, 1000);
-          }),
-        onRowDelete: (oldData) =>
-          new Promise((resolve, reject) => {
-            setTimeout(() => {
-              const dataDelete = [...data];
-              const index = oldData.tableData.id;
-              dataDelete.splice(index, 1);
-              setData([...dataDelete]);
+                    resolve();
+                  }, 1000);
+                }),
+            }}
+          />
+        </Container>
+      </Box>
 
-              resolve();
-            }, 1000);
-          }),
-      }}
-    />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          pt: 2,
+          pb: 8,
+        }}
+      >
+        <Container
+          sx={{
+            margin: 0,
+          }}
+          maxWidth="lg"
+        >
+          <MaterialTable
+            title="Mis Turnos Finalizados"
+            localization={{
+              pagination: {
+                labelDisplayedRows: "{from}-{to} de {count}",
+              },
+              toolbar: {
+                nRowsSelected: "{0} fila(s) seleccionada(s)",
+              },
+              header: {
+                actions: "Opciones",
+              },
+              body: {
+                emptyDataSourceMessage: "Aun no tiene Reservas realizadas",
+                filterRow: {
+                  filterTooltip: "Filter",
+                },
+              },
+            }}
+            icons={tableIcons}
+            columns={columns}
+            data={data}
+            editable={{
+              onRowUpdate: (newData, oldData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    const dataUpdate = [...data];
+                    const index = oldData.tableData.id;
+                    dataUpdate[index] = newData;
+                    setData([...dataUpdate]);
+
+                    resolve();
+                  }, 1000);
+                }),
+              onRowDelete: (oldData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    const dataDelete = [...data];
+                    const index = oldData.tableData.id;
+                    dataDelete.splice(index, 1);
+                    setData([...dataDelete]);
+
+                    resolve();
+                  }, 1000);
+                }),
+            }}
+          />
+        </Container>
+      </Box>
+    </>
   );
 };
 
