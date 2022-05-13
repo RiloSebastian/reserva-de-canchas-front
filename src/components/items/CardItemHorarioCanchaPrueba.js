@@ -179,7 +179,7 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
 
     history.push({
       pathname: BASE_URL_CUSTOMERS.base + "/checkout",
-      state: courtFinalSelected,
+      state: court,
     });
   };
 
