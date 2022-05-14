@@ -1,56 +1,45 @@
-import React, { useState } from "react";
-import Paper from "@mui/material/Paper";
 import { connectProps } from "@devexpress/dx-react-core";
-import Box from "@mui/material/Box";
-import Tabs, { tabsClasses } from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import { alpha, styled } from "@mui/material/styles";
-import { green, orange, red, yellow, blue } from "@mui/material/colors";
-import LowPriority from "@mui/icons-material/LowPriority";
-import PriorityHigh from "@mui/icons-material/PriorityHigh";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import TextEditor from "./TextEditor";
 import {
-  ViewState,
-  GroupingState,
-  IntegratedGrouping,
-  IntegratedEditing,
   EditingState,
+  GroupingState,
+  IntegratedEditing,
+  IntegratedGrouping,
+  ViewState,
 } from "@devexpress/dx-react-scheduler";
 import {
-  Scheduler,
-  Resources,
-  WeekView,
-  Toolbar,
-  TodayButton,
-  AppointmentTooltip,
-  DateNavigator,
-  Appointments,
-  AppointmentForm,
-  ViewSwitcher,
-  MonthView,
-  DayView,
-  GroupingPanel,
-  DragDropProvider,
   AllDayPanel,
-  EditRecurrenceMenu,
+  AppointmentForm,
+  Appointments,
+  AppointmentTooltip,
   ConfirmationDialog,
+  DateNavigator,
+  DayView,
+  DragDropProvider,
+  EditRecurrenceMenu,
+  GroupingPanel,
+  MonthView,
+  Resources,
+  Scheduler,
+  TodayButton,
+  Toolbar,
+  ViewSwitcher,
+  WeekView,
 } from "@devexpress/dx-react-scheduler-material-ui";
-
-import { teal, indigo } from "@mui/material/colors";
-
-import { reservations } from "./appointments/appointments";
-import { EditRecurrenceMenuMessages } from "./localization-messages/EditRecurrenceMenuMessages";
-import { ConfirmationDialogMessages } from "./localization-messages/ConfirmationDialogMessages";
-import { AppointmentFormMessages } from "./localization-messages/AppointmentFormMessages";
-import AppointmentFormContainerBasic from "./appointments/appointment-form-components/AppointmentFormContainerBasic";
-import CommandLayoutPropsComponent from "./appointments/appointment-form-components/CommandLayoutPropsComponent";
-
-import withRoot from "../home/modules/withRoot";
-import InstitutionLayout from "../../layout/InstitutionLayout";
+import LowPriority from "@mui/icons-material/LowPriority";
+import PriorityHigh from "@mui/icons-material/PriorityHigh";
 import { Card } from "@mui/material";
+import { blue, green, orange, red, yellow } from "@mui/material/colors";
+import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import { alpha, styled } from "@mui/material/styles";
+import React, { useState } from "react";
+import AppointmentFormContainerBasic from "./appointments/appointment-form-components/AppointmentFormContainerBasic";
+import { reservations } from "./appointments/appointments";
+import { AppointmentFormMessages } from "./localization-messages/AppointmentFormMessages";
+import { ConfirmationDialogMessages } from "./localization-messages/ConfirmationDialogMessages";
+import { EditRecurrenceMenuMessages } from "./localization-messages/EditRecurrenceMenuMessages";
+import TextEditor from "./TextEditor";
 
 const courts = [
   {
@@ -405,7 +394,7 @@ const ReservaGridCustom = () => {
       console.log("added");
       const startingAddedId =
         data.length > 0 ? data[data.length - 1].id + 1 : 0;
-        newData = [...data, { id: startingAddedId, ...added }];
+      newData = [...data, { id: startingAddedId, ...added }];
     }
     if (changed) {
       console.log("changed");

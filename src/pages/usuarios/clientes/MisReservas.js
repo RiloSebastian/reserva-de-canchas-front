@@ -1,5 +1,3 @@
-import React, { useEffect, useState, forwardRef } from "react";
-import MaterialTable from "material-table";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -15,15 +13,9 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import { Delete } from "@material-ui/icons";
-import Button from "@mui/material/Button";
-import { Divider } from "@mui/material";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import StarHalfIcon from '@mui/icons-material/StarHalf';
-import Chip from '@mui/material/Chip';
+import Container from "@mui/material/Container";
+import React, { forwardRef } from "react";
 import HistoryReservations from "../../../components/my-reservations/HistoryReservations";
 import NextReservations from "../../../components/my-reservations/NextReservations";
 
@@ -58,7 +50,11 @@ const MisReservas = () => {
     { title: "Cancha", field: "name" },
     { title: "Institucion", field: "institucion" },
     { title: "Direccion", field: "direccion" },
-    { title: "Fecha", field: "surname", initialEditValue: "initial edit value" },
+    {
+      title: "Fecha",
+      field: "surname",
+      initialEditValue: "initial edit value",
+    },
     { title: "Horario", field: "birthYear", type: "numeric" },
   ]);
 
@@ -114,7 +110,6 @@ const MisReservas = () => {
           maxWidth="lg"
         >
           <HistoryReservations />
-
         </Container>
       </Box>
     </>
