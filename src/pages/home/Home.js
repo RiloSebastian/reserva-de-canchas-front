@@ -1,11 +1,9 @@
-import React, { useState, forwardRef } from "react";
-import { styled } from "@mui/material/styles";
+import React from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import FormularioFiltroCanchas from "./../../components/formularios-datos/FormularioFiltroCanchas";
+import { styled } from "@mui/material/styles";
 import CardCanchaLista from "../../components/CardCanchaLista";
+import FormularioFiltroCanchas from "./../../components/formularios-datos/FormularioFiltroCanchas";
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,

@@ -1,47 +1,27 @@
-import React, { useEffect, useState, createContext } from "react";
-import "./App.css";
-import MenuBar from "./components/menuBar/MenuBar";
+import CssBaseline from "@mui/material/CssBaseline";
+import React, { createContext, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Route, Switch } from "react-router";
 import { BrowserRouter as Router } from "react-router-dom";
-import { Route, Switch, Redirect } from "react-router";
-import InstitutionRoutes, {
-  CustomerRoutes,
-  PATHS,
-  BASE_URL,
-  BASE_URL_CUSTOMERS,
-  BASE_URL_INSTITUTIONS,
-} from "./pages/routes";
-import InstitutionLayout from "./layout/InstitutionLayout";
-import CustomerLayout from "./layout/CustomerLayout";
-import SignIn from "./pages/login/SignIn";
-import SignUp from "./pages/signup/SignUp";
-import Index from "./pages/home/HomePage";
-import PrivateRoute from "./pages/privateRoute/PrivateRoute";
-import authService from "./services/auth.service";
-import ListaReserva from "./pages/reservas/ListaReserva";
-
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
-import { useDispatch, useSelector } from "react-redux";
+import "./App.css";
 import { history } from "./helpers/history";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
-import CssBaseline from "@mui/material/CssBaseline";
+import CustomerLayout from "./layout/CustomerLayout";
+import InstitutionLayout from "./layout/InstitutionLayout";
 import ForgotPassword from "./pages/home/ForgotPassword";
 import HomePage from "./pages/home/HomePage";
-import Home from "./pages/home/Home";
-import SignUpInstitution from "./pages/signup/SignUpInstitution";
-import ReservaGrid from "./pages/reservas/ReservaGrid";
+import SignIn from "./pages/login/SignIn";
 import NotFound from "./pages/notfound/NotFound";
+import PrivateRoute from "./pages/privateRoute/PrivateRoute";
+import InstitutionRoutes, {
+  BASE_URL_CUSTOMERS,
+  BASE_URL_INSTITUTIONS,
+  CustomerRoutes,
+  PATHS,
+} from "./pages/routes";
+import SignUp from "./pages/signup/SignUp";
+import SignUpInstitution from "./pages/signup/SignUpInstitution";
 
 const pages = ["Home", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];

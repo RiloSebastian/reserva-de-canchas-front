@@ -1,24 +1,3 @@
-import React, { useEffect, useState, forwardRef, useRef } from "react";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import ScheduleAndPrice from "./../ScheduleAndPrice";
-import MaterialTable from "material-table";
-import IconButton from "@mui/material/IconButton";
-import LoadingButton from "@mui/lab/LoadingButton";
-import SaveIcon from "@mui/icons-material/Save";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import moment from "moment";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import TextField from "@mui/material/TextField";
-import MobileDatePicker from "@mui/lab/MobileDatePicker";
-import DateAdapter from "@mui/lab/AdapterMoment";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -34,38 +13,24 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import { Delete } from "@material-ui/icons";
-import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
-import UploadImage from "../../components/UploadImage";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
-import { useHistory } from "react-router-dom";
-
+import LoadingButton from "@mui/lab/LoadingButton";
+import Box from "@mui/material/Box";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import Divider from "@mui/material/Divider";
+import { default as Grid, default as MuiGrid } from "@mui/material/Grid";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
-import { Visibility } from "@mui/icons-material/Visibility";
-
-import PropTypes from "prop-types";
+import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
-import { styled } from "@mui/material/styles";
-import MuiGrid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
-import CardActionArea from "@mui/material/CardActionArea";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-
-import Divider from "@mui/material/Divider";
-
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import moment from "moment";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { BASE_URL_CUSTOMERS } from "../../pages/routes";
 
 const GridDescription = styled(MuiGrid)(({ theme }) => ({
@@ -99,7 +64,7 @@ const tableIcons = {
 };
 
 const colors = {
-  primary: "#ff0000",
+  primary: "#FF5733",
 };
 
 const theme = createTheme({
@@ -128,7 +93,7 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
 
   const [courts, setCourts] = useState(schedule.courts);
 
-  const [courtSelected, setCourtSelected] = useState(schedule.courts);
+  const [courtSelected, setCourtSelected] = useState(schedule.courts[0]);
 
   const [date, setDate] = useState(moment(new Date()));
 
@@ -167,6 +132,15 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
     setLoading(true);
 
     setOpen(false);
+
+    let courtFinalSelected = {
+      ...court,
+      fecha: date,
+      horario: date,
+    };
+
+    console.log("before checkout - sending court selected");
+    console.log(courtFinalSelected);
 
     history.push({
       pathname: BASE_URL_CUSTOMERS.base + "/checkout",

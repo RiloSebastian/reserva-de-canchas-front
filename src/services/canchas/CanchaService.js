@@ -1,6 +1,5 @@
 import http from "../../http-common";
 import AuthHeader from "../auth-header";
-import { Redirect } from "react-router";
 
 const getAll = async (institution_id) => {
   try {
