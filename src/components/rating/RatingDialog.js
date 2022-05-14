@@ -91,7 +91,7 @@ const RatingDialog = ({ open, setOpenFeedbackModal, reservationFeedback, updateF
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={handleClose}>Cancelar</Button>
         <Button onClick={handleSendFeedback}>Enviar Feedback</Button>
       </DialogActions>
     </Dialog>
