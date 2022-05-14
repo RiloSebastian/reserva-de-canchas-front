@@ -37,24 +37,7 @@ function Copyright() {
   );
 }
 
-const steps = ["Tu Reserva", "Forma de Pago", "Revise Su Reserva"];
-
-function getStepContent(step, courtSelected) {
-  console.log("step");
-  console.log(step);
-  switch (step) {
-    case 0:
-      return <PreReview reservation={courtSelected} />;
-    case 1:
-      return <PaymentForm />;
-    case 2:
-      return <Review />;
-    case 3:
-      return <MisReservas />;
-    default:
-      throw new Error("Unknown step");
-  }
-}
+const steps = ["Tu Reserva", "Forma de Pago", "Confirme Su Reserva"];
 
 const theme = createTheme();
 
@@ -63,7 +46,26 @@ const Checkout = () => {
 
   const [activeStep, setActiveStep] = useState(0);
 
+  const [validatedPaymentMethod, setValidatedPaymentMethod] = useState(false);
+
   const [courtSelected, setCourtSelected] = useState(history.location.state);
+
+  const getStepContent = (step, courtSelected) => {
+    console.log("step");
+    console.log(step);
+    switch (step) {
+      case 0:
+        return <PreReview reservation={courtSelected} />;
+      case 1:
+        return <PaymentForm setValidatedPaymentMethod = {setValidatedPaymentMethod}/>;
+      case 2:
+        return <Review />;
+      case 3:
+        return <MisReservas />;
+      default:
+        throw new Error("Unknown step");
+    }
+  }
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -71,6 +73,10 @@ const Checkout = () => {
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
+    if (activeStep === 1) {
+      setValidatedPaymentMethod(false)
+    }
+    
   };
 
   React.useEffect(() => {
@@ -156,6 +162,7 @@ const Checkout = () => {
                     variant="contained"
                     onClick={handleNext}
                     sx={{ mt: 3, ml: 1 }}
+                    disabled={validatedPaymentMethod}
                   >
                     {activeStep === steps.length - 1
                       ? "Confirmar Reserva"

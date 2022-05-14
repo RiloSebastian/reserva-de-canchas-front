@@ -93,13 +93,15 @@ const PreReview = ({ reservation }) => {
   const [chipColor, setChipColor] = useState("info");
   //const [reservations, setReservations] = useState(reservation);
 
-  const subtotal = (items) => {
-    return items.map(({ price }) => price).reduce((sum, i) => sum + i, 0);
+  const subtotal = (price) => {
+    //return items.map(({ price }) => price).reduce((sum, i) => sum + i, 0);
+    return price;
   };
 
-  const [invoiceSubtotal, setInvoiceSubtotal] = useState(subtotal(rows));
-  const invoiceTaxes = TAX_RATE_1 * invoiceSubtotal;
-  const invoiceTotal = invoiceSubtotal - invoiceTaxes;
+  const [invoiceSubtotal, setInvoiceSubtotal] = useState(subtotal(reservation.price));
+  const invoiceAdvancePayment = selectedPercentages * invoiceSubtotal;
+  const invoiceTotal = invoiceAdvancePayment;
+  //const invoiceTotal = invoiceSubtotal - invoiceAdvancePayment;
 
   const handleSelectPercemtage = (newPercentageSelected) => {
     setSelectedPercentages(newPercentageSelected);
@@ -210,10 +212,10 @@ const PreReview = ({ reservation }) => {
                 </FormControl>
                 {/*`${parseFloat((TAX_RATE * 100)).toFixed(0)} %`*/}
               </TableCell>
-              <TableCell align="right">{ccyFormat(invoiceTaxes)}</TableCell>
+              <TableCell align="right">{ccyFormat(invoiceAdvancePayment)}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell colSpan={2}>Total</TableCell>
+              <TableCell colSpan={2}>Total a Pagar</TableCell>
               <TableCell align="right">{ccyFormat(invoiceTotal)}</TableCell>
             </TableRow>
           </TableBody>

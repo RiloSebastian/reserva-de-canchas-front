@@ -22,7 +22,7 @@ const payments = [
     { name: 'Fecha de caducidad', detail: '04/2024' },
 ];
 
-const Review = () => {
+const Review = ({reservation}) => {
     return (
         <React.Fragment>
             <Typography variant="h6" gutterBottom>

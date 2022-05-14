@@ -165,7 +165,7 @@ const HistoryReservations = () => {
                             label={
                                 props.data.feedbackSended
                                     ? "Feedback Enviado"
-                                    : "Calificar Institucion"
+                                    : "Dar Feedback"
                             }
                         />
                     ),
