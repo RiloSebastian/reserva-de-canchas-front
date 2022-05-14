@@ -1,28 +1,18 @@
-import React, { useState } from "react";
+import StarIcon from "@mui/icons-material/Star";
+import { CardActionArea } from "@mui/material";
+import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import ShareIcon from "@mui/icons-material/Share";
-import Avatar from "@mui/material/Avatar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import { red, green } from "@mui/material/colors";
-import Button from "@mui/material/Button";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { CardActionArea } from "@mui/material";
-import CardItemHorarioCancha from "./CardItemHorarioCancha";
-import CardItemHorarioCanchaPrueba from "./CardItemHorarioCanchaPrueba";
-import StarIcon from "@mui/icons-material/Star";
-import { Icon } from "@mui/material";
-import SportsTennisIcon from "@mui/icons-material/SportsTennis";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import Stack from "@mui/material/Stack";
 import Chip from "@mui/material/Chip";
+import Divider from "@mui/material/Divider";
 import Rating from "@mui/material/Rating";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import React, { useState } from "react";
+import CardItemHorarioCanchaPrueba from "./CardItemHorarioCanchaPrueba";
 
 const CardCancha = ({ institution }) => {
   const [open, setOpen] = useState(false);

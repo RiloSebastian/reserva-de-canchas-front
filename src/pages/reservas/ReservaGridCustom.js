@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { connectProps } from "@devexpress/dx-react-core";
 import {
   EditingState,
@@ -33,7 +34,6 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
-import React, { useState } from "react";
 import AppointmentFormContainerBasic from "./appointments/appointment-form-components/AppointmentFormContainerBasic";
 import { reservations } from "./appointments/appointments";
 import { AppointmentFormMessages } from "./localization-messages/AppointmentFormMessages";

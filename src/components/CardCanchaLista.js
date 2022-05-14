@@ -1,10 +1,9 @@
-import React, { useState } from "react";
-import CardCancha from "./items/CardCancha";
-import Box from "@mui/material/Box";
 import { Container, Stack, Typography } from "@mui/material";
+import React, { useState } from "react";
 import { institutionsFounded as i } from "./../assets/mocks/institutionsFounded";
 import CourtFilterSideBar from "./courts/CourtFilterSideBar";
 import CourtSort from "./courts/CourtSort";
+import CardCancha from "./items/CardCancha";
 
 const CardCanchaLista = () => {
   const [institutions, setInstitutions] = useState(i);
@@ -21,9 +20,7 @@ const CardCanchaLista = () => {
 
   return (
     <Container>
-      <Typography variant="h4">
-        Instituciones Encontradas
-      </Typography>
+      <Typography variant="h4">Instituciones Encontradas</Typography>
 
       <Stack
         direction="row"

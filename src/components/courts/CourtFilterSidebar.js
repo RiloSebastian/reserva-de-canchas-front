@@ -1,25 +1,24 @@
-import PropTypes from "prop-types";
-import {
-  Box,
-  Radio,
-  Stack,
-  Button,
-  Rating,
-  Divider,
-  Checkbox,
-  FormGroup,
-  IconButton,
-  Typography,
-  RadioGroup,
-  FormControlLabel,
-} from "@mui/material";
-import ScrollBar from "./ScrollBar";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 import CloseIcon from "@mui/icons-material/Close";
-import { styled, useTheme } from "@mui/material/styles";
-import MuiDrawer from "@mui/material/Drawer";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  Radio,
+  RadioGroup,
+  Rating,
+  Stack,
+  Typography,
+} from "@mui/material";
 import Drawer from "@mui/material/Drawer";
+import { useTheme } from "@mui/material/styles";
+import PropTypes from "prop-types";
+import ScrollBar from "./ScrollBar";
 //import { ColorManyPicker } from "../../../components/color-utils";
 
 const drawerWidth = 240;

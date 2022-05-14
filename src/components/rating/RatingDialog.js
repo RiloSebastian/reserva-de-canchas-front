@@ -1,36 +1,38 @@
 import React, { useState } from "react";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Dialog, { DialogProps } from '@mui/material/Dialog';
+import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import TextField from "@mui/material/TextField";
 import HoverRating from "./HoverRating";
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
   components: {
     MuiTextField: {
       styleOverrides: {
         multiline: {
-          fontWeight: 'bold',
-          fontSize: '20px',
-          color: 'purple',
-          width: '50vw'
-        }
-      }
-    }
-  }
-
-
+          fontWeight: "bold",
+          fontSize: "20px",
+          color: "purple",
+          width: "50vw",
+        },
+      },
+    },
+  },
 });
 
-const RatingDialog = ({ open, setOpenFeedbackModal, reservationFeedback, updateFeedback }) => {
+const RatingDialog = ({
+  open,
+  setOpenFeedbackModal,
+  reservationFeedback,
+  updateFeedback,
+}) => {
   const [fullWidth, setFullWidth] = useState(true);
-  const [maxWidth, setMaxWidth] = useState('sm');
+  const [maxWidth, setMaxWidth] = useState("sm");
 
   const handleClickOpen = () => {
     setOpenFeedbackModal(true);
@@ -41,9 +43,8 @@ const RatingDialog = ({ open, setOpenFeedbackModal, reservationFeedback, updateF
   };
 
   const handleSendFeedback = () => {
-
-    console.log("handleSendFeedback")
-    console.log(reservationFeedback)
+    console.log("handleSendFeedback");
+    console.log(reservationFeedback);
 
     updateFeedback(reservationFeedback.reservation_id);
     //setFeedbackSended(true);
@@ -62,7 +63,8 @@ const RatingDialog = ({ open, setOpenFeedbackModal, reservationFeedback, updateF
       fullWidth={fullWidth}
       maxWidth={maxWidth}
       open={open}
-      onClose={handleClose}>
+      onClose={handleClose}
+    >
       <DialogTitle>Dejanos tu Opinion </DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -73,7 +75,6 @@ const RatingDialog = ({ open, setOpenFeedbackModal, reservationFeedback, updateF
         <HoverRating />
 
         <Box sx={{ m: 2 }} />
-
 
         <DialogContentText>
           Tambien podes agregar un comentario
@@ -88,14 +89,12 @@ const RatingDialog = ({ open, setOpenFeedbackModal, reservationFeedback, updateF
             fullWidth
           />
         </ThemeProvider>
-
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancelar</Button>
         <Button onClick={handleSendFeedback}>Enviar Feedback</Button>
       </DialogActions>
     </Dialog>
-
   );
 };
 

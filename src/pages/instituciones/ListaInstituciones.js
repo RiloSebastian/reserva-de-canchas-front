@@ -1,5 +1,5 @@
-import MaterialTable from "material-table";
-import React, { useState, forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
+import { Delete } from "@material-ui/icons";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -15,9 +15,7 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import { Delete } from "@material-ui/icons";
-import Button from "@mui/material/Button";
-import UploadImage from "../../components/UploadImage";
+import MaterialTable from "material-table";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),

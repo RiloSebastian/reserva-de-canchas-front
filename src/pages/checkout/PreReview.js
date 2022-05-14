@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from "react";
-import Typography from "@mui/material/Typography";
+import DoneIcon from "@mui/icons-material/Done";
+import Chip from "@mui/material/Chip";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Paper from "@mui/material/Paper";
+import RadioGroup from "@mui/material/RadioGroup";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import Chip from "@mui/material/Chip";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
-import DoneIcon from "@mui/icons-material/Done";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
 
 const theme = createTheme({
   components: {
@@ -98,7 +96,9 @@ const PreReview = ({ reservation }) => {
     return price;
   };
 
-  const [invoiceSubtotal, setInvoiceSubtotal] = useState(subtotal(reservation.price));
+  const [invoiceSubtotal, setInvoiceSubtotal] = useState(
+    subtotal(reservation.price)
+  );
   const invoiceAdvancePayment = selectedPercentages * invoiceSubtotal;
   const invoiceTotal = invoiceAdvancePayment;
   //const invoiceTotal = invoiceSubtotal - invoiceAdvancePayment;
@@ -212,7 +212,9 @@ const PreReview = ({ reservation }) => {
                 </FormControl>
                 {/*`${parseFloat((TAX_RATE * 100)).toFixed(0)} %`*/}
               </TableCell>
-              <TableCell align="right">{ccyFormat(invoiceAdvancePayment)}</TableCell>
+              <TableCell align="right">
+                {ccyFormat(invoiceAdvancePayment)}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell colSpan={2}>Total a Pagar</TableCell>

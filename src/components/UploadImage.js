@@ -1,52 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { styled } from '@mui/material/styles';
-import IconButton from '@mui/material/IconButton';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import React, { useState } from "react";
+import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import IconButton from "@mui/material/IconButton";
+import { styled } from "@mui/material/styles";
 
-const Input = styled('input')({
-    display: 'none',
+const Input = styled("input")({
+  display: "none",
 });
 
 const UploadImage = (props) => {
+  const [selectedValue, setSelectedValue] = useState({});
 
-    const [selectedValue, setSelectedValue] = useState({});
+  const handleUploadClick = (event) => {
+    console.log("manejador de imagenes");
+    console.log(props);
 
-    const handleUploadClick = (event) => {
+    // let file = event.target.files[0];
+    //   const imageData = new FormData();
+    //  imageData.append('imageFile', file);
 
-        console.log('manejador de imagenes');
-        console.log(props);
+    //setSelectedValue(imageData)
+    //onChange(selectedValue)
 
-       // let file = event.target.files[0];
-     //   const imageData = new FormData();
-      //  imageData.append('imageFile', file);
+    //setImages(imageData);
+    //setImagePreview(URL.createObjectURL(file));
 
-        //setSelectedValue(imageData)
-        //onChange(selectedValue)
+    console.log("despues de cargar imagen");
+    //onChange(file)
+    console.log(props);
+  };
 
-        //setImages(imageData);
-        //setImagePreview(URL.createObjectURL(file));
+  return (
+    <label htmlFor="icon-button-file">
+      <Input
+        accept="image/*"
+        id="icon-button-file"
+        type="file"
+        //value={selectedValue}
+        //onChange={handleUploadClick}
+      />
+      <IconButton color="primary" aria-label="upload picture" component="span">
+        <PhotoCamera />
+      </IconButton>
+    </label>
+  );
+};
 
-        console.log('despues de cargar imagen');
-        //onChange(file)
-        console.log(props);
-
-
-    }
-
-    return (
-        <label htmlFor="icon-button-file">
-            <Input
-                accept="image/*"
-                id="icon-button-file"
-                type="file"
-                //value={selectedValue}
-                //onChange={handleUploadClick}
-            />
-            <IconButton color="primary" aria-label="upload picture" component="span">
-                <PhotoCamera />
-            </IconButton>
-        </label>
-    )
-}
-
-export default UploadImage
+export default UploadImage;

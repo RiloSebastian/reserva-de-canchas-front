@@ -1,43 +1,38 @@
-import React, { useState, forwardRef } from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import MuiDrawer from "@mui/material/Drawer";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+import React, { forwardRef, useState } from "react";
+import { List, ListItem } from "@material-ui/core";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import MailIcon from "@mui/icons-material/Mail";
+import MenuIcon from "@mui/icons-material/Menu";
+import MoreIcon from "@mui/icons-material/MoreVert";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import MuiAppBar from "@mui/material/AppBar";
+import Badge from "@mui/material/Badge";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import Divider from "@mui/material/Divider";
+import MuiDrawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import MoreIcon from "@mui/icons-material/MoreVert";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import Badge from "@mui/material/Badge";
-import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import clsx from "clsx";
-import { ExpandLess, ExpandMore } from "@material-ui/icons";
-import { List, ListItem, Collapse, Button } from "@material-ui/core";
-import getMenu from "./sideBarItems";
-import useStyles from "./menuBarStyles";
-import { Link, NavLink as RouterLink } from "react-router-dom";
-import { Route, Switch } from "react-router";
-import AuthService from "../../services/auth.service";
-import { USER_ROLE } from "../../constants/userRole";
+import MenuItem from "@mui/material/MenuItem";
+import { styled, useTheme } from "@mui/material/styles";
+import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
-import withRoot from "../../pages/home/modules/withRoot";
+import Typography from "@mui/material/Typography";
+import { Route, Switch } from "react-router";
+import { Link, NavLink as RouterLink } from "react-router-dom";
+import { USER_ROLE } from "../../constants/userRole";
+import AuthService from "../../services/auth.service";
 import InstitutionRoutes, {
-  BASE_URL_INSTITUTIONS,
   BASE_URL_CUSTOMERS,
+  BASE_URL_INSTITUTIONS,
   CustomerRoutes,
-  BASE_URL_ACCOUNT,
 } from "./../../pages/routes";
+import useStyles from "./menuBarStyles";
+import getMenu from "./sideBarItems";
 
 const drawerWidth = 240;
 

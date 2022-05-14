@@ -1,28 +1,22 @@
-import React, { useState } from "react";
-import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import Toolbar from "@mui/material/Toolbar";
+import CssBaseline from "@mui/material/CssBaseline";
+import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
-import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
-import Typography from "@mui/material/Typography";
+import Stepper from "@mui/material/Stepper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import PaymentForm from "./PaymentForm";
-import Review from "./Review";
-import PreReview from "./PreReview";
+import Typography from "@mui/material/Typography";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { IconButton } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SendIcon from "@mui/icons-material/Send";
-import Stack from "@mui/material/Stack";
-import { green, grey, red } from "@mui/material/colors";
-import MisReservas from "./../usuarios/clientes/MisReservas";
 import { BASE_URL_CUSTOMERS } from "../routes";
+import MisReservas from "./../usuarios/clientes/MisReservas";
+import PaymentForm from "./PaymentForm";
+import PreReview from "./PreReview";
+import Review from "./Review";
 
 function Copyright() {
   return (
@@ -57,7 +51,9 @@ const Checkout = () => {
       case 0:
         return <PreReview reservation={courtSelected} />;
       case 1:
-        return <PaymentForm setValidatedPaymentMethod = {setValidatedPaymentMethod}/>;
+        return (
+          <PaymentForm setValidatedPaymentMethod={setValidatedPaymentMethod} />
+        );
       case 2:
         return <Review />;
       case 3:
@@ -65,7 +61,7 @@ const Checkout = () => {
       default:
         throw new Error("Unknown step");
     }
-  }
+  };
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -74,9 +70,8 @@ const Checkout = () => {
   const handleBack = () => {
     setActiveStep(activeStep - 1);
     if (activeStep === 1) {
-      setValidatedPaymentMethod(false)
+      setValidatedPaymentMethod(false);
     }
-    
   };
 
   React.useEffect(() => {

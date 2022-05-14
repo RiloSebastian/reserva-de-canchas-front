@@ -1,22 +1,18 @@
-import React, { useEffect, useState } from "react";
-import TextField from "@mui/material/TextField";
+import { makeStyles } from "@material-ui/core/styles";
+import DeleteIcon from "@mui/icons-material/Delete";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import Stack from "@mui/material/Stack";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import MobileTimePicker from "@mui/lab/MobileTimePicker";
-import Switch from "@mui/material/Switch";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { pink } from "@mui/material/colors";
-import Box from "@mui/material/Box";
-import InputAdornment from "@mui/material/InputAdornment";
-import moment from "moment";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import { makeStyles } from "@material-ui/core/styles";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import NumberFormat from "react-number-format";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
+import Switch from "@mui/material/Switch";
+import TextField from "@mui/material/TextField";
 import PropTypes from "prop-types";
+import React, { useEffect } from "react";
+import NumberFormat from "react-number-format";
 
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
   props,
