@@ -1,17 +1,15 @@
-import HomePage from "./home/HomePage";
-import Home from "./home/Home";
 import ListaCanchas from "./canchas/ListaCanchas";
-import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
-import ListaPromociones from "./promociones/ListaPromociones";
-import ListaFeedback from "./feedback/ListaFeedback";
 import Checkout from "./checkout/Checkout";
-import MisReservas from "./usuarios/clientes/MisReservas";
-import Listainstitucions from "./instituciones/ListaInstituciones";
+import ListaFeedback from "./feedback/ListaFeedback";
+import Home from "./home/Home";
 import ConfiguracionInstituciones from "./instituciones/ConfiguracionInstituciones";
-import CustomerProfile from "./usuarios/profile/CustomerProfile";
-import AdminProfile from "./usuarios/profile/AdminProfile";
-import ReservaGrid from "./reservas/ReservaGrid";
+import Listainstitucions from "./instituciones/ListaInstituciones";
+import ListaPromociones from "./promociones/ListaPromociones";
 import ReservaGridCustom from "./reservas/ReservaGridCustom";
+import MisReservas from "./usuarios/clientes/MisReservas";
+import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
+import AdminProfile from "./usuarios/profile/AdminProfile";
+import CustomerProfile from "./usuarios/profile/CustomerProfile";
 
 export const BASE_URL_INSTITUTIONS = {
   base: "/dashboard",

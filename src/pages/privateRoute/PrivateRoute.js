@@ -1,7 +1,7 @@
-import React, { useContext, createContext, useState } from "react";
-import { Route, Redirect } from "react-router";
-import { PATHS } from "../routes";
+import React, { createContext, useContext } from "react";
+import { Redirect, Route } from "react-router";
 import AuthService from "../../services/auth.service";
+import { PATHS } from "../routes";
 
 const authContext = createContext();
 

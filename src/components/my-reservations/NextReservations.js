@@ -1,3 +1,4 @@
+import React, { forwardRef, useState } from "react";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -13,11 +14,7 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import React, { forwardRef } from "react";
-import HistoryReservations from "../../../components/my-reservations/HistoryReservations";
-import NextReservations from "../../../components/my-reservations/NextReservations";
+import MaterialTable from "material-table";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -43,77 +40,84 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
-const MisReservas = () => {
-  const { useState } = React;
-
+const NextReservations = () => {
   const [columns, setColumns] = useState([
     { title: "Cancha", field: "name" },
     { title: "Institucion", field: "institucion" },
     { title: "Direccion", field: "direccion" },
-    {
-      title: "Fecha",
-      field: "surname",
-      initialEditValue: "initial edit value",
-    },
-    { title: "Horario", field: "birthYear", type: "numeric" },
+    { title: "Fecha", field: "date", initialEditValue: "initial edit value" },
   ]);
 
   const [data, setData] = useState([
     {
+      reservation_id: 1,
       name: "Cancha 1",
-      surname: "27/4 10:00",
+      date: "23/2 15:00",
       birthYear: "10:00",
       institucion: "Palermo Tennis",
       direccion: "Santa Fe 1234",
+      feedbackSended: false,
     },
     {
+      reservation_id: 2,
       name: "Cancha 5",
-      surname: "30/4 18:30",
+      date: "15/5 19:00",
       birthYear: "18:30",
       institucion: "Futbol Plaza",
       direccion: "Corrientes 2345",
+      feedbackSended: false,
     },
   ]);
 
   return (
-    <>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          pt: 2,
-          pb: 8,
-        }}
-      >
-        <Container
-          sx={{
-            margin: 0,
-          }}
-          maxWidth="lg"
-        >
-          <NextReservations />
-        </Container>
-      </Box>
+    <MaterialTable
+      title="Mis Proximos Turnos"
+      localization={{
+        pagination: {
+          labelDisplayedRows: "{from}-{to} de {count}",
+        },
+        toolbar: {
+          nRowsSelected: "{0} fila(s) seleccionada(s)",
+        },
+        header: {
+          actions: "Opciones",
+        },
+        body: {
+          emptyDataSourceMessage: "Aun no tiene Reservas realizadas",
+          filterRow: {
+            filterTooltip: "Filter",
+          },
+        },
+      }}
+      icons={tableIcons}
+      columns={columns}
+      data={data}
+      editable={{
+        onRowUpdate: (newData, oldData) =>
+          new Promise((resolve, reject) => {
+            setTimeout(() => {
+              const dataUpdate = [...data];
+              const index = oldData.tableData.id;
+              dataUpdate[index] = newData;
+              setData([...dataUpdate]);
 
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          pt: 2,
-          pb: 8,
-        }}
-      >
-        <Container
-          sx={{
-            margin: 0,
-          }}
-          maxWidth="lg"
-        >
-          <HistoryReservations />
-        </Container>
-      </Box>
-    </>
+              resolve();
+            }, 1000);
+          }),
+        onRowDelete: (oldData) =>
+          new Promise((resolve, reject) => {
+            setTimeout(() => {
+              const dataDelete = [...data];
+              const index = oldData.tableData.id;
+              dataDelete.splice(index, 1);
+              setData([...dataDelete]);
+
+              resolve();
+            }, 1000);
+          }),
+      }}
+    />
   );
 };
 
-export default MisReservas;
+export default NextReservations;

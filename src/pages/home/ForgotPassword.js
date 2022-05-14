@@ -1,15 +1,13 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
 import Typography from "./modules/components/Typography";
-import AppFooter from "./modules/views/AppFooter";
+import FormButton from "./modules/form/FormButton";
+import RFTextField from "./modules/form/RFTextField";
+import { email, required } from "./modules/form/validation";
 import AppAppBar from "./modules/views/AppAppBar";
 import AppForm from "./modules/views/AppForm";
-import { email, required } from "./modules/form/validation";
-import RFTextField from "./modules/form/RFTextField";
-import FormButton from "./modules/form/FormButton";
-import FormFeedback from "./modules/form/FormFeedback";
 import withRoot from "./modules/withRoot";
-import TextField from "@mui/material/TextField";
 
 function ForgotPassword() {
   const [sent, setSent] = React.useState(false);

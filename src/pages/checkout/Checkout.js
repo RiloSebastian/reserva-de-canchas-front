@@ -1,28 +1,22 @@
-import * as React from "react";
-import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import Toolbar from "@mui/material/Toolbar";
+import CssBaseline from "@mui/material/CssBaseline";
+import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
-import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
-import Typography from "@mui/material/Typography";
+import Stepper from "@mui/material/Stepper";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import PaymentForm from "./PaymentForm";
-import Review from "./Review";
-import PreReview from "./PreReview";
+import Typography from "@mui/material/Typography";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { IconButton } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SendIcon from "@mui/icons-material/Send";
-import Stack from "@mui/material/Stack";
-import { green, grey, red } from "@mui/material/colors";
-import MisReservas from "./../usuarios/clientes/MisReservas";
 import { BASE_URL_CUSTOMERS } from "../routes";
+import MisReservas from "./../usuarios/clientes/MisReservas";
+import PaymentForm from "./PaymentForm";
+import PreReview from "./PreReview";
+import Review from "./Review";
 
 function Copyright() {
   return (
@@ -37,31 +31,37 @@ function Copyright() {
   );
 }
 
-const steps = ["Tu Reserva", "Forma de Pago", "Revise Su Reserva"];
-
-function getStepContent(step) {
-  console.log("step");
-  console.log(step);
-  switch (step) {
-    case 0:
-      return <PreReview />;
-    case 1:
-      return <PaymentForm />;
-    case 2:
-      return <Review />;
-    case 3:
-      return <MisReservas />;
-    default:
-      throw new Error("Unknown step");
-  }
-}
+const steps = ["Tu Reserva", "Forma de Pago", "Confirme Su Reserva"];
 
 const theme = createTheme();
 
 const Checkout = () => {
   const history = useHistory();
 
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
+
+  const [validatedPaymentMethod, setValidatedPaymentMethod] = useState(false);
+
+  const [courtSelected, setCourtSelected] = useState(history.location.state);
+
+  const getStepContent = (step, courtSelected) => {
+    console.log("step");
+    console.log(step);
+    switch (step) {
+      case 0:
+        return <PreReview reservation={courtSelected} />;
+      case 1:
+        return (
+          <PaymentForm setValidatedPaymentMethod={setValidatedPaymentMethod} />
+        );
+      case 2:
+        return <Review />;
+      case 3:
+        return <MisReservas />;
+      default:
+        throw new Error("Unknown step");
+    }
+  };
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -69,9 +69,13 @@ const Checkout = () => {
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
+    if (activeStep === 1) {
+      setValidatedPaymentMethod(false);
+    }
   };
 
   React.useEffect(() => {
+    console.log("selected court");
     console.log(history.location.state);
   });
 
@@ -141,7 +145,7 @@ const Checkout = () => {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {getStepContent(activeStep)}
+                {getStepContent(activeStep, courtSelected)}
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   {activeStep !== 0 && (
                     <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
@@ -153,6 +157,7 @@ const Checkout = () => {
                     variant="contained"
                     onClick={handleNext}
                     sx={{ mt: 3, ml: 1 }}
+                    disabled={validatedPaymentMethod}
                   >
                     {activeStep === steps.length - 1
                       ? "Confirmar Reserva"

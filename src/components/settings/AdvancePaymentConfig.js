@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { DatePicker, TimePicker } from "@material-ui/pickers";
 import {
   Box,
   Button,
@@ -6,23 +7,13 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  Grid,
-  TextField,
   FormControl,
+  FormHelperText,
+  Grid,
   InputLabel,
-  Select,
-  OutlinedInput,
   MenuItem,
-  FormHelperText
+  Select,
 } from "@mui/material";
-// Picker
-import DateFnsUtils from "@date-io/date-fns";
-import {
-  MuiPickersUtilsProvider,
-  TimePicker,
-  DatePicker
-} from "@material-ui/pickers";
-import DropDown from "../ui/DropDown";
 
 function DatePickerWrapper(props) {
   const {
@@ -70,12 +61,12 @@ function TimePickerWrapper(props) {
   );
 }
 
-const onSubmit = async values => {
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const onSubmit = async (values) => {
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   await sleep(300);
   window.alert(JSON.stringify(values, 0, 2));
 };
-const validate = values => {
+const validate = (values) => {
   const errors = {};
   if (!values.firstName) {
     errors.firstName = "Required";
@@ -92,24 +83,19 @@ const validate = values => {
 const BEFORE_RESERVATION = "anterior a la reserva";
 
 const AdvancePaymentConfig = (props) => {
-
   const [advancePaymentPeriod, setAdvancePaymentPeriod] = useState(24);
 
   const handleChange = (event) => {
-    setAdvancePaymentPeriod(event.target.value || '');
+    setAdvancePaymentPeriod(event.target.value || "");
   };
 
-    const [submitting, setSubmitting] = useState(false);
-  
- const handleSubmit = () => {
+  const [submitting, setSubmitting] = useState(false);
 
- }
+  const handleSubmit = () => {};
 
- const handleReset = () => {
+  const handleReset = () => {};
 
- }
-
- const [values, setValues] = useState({
+  const [values, setValues] = useState({
     firstName: "Palermo Tenis",
     address: "Honduras 5460",
     email: "palermotenis@email.com",
@@ -117,52 +103,56 @@ const AdvancePaymentConfig = (props) => {
     state: "Alabama",
     country: "USA",
   });
-    
+
   return (
     <form autoComplete="off" noValidate {...props}>
-    <Card>
-      <CardHeader
-      subheader="Indique con cuanto tiempo de anticipacion se puede cancelar una reserva sin retener la seña al cliente."
-        title="Detalles de la Seña"
-      />
-      <Divider />
-      <CardContent>
-        <Grid container spacing={3}>
-          <Grid item md={6} xs={12}>
-          <FormControl sx={{ m: 1, minWidth: 120 }}>
-        <InputLabel id="demo-simple-select-helper-label">Hasta</InputLabel>
-        <Select
-          labelId="demo-simple-select-helper-label"
-          id="demo-simple-select-helper"
-          value={advancePaymentPeriod}
-          label="Hasta"
-          onChange={handleChange}
-        >
-          <MenuItem value={12}>12 hs {BEFORE_RESERVATION}</MenuItem>
-          <MenuItem value={24}>1 dia {BEFORE_RESERVATION}</MenuItem>
-          <MenuItem value={48}>2 dias {BEFORE_RESERVATION}</MenuItem>
-          <MenuItem value={72}>3 dias {BEFORE_RESERVATION}</MenuItem>
-        </Select>
-        <FormHelperText>Tiempo limite para Cancelar una Reserva</FormHelperText>
-      </FormControl>
+      <Card>
+        <CardHeader
+          subheader="Indique con cuanto tiempo de anticipacion se puede cancelar una reserva sin retener la seña al cliente."
+          title="Detalles de la Seña"
+        />
+        <Divider />
+        <CardContent>
+          <Grid container spacing={3}>
+            <Grid item md={6} xs={12}>
+              <FormControl sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="demo-simple-select-helper-label">
+                  Hasta
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-helper-label"
+                  id="demo-simple-select-helper"
+                  value={advancePaymentPeriod}
+                  label="Hasta"
+                  onChange={handleChange}
+                >
+                  <MenuItem value={12}>12 hs {BEFORE_RESERVATION}</MenuItem>
+                  <MenuItem value={24}>1 dia {BEFORE_RESERVATION}</MenuItem>
+                  <MenuItem value={48}>2 dias {BEFORE_RESERVATION}</MenuItem>
+                  <MenuItem value={72}>3 dias {BEFORE_RESERVATION}</MenuItem>
+                </Select>
+                <FormHelperText>
+                  Tiempo limite para Cancelar una Reserva
+                </FormHelperText>
+              </FormControl>
+            </Grid>
           </Grid>
-        </Grid>
-      </CardContent>
-      <Divider />
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          p: 2,
-        }}
-      >
-        <Button color="primary" variant="contained">
-          Guardar Detalles de Seña
-        </Button>
-      </Box>
-    </Card>
-  </form>
+        </CardContent>
+        <Divider />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            p: 2,
+          }}
+        >
+          <Button color="primary" variant="contained">
+            Guardar Detalles de Seña
+          </Button>
+        </Box>
+      </Card>
+    </form>
   );
-}
+};
 
 export default AdvancePaymentConfig;

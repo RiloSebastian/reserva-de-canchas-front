@@ -1,27 +1,18 @@
 import React, { useState } from "react";
-import Box from "@mui/material/Box";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
-import TextField from "@mui/material/TextField";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import MobileTimePicker from "@mui/lab/MobileTimePicker";
 import MobileDatePicker from "@mui/lab/MobileDatePicker";
-import Stack from "@mui/material/Stack";
-import SearchIcon from "@mui/icons-material/Search";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputAdornment from "@mui/material/InputAdornment";
+import MobileTimePicker from "@mui/lab/MobileTimePicker";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Input from "@mui/material/Input";
-
-import { useTheme } from "@mui/material/styles";
 import Chip from "@mui/material/Chip";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Select from "@mui/material/Select";
+import { useTheme } from "@mui/material/styles";
+import TextField from "@mui/material/TextField";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -58,13 +49,27 @@ function getStyles(name, ubicacion, theme) {
 
 const FormularioFiltroCanchas = () => {
   const theme = useTheme();
+
+  const [searchFilters, setSearchFilters] = useState({});
+
   const [deporte, setDeporte] = useState();
   const [ubicacion, setUbicacion] = useState([]);
   const [institucion, setInstitucion] = useState();
   const [value, setValue] = useState(new Date());
 
   const handleChange = (event) => {
-    setDeporte(event.target.value);
+    setSearchFilters((prevState) => {
+      return {
+        ...prevState,
+        [event.target.name]: event.target.value,
+      };
+    });
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log("handleSubmit");
+    console.log(searchFilters);
   };
 
   const handleUbicacion = (event) => {
@@ -93,6 +98,7 @@ const FormularioFiltroCanchas = () => {
       sx={{
         "& > :not(style)": { m: 1 },
       }}
+      onSubmit={handleSubmit}
       noValidate
       autoComplete="off"
     >
@@ -117,7 +123,7 @@ const FormularioFiltroCanchas = () => {
           id="demo-multiple-chip"
           multiple
           value={ubicacion}
-          onChange={handleUbicacion}
+          onChange={handleChange}
           input={<OutlinedInput id="select-multiple-chip" label="Ubicacion" />}
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -139,7 +145,7 @@ const FormularioFiltroCanchas = () => {
           ))}
         </Select>
       </FormControl>
-      <FormControl fullWidth>
+      {/*<FormControl fullWidth>
         <InputLabel htmlFor="outlined-adornment-password">
           Institucion
         </InputLabel>
@@ -155,16 +161,14 @@ const FormularioFiltroCanchas = () => {
           }
           label="Password"
         />
-      </FormControl>
+        </FormControl>*/}
 
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <FormControl sx={{ width: "25ch" }}>
+        <FormControl fullWidth>
           <MobileDatePicker
             label="Fecha"
             value={value}
-            onChange={(newValue) => {
-              setValue(newValue);
-            }}
+            onChange={handleChange}
             renderInput={(params) => <TextField {...params} />}
           />
         </FormControl>
@@ -181,13 +185,11 @@ const FormularioFiltroCanchas = () => {
       </LocalizationProvider>
 
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <FormControl sx={{ width: "25ch" }}>
+        <FormControl fullWidth>
           <MobileTimePicker
             label="Horario"
             value={value}
-            onChange={(newValue) => {
-              setValue(newValue);
-            }}
+            onChange={handleChange}
             renderInput={(params) => <TextField {...params} />}
           />
         </FormControl>
