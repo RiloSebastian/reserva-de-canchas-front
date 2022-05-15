@@ -243,4 +243,202 @@ export const institutionsFounded = [
       "https://italianodeescobar.files.wordpress.com/2020/12/fleje-tenis-ok-3.jpeg?w=820&h=312&crop=1",
     institution_rating: 3.5,
   },
+  {
+    id: 4,
+    institution_name: "Baires Tenis",
+    sport: {
+      schedules: [
+        {
+          schedule_id: 1,
+          schedule: "9:00",
+          courts: [
+            {
+              court_id: 1,
+              name: "Cancha 1",
+              price: 1500,
+              surface: "Polvo de ladrillo",
+              isCovered: false,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+            {
+              court_id: 2,
+              name: "Cancha 2",
+              price: 1500,
+              surface: "Polvo de ladrillo",
+              isCovered: false,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+            {
+              court_id: 3,
+              name: "Cancha 3",
+              price: 1500,
+              surface: "Cemento",
+              isCovered: true,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+          ],
+        },
+        {
+          schedule_id: 2,
+          schedule: "11:00",
+          courts: [
+            {
+              court_id: 1,
+              name: "Cancha 1",
+              price: 1500,
+              surface: "Polvo de ladrillo",
+              isCovered: false,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+            {
+              court_id: 2,
+              name: "Cancha 2",
+              price: 1500,
+              surface: "Polvo de ladrillo",
+              isCovered: false,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+          ],
+        },
+        {
+          schedule_id: 3,
+          schedule: "14:00",
+          courts: [
+            {
+              court_id: 3,
+              name: "Cancha 3",
+              price: 1500,
+              surface: "Cemento",
+              isCovered: true,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+          ],
+        },
+      ],
+    },
+    sports: [
+      {
+        sport_id: 1,
+        courts: [
+          {
+            court_id: 1,
+            schedules: [
+              { schedule_id: 1, schedule: "10:00" },
+              { schedule_id: 2, schedule: "11:00" },
+              { schedule_id: 3, schedule: "12:00" },
+            ],
+          },
+        ],
+      },
+    ],
+    address: "Jorge Luis Borges 2135, CABA",
+    image:
+      "https://as01.epimg.net/tenis/imagenes/2020/08/01/mas_tenis/1596293296_404365_1596293770_noticia_normal_recorte1.jpg",
+    institution_rating: 5.0,
+  },
+  {
+    id: 5,
+    institution_name: "San Lorenzo",
+    sport: {
+      schedules: [
+        {
+          schedule_id: 1,
+          schedule: "9:00",
+          courts: [
+            {
+              court_id: 1,
+              name: "Cancha 1",
+              price: 1500,
+              surface: "Polvo de ladrillo",
+              isCovered: false,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+            {
+              court_id: 2,
+              name: "Cancha 2",
+              price: 1500,
+              surface: "Polvo de ladrillo",
+              isCovered: false,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+            {
+              court_id: 3,
+              name: "Cancha 3",
+              price: 1500,
+              surface: "Cemento",
+              isCovered: true,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+          ],
+        },
+        {
+          schedule_id: 2,
+          schedule: "11:00",
+          courts: [
+            {
+              court_id: 1,
+              name: "Cancha 1",
+              price: 1500,
+              surface: "Polvo de ladrillo",
+              isCovered: false,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+            {
+              court_id: 2,
+              name: "Cancha 2",
+              price: 1500,
+              surface: "Polvo de ladrillo",
+              isCovered: false,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+          ],
+        },
+        {
+          schedule_id: 3,
+          schedule: "14:00",
+          courts: [
+            {
+              court_id: 3,
+              name: "Cancha 3",
+              price: 1500,
+              surface: "Cemento",
+              isCovered: true,
+              isLighting: true,
+              sign_percentage: 25,
+            },
+          ],
+        },
+      ],
+    },
+    sports: [
+      {
+        sport_id: 1,
+        courts: [
+          {
+            court_id: 1,
+            schedules: [
+              { schedule_id: 1, schedule: "10:00" },
+              { schedule_id: 2, schedule: "11:00" },
+              { schedule_id: 3, schedule: "12:00" },
+            ],
+          },
+        ],
+      },
+    ],
+    address: "Jorge Luis Borges 2135, CABA",
+    image:
+      "https://as01.epimg.net/tenis/imagenes/2020/08/01/mas_tenis/1596293296_404365_1596293770_noticia_normal_recorte1.jpg",
+    institution_rating: 5.0,
+  },
 ];
