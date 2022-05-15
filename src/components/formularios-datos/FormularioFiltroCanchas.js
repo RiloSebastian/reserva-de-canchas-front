@@ -14,6 +14,7 @@ import Select from "@mui/material/Select";
 import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import React, { useReducer, useState } from "react";
+import moment from "moment";
 
 const reducer = (state, action) => {
   console.log("action", action.data);
@@ -68,6 +69,10 @@ const horarios = [
   "12:00",
   "12:30",
 ];
+
+const disableDays = (date) => {
+return moment(date).isSame(moment(new Date(2022, 4, 25)));
+}
 
 function getStyles(name, selected, theme) {
   return {
@@ -210,6 +215,9 @@ const FormularioFiltroCanchas = (props) => {
                   <LocalizationProvider dateAdapter={DateAdapter}>
                     <FormControl fullWidth>
                       <MobileDatePicker
+                        minDate={moment(new Date())}
+                        maxDate={moment(new Date()).add(14, 'days')}
+                        shouldDisableDate={disableDays}
                         label="Fecha"
                         value={state.reservation_date}
                         onChange={(e) => handleDatePickerChange(e)}
