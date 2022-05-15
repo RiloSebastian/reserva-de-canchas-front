@@ -44,32 +44,6 @@ const Home = () => {
   };
 
   return (
-    /*  <Box sx={{ height: 100, width: 1 }}>
-      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
-        <Box
-          gridColumn="span 2"
-          sx={{
-            height: "100%",
-            display: "inline-block",
-          }}
-        >
-          <Item>
-            <FormularioFiltroCanchas />
-          </Item>
-        </Box>
-        <Box
-          gridColumn="span 10"
-          sx={{
-            height: "100%",
-            display: "inline-block",
-          }}
-        >
-          <Item>
-            <CardCanchaLista />
-          </Item>
-        </Box>
-      </Box>
-    </Box> */
     <>
       <Box
         component="main"
@@ -79,7 +53,6 @@ const Home = () => {
         }}
       >
         <Container maxWidth={false}>
-          {/* <CourtListToolbar /> */}
           <FormularioFiltroCanchas />
           <Box sx={{ m: 3 }} />
           <Box>
