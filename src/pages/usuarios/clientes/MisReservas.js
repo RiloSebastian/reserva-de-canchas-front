@@ -82,14 +82,13 @@ const MisReservas = () => {
         sx={{
           flexGrow: 1,
           pt: 2,
-          pb: 8,
         }}
       >
         <Container
           sx={{
             margin: 0,
           }}
-          maxWidth="lg"
+          maxWidth="100%"
         >
           <NextReservations />
         </Container>
@@ -100,14 +99,13 @@ const MisReservas = () => {
         sx={{
           flexGrow: 1,
           pt: 2,
-          pb: 8,
         }}
       >
         <Container
           sx={{
             margin: 0,
           }}
-          maxWidth="lg"
+          maxWidth="100%"
         >
           <HistoryReservations />
         </Container>

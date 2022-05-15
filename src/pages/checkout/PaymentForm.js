@@ -1,4 +1,3 @@
-import React, { useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import EventIcon from "@mui/icons-material/Event";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
@@ -7,6 +6,13 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import "moment/locale/es";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import {
   minLength,
   stripeCardExpirValidation,
@@ -53,9 +59,9 @@ const PaymentForm = ({ reservation, setValidatedPaymentMethod }) => {
     securityCode: "",
   });
 
-  const [cardType, setCardType] = React.useState();
+  const [cardType, setCardType] = useState();
 
-  const [error, setError] = React.useState({});
+  const [error, setError] = useState({});
 
   const handleChange = (e) => {
     dispatch({ type: e.target.name, data: e.target.value });
