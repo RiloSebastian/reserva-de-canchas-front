@@ -23,23 +23,31 @@ const payments = [
 ];
 
 const Review = ({reservation}) => {
+    
+    const [paymentsArray, setPaymentsArray] =  React.useState(
+        [
+            { name: 'Tipo de Tarjeta', detail: 'Visa' },
+            { name: 'Titular de la tarjeta', detail: reservation.checkout.cardOwner },
+            { name: 'Número de tarjeta', detail: reservation.checkout.cardNumber.replace(/[^ ].(?=.{4})/g, "xx") },
+            { name: 'Fecha de caducidad', detail: reservation.checkout.expDate.replace(/\/(?=[^\/]*$)/, '/20') },
+        ]
+    );
+
     return (
         <React.Fragment>
             <Typography variant="h6" gutterBottom>
                 Tu Reserva
             </Typography>
             <List disablePadding>
-                {reservas.map((reserva) => (
-                    <ListItem key={reserva.cancha} sx={{ py: 1, px: 0 }}>
-                        <ListItemText primary={reserva.cancha} secondary={reserva.institucion} />
-                        <Typography variant="body2">{reserva.precio}</Typography>
+                    <ListItem key={reservation.name} sx={{ py: 1, px: 0 }}>
+                        <ListItemText primary={reservation.name} secondary={reservation.institution.institution_name} />
+                        <Typography variant="body2">$ {reservation.price}.00</Typography>
                     </ListItem>
-                ))}
 
                 <ListItem sx={{ py: 1, px: 0 }}>
                     <ListItemText primary="Total" />
                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                        $1200.00
+                        ${reservation.price}.00
                     </Typography>
                 </ListItem>
             </List>
@@ -51,7 +59,7 @@ const Review = ({reservation}) => {
                         Medio de Pago
                     </Typography>
                     <Grid container>
-                        {payments.map((payment) => (
+                        {paymentsArray.map((payment) => (
                             <React.Fragment key={payment.name}>
                                 <Grid item xs={6}>
                                     <Typography gutterBottom>{payment.name}</Typography>

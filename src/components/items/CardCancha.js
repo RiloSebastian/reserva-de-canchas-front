@@ -96,6 +96,7 @@ const CardCancha = ({ institution, state }) => {
           setOpen={setOpen}
           schedule={schedule}
           date={state.reservation_date}
+          institution={institution}
         />
       )}
     </>
