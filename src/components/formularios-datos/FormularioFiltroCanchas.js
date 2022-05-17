@@ -16,23 +16,6 @@ import TextField from "@mui/material/TextField";
 import React, { useReducer, useState } from "react";
 import moment from "moment";
 
-const reducer = (state, action) => {
-  console.log("action", action.data);
-  console.log("state", state);
-  switch (action.type) {
-    case "sport":
-      return { ...state, sport: action.data };
-    case "location":
-      return { ...state, location: action.data };
-    case "reservation_date":
-      return { ...state, reservation_date: action.data };
-    case "reservation_time":
-      return { ...state, reservation_time: action.data };
-    default:
-      return state;
-  }
-};
-
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -57,22 +40,20 @@ const ubicaciones = [
   "Quilmes",
 ];
 
-const horarios = [
-  "8:00",
-  "8:30",
-  "9:00",
-  "9:30",
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-];
+function getHorarios() {
+  const items = [];
+  new Array(17).fill().forEach((acc, index) => {
+    items.push(moment({ hour: index + 7 }).format("H:mm"));
+    items.push(moment({ hour: index + 7, minute: 30 }).format("H:mm"));
+  });
+  return items;
+}
+
+const horarios = getHorarios();
 
 const disableDays = (date) => {
-return moment(date).isSame(moment(new Date(2022, 4, 25)));
-}
+  return moment(date).isSame(moment(new Date(2022, 4, 25)));
+};
 
 function getStyles(name, selected, theme) {
   return {
@@ -83,15 +64,8 @@ function getStyles(name, selected, theme) {
   };
 }
 
-const FormularioFiltroCanchas = (props) => {
+const FormularioFiltroCanchas = ({ state, dispatch }) => {
   const theme = useTheme();
-
-  const [state, dispatch] = useReducer(reducer, {
-    sport: "",
-    location: [],
-    reservation_date: new Date(),
-    reservation_time: [],
-  });
 
   const [deporte, setDeporte] = useState();
   const [ubicacion, setUbicacion] = useState([]);
@@ -216,7 +190,7 @@ const FormularioFiltroCanchas = (props) => {
                     <FormControl fullWidth>
                       <MobileDatePicker
                         minDate={moment(new Date())}
-                        maxDate={moment(new Date()).add(14, 'days')}
+                        maxDate={moment(new Date()).add(14, "days")}
                         shouldDisableDate={disableDays}
                         label="Fecha"
                         value={state.reservation_date}

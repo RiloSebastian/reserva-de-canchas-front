@@ -14,7 +14,7 @@ import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import CardItemHorarioCanchaPrueba from "./CardItemHorarioCanchaPrueba";
 
-const CardCancha = ({ institution }) => {
+const CardCancha = ({ institution, state }) => {
   const [open, setOpen] = useState(false);
 
   const [schedule, setSchedule] = useState([]);
@@ -30,60 +30,6 @@ const CardCancha = ({ institution }) => {
 
   return (
     <>
-      {/*<Card sx={{ maxWidth: 345 }}>
-        <CardActionArea>
-          <CardHeader
-            avatar={
-              <Avatar sx={{ bgcolor: green[500] }} aria-label="recipe">
-                <SportsTennisIcon />
-              </Avatar>
-            }
-            action={
-              <Box alignItems="center">
-                <StarIcon fontSize="large" color="info" />
-                <Box
-                  textAlign="center"
-                  component="span"
-                  sx={{ display: { xs: "block", md: "block" } }}
-                >
-                  {institution.institution_rating}
-                </Box>
-              </Box>
-            }
-            title={institution.institution_name}
-            subheader={institution.address}
-          />
-          <CardMedia
-            component="img"
-            height="194"
-            image={institution.image}
-            alt="Paella dish"
-          />
-          <CardContent>
-            <Typography variant="body2" color="text.secondary">
-              Los Precios pueden variar segun Dias y Horarios.
-            </Typography>
-          </CardContent>
-        </CardActionArea>
-        <CardActions alignItems="center">
-          {institution.sport.schedules.map((schedule) => (
-            <Button
-              alignItems="center"
-              variant="contained"
-              disableElevation
-              onClick={() => desplegarModal(schedule)}
-            >
-              {schedule.schedule}
-            </Button>
-          ))}
-          {<Button variant="contained" disableElevation onClick={desplegarModal}>
-            Consultar Horarios
-          </Button>}
-        </CardActions>
-      </Card>*/}
-
-      {/*open && <CardItemHorarioCancha open={open} setOpen={setOpen} />*/}
-
       <Card sx={{ maxWidth: 345 }}>
         <CardActionArea>
           <CardMedia
@@ -134,16 +80,13 @@ const CardCancha = ({ institution }) => {
             <Stack direction="row" spacing={1}>
               {institution.sport.schedules.map((schedule) => (
                 <Chip
+                  key={schedule}
                   label={schedule.schedule + ` pm`}
                   onClick={() => desplegarModal(schedule)}
                 />
               ))}
             </Stack>
           </Box>
-
-          {/*<Button variant="contained" disableElevation onClick={desplegarModal}>
-            Consultar Horarios
-          </Button>*/}
         </CardActions>
       </Card>
 
@@ -152,6 +95,7 @@ const CardCancha = ({ institution }) => {
           open={open}
           setOpen={setOpen}
           schedule={schedule}
+          date={state.reservation_date}
         />
       )}
     </>

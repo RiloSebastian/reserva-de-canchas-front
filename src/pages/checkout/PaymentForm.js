@@ -18,17 +18,26 @@ import {
   stripeCardExpirValidation,
   stripeCardNumberValidation,
   textWithSpacesOnly,
+  formatCreditCardNumber,
+  formatExpirationDate,
+  formatCVC,
 } from "../../validations";
+
+function clearNumber(value = "") {
+  return value.replace(/\D+/g, "");
+}
 
 const reducer = (state, action) => {
   console.log("action", action.data);
   switch (action.type) {
     case "cardNumber":
-      return { ...state, cardNumber: action.data };
+      return { ...state, cardNumber: formatCreditCardNumber(action.data) };
     case "expDate":
-      return { ...state, expDate: action.data };
-    case "securityCode":
-      return { ...state, securityCode: action.data };
+      return { ...state, expDate: formatExpirationDate(action.data) };
+    case "securityCode": {
+      console.log("securityCode", action.data);
+      return { ...state, securityCode: formatCVC(action.data) };
+    }
     case "cardOwner":
       return { ...state, cardOwner: action.data };
     default:
@@ -55,7 +64,7 @@ const PaymentForm = ({ reservation, setValidatedPaymentMethod }) => {
   const [state, dispatch] = useReducer(reducer, {
     cardOwner: "",
     cardNumber: "",
-    expDate: new Date(),
+    expDate: "",
     securityCode: "",
   });
 
@@ -162,7 +171,6 @@ const PaymentForm = ({ reservation, setValidatedPaymentMethod }) => {
         </Grid>
         <Grid item xs={12} md={6}>
           <TextField
-            inputco
             required
             id="cardNumber"
             label="Numero de Tarjeta"
@@ -182,32 +190,27 @@ const PaymentForm = ({ reservation, setValidatedPaymentMethod }) => {
           />
         </Grid>
         <Grid item xs={12} md={6}>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <MobileDatePicker
-              label="Fecha de Caducidad"
-              value={state.expDate}
-              onChange={handleChange}
-              inputVariant="standard"
-              renderInput={(params) => (
-                <TextField
-                  name="expDate"
-                  onBlur={handleBlur}
-                  {...params}
-                  fullWidth
-                  variant="standard"
-                  InputProps={{
-                    endAdornment: <EventIcon />,
-                  }}
-                  {...(error &&
-                    error.expiryError &&
-                    error.expiryError.length > 1 && {
-                      error,
-                      helperText: error.expiryError,
-                    })}
-                />
-              )}
-            />
-          </LocalizationProvider>
+          <TextField
+            required
+            id="cardExpDate"
+            label="Valida Hasta"
+            fullWidth
+            autoComplete="cc-number"
+            variant="standard"
+            name="expDate"
+            value={state.expDate}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            InputProps={{
+              endAdornment: <EventIcon />,
+            }}
+            {...(error &&
+              error.expiryError &&
+              error.expiryError.length > 1 && {
+                error,
+                helperText: error.expiryError,
+              })}
+          />
         </Grid>
         <Grid item xs={12} md={6}>
           <TextField
@@ -216,10 +219,10 @@ const PaymentForm = ({ reservation, setValidatedPaymentMethod }) => {
             label="CVV"
             helperText="Últimos tres dígitos en la parte posterior de la tarjeta"
             fullWidth
-            autoComplete="cc-csc"
+            autoComplete="cc-number"
             variant="standard"
             name="securityCode"
-            value={state.cvv}
+            value={state.securityCode}
             onChange={handleChange}
             onBlur={handleBlur}
             {...(error &&
