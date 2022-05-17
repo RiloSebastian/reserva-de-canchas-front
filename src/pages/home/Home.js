@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useReducer } from "react";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import CardCanchaLista from "../../components/CardCanchaLista";
@@ -24,16 +24,34 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
+const reducer = (state, action) => {
+  console.log("action", action.data);
+  console.log("state", state);
+  switch (action.type) {
+    case "sport":
+      return { ...state, sport: action.data };
+    case "location":
+      return { ...state, location: action.data };
+    case "reservation_date":
+      return { ...state, reservation_date: action.data };
+    case "reservation_time":
+      return { ...state, reservation_time: action.data };
+    default:
+      return state;
+  }
+};
+
 const Home = () => {
-  const [value, setValue] = useState(0);
+  const [state, dispatch] = useReducer(reducer, {
+    sport: "",
+    location: [],
+    reservation_date: new Date(),
+    reservation_time: [],
+  });
 
   const [institutions, setInstitutions] = useState(i);
 
   const [openFilter, setOpenFilter] = useState(false);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
 
   const handleOpenFilter = () => {
     setOpenFilter(true);
@@ -53,7 +71,7 @@ const Home = () => {
         }}
       >
         <Container maxWidth={false}>
-          <FormularioFiltroCanchas />
+          <FormularioFiltroCanchas state={state} dispatch={dispatch} />
           <Box sx={{ m: 3 }} />
           <Box>
             <Card>
@@ -106,7 +124,10 @@ const Home = () => {
                             md={2}
                             xs={12}
                           >
-                            <CardCancha institution={institution} />
+                            <CardCancha
+                              institution={institution}
+                              state={state}
+                            />
                           </Grid>
                         ))}
                       </Grid>

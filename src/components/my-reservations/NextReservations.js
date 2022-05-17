@@ -15,6 +15,11 @@ import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import MaterialTable from "material-table";
+import Button from "@mui/material/Button";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
+import LoadingButton from "@mui/lab/LoadingButton";
+import Box from "@mui/material/Box";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -41,6 +46,8 @@ const tableIcons = {
 };
 
 const NextReservations = () => {
+  const [loading, setLoading] = useState(false);
+
   const [columns, setColumns] = useState([
     { title: "Cancha", field: "name" },
     { title: "Institucion", field: "institucion" },
@@ -69,6 +76,18 @@ const NextReservations = () => {
     },
   ]);
 
+  const handleCancelReservation = (rowData) => {
+    setLoading(true);
+
+    console.log("handleCancelReservation");
+    console.log(rowData);
+
+    /* if (!rowData.feedbackSended) {
+      setReservationFeedback(rowData);
+      setOpenFeedbackModal(true);
+    } */
+  };
+
   return (
     <MaterialTable
       title="Mis Proximos Turnos"
@@ -89,33 +108,35 @@ const NextReservations = () => {
           },
         },
       }}
+      components={{
+        Action: (props) => (
+          <Box sx={{ "& > button": { m: 1 } }}>
+            <LoadingButton
+              color="error"
+              onClick={(event) => props.action.onClick(event, props.data)}
+              loading={loading}
+              loadingPosition="start"
+              startIcon={<DeleteIcon />}
+              variant="contained"
+            >
+              Cancelar Reserva
+            </LoadingButton>
+          </Box>
+        ),
+      }}
+      options={{
+        actionsColumnIndex: -1,
+      }}
       icons={tableIcons}
       columns={columns}
       data={data}
-      editable={{
-        onRowUpdate: (newData, oldData) =>
-          new Promise((resolve, reject) => {
-            setTimeout(() => {
-              const dataUpdate = [...data];
-              const index = oldData.tableData.id;
-              dataUpdate[index] = newData;
-              setData([...dataUpdate]);
-
-              resolve();
-            }, 1000);
-          }),
-        onRowDelete: (oldData) =>
-          new Promise((resolve, reject) => {
-            setTimeout(() => {
-              const dataDelete = [...data];
-              const index = oldData.tableData.id;
-              dataDelete.splice(index, 1);
-              setData([...dataDelete]);
-
-              resolve();
-            }, 1000);
-          }),
-      }}
+      actions={[
+        {
+          icon: "save",
+          tooltip: "Save User",
+          onClick: (event, rowData) => handleCancelReservation(rowData),
+        },
+      ]}
     />
   );
 };

@@ -196,6 +196,7 @@ const MenuBar = (props) => {
       return (
         visible && (
           <Tooltip
+            key={name}
             disableHoverListener={disableHoverListener}
             title={name}
             placement="right"
