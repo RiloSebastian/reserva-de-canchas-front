@@ -1,5 +1,5 @@
 import { Box, Container, Grid, Typography } from "@mui/material";
-import { AccountProfile } from "../../../components/profile/AccountProfile";
+import AccountProfile from "../../../components/profile/AccountProfile";
 import { AccountProfileDetails } from "../../../components/profile/AccountProfileDetails";
 import { SettingsPassword } from "../../../components/profile/SettingsPassword";
 import InstitutionLayout from "../../../layout/InstitutionLayout";

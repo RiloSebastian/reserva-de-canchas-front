@@ -234,7 +234,7 @@ const MenuBar = (props) => {
     >
       <MenuItem
         component={Link}
-        to={"/dashboard/perfil"}
+        to={`${BASE_URL.base}/perfil`}
         onClick={handleOpenProfile}
       >
         Perfil

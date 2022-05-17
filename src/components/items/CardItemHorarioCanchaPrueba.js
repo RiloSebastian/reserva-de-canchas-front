@@ -88,7 +88,7 @@ const theme = createTheme({
   },
 });
 
-const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule, date }) => {
+const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule, date, institution }) => {
   const history = useHistory();
 
   const [courts, setCourts] = useState(schedule.courts);
@@ -134,6 +134,7 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule, date }) => {
       ...court,
       fecha: moment(date).format("DD / MM"),
       horario: schedule.schedule,
+      institution: institution,
     };
 
     console.log("before checkout - sending court selected");

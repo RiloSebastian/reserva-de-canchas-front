@@ -12,6 +12,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import ReservationService from "../../services/reservations/ReservationService";
 import { BASE_URL_CUSTOMERS } from "../routes";
 import MisReservas from "./../usuarios/clientes/MisReservas";
 import PaymentForm from "./PaymentForm";
@@ -52,10 +53,10 @@ const Checkout = () => {
         return <PreReview reservation={courtSelected} />;
       case 1:
         return (
-          <PaymentForm setValidatedPaymentMethod={setValidatedPaymentMethod} />
+          <PaymentForm setValidatedPaymentMethod={setValidatedPaymentMethod} setCourtSelected={setCourtSelected} />
         );
       case 2:
-        return <Review />;
+        return <Review reservation={courtSelected} />;
       case 3:
         return <MisReservas />;
       default:
@@ -63,7 +64,25 @@ const Checkout = () => {
     }
   };
 
+  const createReservation = async (newReservation) => {
+    const reservationCreated = await ReservationService.create(newReservation);
+    return reservationCreated;
+  }
+
   const handleNext = () => {
+
+    if (activeStep === steps.length - 1) {
+      console.log("generar la reserva")
+
+      const reservationCreated = createReservation(courtSelected);
+
+      const data = reservationCreated;
+
+      console.log("reserva generada")
+      console.log(data)
+
+    }
+
     setActiveStep(activeStep + 1);
   };
 
