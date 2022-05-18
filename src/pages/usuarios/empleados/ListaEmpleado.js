@@ -19,6 +19,26 @@ import { Delete } from '@material-ui/icons';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormularioHorarioPrecioCancha from '../../../components/formularios-datos/FormularioHorarioPrecioCancha';
 import Switch from '@mui/material/Switch';
+import Chip from '@mui/material/Chip';
+import DoneIcon from "@mui/icons-material/Done";
+import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
+import ChipState from '../../../components/employees/ChipState';
+import { TextField } from '@material-ui/core';
+
+const theme = createTheme({
+    components: {
+        MuiChip: {
+            styleOverrides: {
+                colorPrimary: {
+                    backgroundColor: 'green',
+                },
+                colorSecondary: {
+                    backgroundColor: 'red',
+                },
+            },
+        },
+    },
+});
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -48,6 +68,19 @@ const ListaEmpleado = () => {
 
     const [columns, setColumns] = useState([
         { title: 'Nombre', field: 'name' },
+        {
+            title: 'Correo Electronico', field: 'email',
+            editComponent: (props) => (
+                <TextField
+                    required
+                    fullWidth
+                    id="email"
+                    label="Correo Electronico"
+                    name="email"
+                    autoComplete="email"
+                  />
+            ),
+        },
         //{ title: 'Descripcion', field: 'description', initialEditValue: 'initial edit value' },
         //{ title: 'Birth Year', field: 'birthYear', type: 'numeric' },
         {
@@ -56,31 +89,27 @@ const ListaEmpleado = () => {
             lookup: { 1: 'Empleado', 2: 'Administrador', 3: 'Entrenador' },
         },
         {
-            title: 'Estado', field: 'estado',
+            title: 'Estado',
+            field: 'estado',
             editComponent: (rowData) => {
-                return <FormControlLabel control={<Switch defaultChecked />} label="Activo" />;
-            },
-            render: (rowData) => {
-                return (<FormControlLabel control={<Switch defaultChecked />} label="Activo" />);
-                /*return (
-                    
+                return <FormControlLabel control={
                     <Switch
-                        checked={rowData.status}
-                        onChange={handleChange}
-                        inputProps={{ "aria-label": "controlled" }}
-                        color="primary"
-                    />
-                );*/
-            }
+                        onChange={(e) => rowData.onChange(e.target.checked)}
+                        checked={rowData.value} />
+                }
+                    label={rowData.value ? "Activo" : "Inactivo"}
+                />;
+            },
+            render: (rowData, renderType) => <ChipState rowData={rowData} renderType={renderType} />
         },
     ]);
 
     const [data, setData] = useState([
-        { name: 'Marcos', description: 'Cancha de Polvo de Ladrillos', tipo: 1, estado: true },
-        { name: 'Claudia', description: 'Cancha de Cemento', tipo: 1, estado: true },
-        { name: 'Raul', description: 'Cancha de 5 Sintetica', tipo: 2, estado: false },
-        { name: 'Susana', description: 'Cancha de 9 de pasto natural', tipo: 2, estado: true },
-        { name: 'Vanina', description: 'Cancha de Cemento', tipo: 3, estado: false },
+        { name: 'Marcos', email: "marcos@email.com", description: 'Cancha de Polvo de Ladrillos', tipo: 1, estado: true },
+        { name: 'Claudia', email: "claudia@email.com", description: 'Cancha de Cemento', tipo: 1, estado: true },
+        { name: 'Raul', email: "raul@email.com", description: 'Cancha de 5 Sintetica', tipo: 2, estado: false },
+        { name: 'Susana', email: "susana@email.com", description: 'Cancha de 9 de pasto natural', tipo: 2, estado: true },
+        { name: 'Vanina', email: "vaninca@email.com", description: 'Cancha de Cemento', tipo: 3, estado: false },
     ]);
 
     const desplegarModal = () => {

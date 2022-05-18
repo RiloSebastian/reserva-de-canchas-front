@@ -1,3 +1,4 @@
+import { MenuItem, Select } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Delete } from "@material-ui/icons";
 import AddBox from "@material-ui/icons/AddBox";
@@ -25,7 +26,7 @@ import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import MaterialTable from "material-table";
 import moment from "moment";
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
 import CanchaService from "../../services/canchas/CanchaService";
@@ -46,25 +47,77 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const getSurfaces = (sport) => {
-  return sufacesArray.filter((s) => sport.id === s.sport_id);
+  return surfacesArray.filter((s) => sport.id === s.sport_id);
 };
 
-const sufacesArray = [
+const sportArray = [
+  { id: "61a68dbc107957730042e154", name: "TENIS" },
+  { id: "61a68dbc107957730042e153", name: "FUTBOL" },
+  { id: "61a68dbc107957730042e155", name: "PADEL" }
+];
+
+const surfacesArray = [
   {
     sport_id: "61a68dbc107957730042e154",
-    surface: ["Polvo de Ladrillo", "Cemento", "Césped"],
+    surface: [
+      {
+        id: 0,
+        name: "Polvo de Ladrillo"
+      },
+      {
+        id: 1,
+        name: "Cemento"
+      },
+      {
+        id: 2,
+        name: "Césped"
+      },
+    ],
   },
   {
     sport_id: "61a68dbc107957730042e153",
-    surface: ["Césped Sintetico", "Cesped Natural", "Alfombra", "Cemento"],
+    surface: [
+      {
+        id: 0,
+        name: "Césped Sintetico"
+      },
+      {
+        id: 1,
+        name: "Cesped Natural"
+      },
+      {
+        id: 2,
+        name: "Alfombra"
+      },
+      {
+        id: 3,
+        name: "Cemento"
+      },
+    ],
   },
   {
     sport_id: "61a68dbc107957730042e155",
     surface: [
-      "Césped Artificial",
-      "Cemento",
-      "Hormigón Poroso",
-      "Recubrimiento Sintético",
+      {
+        id: 0,
+        name: "Césped Artificial",
+      },
+      {
+        id: 1,
+        name: "Cemento",
+      },
+      {
+        id: 2,
+        name: "Hormigón Poroso",
+      },
+      {
+        id: 3,
+        name: "Recubrimiento Sintético",
+      },
+
+
+
+
     ],
   },
 ];
@@ -114,6 +167,8 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [enableButtons, setEnableButtons] = useState(true);
 
+  const [sportSelected, setSportSelected] = useState({});
+
   const [data, setData] = useState([]);
 
   const [photoData, setPhotoData] = useState([]);
@@ -133,6 +188,8 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [sport, setSport] = useState({});
 
+  const [surfaces, setSurfaces] = useState([]);
+
   const [switchState, setSwitchState] = useState(false);
 
   const handleSwitchChange = (oldRow, e) => {
@@ -145,6 +202,12 @@ const ListaCanchas = ({ institutionId }) => {
     console.log(newRow);
   };
 
+  const handleSelectedSport = (sportId) => {
+
+    console.log("handleSelectedSport");
+    console.log(sportId);
+  };
+
   const columns = [
     {
       title: "Deporte",
@@ -152,12 +215,17 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-              isValid: false,
-              helperText: "Debe seleccionar un deporte para la cancha",
-            }
+            isValid: false,
+            helperText: "Debe seleccionar un deporte para la cancha",
+          }
           : true,
       lookup: sport,
       render: (rowData) => rowData.sport.name,
+      editComponent: (rowData) => {
+        return <Select value={rowData.value || 'string'} onChange={(e) => { rowData.onChange(String(e.target.value)); setSportSelected(e.target.value); }}>
+          {sportArray.map((type) => <MenuItem value={type.id}>{type.name}</MenuItem>)}
+        </Select>;
+      }
     },
     {
       title: "Nombre Cancha",
@@ -165,9 +233,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.name === undefined || rowData.name === ""
           ? {
-              isValid: false,
-              helperText: "El nombre de la cancha no puede estar vacio",
-            }
+            isValid: false,
+            helperText: "El nombre de la cancha no puede estar vacio",
+          }
           : true,
     },
     {
@@ -176,9 +244,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-              isValid: false,
-              helperText: "Debe seleccionar la Superficie de la Cancha",
-            }
+            isValid: false,
+            helperText: "Debe seleccionar la Superficie de la Cancha",
+          }
           : true,
       //lookup: (rowData) => getSurfaces(rowData.sport),
       lookup: surfaces,
@@ -294,9 +362,45 @@ const ListaCanchas = ({ institutionId }) => {
   ];
 
   useEffect(() => {
-    retrieveCourts("61a6d2b35df5ed18eec54355");
-    retrieveSportsList();
+    //retrieveCourts("61a6d2b35df5ed18eec54355");
+    //retrieveSportsList();
+
+    const dynamicLookupObject = sportArray.reduce(function (acc, cur, i) {
+      acc[cur.id] = cur.name;
+
+      return acc;
+    }, {});
+
+    console.log(dynamicLookupObject)
+
+    setSport(dynamicLookupObject);
   }, []);
+
+  const firstUpdate = useRef(true);
+  useEffect(() => {
+
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+
+    console.log("surfacesArray")
+    console.log(surfacesArray)
+    console.log("sportSelected")      
+    console.log(sportSelected)
+
+    const surfacesArrayFiltered = surfacesArray.filter((s) => s.sport_id == sportSelected);
+
+    const dynamicLookupSurfaces = surfacesArrayFiltered[0].surface.reduce(function (acc, cur, i) {
+      acc[cur.id] = cur.name;
+
+      return acc;
+    }, {});
+
+    setSurfaces(dynamicLookupSurfaces);
+  }, [sportSelected]);
+
+
 
   const handleUploadImage = (event) => {
     let images = [];
@@ -395,10 +499,10 @@ const ListaCanchas = ({ institutionId }) => {
     const horarios = horariosYPrecios.schedules.map((s) =>
       s
         ? {
-            ...s,
-            ["from"]: moment(s.from).format("HH:mm"),
-            ["to"]: moment(s.to).format("HH:mm"),
-          }
+          ...s,
+          ["from"]: moment(s.from).format("HH:mm"),
+          ["to"]: moment(s.to).format("HH:mm"),
+        }
         : s
     );
     horariosYPrecios.schedules = horarios;
