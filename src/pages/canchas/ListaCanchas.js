@@ -33,28 +33,6 @@ import DeporteService from "../../services/deportes/DeporteService";
 import PhotoService from "../../services/photos/PhotoService";
 import CourtsDetails from "./CourtsDetails";
 
-/*const useStyles = makeStyles(() =>
-  createStyles({
-    container: {
-      padding: "1rem",
-      height: "fit-content",
-    },
-  })
-);*/
-
-function srcset(image, width, height) {
-  return {
-    src: `${image}?w=${width}&h=${height}&fit=crop&auto=format`,
-    srcSet: `${image}?w=${width}&h=${height}&fit=crop&auto=format&dpr=2 2x`,
-  };
-}
-
-const flexContainer = {
-  display: "flex",
-  flexDirection: "row",
-  padding: 0,
-};
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -67,22 +45,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const itemData = [
+const getSurfaces = (sport) => {
+  return sufacesArray.filter((s) => sport.id === s.sport_id);
+};
+
+const sufacesArray = [
   {
-    img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-    title: "Breakfast",
-    author: "@bkristastucchio",
-    featured: true,
+    sport_id: "61a68dbc107957730042e154",
+    surface: ["Polvo de Ladrillo", "Cemento", "Césped"],
   },
   {
-    img: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-    title: "Burger",
-    author: "@rollelflex_graphy726",
+    sport_id: "61a68dbc107957730042e153",
+    surface: ["Césped Sintetico", "Cesped Natural", "Alfombra", "Cemento"],
   },
   {
-    img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
-    title: "Camera",
-    author: "@helloimnik",
+    sport_id: "61a68dbc107957730042e155",
+    surface: [
+      "Césped Artificial",
+      "Cemento",
+      "Hormigón Poroso",
+      "Recubrimiento Sintético",
+    ],
   },
 ];
 
@@ -125,6 +108,8 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [open, setOpen] = useState(false);
 
+  const [enableSelectSurface, setEnableSelectSurface] = useState(false);
+
   const [isMultipleEdit, setIsMultipleEdit] = useState(false);
 
   const [enableButtons, setEnableButtons] = useState(true);
@@ -154,28 +139,13 @@ const ListaCanchas = ({ institutionId }) => {
     const changeData = { [e.target.name]: e.target.checked };
     const newRow = { ...oldRow, ...changeData };
 
-    console.log("habilitando canchsa");
+    console.log("habilitando cancha");
     console.log(changeData);
     console.log(oldRow);
     console.log(newRow);
   };
 
-  const ariaLabel = { "aria-label": "description" };
-
   const columns = [
-    {
-      title: "Nombre Cancha",
-      field: "name",
-      validate: (rowData) =>
-        rowData.name === undefined || rowData.name === ""
-          ? {
-              isValid: false,
-              helperText: "El nombre de la cancha no puede estar vacio",
-            }
-          : true,
-    },
-    { title: "Descripcion", field: "description" },
-    //{ title: 'Birth Year', field: 'birthYear', type: 'numeric' },
     {
       title: "Deporte",
       field: "sport",
@@ -190,10 +160,35 @@ const ListaCanchas = ({ institutionId }) => {
       render: (rowData) => rowData.sport.name,
     },
     {
+      title: "Nombre Cancha",
+      field: "name",
+      validate: (rowData) =>
+        rowData.name === undefined || rowData.name === ""
+          ? {
+              isValid: false,
+              helperText: "El nombre de la cancha no puede estar vacio",
+            }
+          : true,
+    },
+    {
+      title: "Superficie",
+      field: "surface",
+      validate: (rowData) =>
+        rowData.sport === undefined
+          ? {
+              isValid: false,
+              helperText: "Debe seleccionar la Superficie de la Cancha",
+            }
+          : true,
+      //lookup: (rowData) => getSurfaces(rowData.sport),
+      lookup: surfaces,
+      render: (rowData) => rowData.surface,
+    },
+    { title: "Descripcion", field: "description" },
+    {
       title: "Seña",
       field: "signPercentage",
       type: "numeric",
-      // validate: rowData => rowData.signPercentage === undefined || (rowData.sensignPercentageia >= 0 && rowData.signPercentage <= 100),
       render: (rowData) =>
         rowData.signPercentage === undefined || rowData.signPercentage === 0
           ? "no requiere seña"
@@ -234,6 +229,38 @@ const ListaCanchas = ({ institutionId }) => {
       ),
     },
     {
+      title: "Techada",
+      field: "techada",
+      render: (rowData) => (rowData.enabled ? "Techada" : "Descubierta"),
+      editComponent: (props) => (
+        <FormControlLabel
+          control={
+            <Switch
+              onChange={(e) => props.onChange(e.target.checked)}
+              checked={props.value}
+            />
+          }
+          label={props.value ? "Habilitada" : "Deshabilitada"}
+        />
+      ),
+    },
+    {
+      title: "Iluminacion",
+      field: "iluminacion",
+      render: (rowData) => (rowData.enabled ? "Si" : "No"),
+      editComponent: (props) => (
+        <FormControlLabel
+          control={
+            <Switch
+              onChange={(e) => props.onChange(e.target.checked)}
+              checked={props.value}
+            />
+          }
+          label={props.value ? "Habilitada" : "Deshabilitada"}
+        />
+      ),
+    },
+    {
       field: "schedule",
       filtering: false,
       editComponent: (props) => (
@@ -252,8 +279,7 @@ const ListaCanchas = ({ institutionId }) => {
             multiple
             id="icon-button-file"
             type="file"
-            //value={props.value}
-            onChange={/*e => props.onChange(e.target.value)*/ handleUploadImage}
+            onChange={handleUploadImage}
           />
           <IconButton
             color="primary"
@@ -285,16 +311,6 @@ const ListaCanchas = ({ institutionId }) => {
       selectedFiles: event.target.files,
       previewImages: images,
     });
-
-    /*    let file = event.target.files[0];
-            let imageData = new FormData();
-            imageData.append('imageFile', event.target.files[0])
-        
-            console.log('guardando imagen');
-            console.log(imageData.values);
-            console.log(file);
-            console.log(URL.createObjectURL(file));
-            setImages(file)*/
   };
 
   const retrieveCourts = async (institutionId) => {
@@ -376,9 +392,6 @@ const ListaCanchas = ({ institutionId }) => {
   const createCancha = async (newCancha) => {
     console.log("newCancha");
 
-    //const cancha = { ...newCancha, ['horarios']: horariosYPrecios, ['images']: images }
-    //let cancha = { ...newCancha, ['schedule']: horariosYPrecios }
-
     const horarios = horariosYPrecios.schedules.map((s) =>
       s
         ? {
@@ -429,7 +442,6 @@ const ListaCanchas = ({ institutionId }) => {
   const updateCancha = async (canchaToUpdated) => {
     console.log("canchaToUpdated");
 
-    //const cancha = { ...newCancha, ['horarios']: horariosYPrecios, ['images']: images }
     const cancha = { ...canchaToUpdated, ["schedule"]: horariosYPrecios };
 
     console.log(cancha);

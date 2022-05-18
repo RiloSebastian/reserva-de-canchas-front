@@ -11,6 +11,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { Link, useHistory } from "react-router-dom";
 import AppAppBar from "./../home/modules/views/AppAppBar";
+import AuthService from "../../services/auth.service";
 
 function Copyright(props) {
   return (
@@ -50,16 +51,25 @@ const SignIn = (props) => {
       password: data.get("password"),
     });
 
-    localStorage.setItem(
+    /* localStorage.setItem(
+      "user",
+      JSON.stringify({
+        roles: ["ROLE_ADMIN"],
+      })
+    );
+
+    history.push("/dashboard/reservas");
+
+     localStorage.setItem(
       "user",
       JSON.stringify({
         roles: ["ROLE_CUSTOMER"],
       })
-    );
+    ); 
 
-    history.push("/customer/home");
+    history.push("/customer/home");*/
 
-    /*  const user = await AuthService.login(
+    const user = await AuthService.login(
       data.get("username"),
       data.get("password")
     ).then((data) => data);
@@ -70,7 +80,7 @@ const SignIn = (props) => {
       history.push("/customer/home");
     } else {
       history.push("/dashboard/reservas");
-    }*/
+    }
   };
 
   return (
