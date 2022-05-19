@@ -51,7 +51,7 @@ const SignIn = (props) => {
       password: data.get("password"),
     });
 
-    localStorage.setItem(
+    /*localStorage.setItem(
       "user",
       JSON.stringify({
         roles: ["ROLE_ADMIN"],
@@ -60,14 +60,14 @@ const SignIn = (props) => {
 
     history.push("/dashboard/reservas");
 
-    /*  localStorage.setItem(
+      localStorage.setItem(
       "user",
       JSON.stringify({
         roles: ["ROLE_CUSTOMER"],
       })
     ); 
 
-    history.push("/customer/home");
+    history.push("/customer/home");*/
 
     const user = await AuthService.login(
       data.get("username"),
@@ -80,7 +80,7 @@ const SignIn = (props) => {
       history.push("/customer/home");
     } else {
       history.push("/dashboard/reservas");
-    }*/
+    }
   };
 
   return (

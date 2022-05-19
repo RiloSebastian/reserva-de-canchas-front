@@ -62,13 +62,6 @@ const ScheduleAndPrice = ({
 
   const classes = useStyles();
 
-  //const [desde, setDesde] = useState(moment());
-  //const [hasta, setHasta] = useState(moment());
-
-  //const handleChange = (event) => {
-  // setHorarioHabilitado(event.target.checked);
-  //};
-
   const handleChange = (e) => {
     if (e.target.type === "checkbox") {
       setHorarios((horarios) => {
@@ -92,31 +85,6 @@ const ScheduleAndPrice = ({
       });
     }
   };
-
-  /* useEffect(() => {
- 
-         let fromTime = moment(moment(from, 'HH:mm'));
-         let toTime = moment(moment(to, 'HH:mm'));
- 
-         console.log(fromTime)
-         console.log(toTime)
- 
-         let duration = moment.duration(toTime.diff(fromTime));
- 
-         console.log(duration)
- 
-         let diff = duration.hours();
-         let array = [];
- 
-         for (var i = 0; diff > i; i++) {
-             let result = moment(fromTime).add(i, 'hours').format('HH:mm')
-             array.push({
-                 result
-             })
-         }
- 
-         console.log(array)
-     }, [from, to])*/
 
   useEffect(() => {
     setHorarios((horarios) => {
@@ -146,10 +114,6 @@ const ScheduleAndPrice = ({
               name="from"
               value={from}
               onChange={(newValue) => {
-                /* setHorariosYPrecios((body) => {
-                                     return { ...body, ['schedules']: horarios };
-                                 });*/
-
                 setHorarios((horarios) => {
                   let horariosUpdated = horarios.map((horario) =>
                     horario.id === id
@@ -178,11 +142,6 @@ const ScheduleAndPrice = ({
 
                   return [...horariosUpdated];
                 });
-
-                /*     setHorariosYPrecios((body) => {
-     
-                                         return { ...body, ['schedules']: horarios };
-                                     });*/
               }}
               renderInput={(params) => <TextField {...params} />}
               shouldDisableTime={(timeValue, clockType) => {
@@ -215,11 +174,6 @@ const ScheduleAndPrice = ({
           />
         </Grid>
         <Grid item xs>
-          {/*<Switch
-                        checked={checked}
-                        onChange={handleChange}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                    />*/}
           <FormControlLabel
             control={
               <Switch

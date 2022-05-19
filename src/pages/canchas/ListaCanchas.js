@@ -53,7 +53,7 @@ const getSurfaces = (sport) => {
 const sportArray = [
   { id: "61a68dbc107957730042e154", name: "TENIS" },
   { id: "61a68dbc107957730042e153", name: "FUTBOL" },
-  { id: "61a68dbc107957730042e155", name: "PADEL" }
+  { id: "61a68dbc107957730042e155", name: "PADEL" },
 ];
 
 const surfacesArray = [
@@ -62,15 +62,15 @@ const surfacesArray = [
     surface: [
       {
         id: 0,
-        name: "Polvo de Ladrillo"
+        name: "Polvo de Ladrillo",
       },
       {
         id: 1,
-        name: "Cemento"
+        name: "Cemento",
       },
       {
         id: 2,
-        name: "Césped"
+        name: "Césped",
       },
     ],
   },
@@ -79,19 +79,19 @@ const surfacesArray = [
     surface: [
       {
         id: 0,
-        name: "Césped Sintetico"
+        name: "Césped Sintetico",
       },
       {
         id: 1,
-        name: "Cesped Natural"
+        name: "Cesped Natural",
       },
       {
         id: 2,
-        name: "Alfombra"
+        name: "Alfombra",
       },
       {
         id: 3,
-        name: "Cemento"
+        name: "Cemento",
       },
     ],
   },
@@ -114,10 +114,6 @@ const surfacesArray = [
         id: 3,
         name: "Recubrimiento Sintético",
       },
-
-
-
-
     ],
   },
 ];
@@ -203,7 +199,6 @@ const ListaCanchas = ({ institutionId }) => {
   };
 
   const handleSelectedSport = (sportId) => {
-
     console.log("handleSelectedSport");
     console.log(sportId);
   };
@@ -215,17 +210,27 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-            isValid: false,
-            helperText: "Debe seleccionar un deporte para la cancha",
-          }
+              isValid: false,
+              helperText: "Debe seleccionar un deporte para la cancha",
+            }
           : true,
       lookup: sport,
       render: (rowData) => rowData.sport.name,
       editComponent: (rowData) => {
-        return <Select value={rowData.value || 'string'} onChange={(e) => { rowData.onChange(String(e.target.value)); setSportSelected(e.target.value); }}>
-          {sportArray.map((type) => <MenuItem value={type.id}>{type.name}</MenuItem>)}
-        </Select>;
-      }
+        return (
+          <Select
+            value={rowData.value || "string"}
+            onChange={(e) => {
+              rowData.onChange(String(e.target.value));
+              setSportSelected(e.target.value);
+            }}
+          >
+            {sportArray.map((type) => (
+              <MenuItem value={type.id}>{type.name}</MenuItem>
+            ))}
+          </Select>
+        );
+      },
     },
     {
       title: "Nombre Cancha",
@@ -233,9 +238,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.name === undefined || rowData.name === ""
           ? {
-            isValid: false,
-            helperText: "El nombre de la cancha no puede estar vacio",
-          }
+              isValid: false,
+              helperText: "El nombre de la cancha no puede estar vacio",
+            }
           : true,
     },
     {
@@ -244,9 +249,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-            isValid: false,
-            helperText: "Debe seleccionar la Superficie de la Cancha",
-          }
+              isValid: false,
+              helperText: "Debe seleccionar la Superficie de la Cancha",
+            }
           : true,
       //lookup: (rowData) => getSurfaces(rowData.sport),
       lookup: surfaces,
@@ -308,7 +313,7 @@ const ListaCanchas = ({ institutionId }) => {
               checked={props.value}
             />
           }
-          label={props.value ? "Habilitada" : "Deshabilitada"}
+          label={props.value ? "Techada" : "Descubierta"}
         />
       ),
     },
@@ -324,7 +329,7 @@ const ListaCanchas = ({ institutionId }) => {
               checked={props.value}
             />
           }
-          label={props.value ? "Habilitada" : "Deshabilitada"}
+          label={props.value ? "Si" : "No"}
         />
       ),
     },
@@ -362,8 +367,8 @@ const ListaCanchas = ({ institutionId }) => {
   ];
 
   useEffect(() => {
-    //retrieveCourts("61a6d2b35df5ed18eec54355");
-    //retrieveSportsList();
+    retrieveCourts("61a6d2b35df5ed18eec54355");
+    retrieveSportsList();
 
     const dynamicLookupObject = sportArray.reduce(function (acc, cur, i) {
       acc[cur.id] = cur.name;
@@ -371,36 +376,38 @@ const ListaCanchas = ({ institutionId }) => {
       return acc;
     }, {});
 
-    console.log(dynamicLookupObject)
+    console.log(dynamicLookupObject);
 
     setSport(dynamicLookupObject);
   }, []);
 
   const firstUpdate = useRef(true);
   useEffect(() => {
-
     if (firstUpdate.current) {
       firstUpdate.current = false;
       return;
     }
 
-    console.log("surfacesArray")
-    console.log(surfacesArray)
-    console.log("sportSelected")      
-    console.log(sportSelected)
+    console.log("surfacesArray");
+    console.log(surfacesArray);
+    console.log("sportSelected");
+    console.log(sportSelected);
 
-    const surfacesArrayFiltered = surfacesArray.filter((s) => s.sport_id == sportSelected);
+    const surfacesArrayFiltered = surfacesArray.filter(
+      (s) => s.sport_id == sportSelected
+    );
 
-    const dynamicLookupSurfaces = surfacesArrayFiltered[0].surface.reduce(function (acc, cur, i) {
-      acc[cur.id] = cur.name;
+    const dynamicLookupSurfaces = surfacesArrayFiltered[0].surface.reduce(
+      function (acc, cur, i) {
+        acc[cur.id] = cur.name;
 
-      return acc;
-    }, {});
+        return acc;
+      },
+      {}
+    );
 
     setSurfaces(dynamicLookupSurfaces);
   }, [sportSelected]);
-
-
 
   const handleUploadImage = (event) => {
     let images = [];
@@ -499,10 +506,10 @@ const ListaCanchas = ({ institutionId }) => {
     const horarios = horariosYPrecios.schedules.map((s) =>
       s
         ? {
-          ...s,
-          ["from"]: moment(s.from).format("HH:mm"),
-          ["to"]: moment(s.to).format("HH:mm"),
-        }
+            ...s,
+            ["from"]: moment(s.from).format("HH:mm"),
+            ["to"]: moment(s.to).format("HH:mm"),
+          }
         : s
     );
     horariosYPrecios.schedules = horarios;
