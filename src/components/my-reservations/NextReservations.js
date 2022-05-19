@@ -20,6 +20,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
+import CancelReservationDialog from "./CancelReservationDialog";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -46,6 +47,9 @@ const tableIcons = {
 };
 
 const NextReservations = () => {
+
+  const [openCancelReservationModal, setOpenCancelReservationModal] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
   const [columns, setColumns] = useState([
@@ -64,6 +68,7 @@ const NextReservations = () => {
       institucion: "Palermo Tennis",
       direccion: "Santa Fe 1234",
       feedbackSended: false,
+      status: "PENDING",
     },
     {
       reservation_id: 2,
@@ -73,6 +78,7 @@ const NextReservations = () => {
       institucion: "Futbol Plaza",
       direccion: "Corrientes 2345",
       feedbackSended: false,
+      status: "PENDING",
     },
   ]);
 
@@ -82,62 +88,81 @@ const NextReservations = () => {
     console.log("handleCancelReservation");
     console.log(rowData);
 
-    /* if (!rowData.feedbackSended) {
-      setReservationFeedback(rowData);
-      setOpenFeedbackModal(true);
-    } */
+      console.log("open dialog");
+      setOpenCancelReservationModal(true);
+    
+  };
+
+  const updateRservationStatus = (reservation_id) => {
+    console.log("updateRservationStatus");
+    console.log(reservation_id);
+
+    setData((existingItems) => {
+      return existingItems.map((reservation) => {
+        return reservation_id === reservation.reservation_id
+          ? { ...reservation, status: "CANCELED" }
+          : reservation;
+      });
+    });
   };
 
   return (
-    <MaterialTable
-      title="Mis Proximos Turnos"
-      localization={{
-        pagination: {
-          labelDisplayedRows: "{from}-{to} de {count}",
-        },
-        toolbar: {
-          nRowsSelected: "{0} fila(s) seleccionada(s)",
-        },
-        header: {
-          actions: "Opciones",
-        },
-        body: {
-          emptyDataSourceMessage: "Aun no tiene Reservas realizadas",
-          filterRow: {
-            filterTooltip: "Filter",
+    <>
+      <MaterialTable
+        title="Mis Proximos Turnos"
+        localization={{
+          pagination: {
+            labelDisplayedRows: "{from}-{to} de {count}",
           },
-        },
-      }}
-      components={{
-        Action: (props) => (
-          <Box sx={{ "& > button": { m: 1 } }}>
-            <LoadingButton
-              color="error"
-              onClick={(event) => props.action.onClick(event, props.data)}
-              loading={loading}
-              loadingPosition="start"
-              startIcon={<DeleteIcon />}
-              variant="contained"
-            >
-              Cancelar Reserva
-            </LoadingButton>
-          </Box>
-        ),
-      }}
-      options={{
-        actionsColumnIndex: -1,
-      }}
-      icons={tableIcons}
-      columns={columns}
-      data={data}
-      actions={[
-        {
-          icon: "save",
-          tooltip: "Save User",
-          onClick: (event, rowData) => handleCancelReservation(rowData),
-        },
-      ]}
-    />
+          toolbar: {
+            nRowsSelected: "{0} fila(s) seleccionada(s)",
+          },
+          header: {
+            actions: "Opciones",
+          },
+          body: {
+            emptyDataSourceMessage: "Aun no tiene Reservas realizadas",
+            filterRow: {
+              filterTooltip: "Filter",
+            },
+          },
+        }}
+        components={{
+          Action: (props) => (
+            <Box sx={{ "& > button": { m: 1 } }}>
+              <LoadingButton
+                color="error"
+                onClick={(event) => props.action.onClick(event, props.data)}
+                loading={loading}
+                loadingPosition="start"
+                startIcon={<DeleteIcon />}
+                variant="contained"
+              >
+                Cancelar Reserva
+              </LoadingButton>
+            </Box>
+          ),
+        }}
+        options={{
+          actionsColumnIndex: -1,
+        }}
+        icons={tableIcons}
+        columns={columns}
+        data={data}
+        actions={[
+          {
+            icon: "save",
+            tooltip: "Save User",
+            onClick: (event, rowData) => handleCancelReservation(rowData),
+          },
+        ]}
+      />
+      <CancelReservationDialog
+        open={openCancelReservationModal}
+        setOpenCancelReservationModal={setOpenCancelReservationModal}
+        updateRservationStatus={updateRservationStatus}
+      />  
+    </>
   );
 };
 

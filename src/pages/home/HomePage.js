@@ -1,4 +1,5 @@
 import * as React from "react";
+import Footer from "../../components/footer/Footer";
 import AppAppBar from "./modules/views/AppAppBar";
 import ProductHero from "./modules/views/ProductHero";
 import withRoot from "./modules/withRoot";
@@ -8,6 +9,7 @@ const HomePage = () => {
     <React.Fragment>
       <AppAppBar />
       <ProductHero />
+      <Footer />
 
       {/*
        <ProductValues />
