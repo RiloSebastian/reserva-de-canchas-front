@@ -1,62 +1,119 @@
-import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import Avatar from '@material-ui/core/Avatar';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary">
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import RoomIcon from '@material-ui/icons/Room';
+import PhoneIcon from '@material-ui/icons/Phone';
+import EmailIcon from '@material-ui/icons/Email';
+import WebAssetIcon from '@material-ui/icons/WebAsset';
+import FacebookIcon from '@material-ui/icons/Facebook';
+import TwitterIcon from '@material-ui/icons/Twitter';
+import LinkedInIcon from '@material-ui/icons/LinkedIn';
 
-export default function Footer() {
+const useStyles = makeStyles((theme) => ({
+  iconWrapper: {
+    backgroundColor: theme.palette.background.emphasis,
+  },
+  midColumn: {
+    [theme.breakpoints.up('md')]: {
+      paddingLeft: theme.spacing(4)
+    }
+  }
+}));
+
+export default function Footer(props) {
+  const classes = useStyles();
+
+  const content = {
+    'header': 'Reserva Tu Cancha',
+    'description': 'Contactanos a traves de',
+    'contact1': 'Direccion',
+    'contact1-desc1': 'Habana 4401',
+    'contact1-desc2': 'Devoto, CABA, C1419',
+    'contact2': 'Email',
+    'contact2-desc': 'reservatucancha@email.com',
+    'contact3': 'Social Media',
+    'contact4': 'Telefono',
+    'contact4-desc': '(011) 4285-9856',
+    ...props.content
+  };
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-      }}
-    >
-      <CssBaseline />
-      <Container component="main" sx={{ mt: 8, mb: 2 }} maxWidth="sm">
-        <Typography variant="h2" component="h1" gutterBottom>
-          Sticky footer
-        </Typography>
-        <Typography variant="h5" component="h2" gutterBottom>
-          {'Pin a footer to the bottom of the viewport.'}
-          {'The footer will move as the main element of the page grows.'}
-        </Typography>
-        <Typography variant="body1">Sticky footer placeholder.</Typography>
+    <section>
+      <Container maxWidth="lg">
+        <Box py={10}>
+          <Grid container spacing={6}>
+            <Grid item xs={12} md={4}>
+              <Typography variant="h6" component="h2" gutterBottom={true}>{content['header']}</Typography>
+              <Typography variant="subtitle1" color="textSecondary" paragraph={true}>{content['description']}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <div className={classes.midColumn}>
+                <Box display="flex" mb={3}>
+                  <div>
+                    <Avatar className={classes.iconWrapper}>
+                      <RoomIcon color="primary" fontSize="small" />
+                    </Avatar>
+                  </div>
+                  <Box ml={2}>
+                    <Typography variant="h6" gutterBottom={true}>{content['contact1']}</Typography>
+                    <Typography variant="body2" color="textSecondary">{content['contact1-desc1']}</Typography>
+                    <Typography variant="body2" color="textSecondary">{content['contact1-desc2']}</Typography>
+                  </Box>
+                </Box>
+                <Box display="flex">
+                  <div>
+                    <Avatar className={classes.iconWrapper}>
+                      <EmailIcon color="primary" fontSize="small" />
+                    </Avatar>
+                  </div>
+                  <Box ml={2}>
+                    <Typography variant="h6" gutterBottom={true}>{content['contact2']}</Typography>
+                    <Typography variant="body2" color="textSecondary">{content['contact2-desc']}</Typography>
+                  </Box>
+                </Box>
+              </div>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Box display="flex" mb={3}>
+                <div>
+                  <Avatar className={classes.iconWrapper}>
+                    <WebAssetIcon color="primary" fontSize="small" />
+                  </Avatar>
+                </div>
+                <Box ml={2}>
+                  <Typography variant="h6" gutterBottom={true}>{content['contact3']}</Typography>
+                  <IconButton href="#" color="inherit">
+                    <FacebookIcon />
+                  </IconButton>
+                  <IconButton href="#" color="inherit">
+                    <TwitterIcon />
+                  </IconButton>
+                  <IconButton href="#" color="inherit">
+                    <LinkedInIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+              <Box display="flex">
+                <div>
+                  <Avatar className={classes.iconWrapper}>
+                    <PhoneIcon color="primary" fontSize="small" />
+                  </Avatar>
+                </div>
+                <Box ml={2}>
+                  <Typography variant="h6" gutterBottom={true}>{content['contact4']}</Typography>
+                  <Typography variant="body2" color="textSecondary">{content['contact4-desc']}</Typography>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
       </Container>
-      <Box
-        component="footer"
-        sx={{
-          py: 3,
-          px: 2,
-          mt: 'auto',
-          backgroundColor: (theme) =>
-            theme.palette.mode === 'light'
-              ? theme.palette.grey[200]
-              : theme.palette.grey[800],
-        }}
-      >
-        <Container maxWidth="sm">
-          <Typography variant="body1">
-            My sticky footer can be found here.
-          </Typography>
-          <Copyright />
-        </Container>
-      </Box>
-    </Box>
+    </section>
   );
 }
