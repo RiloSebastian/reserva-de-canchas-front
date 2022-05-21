@@ -86,10 +86,9 @@ const percentages = Array.from({ length: 3 }, (_, i) => {
   return percentage;
 });
 
-const PreReview = ({ reservation }) => {
+const PreReview = ({ reservation, setReservation }) => {
   const [selectedPercentages, setSelectedPercentages] = useState();
   const [chipColor, setChipColor] = useState("info");
-  //const [reservations, setReservations] = useState(reservation);
 
   const subtotal = (price) => {
     //return items.map(({ price }) => price).reduce((sum, i) => sum + i, 0);
@@ -103,7 +102,7 @@ const PreReview = ({ reservation }) => {
   const invoiceTotal = invoiceAdvancePayment;
   //const invoiceTotal = invoiceSubtotal - invoiceAdvancePayment;
 
-  const handleSelectPercemtage = (newPercentageSelected) => {
+  const handleSelectPercentage = (newPercentageSelected) => {
     setSelectedPercentages(newPercentageSelected);
 
     if (newPercentageSelected === 1) {
@@ -114,6 +113,13 @@ const PreReview = ({ reservation }) => {
   };
 
   useEffect(() => {
+    console.log("updating total to pay");
+    setReservation(prevState => {
+      return { ...prevState, priceToPay: ccyFormat(invoiceTotal), debToPay: ccyFormat(invoiceSubtotal - invoiceTotal) };
+    });
+  }, [selectedPercentages]);
+
+  useEffect(() => {
     console.log("loading preview");
     console.log(reservation);
 
@@ -121,6 +127,9 @@ const PreReview = ({ reservation }) => {
       (percentage) => percentage === 0.5
     );
     setSelectedPercentages(selectedPercentages[0]);
+    setReservation(prevState => {
+      return { ...prevState, priceToPay: ccyFormat(invoiceTotal), debToPay: ccyFormat(invoiceSubtotal - invoiceTotal) };
+    });
   }, []);
 
   return (
@@ -182,10 +191,10 @@ const PreReview = ({ reservation }) => {
                           <ThemeProvider theme={theme}>
                             <Chip
                               key={percentage}
-                              onClick={() => handleSelectPercemtage(percentage)}
+                              onClick={() => handleSelectPercentage(percentage)}
                               //onClick={() => setSelected((s) => !s)}
                               onDelete={
-                                selectedPercentages === percentage && (() => {})
+                                selectedPercentages === percentage && (() => { })
                               }
                               color={
                                 selectedPercentages === percentage
@@ -201,7 +210,7 @@ const PreReview = ({ reservation }) => {
                               label={`${parseFloat(percentage * 100).toFixed(
                                 0
                               )} %`}
-                              //onClick={() => setSelectedPercentages(percentage)}
+                            //onClick={() => setSelectedPercentages(percentage)}
                             />
                           </ThemeProvider>
                         }

@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useState, useEffect } from "react";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -59,28 +59,36 @@ const NextReservations = () => {
     { title: "Institucion", field: "institucion" },
     { title: "Direccion", field: "direccion" },
     { title: "Fecha", field: "date", initialEditValue: "initial edit value" },
+    { title: "Seña", field: "advancePayment", render: rowData => `$ ${rowData.advancePayment}` },
+    { title: "Precio Total", field: "price", render: rowData => `$ ${rowData.price}` },
   ]);
 
   const [data, setData] = useState([
     {
       reservation_id: 1,
       name: "Cancha 1",
-      date: "23/2 15:00",
+      date: "27/5 15:00",
       birthYear: "10:00",
       institucion: "Palermo Tennis",
       direccion: "Santa Fe 1234",
       feedbackSended: false,
       status: "PENDING",
+      price: 1200.00,
+      advancePayment: 600.00,
+      returnableDeposit: true
     },
     {
       reservation_id: 2,
       name: "Cancha 5",
-      date: "15/5 19:00",
+      date: "25/5 19:00",
       birthYear: "18:30",
       institucion: "Futbol Plaza",
       direccion: "Corrientes 2345",
       feedbackSended: false,
       status: "PENDING",
+      price: 1800.00,
+      advancePayment: 900.00,
+      returnableDeposit: false
     },
   ]);
 
@@ -94,8 +102,8 @@ const NextReservations = () => {
     }
   };
 
-  const updateRservationStatus = (reservation_id) => {
-    console.log("updateRservationStatus");
+  const updateRervationStatus = (reservation_id) => {
+    console.log("updateRervationStatus");
     console.log(reservation_id);
 
     setData((existingItems) => {
@@ -132,12 +140,12 @@ const NextReservations = () => {
           Action: (props) => (
             <Box sx={{ "& > button": { m: 1 } }}>
               <LoadingButton
-                color="error"
+                color={props.data.status !== "CANCELED" ? "error" : "error"}
                 onClick={(event) => props.action.onClick(event, props.data)}
                 loading={
                   loading &&
                   selectedReservation.reservation_id ===
-                    props.data.reservation_id &&
+                  props.data.reservation_id &&
                   selectedReservation.status !== "CANCELED"
                 }
                 loadingPosition="start"
@@ -158,16 +166,15 @@ const NextReservations = () => {
         data={data}
         actions={[
           {
-            icon: "save",
-            tooltip: "Save User",
             onClick: (event, rowData) => handleCancelReservation(rowData),
           },
         ]}
       />
       <CancelReservationDialog
         open={openCancelReservationModal}
+        selectedReservation={selectedReservation}
         setOpenCancelReservationModal={setOpenCancelReservationModal}
-        updateRservationStatus={updateRservationStatus}
+        updateRervationStatus={updateRervationStatus}
         setLoading={setLoading}
       />
     </>

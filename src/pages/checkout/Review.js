@@ -41,13 +41,13 @@ const Review = ({reservation}) => {
             <List disablePadding>
                     <ListItem key={reservation.name} sx={{ py: 1, px: 0 }}>
                         <ListItemText primary={reservation.name} secondary={reservation.institution.institution_name} />
-                        <Typography variant="body2">$ {reservation.price}.00</Typography>
+                        <Typography variant="body2">$ {reservation.priceToPay}</Typography>
                     </ListItem>
 
                 <ListItem sx={{ py: 1, px: 0 }}>
                     <ListItemText primary="Total" />
                     <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                        ${reservation.price}.00
+                        ${reservation.priceToPay}
                     </Typography>
                 </ListItem>
             </List>

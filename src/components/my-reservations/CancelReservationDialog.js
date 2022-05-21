@@ -8,6 +8,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
+import AlertInformation from "./AlertInformation";
 
 const theme = createTheme({
   components: {
@@ -26,9 +27,9 @@ const theme = createTheme({
 
 const CancelReservationDialog = ({
   open,
+  selectedReservation,
   setOpenCancelReservationModal,
-  reservationFeedback,
-  updateRservationStatus,
+  updateRervationStatus,
   setLoading,
 }) => {
   const [fullWidth, setFullWidth] = useState(true);
@@ -45,11 +46,11 @@ const CancelReservationDialog = ({
 
   const handleCancelReservation = () => {
     console.log("handleCancelReservation");
-    console.log(reservationFeedback);
+    console.log(selectedReservation);
 
-    updateRservationStatus(reservationFeedback.reservation_id);
+    updateRervationStatus(selectedReservation.reservation_id);
     //setFeedbackSended(true);
-    /* setReservationFeedback((prevState) => {
+    /* setselectedReservation((prevState) => {
       return {
         ...prevState,
         feedbackSended: true,
@@ -69,12 +70,12 @@ const CancelReservationDialog = ({
     >
       <DialogTitle>Cancelar Reserva </DialogTitle>
       <DialogContent>
+        <AlertInformation returnableDeposit={selectedReservation && selectedReservation.returnableDeposit} />
+        <Box sx={{ m: 1 }} />
+        <Box sx={{ m: 2 }} />
         <DialogContentText>
           ¿Estas seguro que desea cancelar la reserva?
         </DialogContentText>
-        <Box sx={{ m: 1 }} />
-
-        <Box sx={{ m: 2 }} />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>No, Mantener Reserva</Button>

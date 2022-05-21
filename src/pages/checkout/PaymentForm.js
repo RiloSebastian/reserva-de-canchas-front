@@ -60,7 +60,7 @@ const findDebitCardType = (cardNumber) => {
   return "";
 };
 
-const PaymentForm = ({setValidatedPaymentMethod, setCourtSelected }) => {
+const PaymentForm = ({setValidatedPaymentMethod, setReservation }) => {
   const [state, dispatch] = useReducer(reducer, {
     cardOwner: "",
     cardNumber: "",
@@ -138,7 +138,7 @@ const PaymentForm = ({setValidatedPaymentMethod, setCourtSelected }) => {
       isFormValid()
     ) {
       setValidatedPaymentMethod(false);
-      setCourtSelected(prevState => {
+      setReservation(prevState => {
         return {...prevState, checkout: state};
       });
     } else {

@@ -43,20 +43,20 @@ const Checkout = () => {
 
   const [validatedPaymentMethod, setValidatedPaymentMethod] = useState(false);
 
-  const [courtSelected, setCourtSelected] = useState(history.location.state);
+  const [reservation, setReservation] = useState(history.location.state);
 
-  const getStepContent = (step, courtSelected) => {
+  const getStepContent = (step, reservation) => {
     console.log("step");
     console.log(step);
     switch (step) {
       case 0:
-        return <PreReview reservation={courtSelected} />;
+        return <PreReview reservation={reservation} setReservation={setReservation} />;
       case 1:
         return (
-          <PaymentForm setValidatedPaymentMethod={setValidatedPaymentMethod} setCourtSelected={setCourtSelected} />
+          <PaymentForm setValidatedPaymentMethod={setValidatedPaymentMethod} setReservation={setReservation} />
         );
       case 2:
-        return <Review reservation={courtSelected} />;
+        return <Review reservation={reservation} />;
       case 3:
         return <MisReservas />;
       default:
@@ -71,10 +71,15 @@ const Checkout = () => {
 
   const handleNext = () => {
 
+    if (activeStep === 0) {
+      console.log("Show PreReview")
+
+    }
+
     if (activeStep === steps.length - 1) {
       console.log("generar la reserva")
 
-      const reservationCreated = createReservation(courtSelected);
+      const reservationCreated = createReservation(reservation);
 
       const data = reservationCreated;
 
@@ -164,7 +169,7 @@ const Checkout = () => {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {getStepContent(activeStep, courtSelected)}
+                {getStepContent(activeStep, reservation)}
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   {activeStep !== 0 && (
                     <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
