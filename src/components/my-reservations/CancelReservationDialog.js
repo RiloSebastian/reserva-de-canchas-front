@@ -29,6 +29,7 @@ const CancelReservationDialog = ({
   setOpenCancelReservationModal,
   reservationFeedback,
   updateRservationStatus,
+  setLoading,
 }) => {
   const [fullWidth, setFullWidth] = useState(true);
   const [maxWidth, setMaxWidth] = useState("sm");
@@ -39,6 +40,7 @@ const CancelReservationDialog = ({
 
   const handleClose = () => {
     setOpenCancelReservationModal(false);
+    setLoading(false);
   };
 
   const handleCancelReservation = () => {
@@ -55,6 +57,7 @@ const CancelReservationDialog = ({
     }); */
 
     setOpenCancelReservationModal(false);
+    setLoading(false);
   };
 
   return (

@@ -47,8 +47,10 @@ const tableIcons = {
 };
 
 const NextReservations = () => {
+  const [openCancelReservationModal, setOpenCancelReservationModal] =
+    useState(false);
 
-  const [openCancelReservationModal, setOpenCancelReservationModal] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -83,14 +85,13 @@ const NextReservations = () => {
   ]);
 
   const handleCancelReservation = (rowData) => {
-    setLoading(true);
-
     console.log("handleCancelReservation");
     console.log(rowData);
 
-      console.log("open dialog");
+    if (rowData.status !== "CANCELED") {
+      setLoading(true);
       setOpenCancelReservationModal(true);
-    
+    }
   };
 
   const updateRservationStatus = (reservation_id) => {
@@ -133,7 +134,12 @@ const NextReservations = () => {
               <LoadingButton
                 color="error"
                 onClick={(event) => props.action.onClick(event, props.data)}
-                loading={loading}
+                loading={
+                  loading &&
+                  selectedReservation.reservation_id ===
+                    props.data.reservation_id &&
+                  selectedReservation.status !== "CANCELED"
+                }
                 loadingPosition="start"
                 startIcon={<DeleteIcon />}
                 variant="contained"
@@ -143,6 +149,7 @@ const NextReservations = () => {
             </Box>
           ),
         }}
+        onRowClick={(evt, selectedRow) => setSelectedReservation(selectedRow)}
         options={{
           actionsColumnIndex: -1,
         }}
@@ -161,7 +168,8 @@ const NextReservations = () => {
         open={openCancelReservationModal}
         setOpenCancelReservationModal={setOpenCancelReservationModal}
         updateRservationStatus={updateRservationStatus}
-      />  
+        setLoading={setLoading}
+      />
     </>
   );
 };
