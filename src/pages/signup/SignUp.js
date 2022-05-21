@@ -110,7 +110,8 @@ const SignUp = () => {
       data.get("email"),
       data.get("password")
     )
-      .then(history.push("/dashboard/home"))
+      //.then(history.push("/dashboard/home"))
+      .then(history.push("/account-confirmation"))
       .catch(function (rej) {
         //here when you reject the promise
         console.log(rej);

@@ -27,6 +27,7 @@ export const BASE_URL_CUSTOMERS = {
 export const PATHS = {
   login: "/login",
   signup: "/signup",
+  accountconfirmation: "/account-confirmation",
   signupinstitution: "/signup/institution",
   forgotpass: "/forgot-pass",
   homepage: "/homepage",
