@@ -9,9 +9,9 @@ const HomePage = () => {
     <React.Fragment>
       <AppAppBar />
       <ProductHero />
-      <Footer />
 
       {/*
+      <Footer />
        <ProductValues />
       <ProductCategories />
       <ProductHowItWorks />

@@ -33,6 +33,7 @@ import InstitutionRoutes, {
 } from "./../../pages/routes";
 import useStyles from "./menuBarStyles";
 import getMenu from "./sideBarItems";
+import { AppBar } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -70,7 +71,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const AppBar = styled(MuiAppBar, {
+{
+  /* const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
@@ -86,7 +88,8 @@ const AppBar = styled(MuiAppBar, {
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
-}));
+})); */
+}
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -261,7 +264,7 @@ const MenuBar = (props) => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
+      {/*<MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="error">
             <MailIcon />
@@ -280,7 +283,7 @@ const MenuBar = (props) => {
           </Badge>
         </IconButton>
         <p>Notificaciones</p>
-      </MenuItem>
+    </MenuItem>*/}
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           size="large"
@@ -318,7 +321,7 @@ const MenuBar = (props) => {
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
+            {/*<IconButton
               size="large"
               aria-label="show 4 new mails"
               color="inherit"
@@ -335,7 +338,7 @@ const MenuBar = (props) => {
               <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+          </IconButton>*/}
             <IconButton
               size="large"
               edge="end"

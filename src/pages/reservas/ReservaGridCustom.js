@@ -431,11 +431,7 @@ const ReservaGridCustom = () => {
 
   return (
     <Card>
-      <Scheduler
-        data={filterTasks(data, currentSport)}
-        height={660}
-        locale={"es-ES"}
-      >
+      <Scheduler data={filterTasks(data, currentSport)} locale={"es-ES"}>
         <ViewState
           currentDate={currentDate}
           onCurrentDateChange={handleDateChange}
@@ -454,18 +450,20 @@ const ReservaGridCustom = () => {
         <EditRecurrenceMenu messages={EditRecurrenceMenuMessages} />
         <IntegratedEditing />
         <GroupingState grouping={grouping} groupByDate={() => true} />
-        <WeekView startDayHour={9} endDayHour={19} />
+        <WeekView cellDuration={60} startDayHour={7} endDayHour={24} />
         <WeekView
+          cellDuration={60}
           name="work-week"
           displayName="Semana"
           excludedDays={[0, 6]}
-          startDayHour={9}
-          endDayHour={19}
+          startDayHour={7}
+          endDayHour={24}
         />
-        <MonthView displayName="Mes" />
+        <MonthView cellDuration={60} displayName="Mes" />
         <DayView
-          startDayHour={8}
-          endDayHour={23}
+          cellDuration={60}
+          startDayHour={7}
+          endDayHour={24}
           displayName="Dia"
           name="day"
         />
