@@ -367,8 +367,8 @@ const ListaCanchas = ({ institutionId }) => {
   ];
 
   useEffect(() => {
-    retrieveCourts("61a6d2b35df5ed18eec54355");
-    retrieveSportsList();
+    //retrieveCourts("61a6d2b35df5ed18eec54355");
+    //retrieveSportsList();
 
     const dynamicLookupObject = sportArray.reduce(function (acc, cur, i) {
       acc[cur.id] = cur.name;

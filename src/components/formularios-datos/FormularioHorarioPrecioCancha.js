@@ -120,35 +120,6 @@ const FormularioHorarioPrecioCancha = ({
             seleccionadas.
           </DialogContentText>
 
-          <Box textAlign="center" sx={{ mt: 4 }}>
-            {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
-            <p>Dias de la Semana</p>
-            <SelectWeekDays setHorariosYPrecios={setHorariosYPrecios} />
-          </Box>
-
-          <Grid
-            container
-            spacing={0}
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Box sx={{ m: 1 }}>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="excluirDiasNoLaborales"
-                      checked={excluirDiasNoLaborales}
-                      onChange={handleChange}
-                      defaultChecked
-                    />
-                  }
-                  label="Excluir dias no Laborales"
-                />
-              </FormGroup>
-            </Box>
-          </Grid>
           {isMultipleEdit && (
             <Box textAlign="left" sx={{ m: 4 }}>
               <TextField
@@ -173,6 +144,11 @@ const FormularioHorarioPrecioCancha = ({
 
             return (
               <Box key={key} textAlign="center" sx={{ m: 4 }}>
+                <Box textAlign="center" sx={{ mt: 4 }}>
+                  {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
+                  <p>Dias de la Semana</p>
+                  <SelectWeekDays setHorariosYPrecios={setHorariosYPrecios} />
+                </Box>
                 <ScheduleAndPrice
                   key={key}
                   horario={horario}
