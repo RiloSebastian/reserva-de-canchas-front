@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connectProps } from "@devexpress/dx-react-core";
 import {
   EditingState,
@@ -40,8 +40,17 @@ import { AppointmentFormMessages } from "./localization-messages/AppointmentForm
 import { ConfirmationDialogMessages } from "./localization-messages/ConfirmationDialogMessages";
 import { EditRecurrenceMenuMessages } from "./localization-messages/EditRecurrenceMenuMessages";
 import TextEditor from "./TextEditor";
+import { institutionConfigs } from "../../assets/mocks/institutionConfigs";
+import { set } from "date-fns";
 
-const courts = [
+const sportsDeprecated = [
+  { text: "Futbol", id: 1, color: green },
+  { text: "Tenis", id: 2, color: red },
+  { text: "Basquet", id: 3, color: orange },
+  { text: "Volley", id: 4, color: yellow },
+];
+
+const courtsDeprecated = [
   {
     text: "Cancha 1",
     id: 1,
@@ -69,12 +78,40 @@ const courts = [
   },
 ];
 
-const sports = [
-  { text: "Futbol", id: 1, color: green },
-  { text: "Tenis", id: 2, color: red },
-  { text: "Basquet", id: 3, color: orange },
-  { text: "Volley", id: 4, color: yellow },
-];
+const gettingCourts = () => {
+  let courtsArray = [];
+
+  institutionConfigs.sports.forEach((sport) => {
+    sport.courts.forEach((court) => {
+      courtsArray.push({
+        ...court,
+        text: court.name,
+        id: court.court_id,
+        sport_id: court.sport_id,
+      });
+    });
+  });
+
+  return courtsArray;
+};
+
+const courts = gettingCourts();
+
+const gettingSports = () => {
+  let sportsArray = [];
+
+  institutionConfigs.sports.forEach((sport) => {
+    sportsArray.push({
+      ...sport,
+      color: green,
+      text: sport.name,
+      id: sport.sport_id,
+    });
+  });
+
+  return sportsArray;
+};
+const sports = gettingSports();
 
 const priorityData = [
   { text: "Low Priority", id: 1, color: green },
@@ -100,7 +137,7 @@ const classes = {
 const stylesByPriority = sports.reduce(
   (acc, sport) => ({
     ...acc,
-    [`cell${sport.text.replace(" ", "")}`]: {
+    [`cell${sport.name.replace(" ", "")}`]: {
       backgroundColor: alpha(sport.color[400], 0.1),
       "&:hover": {
         backgroundColor: alpha(sport.color[400], 0.15),
@@ -109,7 +146,7 @@ const stylesByPriority = sports.reduce(
         backgroundColor: alpha(sport.color[400], 0.2),
       },
     },
-    [`headerCell${sport.text.replace(" ", "")}`]: {
+    [`headerCell${sport.name.replace(" ", "")}`]: {
       backgroundColor: alpha(sport.color[400], 0.1),
       "&:hover": {
         backgroundColor: alpha(sport.color[400], 0.1),
@@ -235,9 +272,8 @@ const StyledPrioritySelectorItem = styled("div")(
   })
 );
 
-const PrioritySelectorItem = ({ color, text: resourceTitle }) => {
-  const text = resourceTitle || "Todos los Deportes";
-  const shortText = resourceTitle ? text.substring(0, 1) : "Todos";
+const PrioritySelectorItem = ({ color, name: resourceTitle }) => {
+  const name = resourceTitle;
 
   return (
     <StyledPrioritySelectorItem
@@ -245,7 +281,7 @@ const PrioritySelectorItem = ({ color, text: resourceTitle }) => {
       color={color}
     >
       <span className={classes.bullet} />
-      <span className={classes.priorityText}>{text}</span>
+      <span className={classes.priorityText}>{name}</span>
     </StyledPrioritySelectorItem>
   );
 };
@@ -269,7 +305,7 @@ const FlexibleSpace = ({ sport, sportChange, ...restProps }) => (
 );
 
 const PrioritySelector = ({ sportChange, sport }) => {
-  const currentSport = sport > 0 ? sports[sport - 1] : {};
+  const currentSport = sport > 1 ? sports[sport - 1] : {};
   return (
     <StyledFormControl className={classes.prioritySelector} variant="standard">
       <Select
@@ -280,17 +316,14 @@ const PrioritySelector = ({ sportChange, sport }) => {
         }}
         renderValue={() => (
           <PrioritySelectorItem
-            text={currentSport.text}
+            name={currentSport.name}
             color={currentSport.color}
           />
         )}
       >
-        <MenuItem value={0}>
-          <PrioritySelectorItem />
-        </MenuItem>
-        {sports.map(({ id, color, text }) => (
-          <MenuItem value={id} key={id.toString()}>
-            <PrioritySelectorItem color={color} text={text} />
+        {sports.map(({ sport_id, color, name }) => (
+          <MenuItem value={sport_id} key={sport_id.toString()}>
+            <PrioritySelectorItem color={color} name={name} />
           </MenuItem>
         ))}
       </Select>
@@ -303,9 +336,61 @@ const appointmentComponent = (props) => {
 };
 
 const ReservaGridCustom = () => {
+  //TODO: obtener los deportes, canchas y horarios de cada cancha para armar la grilla de las reservas
+
   const [data, setData] = useState(reservations);
 
   const [currentSport, setCurrentSport] = useState(0);
+
+  const [currentSportCell, setCurrentSportCell] = useState(0);
+
+  const [currentSportId, setCurrentSportId] = useState(0);
+
+  const [addedAppointment, setAddedAppointment] = useState({});
+
+  const [appointmentChanges, setAppointmentChanges] = useState({});
+
+  const [editingAppointment, setEditingAppointment] = useState({});
+
+  const [resources, setResources] = useState([
+    {
+      fieldName: "id",
+      title: "Reservations",
+      instances: reservations,
+      allowMultiple: true,
+    },
+    {
+      fieldName: "court_id",
+      title: "Courts",
+      instances: courts,
+      allowMultiple: true,
+    },
+    {
+      fieldName: "sport_id",
+      title: "Sport",
+      isMain: true,
+      instances: sports,
+    },
+  ]);
+
+  const [grouping, setGrouping] = useState([
+    {
+      resourceName: "sport_id",
+    },
+    {
+      resourceName: "court_id",
+    },
+  ]);
+
+  const [currentDate, setCurrentDate] = useState(new Date(2022, 3, 5));
+
+  const [currentViewName, setCurrentViewName] = useState("day");
+
+  const filterTasks = (items, sport_id) =>
+    items.filter((task) => !sport_id || task.sport_id === sport_id);
+
+  const filterCourts = (courts, sport_id) =>
+    courts.filter((court) => !sport_id || court.sport_id === sport_id);
 
   const sportChange = (value) => {
     const nextResources = [
@@ -316,13 +401,13 @@ const ReservaGridCustom = () => {
         allowMultiple: true,
       },
       {
-        fieldName: "courtId",
+        fieldName: "court_id",
         title: "Courts",
-        instances: courts,
+        instances: value > 0 ? filterCourts(courts, value) : courts,
         allowMultiple: true,
       },
       {
-        fieldName: "sportId",
+        fieldName: "sport_id",
         title: "Sport",
         instances: value > 0 ? [sports[value - 1]] : sports,
       },
@@ -332,53 +417,12 @@ const ReservaGridCustom = () => {
     setResources(nextResources);
   };
 
-  const [addedAppointment, setAddedAppointment] = useState({});
-
-  const [appointmentChanges, setAppointmentChanges] = useState({});
-
-  const [editingAppointment, setEditingAppointment] = useState({});
-
   const flexibleSpace = connectProps(FlexibleSpace, () => {
     return {
       sport: currentSport,
       sportChange: sportChange,
     };
   });
-
-  const [resources, setResources] = useState([
-    {
-      fieldName: "id",
-      title: "Reservations",
-      instances: reservations,
-      allowMultiple: true,
-    },
-    {
-      fieldName: "courtId",
-      title: "Courts",
-      instances: courts,
-    },
-    {
-      fieldName: "sportId",
-      title: "Sport",
-      instances: sports,
-    },
-  ]);
-
-  const [grouping, setGrouping] = useState([
-    {
-      resourceName: "sportId",
-    },
-    {
-      resourceName: "courtId",
-    },
-  ]);
-
-  const filterTasks = (items, sportId) =>
-    items.filter((task) => !sportId || task.sportId === sportId);
-
-  const [currentDate, setCurrentDate] = useState(new Date(2022, 3, 5));
-
-  const [currentViewName, setCurrentViewName] = useState("day");
 
   const handleDateChange = (newCurrentDate) => {
     setCurrentDate(newCurrentDate);
@@ -429,9 +473,100 @@ const ReservaGridCustom = () => {
     setEditingAppointment(editingAppointment);
   };
 
+  useEffect(() => {
+    //
+  }, []);
+
+  const handleOnChangeCurrentSportCell = () => {
+    let newCell = currentSportCell + 1;
+    setCurrentSportCell(newCell);
+  };
+
+  const handleOnChangeCurrentSportId = (sportId) => {
+    setCurrentSportId(sportId);
+  };
+
+  const GroupingPanelRow = React.memo(({ children }) => {
+    const StyledComponent = useGroupingStyles(GroupingPanel.Row, null);
+
+    console.log("GroupingPanelRow");
+    console.log(children);
+
+    console.log("currentSportCell");
+    console.log(currentSportCell);
+
+    if (children[1][0].props.group.fieldName === "sport_id") {
+      console.log("es deporte");
+      console.log(children[1][currentSportCell]);
+      console.log(currentSportCell);
+
+      if (children[1][currentSportCell]) {
+        handleOnChangeCurrentSportId(
+          children[1][currentSportCell].props.group.id
+        );
+
+        handleOnChangeCurrentSportCell();
+      }
+
+      return (
+        <StyledComponent className={classes.headerCell}>
+          {children}
+        </StyledComponent>
+      );
+    } else {
+      console.log("es cancha");
+      console.log(children[1]);
+      //si es el ultimo volver a cero los valores!
+
+      console.log("filtrar cancha para el deporte");
+      console.log(currentSportId);
+
+      const filtered = children[1].filter((cancha) => {
+        console.log("cancha");
+        console.log(cancha);
+
+        const value = cancha.props.group.id;
+        console.log("value");
+        console.log(value);
+        switch (value) {
+          case 4: {
+            console.log("case1");
+            return cancha;
+          }
+
+          default:
+            break;
+        }
+
+        /* const deportesFiltrados = sports.filter(
+            (sport) => sport.sport_id === 1
+          );
+          console.log(deportesFiltrados);
+  
+          if (deportesFiltrados.length > 0) {
+            deportesFiltrados[0].courts.forEach((court) => {
+              if (court.court_id === cancha.props.group.id) {
+                return cancha;
+              }
+            });
+          } */
+      });
+
+      return (
+        <StyledComponent className={classes.headerCell}>
+          {filtered}
+        </StyledComponent>
+      );
+    }
+  });
+
   return (
     <Card>
-      <Scheduler data={filterTasks(data, currentSport)} locale={"es-ES"}>
+      <Scheduler
+        data={filterTasks(data, currentSport)}
+        locale={"es-ES"}
+        resources
+      >
         <ViewState
           currentDate={currentDate}
           onCurrentDateChange={handleDateChange}
@@ -473,7 +608,7 @@ const ReservaGridCustom = () => {
         <ViewSwitcher />
         <ConfirmationDialog messages={ConfirmationDialogMessages} />
         <Appointments appointmentComponent={appointmentComponent} />
-        <Resources data={resources} mainResourceName="sportId" />
+        <Resources data={resources} mainResourceName="sport_id" />
 
         <IntegratedGrouping />
 
@@ -484,7 +619,10 @@ const ReservaGridCustom = () => {
           basicLayoutComponent={AppointmentFormContainerBasic}
           textEditorComponent={TextEditor}
         />
-        <GroupingPanel cellComponent={GroupingPanelCell} />
+        <GroupingPanel
+          //rowComponent={GroupingPanelRow}
+          cellComponent={GroupingPanelCell}
+        />
         <DragDropProvider />
       </Scheduler>
     </Card>

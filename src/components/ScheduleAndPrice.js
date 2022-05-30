@@ -7,7 +7,7 @@ import { pink } from "@mui/material/colors";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
-import Paper from "@mui/material/Paper";
+
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import PropTypes from "prop-types";
@@ -54,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ScheduleAndPrice = ({
   horario,
+  diaYHorarioId,
   removeHorario,
   setHorarios,
   setHorariosYPrecios,
@@ -105,101 +106,94 @@ const ScheduleAndPrice = ({
   }, []);
 
   return (
-    <Paper className={classes}>
-      <Grid container spacing={3} alignItems="center">
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <Grid item xs>
-            <MobileTimePicker
-              label="Desde"
-              name="from"
-              value={from}
-              onChange={(newValue) => {
-                setHorarios((horarios) => {
-                  let horariosUpdated = horarios.map((horario) =>
-                    horario.id === id
-                      ? { ...horario, ["from"]: newValue }
-                      : horario
-                  );
-
-                  return [...horariosUpdated];
-                });
-              }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </Grid>
-          <Grid item xs>
-            <MobileTimePicker
-              label="Hasta"
-              name="to"
-              value={to}
-              onChange={(newValue) => {
-                setHorarios((horarios) => {
-                  let horariosUpdated = horarios.map((horario) =>
-                    horario.id === id
-                      ? { ...horario, ["to"]: newValue }
-                      : horario
-                  );
-
-                  return [...horariosUpdated];
-                });
-              }}
-              renderInput={(params) => <TextField {...params} />}
-              shouldDisableTime={(timeValue, clockType) => {
-                if (
-                  clockType === "minutes" &&
-                  timeValue !== from.getMinutes()
-                ) {
-                  return true;
-                }
-
-                return false;
-              }}
-              minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
-            />
-          </Grid>
-        </LocalizationProvider>
-
+    <Grid container spacing={3} alignItems="center">
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Grid item xs>
-          <TextField
-            name="price"
-            value={precio}
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-            label="Precio /hr"
-            onChange={handleChange}
-            id="outlined-start-adornment"
-            sx={{ m: 1, width: "25ch" }}
-            InputProps={{
-              inputComponent: NumberFormatCustom,
+          <MobileTimePicker
+            label="Desde"
+            name="from"
+            value={from}
+            onChange={(newValue) => {
+              setHorarios((horarios) => {
+                let horariosUpdated = horarios.map((horario) =>
+                  horario.id === id
+                    ? { ...horario, ["from"]: newValue }
+                    : horario
+                );
+
+                return [...horariosUpdated];
+              });
             }}
+            renderInput={(params) => <TextField {...params} />}
           />
         </Grid>
         <Grid item xs>
-          <FormControlLabel
-            control={
-              <Switch
-                name="enabled"
-                onChange={handleChange}
-                checked={enabled}
-                color="primary"
-              />
-            }
-            label={enabled ? "Activo" : "Inactivo"}
-            labelPlacement="activo"
+          <MobileTimePicker
+            label="Hasta"
+            name="to"
+            value={to}
+            onChange={(newValue) => {
+              setHorarios((horarios) => {
+                let horariosUpdated = horarios.map((horario) =>
+                  horario.id === id ? { ...horario, ["to"]: newValue } : horario
+                );
+
+                return [...horariosUpdated];
+              });
+            }}
+            renderInput={(params) => <TextField {...params} />}
+            shouldDisableTime={(timeValue, clockType) => {
+              if (clockType === "minutes" && timeValue !== from.getMinutes()) {
+                return true;
+              }
+
+              return false;
+            }}
+            minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
           />
         </Grid>
-        <Grid item xs>
-          <IconButton
-            onClick={() => {
-              removeHorario(id);
-            }}
-            aria-label="delete"
-            size="large"
-          >
-            <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
-          </IconButton>
-        </Grid>
+      </LocalizationProvider>
+
+      <Grid item xs>
+        <TextField
+          name="price"
+          value={precio}
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+          label="Precio /hr"
+          onChange={handleChange}
+          id="outlined-start-adornment"
+          sx={{ m: 1, width: "25ch" }}
+          InputProps={{
+            inputComponent: NumberFormatCustom,
+          }}
+        />
       </Grid>
-    </Paper>
+      <Grid item xs>
+        <FormControlLabel
+          control={
+            <Switch
+              name="enabled"
+              onChange={handleChange}
+              checked={enabled}
+              color="primary"
+            />
+          }
+          label={enabled ? "Activo" : "Inactivo"}
+          labelPlacement="activo"
+        />
+      </Grid>
+      <Grid item xs>
+        <IconButton
+          onClick={() => {
+            removeHorario(id, diaYHorarioId);
+          }}
+          aria-label="delete"
+          size="large"
+        >
+          <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
+        </IconButton>
+      </Grid>
+    </Grid>
   );
 };
 

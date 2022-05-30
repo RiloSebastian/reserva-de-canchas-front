@@ -17,6 +17,18 @@ import TextField from "@mui/material/TextField";
 import moment from "moment";
 import ScheduleAndPrice from "./../ScheduleAndPrice";
 import SelectWeekDays from "./SelectWeekDays";
+import Paper from "@mui/material/Paper";
+import { makeStyles } from "@material-ui/core/styles";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import Button from "@mui/material/Button";
+
+const useStyles = makeStyles((theme) => ({
+  ...theme.typography.body2,
+  textAlign: "center",
+  color: theme.palette.text.secondary,
+  height: 30,
+  lineHeight: "30px",
+}));
 
 const FormularioHorarioPrecioCancha = ({
   open,
@@ -26,6 +38,8 @@ const FormularioHorarioPrecioCancha = ({
   isMultipleEdit,
 }) => {
   const { excluirDiasNoLaborales, porcentajeSenia } = horariosYPrecios;
+
+  const classes = useStyles();
 
   //const [open, setOpen] = useState(false);
 
@@ -45,6 +59,8 @@ const FormularioHorarioPrecioCancha = ({
 
   const [horarios, setHorarios] = useState([]);
 
+  const [diasYHorarios, setDiasYHorarios] = useState([]);
+
   const [dates, setDates] = useState([]);
 
   const nuevoHorario = {
@@ -55,12 +71,20 @@ const FormularioHorarioPrecioCancha = ({
     enabled: true,
   };
 
+  const nuevoDiaYHorario = {
+    id: "",
+    dias: [],
+    horarios: [nuevoHorario],
+  };
+
   useEffect(() => {
     //traer los horarios guardados por la institucion
     //getHorarios();
 
-    const newSchedule = [...horarios, nuevoHorario];
-    setHorarios(newSchedule);
+    //const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
+    //const newSchedule = [...horarios, nuevoHorario];
+    setDiasYHorarios([nuevoDiaYHorario]);
+    //setHorarios(newSchedule);
   }, []);
 
   const handleChange = (e) => {
@@ -92,21 +116,69 @@ const FormularioHorarioPrecioCancha = ({
     setOpen(false);
   };
 
-  const handleAddNewSchedule = () => {
-    console.log("agregando nuevo horario");
+  const handleAddNewSchedule = (id) => {
+    console.log("agregando nuevo horario para la card -> " + id);
     console.log(nuevoHorario);
 
-    const newSchedule = [...horarios, nuevoHorario];
+    //const newSchedule = [...horarios, nuevoHorario];
 
-    console.log(newSchedule);
-    setHorarios(newSchedule);
+    console.log(diasYHorarios);
+    //setHorarios(newSchedule);
+
+    const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
+      if (diaYHorario.id === id) {
+        const horariosUpdated = [...diaYHorario.horarios, nuevoHorario];
+        return {
+          ...diaYHorario,
+          horarios: horariosUpdated,
+        };
+      } else {
+        return diaYHorario;
+      }
+    });
+
+    setDiasYHorarios(diasYHorariosUpdated);
+    /* setDiasYHorarios((prevState) => {
+      return [
+        {
+          ...prevState,
+          horarios: [...horarios, nuevoHorario],
+        },
+      ];
+    }); */
   };
 
-  const removeHorario = (id) => {
+  const handleAddNewDatesSchedules = () => {
+    console.log("agregando nuevos dias y horarios");
+    console.log(nuevoDiaYHorario);
+
+    const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
+
+    console.log(newDayAndSchedule);
+    setDiasYHorarios(newDayAndSchedule);
+  };
+
+  const removeHorario = (id, diaYHorarioId) => {
     if (window.confirm("Esta Seguro que desea eliminar este horario?" + id)) {
-      setHorarios((horarios) => {
-        return horarios.filter((horario) => horario.id !== id);
+      const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
+        if (diaYHorario.id === diaYHorarioId) {
+          const horariosUpdated = diaYHorario.horarios.filter(
+            (horario) => horario.id !== id
+          );
+
+          return {
+            ...diaYHorario,
+            horarios: horariosUpdated,
+          };
+        }
+
+        return diaYHorario;
       });
+      /*  setHorarios((horarios) => {
+        return horarios.filter((horario) => horario.id !== id);
+      }); */
+
+      setDiasYHorarios(diasYHorariosUpdated);
     }
   };
 
@@ -139,24 +211,45 @@ const FormularioHorarioPrecioCancha = ({
             </Box>
           )}
 
-          {horarios.map((horario, key) => {
-            horario.id = key;
+          {diasYHorarios.map((diaYHorario, key) => {
+            diaYHorario.id = key;
 
             return (
-              <Box key={key} textAlign="center" sx={{ m: 4 }}>
-                <Box textAlign="center" sx={{ mt: 4 }}>
-                  {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
-                  <p>Dias de la Semana</p>
-                  <SelectWeekDays setHorariosYPrecios={setHorariosYPrecios} />
+              <Paper className={classes}>
+                <Box key={key} textAlign="center" sx={{ m: 4 }}>
+                  <Box textAlign="left" sx={{ mt: 4 }}>
+                    {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
+                    <p>Dias de la Semana</p>
+                    <SelectWeekDays setHorariosYPrecios={setHorariosYPrecios} />
+                  </Box>
+                  <Box textAlign="left" sx={{ mt: 4 }}>
+                    <p>Horarios</p>
+                    {diaYHorario.horarios.map((horario, key) => {
+                      horario.id = key;
+                      return (
+                        <ScheduleAndPrice
+                          key={key}
+                          horario={horario}
+                          diaYHorarioId={diaYHorario.id}
+                          removeHorario={removeHorario}
+                          setHorarios={setHorarios}
+                          setHorariosYPrecios={setHorariosYPrecios}
+                        />
+                      );
+                    })}
+
+                    <Box textAlign="center" sx={{ mt: 2, pb: 2 }}>
+                      <Button
+                        variant="outlined"
+                        startIcon={<AddCircleOutlineIcon />}
+                        onClick={() => handleAddNewSchedule(key)}
+                      >
+                        Agregar Mas Horarios
+                      </Button>
+                    </Box>
+                  </Box>
                 </Box>
-                <ScheduleAndPrice
-                  key={key}
-                  horario={horario}
-                  removeHorario={removeHorario}
-                  setHorarios={setHorarios}
-                  setHorariosYPrecios={setHorariosYPrecios}
-                />
-              </Box>
+              </Paper>
             );
           })}
         </DialogContent>
@@ -164,7 +257,7 @@ const FormularioHorarioPrecioCancha = ({
         <Box textAlign="center">
           <IconButton color="secondary" aria-label="delete" size="large">
             <AddCircleIcon
-              onClick={handleAddNewSchedule}
+              onClick={handleAddNewDatesSchedules}
               sx={{ fontSize: 50 }}
             />
           </IconButton>

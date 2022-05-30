@@ -3,6 +3,11 @@ import moment from "moment";
 import { withStyles } from "@material-ui/core/styles";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
+import Chip from "@mui/material/Chip";
+import { styled } from "@mui/material/styles";
+import Paper from "@mui/material/Paper";
+import DoneIcon from "@mui/icons-material/Done";
+import MultipleSelectChips from "../ui/MultipleSelectChips";
 
 const StyledToggleButtonGroup = withStyles((theme) => ({
   grouped: {
@@ -45,23 +50,54 @@ const StyledToggle = withStyles({
   selected: {},
 })(ToggleButton);
 
+const ListItem = styled("li")(({ theme }) => ({
+  margin: theme.spacing(0.5),
+}));
+
 const ToggleDays = () => {
   const [days, setDays] = useState([0, 1, 2, 3, 4, 5, 6, 7]);
+
+  const [value, setValue] = useState([]);
+  const [error, setError] = useState("");
+  const options = [
+    { label: "Lunes", value: 1 },
+    { label: "Martes", value: 2 },
+    { label: "Miercoles", value: 3 },
+    { label: "Jueces", value: 4 },
+    { label: "Viernes", value: 5 },
+    { label: "Sabado", value: 6 },
+    { label: "Domingo", value: 7 },
+  ];
+
+  const handleClick = () => {
+    console.info("You clicked the Chip.");
+  };
+
+  const handleDelete = () => {
+    console.info("You clicked the delete icon.");
+  };
+
   return (
-    <>
-      <StyledToggleButtonGroup
-        size="small"
-        arial-label="Dias de la Semana"
-        value={days}
-        onChange={(event, value) => setDays(value)}
-      >
-        {allWeek.weekdays().map((day, index) => (
-          <StyledToggle key={day.key} value={index} aria-label={day.key}>
-            {day.label}
-          </StyledToggle>
-        ))}
-      </StyledToggleButtonGroup>
-    </>
+    <Paper
+      sx={{
+        display: "flex",
+        justifyContent: "left",
+        flexWrap: "wrap",
+        listStyle: "none",
+        p: 0.5,
+        m: 0,
+      }}
+      component="ul"
+    >
+      <MultipleSelectChips
+        label="Dias"
+        value={value}
+        setValue={setValue}
+        options={options}
+        error={error}
+        setError={setError}
+      />
+    </Paper>
   );
 };
 

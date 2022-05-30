@@ -198,9 +198,9 @@ const ListaCanchas = ({ institutionId }) => {
     console.log(newRow);
   };
 
-  const handleSelectedSport = (sportId) => {
+  const handleSelectedSport = (sport_id) => {
     console.log("handleSelectedSport");
-    console.log(sportId);
+    console.log(sport_id);
   };
 
   const columns = [

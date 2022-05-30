@@ -310,13 +310,13 @@ const ReservaGrid = () => {
   const sportChange = (value) => {
     const nextResources = [
       {
-        fieldName: "courtId",
+        fieldName: "court_id",
         title: "Courts",
         instances: courts,
         allowMultiple: true,
       },
       {
-        fieldName: "sportId",
+        fieldName: "sport_id",
         title: "Sport",
         instances: value > 0 ? [sports[value - 1]] : sports,
       },
@@ -341,13 +341,13 @@ const ReservaGrid = () => {
 
   const [resources, setResources] = useState([
     {
-      fieldName: "courtId",
+      fieldName: "court_id",
       title: "Courts",
       instances: courts,
       allowMultiple: true,
     },
     {
-      fieldName: "sportId",
+      fieldName: "sport_id",
       title: "Sport",
       instances: sports,
     },
@@ -355,15 +355,15 @@ const ReservaGrid = () => {
 
   const [grouping, setGrouping] = useState([
     {
-      resourceName: "sportId",
+      resourceName: "sport_id",
     },
     {
-      resourceName: "courtId",
+      resourceName: "court_id",
     },
   ]);
 
-  const filterTasks = (items, sportId) =>
-    items.filter((task) => !sportId || task.sportId === sportId);
+  const filterTasks = (items, sport_id) =>
+    items.filter((task) => !sport_id || task.sport_id === sport_id);
 
   const [currentDate, setCurrentDate] = useState(new Date(2022, 3, 5));
 
@@ -463,7 +463,7 @@ const ReservaGrid = () => {
         <ViewSwitcher />
         <ConfirmationDialog messages={ConfirmationDialogMessages} />
         <Appointments appointmentComponent={appointmentComponent} />
-        <Resources data={resources} mainResourceName="sportId" />
+        <Resources data={resources} mainResourceName="sport_id" />
 
         <IntegratedGrouping />
 
