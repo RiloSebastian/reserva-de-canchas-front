@@ -17,6 +17,14 @@ const getAll = async (institution_id) => {
     }
 };
 
+const getAllByCustomerId = async (customer_id) => {
+    try {
+        return await http.get(`/reservations/customers/${customer_id}`);
+    } catch (err) {
+        console.log(err);
+    }
+};
+
 const get = async (institution_id, court_id) => {
     try {
         return await http.get(`/institutions/${institution_id}/courts/${court_id}`);
@@ -89,6 +97,7 @@ const removeAll = async (institution_id) => {
 export default {
     getAll,
     get,
+    getAllByCustomerId,
     create,
     update,
     remove,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useReducer } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -9,21 +9,27 @@ import AdvancePaymentConfig from "../../components/settings/AdvancePaymentConfig
 import { InstitutionDetails } from "../../components/settings/InstitutionDetails";
 import { NonWorkingDays } from "../../components/settings/NonWorkingDays";
 import { OpenAndCloseTimes } from "../../components/settings/OpenAndCloseTimes";
+import { Holidays } from "../../components/settings/Holidays";
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="#">
-        Reserva Tu Cancha
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+const reducer = (state, action) => {
+  console.log("action", action.data);
+  console.log("state", state);
+  switch (action.type) {
+    case "schedules":
+      return { ...state, schedules: action.data };
+    default:
+      return state;
+  }
+};
 
 const ConfiguracionInstituciones = () => {
+
+  const [state, dispatch] = useReducer(reducer, {
+
+    schedules: [],
+
+  });
+
   return (
     <>
       <Card sx={{ minWidth: 275 }}>
@@ -53,7 +59,11 @@ const ConfiguracionInstituciones = () => {
               </Box>
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}
-                <OpenAndCloseTimes />
+                <Holidays />
+              </Box>
+              <Box sx={{ pt: 3 }}>
+                {/*<SettingsNotifications />*/}
+                <OpenAndCloseTimes state={state} dispatch={dispatch} />
               </Box>
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}

@@ -11,6 +11,11 @@ import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
 import AdminProfile from "./usuarios/profile/AdminProfile";
 import CustomerProfile from "./usuarios/profile/CustomerProfile";
 
+export const FooterRoutes = [
+  { name: "Home", link: "/" },
+  { name: "About", link: "/about" },
+];
+
 export const BASE_URL_INSTITUTIONS = {
   base: "/dashboard",
 };
@@ -22,6 +27,7 @@ export const BASE_URL_CUSTOMERS = {
 export const PATHS = {
   login: "/login",
   signup: "/signup",
+  accountconfirmation: "/account-confirmation",
   signupinstitution: "/signup/institution",
   forgotpass: "/forgot-pass",
   homepage: "/homepage",
@@ -106,5 +112,13 @@ const InstitutionRoutes = [
     exact: true,
   },
 ];
+
+export const SocialMediaRoutes = {
+  instagram: "https://www.instagram.com",
+  facebook: "https://www.facebook.com",
+  github:
+    "https://github.com",
+  homepage: "/homepage",
+};
 
 export default InstitutionRoutes;

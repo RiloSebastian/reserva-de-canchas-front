@@ -31,13 +31,7 @@ const ubicaciones = [
   "Palermo",
   "Belgrano",
   "Caballito",
-  "Avellaneda",
-  "Haedo",
-  "Moron",
-  "San Miguel",
   "Flores",
-  "La Plata",
-  "Quilmes",
 ];
 
 function getHorarios() {

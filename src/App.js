@@ -9,6 +9,7 @@ import "./App.css";
 import { history } from "./helpers/history";
 import CustomerLayout from "./layout/CustomerLayout";
 import InstitutionLayout from "./layout/InstitutionLayout";
+import AccountConfirmation from "./pages/account/AccountConfirmation";
 import ForgotPassword from "./pages/home/ForgotPassword";
 import HomePage from "./pages/home/HomePage";
 import SignIn from "./pages/login/SignIn";
@@ -83,6 +84,7 @@ const App = () => {
               path={PATHS.signupinstitution}
               component={SignUpInstitution}
             />
+            <Route exact path={PATHS.accountconfirmation} component={AccountConfirmation} />
             <Route exact path={PATHS.forgotpass} component={ForgotPassword} />
             <Route exact path="/">
               <HomePage />

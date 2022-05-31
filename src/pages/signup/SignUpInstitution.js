@@ -120,7 +120,9 @@ const SignUpInstitution = () => {
       data.get("email"),
       data.get("password")
     )
-      .then()
+      .then(
+        //TODO: agregar redireccionamiento para confirmar la cuenta 
+      )
       .catch(function (rej) {
         //here when you reject the promise
         console.log(rej);
