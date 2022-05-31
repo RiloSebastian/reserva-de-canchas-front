@@ -28,6 +28,7 @@ import MaterialTable from "material-table";
 import moment from "moment";
 import React, { forwardRef, useEffect, useState, useRef } from "react";
 import { useHistory } from "react-router-dom";
+import { courtList } from "../../assets/mocks/courtList";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
 import CanchaService from "../../services/canchas/CanchaService";
 import DeporteService from "../../services/deportes/DeporteService";
@@ -379,6 +380,7 @@ const ListaCanchas = ({ institutionId }) => {
     console.log(dynamicLookupObject);
 
     setSport(dynamicLookupObject);
+    setData(courtList);
   }, []);
 
   const firstUpdate = useRef(true);

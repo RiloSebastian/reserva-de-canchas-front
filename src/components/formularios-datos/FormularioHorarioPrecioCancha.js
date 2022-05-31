@@ -41,7 +41,15 @@ const FormularioHorarioPrecioCancha = ({
 
   const classes = useStyles();
 
-  const [daysSelected, setDaysSelected] = useState([]);
+  const [daysSelected, setDaysSelected] = useState([
+    { label: "Lunes", value: 1, daysAndTimesId: null, selected: false },
+    { label: "Martes", value: 2, daysAndTimesId: null, selected: false },
+    { label: "Miercoles", value: 3, daysAndTimesId: null, selected: false },
+    { label: "Jueves", value: 4, daysAndTimesId: null, selected: false },
+    { label: "Viernes", value: 5, daysAndTimesId: null, selected: false },
+    { label: "Sabado", value: 6, daysAndTimesId: null, selected: false },
+    { label: "Domingo", value: 7, daysAndTimesId: null, selected: false },
+  ]);
 
   const [loading, setLoading] = useState(false);
 
@@ -73,15 +81,7 @@ const FormularioHorarioPrecioCancha = ({
 
   const nuevoDiaYHorario = {
     id: "",
-    dias: [
-      { label: "Lunes", value: 1, selected: false },
-      { label: "Martes", value: 2, selected: false },
-      { label: "Miercoles", value: 3, selected: false },
-      { label: "Jueves", value: 4, selected: false },
-      { label: "Viernes", value: 5, selected: false },
-      { label: "Sabado", value: 6, selected: false },
-      { label: "Domingo", value: 7, selected: false },
-    ],
+    dias: daysSelected,
     horarios: [nuevoHorario],
   };
 
@@ -94,6 +94,15 @@ const FormularioHorarioPrecioCancha = ({
     setDiasYHorarios([nuevoDiaYHorario]);
     //setHorarios(newSchedule);
   }, []);
+
+  useEffect(() => {
+    //Actualizar todos los dias seleccionados 
+
+    console.log("Actualizar todos los dias seleccionados")
+    console.log(daysSelected)
+
+
+  }, [daysSelected]);
 
   const handleChange = (e) => {
     if (e.target.type === "checkbox") {
@@ -229,10 +238,11 @@ const FormularioHorarioPrecioCancha = ({
                     {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
                     <p>Dias de la Semana</p>
                     <SelectWeekDays
-                      daysOptions={diaYHorario.dias}
+                      //daysOptions={diaYHorario.dias}
                       setDaysSelected={setDaysSelected}
                       setHorariosYPrecios={setHorariosYPrecios}
                       daysSelected={daysSelected}
+                      daysAndTimesId={diaYHorario.id}
                     />
                   </Box>
                   <Box textAlign="left" sx={{ mt: 4 }}>
@@ -268,7 +278,7 @@ const FormularioHorarioPrecioCancha = ({
         </DialogContent>
 
         <Box textAlign="center">
-          <IconButton color="secondary" aria-label="delete" size="large">
+          <IconButton color="secondary" aria-label="delete" size="large" disabled={!daysSelected.map((daySelected) => daySelected.selected ).includes(false)}>
             <AddCircleIcon
               onClick={handleAddNewDatesSchedules}
               sx={{ fontSize: 50 }}

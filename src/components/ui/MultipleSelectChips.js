@@ -31,34 +31,54 @@ const useStyles = makeStyles((theme) => ({
 const MultipleSelectChips = ({
   value,
   setValue,
-  options,
+  //options,
   label,
   error,
   setError,
   setDaysSelected,
   daysSelected,
+  daysAndTimesId,
 }) => {
   const classes = useStyles();
 
-  const handleClick = (clickedValue) => {
-    console.log("clickedValue");
-    console.log(clickedValue);
+  const handleClick = (clickedValue, daysAndTimesId) => {
+    console.log("daysAndTimesId")
+    console.log(daysAndTimesId)
     if (setError) {
       setError("");
     }
     if (value.find((e) => e === clickedValue)) {
-      console.log("Day Selected");
-      console.log(value);
       const index = value.findIndex((e) => e === clickedValue);
-      console.log("index founded");
-      console.log(index);
       let arr = [...value];
       arr.splice(index, 1);
       setValue(arr);
-      setDaysSelected([arr]);
+
+      const dayUpdated = daysSelected.map(day => {
+        if (day.value === clickedValue) {
+          return {
+            ...day,
+            selected: false,
+            daysAndTimesId: daysAndTimesId
+          }
+        }
+        return day;
+      })
+      setDaysSelected(dayUpdated);
     } else {
+      const dayUpdated = daysSelected.map(day => {
+        if (day.value === clickedValue) {
+          return {
+            ...day,
+            selected: true,
+            daysAndTimesId: daysAndTimesId
+          }
+        }
+        return day;
+      })
+
+
       setValue([...value, clickedValue]);
-      setDaysSelected([...value, clickedValue]);
+      setDaysSelected(dayUpdated);
     }
   };
 
@@ -67,16 +87,14 @@ const MultipleSelectChips = ({
       <div className={classes.container}>
         {label && (
           <FormLabel error={Boolean(error)}>
-            <Typography variant="body2">{`${label}${
-              value.length ? ":" : ": No ha seleccionado ningun dia."
-            } ${
-              value.length === 7
+            <Typography variant="body2">{`${label}${value.length ? ":" : ": No ha seleccionado ningun dia."
+              } ${value.length === 7
                 ? "Todos los Dias"
-                : options
-                    .filter((option) => value.indexOf(option.value) !== -1)
-                    .map((option) => option.label)
-                    .join(", ")
-            }`}</Typography>
+                : daysSelected
+                  .filter((option) => value.indexOf(option.value) !== -1)
+                  .map((option) => option.label)
+                  .join(", ")
+              }`}</Typography>
           </FormLabel>
         )}
         {Boolean(error) && (
@@ -88,25 +106,29 @@ const MultipleSelectChips = ({
           </FormHelperText>
         )}
         <div className={classes.chipsDiv}>
-          {options && options.length
-            ? options.map((option, i) => (
-                <Chip
-                  icon={option.icon}
-                  className={classes.chip}
-                  key={i}
-                  color="primary"
-                  variant={
-                    value.find((e) => e === option.value)
-                      ? "default"
-                      : "outlined"
-                  }
-                  label={
-                    <Typography variant="body2">{`${option.label}`}</Typography>
-                  }
-                  clickable
-                  onClick={() => handleClick(option.value)}
-                />
-              ))
+          {daysSelected && daysSelected.length
+            ? daysSelected.map((option, i) => {
+              if (!option.selected || option.daysAndTimesId === daysAndTimesId) {
+                return (
+                  <Chip
+                    icon={option.icon}
+                    className={classes.chip}
+                    key={i}
+                    color={option.selected && option.daysAndTimesId === daysAndTimesId ? "primary" : "default"}
+                    variant={
+                      value.find((e) => e === option.value) || option.selected
+                        ? "default"
+                        : "outlined"
+                    }
+                    label={
+                      <Typography variant="body2">{`${option.label}`}</Typography>
+                    }
+                    clickable={!option.selected || option.daysAndTimesId === daysAndTimesId}
+                    onClick={!option.selected || option.daysAndTimesId === daysAndTimesId ? () => handleClick(option.value, daysAndTimesId) : undefined}
+                  />
+                )
+              }
+            })
             : null}
         </div>
       </div>
@@ -118,7 +140,7 @@ MultipleSelectChips.propTypes = {
   label: PropTypes.string,
   value: PropTypes.array.isRequired,
   setValue: PropTypes.func.isRequired,
-  options: PropTypes.arrayOf(
+  daysSelected: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])

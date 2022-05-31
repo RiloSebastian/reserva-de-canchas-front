@@ -55,10 +55,11 @@ const ListItem = styled("li")(({ theme }) => ({
 }));
 
 const SelectWeekDays = ({
-  daysOptions,
+  //daysOptions,
   setDaysSelected,
   setHorariosYPrecios,
-  daysSelected = { daysSelected },
+  daysSelected,
+  daysAndTimesId
 }) => {
   const [days, setDays] = useState([0, 1, 2, 3, 4, 5, 6, 7]);
 
@@ -89,11 +90,12 @@ const SelectWeekDays = ({
         label="Dias"
         value={value}
         setValue={setValue}
-        options={daysOptions}
+        //options={daysOptions}
         error={error}
         setError={setError}
         setDaysSelected={setDaysSelected}
         daysSelected={daysSelected}
+        daysAndTimesId={daysAndTimesId}
       />
     </Paper>
   );

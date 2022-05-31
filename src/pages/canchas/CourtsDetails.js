@@ -106,6 +106,9 @@ const CourtsDetails = ({ rowData }) => {
         </List>
       </Grid>
       <Grid item xs={12}>
+        <Typography variant="h6" component="h6">
+          Imagenes
+        </Typography>
         {photos.length > 0 ? (
           <ImageList
             sx={{ width: 500, height: 500 }}
