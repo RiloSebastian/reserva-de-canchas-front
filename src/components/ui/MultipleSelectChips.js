@@ -35,20 +35,30 @@ const MultipleSelectChips = ({
   label,
   error,
   setError,
+  setDaysSelected,
+  daysSelected,
 }) => {
   const classes = useStyles();
 
   const handleClick = (clickedValue) => {
+    console.log("clickedValue");
+    console.log(clickedValue);
     if (setError) {
       setError("");
     }
     if (value.find((e) => e === clickedValue)) {
+      console.log("Day Selected");
+      console.log(value);
       const index = value.findIndex((e) => e === clickedValue);
+      console.log("index founded");
+      console.log(index);
       let arr = [...value];
       arr.splice(index, 1);
       setValue(arr);
+      setDaysSelected([arr]);
     } else {
       setValue([...value, clickedValue]);
+      setDaysSelected([...value, clickedValue]);
     }
   };
 

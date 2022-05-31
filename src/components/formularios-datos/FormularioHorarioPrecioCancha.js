@@ -41,7 +41,7 @@ const FormularioHorarioPrecioCancha = ({
 
   const classes = useStyles();
 
-  //const [open, setOpen] = useState(false);
+  const [daysSelected, setDaysSelected] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -73,7 +73,15 @@ const FormularioHorarioPrecioCancha = ({
 
   const nuevoDiaYHorario = {
     id: "",
-    dias: [],
+    dias: [
+      { label: "Lunes", value: 1, selected: false },
+      { label: "Martes", value: 2, selected: false },
+      { label: "Miercoles", value: 3, selected: false },
+      { label: "Jueves", value: 4, selected: false },
+      { label: "Viernes", value: 5, selected: false },
+      { label: "Sabado", value: 6, selected: false },
+      { label: "Domingo", value: 7, selected: false },
+    ],
     horarios: [nuevoHorario],
   };
 
@@ -220,7 +228,12 @@ const FormularioHorarioPrecioCancha = ({
                   <Box textAlign="left" sx={{ mt: 4 }}>
                     {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
                     <p>Dias de la Semana</p>
-                    <SelectWeekDays setHorariosYPrecios={setHorariosYPrecios} />
+                    <SelectWeekDays
+                      daysOptions={diaYHorario.dias}
+                      setDaysSelected={setDaysSelected}
+                      setHorariosYPrecios={setHorariosYPrecios}
+                      daysSelected={daysSelected}
+                    />
                   </Box>
                   <Box textAlign="left" sx={{ mt: 4 }}>
                     <p>Horarios</p>

@@ -54,20 +54,16 @@ const ListItem = styled("li")(({ theme }) => ({
   margin: theme.spacing(0.5),
 }));
 
-const ToggleDays = () => {
+const SelectWeekDays = ({
+  daysOptions,
+  setDaysSelected,
+  setHorariosYPrecios,
+  daysSelected = { daysSelected },
+}) => {
   const [days, setDays] = useState([0, 1, 2, 3, 4, 5, 6, 7]);
 
   const [value, setValue] = useState([]);
   const [error, setError] = useState("");
-  const options = [
-    { label: "Lunes", value: 1 },
-    { label: "Martes", value: 2 },
-    { label: "Miercoles", value: 3 },
-    { label: "Jueces", value: 4 },
-    { label: "Viernes", value: 5 },
-    { label: "Sabado", value: 6 },
-    { label: "Domingo", value: 7 },
-  ];
 
   const handleClick = () => {
     console.info("You clicked the Chip.");
@@ -93,9 +89,11 @@ const ToggleDays = () => {
         label="Dias"
         value={value}
         setValue={setValue}
-        options={options}
+        options={daysOptions}
         error={error}
         setError={setError}
+        setDaysSelected={setDaysSelected}
+        daysSelected={daysSelected}
       />
     </Paper>
   );
@@ -137,9 +135,5 @@ const allWeek = moment.updateLocale("es", {
 const weekend = moment.updateLocale("es", {
   weekdays: ["Sunday", "Saturday"],
 });
-
-const SelectWeekDays = ({ setHorariosYPrecios }) => {
-  return <ToggleDays />;
-};
 
 export default SelectWeekDays;
