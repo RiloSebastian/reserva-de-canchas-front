@@ -34,6 +34,8 @@ import CanchaService from "../../services/canchas/CanchaService";
 import DeporteService from "../../services/deportes/DeporteService";
 import PhotoService from "../../services/photos/PhotoService";
 import CourtsDetails from "./CourtsDetails";
+import UploadImage from "./../../components/UploadImage";
+import UploadPhotos from "../../components/ui/UploadPhotos";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -158,6 +160,8 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [open, setOpen] = useState(false);
 
+  const [openUploadPhotos, setOpenUploadPhotos] = useState(false);
+
   const [enableSelectSurface, setEnableSelectSurface] = useState(false);
 
   const [isMultipleEdit, setIsMultipleEdit] = useState(false);
@@ -170,14 +174,7 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [photoData, setPhotoData] = useState([]);
 
-  const [images, setImages] = useState({
-    selectedFiles: undefined,
-    previewImages: [],
-    progressInfos: [],
-    message: [],
-
-    imageInfos: [],
-  });
+  const [images, setImages] = useState([]);
 
   const [horariosYPrecios, setHorariosYPrecios] = useState({
     excluirDiasNoLaborales: true,
@@ -347,22 +344,16 @@ const ListaCanchas = ({ institutionId }) => {
       field: "images",
       filtering: false,
       editComponent: (props) => (
-        <label htmlFor="icon-button-file">
-          <InputImage
-            accept="image/*"
-            multiple
-            id="icon-button-file"
-            type="file"
-            onChange={handleUploadImage}
-          />
-          <IconButton
-            color="primary"
-            aria-label="upload picture"
-            component="span"
-          >
-            <PhotoCamera />
-          </IconButton>
-        </label>
+        <IconButton
+          color="primary"
+          aria-label="upload picture"
+          component="span"
+          onClick={() => {
+            setOpenUploadPhotos(true);
+          }}
+        >
+          <PhotoCamera />
+        </IconButton>
       ),
     },
   ];
@@ -411,8 +402,8 @@ const ListaCanchas = ({ institutionId }) => {
     setSurfaces(dynamicLookupSurfaces);
   }, [sportSelected]);
 
-  const handleUploadImage = (event) => {
-    let images = [];
+  const handleUploadImage = (e) => {
+    /* let images = [];
 
     for (let i = 0; i < event.target.files.length; i++) {
       images.push(URL.createObjectURL(event.target.files[i]));
@@ -423,7 +414,15 @@ const ListaCanchas = ({ institutionId }) => {
       message: [],
       selectedFiles: event.target.files,
       previewImages: images,
-    });
+    }); 
+    setOpenUploadPhotos(true);*/
+
+    let ImagesArray = Object.entries(e.target.files).map((e) =>
+      URL.createObjectURL(e[1])
+    );
+    console.log(ImagesArray);
+    setImages([...images, ...ImagesArray]);
+    console.log("images", images);
   };
 
   const retrieveCourts = async (institutionId) => {
@@ -689,6 +688,16 @@ const ListaCanchas = ({ institutionId }) => {
             }),
         }}
       />
+      {openUploadPhotos && (
+        <UploadPhotos
+          openUploadPhotos={openUploadPhotos}
+          setOpenUploadPhotos={setOpenUploadPhotos}
+          setImages={setImages}
+          images={images}
+          isMultipleEdit={isMultipleEdit}
+          handleUploadImage={handleUploadImage}
+        />
+      )}
       {open && (
         <FormularioHorarioPrecioCancha
           open={open}
