@@ -23,6 +23,8 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 import SchedulerFromTo from "../schedulers/SchedulerFromTo";
 import { makeStyles } from "@material-ui/core/styles";
+import SelectWeekDays from "../formularios-datos/SelectWeekDays";
+import DaysAndSchedulePaper from "../ui/datesAndTimes/DaysAndSchedulePaper";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -52,7 +54,7 @@ function getStyles(day1, day, theme) {
   };
 }
 
-export const OpenAndCloseTimes = ({ props, state, dispatch }) => {
+export const OpenAndCloseTimes = ({ props, state, dispatch, setHorariosYPrecios, }) => {
 
   const useStyles = makeStyles((theme) => ({
     ...theme.typography.body2,
@@ -66,6 +68,16 @@ export const OpenAndCloseTimes = ({ props, state, dispatch }) => {
 
   const theme = useTheme();
   const [day, setDay] = useState([]);
+
+  const [daysSelected, setDaysSelected] = useState([
+    { label: "Lunes", value: 1, daysAndTimesId: null, selected: false },
+    { label: "Martes", value: 2, daysAndTimesId: null, selected: false },
+    { label: "Miercoles", value: 3, daysAndTimesId: null, selected: false },
+    { label: "Jueves", value: 4, daysAndTimesId: null, selected: false },
+    { label: "Viernes", value: 5, daysAndTimesId: null, selected: false },
+    { label: "Sabado", value: 6, daysAndTimesId: null, selected: false },
+    { label: "Domingo", value: 7, daysAndTimesId: null, selected: false },
+  ]);
 
   const handleChange = (e) => {
     console.log("handleChange")
@@ -82,10 +94,11 @@ export const OpenAndCloseTimes = ({ props, state, dispatch }) => {
         <CardHeader title="Horarios de Apertura y Cierre" />
         <Divider />
         <CardContent>
-            <Grid container spacing={3} alignItems="center">
-              <Grid item xs>
-                <FormControl sx={{ m: 1, width: 300 }}>
-                  <InputLabel id="demo-multiple-chip-label">Dias</InputLabel>
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs>
+              <FormControl sx={{ m: 1, width: 300 }}>
+                <DaysAndSchedulePaper />
+                {/* <InputLabel id="demo-multiple-chip-label">Dias</InputLabel>
                   <Select
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"
@@ -112,11 +125,11 @@ export const OpenAndCloseTimes = ({ props, state, dispatch }) => {
                         {day}
                       </MenuItem>
                     ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <SchedulerFromTo />
+                  </Select> */}
+
+              </FormControl>
             </Grid>
+          </Grid>
         </CardContent >
         <Divider />
         <Box
