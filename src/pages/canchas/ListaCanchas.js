@@ -176,6 +176,8 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [images, setImages] = useState([]);
 
+  const [fileObjects, setFileObjects] = useState([]);
+
   const [horariosYPrecios, setHorariosYPrecios] = useState({
     excluirDiasNoLaborales: true,
   });
@@ -696,6 +698,9 @@ const ListaCanchas = ({ institutionId }) => {
           images={images}
           isMultipleEdit={isMultipleEdit}
           handleUploadImage={handleUploadImage}
+          fileObjects={fileObjects}
+          setFileObjects={setFileObjects}
+          filesLimit={6}
         />
       )}
       {open && (
