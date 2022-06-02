@@ -14,6 +14,8 @@ import { styled } from "@mui/material/styles";
 import CloudDoneIcon from "@mui/icons-material/CloudDone";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import Typography from "@mui/material/Typography";
+import { DropzoneDialog } from "material-ui-dropzone";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 
 const Input = styled("input")({
   display: "none",
@@ -51,7 +53,43 @@ const UploadPhotos = ({
     setOpenUploadPhotos(false);
   };
 
+  const useStyles = makeStyles((theme) =>
+    createStyles({
+      previewChip: {
+        minWidth: 160,
+        maxWidth: 210,
+      },
+    })
+  );
+
+  const classes = useStyles();
+
   return (
+    <DropzoneDialog
+      acceptedFiles={["image/*"]}
+      cancelButtonText={"Cancelar"}
+      submitButtonText={"Cargar Fotos"}
+      open={openUploadPhotos}
+      onClose={handleClose}
+      onSave={(files) => {
+        console.log("Files:", files);
+        handleClose();
+      }}
+      showPreviews={true}
+      showFileNamesInPreview={true}
+      maxFileSize={50000000}
+      showPreviewsInDropzone={false}
+      previewGridProps={{
+        container: { spacing: 1, direction: "row" },
+      }}
+      previewChipProps={{ classes: { root: classes.previewChip } }}
+      previewText="Imagenes Seleccionadas"
+      filesLimit={6}
+      dropzoneText="Arrastre y suelte una foto aquí o haga Clic"
+    />
+  );
+
+  /* return (
     <Dialog open={openUploadPhotos} onClose={handleClose} maxWidth="xl">
       <DialogTitle>Carga las fotos de la Cancha</DialogTitle>
       <DialogContent>
@@ -68,10 +106,7 @@ const UploadPhotos = ({
                   </div>
                 );
               })}
-          </div> */}
-          <Typography variant="h6" component="h6">
-            Imagenes Seleccionadas
-          </Typography>
+          </div> 
           <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
             {images.length > 0 ? (
               images.map((item) => (
@@ -98,7 +133,20 @@ const UploadPhotos = ({
                 </ImageListItem>
               ))
             ) : (
-              <CloudUploadIcon />
+              <ImageListItem key="Subheader" cols={3}>
+                <DropzoneArea
+                  maxFileSize={50000000}
+                  showPreviews={true}
+                  showPreviewsInDropzone={false}
+                  previewGridProps={{
+                    container: { spacing: 1, direction: "row" },
+                  }}
+                  previewChipProps={{ classes: { root: classes.previewChip } }}
+                  previewText="Imagenes Seleccionadas"
+                  filesLimit={6}
+                  dropzoneText="Arrastre y suelte una foto aquí o haga Clic"
+                />
+              </ImageListItem>
             )}
           </ImageList>
           {images.length > 0 ? (
@@ -139,7 +187,7 @@ const UploadPhotos = ({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  ); */
 };
 
 export default UploadPhotos;
