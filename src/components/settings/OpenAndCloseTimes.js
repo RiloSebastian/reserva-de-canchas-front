@@ -87,8 +87,6 @@ export const OpenAndCloseTimes = ({
     id: "",
     from: new Date(),
     to: new Date(new Date().setHours(new Date().getHours() + 1)),
-    price: "",
-    enabled: true,
   };
 
   const nuevoDiaYHorario = {
@@ -151,10 +149,11 @@ export const OpenAndCloseTimes = ({
                   diaYHorario.id = key;
                   return (
                     <DaysAndSchedulePaper
+                      setDaysSelected={setDaysSelected}
+                      daysSelected={daysSelected}
                       diaYHorarioId={diaYHorario.id}
                       diaYHorario={diaYHorario}
                       removeDaysAndSchedule={removeDaysAndSchedule}
-                      key={key}
                     />
                   );
                 })}

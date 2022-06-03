@@ -58,6 +58,7 @@ const SelectWeekDays = ({
   //daysOptions,
   setDaysSelected,
   setHorariosYPrecios,
+  setHorarios,
   daysSelected,
   daysAndTimesId,
 }) => {

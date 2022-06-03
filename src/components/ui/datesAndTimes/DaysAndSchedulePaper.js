@@ -36,56 +36,12 @@ const useStyles = makeStyles((theme) => ({
 const DaysAndSchedulePaper = ({
   diaYHorario,
   diaYHorarioId,
-  setHorarios,
-  key,
+  setHorario,
   removeDaysAndSchedule,
+  daysSelected,
+  setDaysSelected,
 }) => {
   const { id } = diaYHorario;
-
-  const classes = useStyles();
-
-  const [daysSelected, setDaysSelected] = useState([
-    { label: "Lunes", value: 1, daysAndTimesId: null, selected: false },
-    { label: "Martes", value: 2, daysAndTimesId: null, selected: false },
-    { label: "Miercoles", value: 3, daysAndTimesId: null, selected: false },
-    { label: "Jueves", value: 4, daysAndTimesId: null, selected: false },
-    { label: "Viernes", value: 5, daysAndTimesId: null, selected: false },
-    { label: "Sabado", value: 6, daysAndTimesId: null, selected: false },
-    { label: "Domingo", value: 7, daysAndTimesId: null, selected: false },
-  ]);
-
-  const nuevoHorario = {
-    id: "",
-    from: new Date(),
-    to: new Date(new Date().setHours(new Date().getHours() + 1)),
-    price: "",
-    enabled: true,
-  };
-
-  const [horariosYPrecios, setHorariosYPrecios] = useState([]);
-
-  const [diasYHorarios, setDiasYHorarios] = useState([]);
-
-  const handleAddNewSchedule = (id) => {
-    console.log("agregando nuevo horario para la card -> " + id);
-    console.log(nuevoHorario);
-
-    console.log(diasYHorarios);
-
-    const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
-      if (diaYHorario.id === id) {
-        const horariosUpdated = [...diaYHorario.horarios, nuevoHorario];
-        return {
-          ...diaYHorario,
-          horarios: horariosUpdated,
-        };
-      } else {
-        return diaYHorario;
-      }
-    });
-
-    setDiasYHorarios(diasYHorariosUpdated);
-  };
 
   return (
     <Paper
@@ -102,7 +58,7 @@ const DaysAndSchedulePaper = ({
               <SelectWeekDays
                 //daysOptions={diaYHorario.dias}
                 setDaysSelected={setDaysSelected}
-                setHorariosYPrecios={setHorariosYPrecios}
+                setHorarios={setHorario}
                 daysSelected={daysSelected}
                 daysAndTimesId={diaYHorarioId}
               />
