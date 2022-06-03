@@ -53,20 +53,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SchedulerFromTo = () => {
-
   const [from, setFrom] = useState(new Date("2020-01-01 8:00"));
   const [to, setTo] = useState(new Date("2020-01-01 23:00"));
 
   const classes = useStyles();
 
-  const handleChange = (e) => {
-  };
+  const handleChange = (e) => {};
 
-  useEffect(() => {
-  }, []);
+  useEffect(() => {}, []);
 
   return (
-    <>
+    <Grid container alignItems="center">
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Grid item xs>
           <MobileTimePicker
@@ -85,10 +82,7 @@ const SchedulerFromTo = () => {
             onChange={handleChange}
             renderInput={(params) => <TextField {...params} />}
             shouldDisableTime={(timeValue, clockType) => {
-              if (
-                clockType === "minutes" &&
-                timeValue !== from.getMinutes()
-              ) {
+              if (clockType === "minutes" && timeValue !== from.getMinutes()) {
                 return true;
               }
 
@@ -98,18 +92,7 @@ const SchedulerFromTo = () => {
           />
         </Grid>
       </LocalizationProvider>
-      <Grid item xs>
-        <IconButton
-          onClick={() => {
-            //removeHorario(id);
-          }}
-          aria-label="delete"
-          size="large"
-        >
-          <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
-        </IconButton>
-      </Grid>
-    </>
+    </Grid>
   );
 };
 

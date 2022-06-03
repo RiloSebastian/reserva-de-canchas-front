@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -14,17 +14,18 @@ import Stack from "@mui/material/Stack";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
-import { Theme, useTheme } from '@mui/material/styles';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import Chip from '@mui/material/Chip';
+import { Theme, useTheme } from "@mui/material/styles";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Chip from "@mui/material/Chip";
 import SchedulerFromTo from "../schedulers/SchedulerFromTo";
 import { makeStyles } from "@material-ui/core/styles";
 import SelectWeekDays from "../formularios-datos/SelectWeekDays";
 import DaysAndSchedulePaper from "../ui/datesAndTimes/DaysAndSchedulePaper";
+import ButtonAddMoreDatesAndTime from "../ui/datesAndTimes/ButtonAddMoreDatesAndTime";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -38,11 +39,11 @@ const MenuProps = {
 };
 
 const days = [
-  'Todos los Días',
-  'Lunes a Viernes',
-  'Sabados',
-  'Domingos',
-  'Feriados',
+  "Todos los Días",
+  "Lunes a Viernes",
+  "Sabados",
+  "Domingos",
+  "Feriados",
 ];
 
 function getStyles(day1, day, theme) {
@@ -54,8 +55,12 @@ function getStyles(day1, day, theme) {
   };
 }
 
-export const OpenAndCloseTimes = ({ props, state, dispatch, setHorariosYPrecios, }) => {
-
+export const OpenAndCloseTimes = ({
+  props,
+  state,
+  dispatch,
+  setHorariosYPrecios,
+}) => {
   const useStyles = makeStyles((theme) => ({
     ...theme.typography.body2,
     textAlign: "center",
@@ -67,7 +72,6 @@ export const OpenAndCloseTimes = ({ props, state, dispatch, setHorariosYPrecios,
   const classes = useStyles();
 
   const theme = useTheme();
-  const [day, setDay] = useState([]);
 
   const [daysSelected, setDaysSelected] = useState([
     { label: "Lunes", value: 1, daysAndTimesId: null, selected: false },
@@ -79,14 +83,60 @@ export const OpenAndCloseTimes = ({ props, state, dispatch, setHorariosYPrecios,
     { label: "Domingo", value: 7, daysAndTimesId: null, selected: false },
   ]);
 
+  const nuevoHorario = {
+    id: "",
+    from: new Date(),
+    to: new Date(new Date().setHours(new Date().getHours() + 1)),
+    price: "",
+    enabled: true,
+  };
+
+  const nuevoDiaYHorario = {
+    id: "",
+    dias: daysSelected,
+    horarios: [nuevoHorario],
+  };
+
+  const [day, setDay] = useState([]);
+
   const handleChange = (e) => {
-    console.log("handleChange")
-    console.log(day)
+    console.log("handleChange");
+    console.log(day);
     dispatch({ type: e.target.name, data: e.target.value });
   };
 
   const [from, setFrom] = useState(new Date("2020-01-01 8:00"));
   const [to, setTo] = useState(new Date("2020-01-01 23:00"));
+
+  const [diasYHorarios, setDiasYHorarios] = useState([]);
+
+  const handleAddNewDatesSchedules = () => {
+    console.log("agregando nuevos dias y horarios");
+    console.log(nuevoDiaYHorario);
+
+    const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
+
+    console.log(newDayAndSchedule);
+    setDiasYHorarios(newDayAndSchedule);
+  };
+
+  const removeDaysAndSchedule = (id, diaYHorarioId) => {
+    if (
+      window.confirm(
+        "Esta Seguro que desea eliminar estos dias y horarios?" + diaYHorarioId
+      )
+    ) {
+      const diasYHorariosUpdated = diasYHorarios.filter(
+        (diaYHorario) => diaYHorario.id !== diaYHorarioId
+      );
+
+      setDiasYHorarios(diasYHorariosUpdated);
+    }
+  };
+
+  useEffect(() => {
+    setDiasYHorarios([nuevoDiaYHorario]);
+  }, []);
 
   return (
     <form autoComplete="off" noValidate {...props}>
@@ -96,41 +146,26 @@ export const OpenAndCloseTimes = ({ props, state, dispatch, setHorariosYPrecios,
         <CardContent>
           <Grid container spacing={3} alignItems="center">
             <Grid item xs>
-              <FormControl sx={{ m: 1, width: 300 }}>
-                <DaysAndSchedulePaper />
-                {/* <InputLabel id="demo-multiple-chip-label">Dias</InputLabel>
-                  <Select
-                    labelId="demo-multiple-chip-label"
-                    id="demo-multiple-chip"
-                    multiple
-                    name="schedules"
-                    value={state.schedules}
-                    onChange={handleChange}
-                    input={<OutlinedInput id="select-multiple-chip" label="Dias" />}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((day) => (
-                          <Chip key={day} label={day} />
-                        ))}
-                      </Box>
-                    )}
-                    MenuProps={MenuProps}
-                  >
-                    {days.map((day) => (
-                      <MenuItem
-                        key={day}
-                        value={day}
-                        style={getStyles(day, day, theme)}
-                      >
-                        {day}
-                      </MenuItem>
-                    ))}
-                  </Select> */}
-
+              <FormControl sx={{ m: 1 }}>
+                {diasYHorarios.map((diaYHorario, key) => {
+                  diaYHorario.id = key;
+                  return (
+                    <DaysAndSchedulePaper
+                      diaYHorarioId={diaYHorario.id}
+                      diaYHorario={diaYHorario}
+                      removeDaysAndSchedule={removeDaysAndSchedule}
+                      key={key}
+                    />
+                  );
+                })}
+                <ButtonAddMoreDatesAndTime
+                  daysSelected={daysSelected}
+                  handleAddNewDatesSchedules={handleAddNewDatesSchedules}
+                />
               </FormControl>
             </Grid>
           </Grid>
-        </CardContent >
+        </CardContent>
         <Divider />
         <Box
           sx={{
