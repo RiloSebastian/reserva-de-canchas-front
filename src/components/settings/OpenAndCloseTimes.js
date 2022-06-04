@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Button,
@@ -38,14 +39,6 @@ const MenuProps = {
   },
 };
 
-const days = [
-  "Todos los Días",
-  "Lunes a Viernes",
-  "Sabados",
-  "Domingos",
-  "Feriados",
-];
-
 function getStyles(day1, day, theme) {
   return {
     fontWeight:
@@ -55,12 +48,23 @@ function getStyles(day1, day, theme) {
   };
 }
 
-export const OpenAndCloseTimes = ({
-  props,
-  state,
-  dispatch,
-  setHorariosYPrecios,
-}) => {
+export const OpenAndCloseTimes = ({ props, state, setHorariosYPrecios }) => {
+  const dispatch = useDispatch();
+
+  const configuration = useSelector((state) => state.configuration);
+
+  const updateDays = (dayUpdated) => {
+    dispatch({ type: "UPDATE_DAYS_AND_SCHEDULES", days: dayUpdated });
+  };
+
+  const addNewDaysAndSchechedules = (dayUpdated) => {
+    dispatch({ type: "add", days: dayUpdated });
+  };
+
+  const removeDaysAndSchechedules = () => {
+    dispatch({ type: "remove" });
+  };
+
   const useStyles = makeStyles((theme) => ({
     ...theme.typography.body2,
     textAlign: "center",
@@ -118,15 +122,20 @@ export const OpenAndCloseTimes = ({
     setDiasYHorarios(newDayAndSchedule);
   };
 
-  const removeDaysAndSchedule = (id, diaYHorarioId) => {
+  const removeDaysAndSchedule = (diaYHorarioId) => {
     if (
       window.confirm(
         "Esta Seguro que desea eliminar estos dias y horarios?" + diaYHorarioId
       )
     ) {
+      console.log("removiendo dias y horarios");
+      console.log(diasYHorarios);
       const diasYHorariosUpdated = diasYHorarios.filter(
         (diaYHorario) => diaYHorario.id !== diaYHorarioId
       );
+
+      console.log("y quedan !!! ");
+      console.log(diasYHorariosUpdated);
 
       setDiasYHorarios(diasYHorariosUpdated);
     }

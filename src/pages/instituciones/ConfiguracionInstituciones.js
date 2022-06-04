@@ -1,4 +1,5 @@
 import React, { useReducer } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -23,12 +24,13 @@ const reducer = (state, action) => {
 };
 
 const ConfiguracionInstituciones = () => {
-
-  const [state, dispatch] = useReducer(reducer, {
-
+  /* const [state, dispatch] = useReducer(reducer, {
     schedules: [],
+  }); */
 
-  });
+  const dispatch = useDispatch();
+
+  const configuration = useSelector((state) => state.configuration);
 
   return (
     <>
@@ -63,7 +65,7 @@ const ConfiguracionInstituciones = () => {
               </Box>
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}
-                <OpenAndCloseTimes state={state} dispatch={dispatch} />
+                <OpenAndCloseTimes />
               </Box>
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}
