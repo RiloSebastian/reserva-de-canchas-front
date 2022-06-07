@@ -31,6 +31,8 @@ import {
   WeekView,
   ViewSwitcher,
   GroupingPanel,
+  ConfirmationDialog,
+  TodayButton,
 } from "@devexpress/dx-react-scheduler-material-ui";
 import WbSunny from "@mui/icons-material/WbSunny";
 import FilterDrama from "@mui/icons-material/FilterDrama";
@@ -39,6 +41,14 @@ import ColorLens from "@mui/icons-material/ColorLens";
 import { owners } from "../../utils/data/tasks";
 import { institutionConfigs } from "../../assets/mocks/institutionConfigs";
 import { reservations } from "./appointments/appointments";
+import { TodayButtonMessages } from "./localization-messages/TodayButtonMessages";
+import { ConfirmationDialogMessages } from "./localization-messages/ConfirmationDialogMessages";
+import DataCell from "../../components/schedulers/DataCell";
+import Utils from "../../utils/utils";
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 const PREFIX = "Demo";
 
@@ -46,6 +56,7 @@ const classes = {
   cell: `${PREFIX}-cell`,
   content: `${PREFIX}-content`,
   text: `${PREFIX}-text`,
+  textWeek: `${PREFIX}-textWeek`,
   sun: `${PREFIX}-sun`,
   cloud: `${PREFIX}-cloud`,
   rain: `${PREFIX}-rain`,
@@ -69,13 +80,17 @@ const classes = {
   weekendCell: `${PREFIX}-weekendCell`,
   weekendCellAvailable: `${PREFIX}-weekendCellAvailable`,
   weekEnd: `${PREFIX}-weekEnd`,
+  nonWorkingCell: `${PREFIX}-nonWorkingCell`,
 };
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const getBorder = (theme) =>
-  `1px solid ${
-    theme.palette.mode === "light"
-      ? lighten(alpha(theme.palette.divider, 1), 0.88)
-      : darken(alpha(theme.palette.divider, 1), 0.68)
+  `1px solid ${theme.palette.mode === "light"
+    ? lighten(alpha(theme.palette.divider, 1), 0.88)
+    : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -116,19 +131,8 @@ const StyledWeekViewTimeTableCell = styled(WeekView.TimeTableCell)(
         backgroundColor: alpha(palette.action.disabledBackground, 0.04),
       },
     },
-  })
-);
-
-const StyledWeekViewTimeTableCellAvailable = styled(WeekView.TimeTableCell)(
-  ({ theme: { palette } }) => ({
-    [`&.${classes.weekendCellAvailable}`]: {
-      backgroundColor: alpha(palette.action.disabledBackground, 0.04),
-      "&:hover": {
-        backgroundColor: alpha(palette.action.disabledBackground, 0.04),
-      },
-      "&:focus": {
-        backgroundColor: alpha(palette.action.disabledBackground, 0.04),
-      },
+    [`&.${classes.nonWorkingCell}`]: {
+      backgroundColor: "#9b6467!important",
     },
   })
 );
@@ -136,23 +140,29 @@ const StyledWeekViewTimeTableCellAvailable = styled(WeekView.TimeTableCell)(
 const isRestTime = (date) =>
   date.getDay() === 0 ||
   date.getDay() === 6 ||
-  date.getHours() < 9 ||
-  date.getHours() >= 18;
+  date.getHours() === 13;
 
 const TimeTableCellWeek = ({ ...restProps }) => {
-  console.log("TimeTableCellWeek");
-  console.log({ ...restProps });
   const { startDate } = restProps;
+
+  return (<StyledWeekViewTimeTableCell {...restProps} >
+    <DataCell itemData={{ ...restProps }} />
+  </StyledWeekViewTimeTableCell>)
+
+
+
   if (isRestTime(startDate)) {
     return (
       <StyledWeekViewTimeTableCell
         {...restProps}
-        className={classes.weekendCell}
+        className={classes.nonWorkingCell}
       />
     );
   }
-  return <StyledWeekViewTimeTableCellAvailable {...restProps} />;
-  //return <TimeTableCellWeek2 />;
+  return (<StyledWeekViewTimeTableCell {...restProps} >
+    <TimeTableCellWeek2 {...restProps} />
+  </StyledWeekViewTimeTableCell>)
+  //return ;
 };
 
 // #FOLD_BLOCK
@@ -218,6 +228,12 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const StyledDivText = styled("div")(() => ({
   [`&.${classes.text}`]: {
     padding: "0.5em",
+    textAlign: "center",
+  },
+}));
+// #FOLD_BLOCK
+const StyledWeekDivText = styled("div")(() => ({
+  [`&.${classes.textWeek}`]: {
     textAlign: "center",
   },
 }));
@@ -393,17 +409,19 @@ const CellBase = React.memo(
 const CellWeekBase = React.memo(
   ({
     startDate,
-    formatDate,
-    // #FOLD_BLOCK
+    endDate
   }) => {
     return (
-      <StyledTableCell>
-        <StyledDivContent>
-          <WeatherIcon />
-        </StyledDivContent>
-        <StyledDivText>1200</StyledDivText>
-      </StyledTableCell>
+      <StyledWeekDivText className={classes.textWeek}> $ 1200</StyledWeekDivText>
     );
+
+    /* return (
+      <StyledTableCell className={classNames({
+        [classes.rainBack]: true,
+      })}>
+        <StyledWeekDivText className={classes.textWeek}> $ 1200</StyledWeekDivText>
+      </StyledTableCell>
+    ); */
   }
 );
 
@@ -711,53 +729,126 @@ const ReservaGridCustom2 = () => {
     };
   });
 
+  const [addedAppointment, setAddedAppointment] = useState({});
+
+  const [appointmentChanges, setAppointmentChanges] = useState({});
+
+  const [editingAppointment, setEditingAppointment] = useState({});
+
+  const [isValidAppointment, setIsValidAppointment] = useState(false);
+
+  const [showAlert, setShowAlert] = useState(false);
+
+  const handleChangeAddedAppointment = (addedAppointment) => {
+    console.log("handleChangeAddedAppointment");
+    console.log(addedAppointment);
+
+    const isValidAppointment = Utils.isValidAppointment(addedAppointment, addedAppointment);
+    if (!isValidAppointment) {
+      addedAppointment.cancel = true;
+      setShowAlert(true)
+      return
+    }
+
+    setIsValidAppointment(true)
+    setAddedAppointment(addedAppointment);
+  };
+
+  const handleChangeAppointmentChanges = (appointmentChanges) => {
+    console.log("handleChangeAppointmentChanges");
+    console.log(appointmentChanges);
+
+    const isValidAppointment = Utils.isValidAppointment(addedAppointment, addedAppointment);
+    if (!isValidAppointment) {
+      addedAppointment.cancel = true;
+      setShowAlert(true)
+      return
+    }
+    setIsValidAppointment(false)
+    setAppointmentChanges(appointmentChanges);
+  };
+
+  const handleChangeEditingAppointment = (editingAppointment) => {
+    console.log("handleChangeEditingAppointment");
+    console.log(editingAppointment);
+
+    const isValidAppointment = Utils.isValidAppointment(addedAppointment, addedAppointment);
+    if (!isValidAppointment) {
+      addedAppointment.cancel = true;
+      setShowAlert(true)
+      return
+    }
+    setIsValidAppointment(true)
+    setEditingAppointment(editingAppointment);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false)
+    setIsValidAppointment(false)
+  }
+
   useEffect(() => {
     //
     sportChange(1);
   }, []);
 
   return (
-    <Paper>
-      <Scheduler
-        data={filterTasks(appointments, currentSport)}
-        locale={"es-ES"}
-      >
-        <EditingState onCommitChanges={handleCommitChanges} />
-        <ViewState defaultCurrentDate="2018-07-17" />
-        <GroupingState grouping={grouping} />
-        <WeekView
-          cellDuration={60}
-          startDayHour={8}
-          endDayHour={19}
-          timeTableCellComponent={TimeTableCellWeek}
-          //timeTableCellComponent={TimeTableCellWeek2}
-          dayScaleCellComponent={DayScaleCellWeek}
-        />
+    <>
+      <Paper>
+        <Scheduler
+          data={filterTasks(appointments, currentSport)}
+          locale={"es-ES"}
+        >
+          <EditingState onCommitChanges={handleCommitChanges}
+            addedAppointment={addedAppointment}
+            onAddedAppointmentChange={handleChangeAddedAppointment}
+            appointmentChanges={appointmentChanges}
+            onAppointmentChangesChange={handleChangeAppointmentChanges}
+            editingAppointment={editingAppointment}
+            onEditingAppointmentChange={handleChangeEditingAppointment} />
+          <ViewState defaultCurrentDate="2018-07-17" />
+          <GroupingState grouping={grouping} />
+          <WeekView
+            cellDuration={60}
+            startDayHour={8}
+            endDayHour={19}
+            timeTableCellComponent={TimeTableCellWeek}
+            //timeTableCellComponent={TimeTableCellWeek2}
+            dayScaleCellComponent={DayScaleCellWeek}
+          />
 
-        <DayView cellDuration={60} startDayHour={9} endDayHour={19} />
-        <MonthView
-          timeTableCellComponent={TimeTableCell}
-          dayScaleCellComponent={DayScaleCell}
-        />
+          <DayView cellDuration={60} startDayHour={9} endDayHour={19} />
+          <MonthView
+            timeTableCellComponent={TimeTableCell}
+            dayScaleCellComponent={DayScaleCell}
+          />
 
-        <Appointments
-          appointmentComponent={Appointment}
-          appointmentContentComponent={AppointmentContent}
-        />
-        <Resources data={resources} mainResourceName="court_id" />
-        <Toolbar flexibleSpaceComponent={flexibleSpace} />
-        <DateNavigator />
-        <EditRecurrenceMenu />
+          <Appointments
+            appointmentComponent={Appointment}
+            appointmentContentComponent={AppointmentContent}
+          />
+          <Resources data={resources} mainResourceName="court_id" />
+          <Toolbar flexibleSpaceComponent={flexibleSpace} />
+          <DateNavigator />
+          <EditRecurrenceMenu />
+          <IntegratedGrouping />
+          <IntegratedEditing />
 
-        <IntegratedGrouping />
-        <IntegratedEditing />
+          <ConfirmationDialog messages={ConfirmationDialogMessages} />
 
-        <AppointmentTooltip showCloseButton showDeleteButton showOpenButton />
-        <AppointmentForm />
-        <GroupingPanel />
-        <ViewSwitcher />
-      </Scheduler>
-    </Paper>
+          <AppointmentTooltip showCloseButton showDeleteButton showOpenButton />
+          <AppointmentForm />
+          <GroupingPanel />
+          <ViewSwitcher />
+          <TodayButton messages={TodayButtonMessages} />
+        </Scheduler>
+      </Paper>
+      <Snackbar open={showAlert} autoHideDuration={6000} onClose={handleCloseAlert}>
+        <Alert onClose={handleCloseAlert} severity="warning" sx={{ width: '100%' }}>
+          This is a success message!
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 export default ReservaGridCustom2;
