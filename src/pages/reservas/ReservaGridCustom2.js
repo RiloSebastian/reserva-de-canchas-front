@@ -12,6 +12,8 @@ import {
   ViewState,
   EditingState,
   GroupingState,
+  IntegratedEditing,
+  IntegratedGrouping,
 } from "@devexpress/dx-react-scheduler";
 import classNames from "clsx";
 import {
@@ -28,6 +30,7 @@ import {
   DayView,
   WeekView,
   ViewSwitcher,
+  GroupingPanel,
 } from "@devexpress/dx-react-scheduler-material-ui";
 import WbSunny from "@mui/icons-material/WbSunny";
 import FilterDrama from "@mui/icons-material/FilterDrama";
@@ -64,6 +67,7 @@ const classes = {
   titleContainer: `${PREFIX}-titleContainer`,
   container: `${PREFIX}-container`,
   weekendCell: `${PREFIX}-weekendCell`,
+  weekendCellAvailable: `${PREFIX}-weekendCellAvailable`,
   weekEnd: `${PREFIX}-weekEnd`,
 };
 
@@ -115,6 +119,20 @@ const StyledWeekViewTimeTableCell = styled(WeekView.TimeTableCell)(
   })
 );
 
+const StyledWeekViewTimeTableCellAvailable = styled(WeekView.TimeTableCell)(
+  ({ theme: { palette } }) => ({
+    [`&.${classes.weekendCellAvailable}`]: {
+      backgroundColor: alpha(palette.action.disabledBackground, 0.04),
+      "&:hover": {
+        backgroundColor: alpha(palette.action.disabledBackground, 0.04),
+      },
+      "&:focus": {
+        backgroundColor: alpha(palette.action.disabledBackground, 0.04),
+      },
+    },
+  })
+);
+
 const isRestTime = (date) =>
   date.getDay() === 0 ||
   date.getDay() === 6 ||
@@ -122,6 +140,8 @@ const isRestTime = (date) =>
   date.getHours() >= 18;
 
 const TimeTableCellWeek = ({ ...restProps }) => {
+  console.log("TimeTableCellWeek");
+  console.log({ ...restProps });
   const { startDate } = restProps;
   if (isRestTime(startDate)) {
     return (
@@ -131,7 +151,8 @@ const TimeTableCellWeek = ({ ...restProps }) => {
       />
     );
   }
-  return <StyledWeekViewTimeTableCell {...restProps} />;
+  return <StyledWeekViewTimeTableCellAvailable {...restProps} />;
+  //return <TimeTableCellWeek2 />;
 };
 
 // #FOLD_BLOCK
@@ -228,15 +249,7 @@ const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
     margin: "0 auto",
   },
 }));
-/* const StyledToolbarFlexibleSpace = styled(Toolbar.FlexibleSpace)(() => ({
-  [`&.${classes.flexibleSpace}`]: {
-    flex: "none",
-  },
-  [`& .${classes.flexContainer}`]: {
-    display: "flex",
-    alignItems: "center",
-  },
-})); */
+
 // #FOLD_BLOCK
 const StyledAppointmentsAppointmentContent = styled(
   Appointments.AppointmentContent
@@ -377,14 +390,40 @@ const CellBase = React.memo(
   }
 );
 
+const CellWeekBase = React.memo(
+  ({
+    startDate,
+    formatDate,
+    // #FOLD_BLOCK
+  }) => {
+    return (
+      <StyledTableCell>
+        <StyledDivContent>
+          <WeatherIcon />
+        </StyledDivContent>
+        <StyledDivText>1200</StyledDivText>
+      </StyledTableCell>
+    );
+  }
+);
+
 const TimeTableCell = CellBase;
 
-const Appointment = ({ ...restProps }) => (
-  <StyledAppointmentsAppointment
-    {...restProps}
-    className={classes.appointment}
-  />
-);
+const TimeTableCellWeek2 = CellWeekBase;
+
+const Appointment = ({ ...restProps }) => {
+  console.log("devolviendo appointments");
+  console.log({ ...restProps.data });
+
+  const appointmentData = { ...restProps };
+
+  return (
+    <StyledAppointmentsAppointment
+      {...restProps}
+      className={classes.appointment}
+    />
+  );
+};
 
 const AppointmentContent = ({ ...restProps }) => (
   <StyledAppointmentsAppointmentContent
@@ -436,9 +475,6 @@ const sports = gettingSports();
 const ReservaGridCustom2 = () => {
   const [grouping, setGrouping] = useState([
     {
-      resourceName: "sport_id",
-    },
-    {
       resourceName: "court_id",
     },
   ]);
@@ -452,6 +488,7 @@ const ReservaGridCustom2 = () => {
       title: "Sebastian",
       court_id: [1],
       sport_id: 1,
+      price: 1200.0,
       startDate: new Date(2018, 6, 23, 9, 30),
       endDate: new Date(2018, 6, 23, 11, 30),
     },
@@ -468,6 +505,7 @@ const ReservaGridCustom2 = () => {
       title: "Alejandro",
       court_id: [1],
       sport_id: 1,
+      price: 1200.0,
       startDate: new Date(2018, 6, 9, 12, 0),
       endDate: new Date(2018, 6, 9, 13, 0),
     },
@@ -476,6 +514,7 @@ const ReservaGridCustom2 = () => {
       title: "Franco",
       court_id: [5],
       sport_id: 2,
+      price: 1200.0,
       startDate: new Date(2018, 6, 18, 14, 30),
       endDate: new Date(2018, 6, 18, 15, 30),
     },
@@ -484,6 +523,7 @@ const ReservaGridCustom2 = () => {
       title: "Claudio",
       court_id: [4],
       sport_id: 2,
+      price: 1200.0,
       startDate: new Date(2018, 6, 20, 12, 0),
       endDate: new Date(2018, 6, 20, 13, 35),
     },
@@ -492,6 +532,7 @@ const ReservaGridCustom2 = () => {
       title: "Claudio",
       court_id: [5],
       sport_id: 2,
+      price: 1200.0,
       startDate: new Date(2018, 6, 6, 13, 0),
       endDate: new Date(2018, 6, 6, 14, 0),
       rRule: "FREQ=WEEKLY;BYDAY=FR;UNTIL=20180816",
@@ -502,6 +543,7 @@ const ReservaGridCustom2 = () => {
       title: "Maria Belen",
       court_id: [4],
       sport_id: 2,
+      price: 1200.0,
       startDate: new Date(2018, 5, 28, 12, 0),
       endDate: new Date(2018, 5, 28, 12, 30),
       rRule: "FREQ=WEEKLY;BYDAY=TH;UNTIL=20180727",
@@ -512,6 +554,7 @@ const ReservaGridCustom2 = () => {
       title: "Agustin",
       court_id: [4],
       sport_id: 2,
+      price: 1200.0,
       startDate: new Date(2018, 6, 3, 11, 0),
       endDate: new Date(2018, 6, 3, 12, 0),
       rRule: "FREQ=WEEKLY;BYDAY=TU;UNTIL=20180801",
@@ -522,6 +565,7 @@ const ReservaGridCustom2 = () => {
       title: "Roger Federer",
       court_id: [5],
       sport_id: 2,
+      price: 1200.0,
       startDate: new Date(2018, 6, 9, 11, 0),
       endDate: new Date(2018, 6, 9, 12, 0),
     },
@@ -530,43 +574,20 @@ const ReservaGridCustom2 = () => {
 
   const [resources, setResources] = useState([
     {
-      fieldName: "id",
-      title: "Reservations",
-      instances: reservations,
-      allowMultiple: true,
-    },
-    {
       fieldName: "court_id",
       title: "Courts",
       instances: courts,
       allowMultiple: true,
-    },
-    {
-      fieldName: "sport_id",
-      title: "Sport",
-      isMain: true,
-      instances: sports,
     },
   ]);
 
   const sportChange = (value) => {
     const nextResources = [
       {
-        fieldName: "id",
-        title: "Reservations",
-        instances: appointments,
-        allowMultiple: true,
-      },
-      {
         fieldName: "court_id",
         title: "Courts",
         instances: value > 0 ? filterCourts(courts, value) : courts,
         allowMultiple: true,
-      },
-      {
-        fieldName: "sport_id",
-        title: "Sport",
-        instances: value > 0 ? [sports[value - 1]] : sports,
       },
     ];
 
@@ -574,27 +595,28 @@ const ReservaGridCustom2 = () => {
     setResources(nextResources);
   };
 
-  // #FOLD_BLOCK
   const handleCommitChanges = ({ added, changed, deleted }) => {
-    this.setState((state) => {
-      let { data } = state;
-      if (added) {
-        const startingAddedId =
-          data.length > 0 ? data[data.length - 1].id + 1 : 0;
-        data = [...data, { id: startingAddedId, ...added }];
-      }
-      if (changed) {
-        data = data.map((appointment) =>
-          changed[appointment.id]
-            ? { ...appointment, ...changed[appointment.id] }
-            : appointment
-        );
-      }
-      if (deleted !== undefined) {
-        data = data.filter((appointment) => appointment.id !== deleted);
-      }
-      return { data };
-    });
+    let newData = appointments;
+    if (added) {
+      const startingAddedId =
+        appointments.length > 0
+          ? appointments[appointments.length - 1].id + 1
+          : 0;
+      newData = [...appointments, { id: startingAddedId, ...added }];
+    }
+    if (changed) {
+      newData = appointments.map((appointment) =>
+        changed[appointment.id]
+          ? { ...appointment, ...changed[appointment.id] }
+          : appointment
+      );
+    }
+    if (deleted !== undefined) {
+      newData = appointments.filter(
+        (appointment) => appointment.id !== deleted
+      );
+    }
+    setAppointments(newData);
   };
 
   const StyledPrioritySelectorItem = styled("div")(
@@ -703,29 +725,36 @@ const ReservaGridCustom2 = () => {
         <EditingState onCommitChanges={handleCommitChanges} />
         <ViewState defaultCurrentDate="2018-07-17" />
         <GroupingState grouping={grouping} />
-        <MonthView
-          timeTableCellComponent={TimeTableCell}
-          dayScaleCellComponent={DayScaleCell}
-        />
-        <DayView startDayHour={9} endDayHour={19} />
         <WeekView
+          cellDuration={60}
           startDayHour={8}
           endDayHour={19}
           timeTableCellComponent={TimeTableCellWeek}
+          //timeTableCellComponent={TimeTableCellWeek2}
           dayScaleCellComponent={DayScaleCellWeek}
+        />
+
+        <DayView cellDuration={60} startDayHour={9} endDayHour={19} />
+        <MonthView
+          timeTableCellComponent={TimeTableCell}
+          dayScaleCellComponent={DayScaleCell}
         />
 
         <Appointments
           appointmentComponent={Appointment}
           appointmentContentComponent={AppointmentContent}
         />
-        <Resources data={resources} />
+        <Resources data={resources} mainResourceName="court_id" />
         <Toolbar flexibleSpaceComponent={flexibleSpace} />
         <DateNavigator />
         <EditRecurrenceMenu />
+
+        <IntegratedGrouping />
+        <IntegratedEditing />
+
         <AppointmentTooltip showCloseButton showDeleteButton showOpenButton />
         <AppointmentForm />
-        <DragDropProvider />
+        <GroupingPanel />
         <ViewSwitcher />
       </Scheduler>
     </Paper>
