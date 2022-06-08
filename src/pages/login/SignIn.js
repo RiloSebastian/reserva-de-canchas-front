@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -12,6 +12,14 @@ import Typography from "@mui/material/Typography";
 import { Link, useHistory } from "react-router-dom";
 import AppAppBar from "./../home/modules/views/AppAppBar";
 import AuthService from "../../services/auth.service";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Stack from '@mui/material/Stack';
 
 function Copyright(props) {
   return (
@@ -42,6 +50,19 @@ const rightLink = {
 const SignIn = (props) => {
   let history = useHistory();
 
+  const [showMessageError, setShowMessageError] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleMessageError = (message) => {
+    setErrorMessage(message)
+  }
+
+
+  const handleClose = () => {
+    setShowMessageError(false)
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -69,17 +90,26 @@ const SignIn = (props) => {
 
       history.push("/customer/home"); */
 
-    const user = await AuthService.login(
-      data.get("username"),
-      data.get("password")
-    ).then((data) => data);
 
-    console.log(user.roles[0]);
+    try {
+      const user = await AuthService.login(
+        data.get("username"),
+        data.get("password")
+      ).then((data) => data)
 
-    if (user.roles[0] === "ROLE_CUSTOMER") {
-      history.push("/customer/home");
-    } else {
-      history.push("/dashboard/reservas");
+      console.log(user);
+
+      if (user.roles[0] === "ROLE_CUSTOMER") {
+        history.push("/customer/home");
+      } else {
+        history.push("/dashboard/reservas");
+      }
+    } catch (err) {
+      console.error("error al obtener usuario");
+      console.log(err);
+
+      handleMessageError(err.data.error);
+      setShowMessageError(true);
     }
   };
 
@@ -158,6 +188,16 @@ const SignIn = (props) => {
           <Copyright sx={{ mt: 8, mb: 4 }} />
         </Container>
       </ThemeProvider>
+      <Dialog
+        open={showMessageError}
+        onClose={handleClose}
+        style={{ padding: '0px 0px 0px 0px' }}
+      >
+        <Alert onClose={handleClose} severity="error">
+          <AlertTitle >Atencion!</AlertTitle>
+          {errorMessage}
+        </Alert>
+      </Dialog>
     </React.Fragment>
   );
 };

@@ -111,7 +111,11 @@ const SignUp = () => {
       data.get("password")
     )
       //.then(history.push("/dashboard/home"))
-      .then(history.push("/account-confirmation"))
+      .then(
+        history.push({
+          pathname: "/account-confirmation",
+          state: data.get("firstName"),
+        }))
       .catch(function (rej) {
         //here when you reject the promise
         console.log(rej);

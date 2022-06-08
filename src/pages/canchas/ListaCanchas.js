@@ -210,9 +210,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-              isValid: false,
-              helperText: "Debe seleccionar un deporte para la cancha",
-            }
+            isValid: false,
+            helperText: "Debe seleccionar un deporte para la cancha",
+          }
           : true,
       lookup: sport,
       render: (rowData) => rowData.sport.name,
@@ -238,9 +238,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.name === undefined || rowData.name === ""
           ? {
-              isValid: false,
-              helperText: "El nombre de la cancha no puede estar vacio",
-            }
+            isValid: false,
+            helperText: "El nombre de la cancha no puede estar vacio",
+          }
           : true,
     },
     {
@@ -249,9 +249,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-              isValid: false,
-              helperText: "Debe seleccionar la Superficie de la Cancha",
-            }
+            isValid: false,
+            helperText: "Debe seleccionar la Superficie de la Cancha",
+          }
           : true,
       //lookup: (rowData) => getSurfaces(rowData.sport),
       lookup: surfaces,
@@ -509,10 +509,10 @@ const ListaCanchas = ({ institutionId }) => {
     const horarios = horariosYPrecios.schedules.map((s) =>
       s
         ? {
-            ...s,
-            ["from"]: moment(s.from).format("HH:mm"),
-            ["to"]: moment(s.to).format("HH:mm"),
-          }
+          ...s,
+          ["from"]: moment(s.from).format("HH:mm"),
+          ["to"]: moment(s.to).format("HH:mm"),
+        }
         : s
     );
     horariosYPrecios.schedules = horarios;
@@ -701,6 +701,7 @@ const ListaCanchas = ({ institutionId }) => {
           fileObjects={fileObjects}
           setFileObjects={setFileObjects}
           filesLimit={6}
+          isModal={true}
         />
       )}
       {open && (

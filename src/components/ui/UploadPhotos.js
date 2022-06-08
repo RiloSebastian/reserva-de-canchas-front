@@ -16,7 +16,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import Typography from "@mui/material/Typography";
 import { DropzoneDialog } from "material-ui-dropzone";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import { DropzoneDialogBase } from "material-ui-dropzone";
+import { DropzoneDialogBase, DropzoneAreaBase } from "material-ui-dropzone";
 
 const Input = styled("input")({
   display: "none",
@@ -31,6 +31,7 @@ const UploadPhotos = ({
   fileObjects,
   setFileObjects,
   filesLimit,
+  isModal,
 }) => {
   /* function uploadSingleFile(e) {
     let ImagesArray = Object.entries(e.target.files).map((e) =>
@@ -80,37 +81,72 @@ const UploadPhotos = ({
   //const [fileObjects, setFileObjects] = useState([]);
 
   return (
-    <DropzoneDialogBase
-      dialogTitle="Carga las fotos de la Cancha"
-      acceptedFiles={["image/*"]}
-      cancelButtonText={"Cancelar"}
-      submitButtonText={"Cargar Fotos"}
-      open={openUploadPhotos}
-      onClose={handleClose}
-      onSave={(files) => {
-        console.log("onSave", fileObjects);
-        handleClose();
-      }}
-      onAdd={(newFileObjs) => {
-        console.log("onAdd", newFileObjs);
-        setFileObjects([].concat(fileObjects, newFileObjs));
-      }}
-      onDelete={(deleteFileObj) => {
-        console.log("onDelete", deleteFileObj);
-        deleteFile(deleteFileObj);
-      }}
-      fileObjects={fileObjects}
-      showPreviews={true}
-      showFileNamesInPreview={true}
-      maxFileSize={50000000}
-      showPreviewsInDropzone={false}
-      previewGridProps={{
-        container: { spacing: 1, direction: "row" },
-      }}
-      previewText="Imagenes Seleccionadas"
-      filesLimit={filesLimit}
-      dropzoneText="Arrastre y suelte una foto aquí o haga Clic"
-    />
+    isModal ? (
+      <DropzoneDialogBase
+        dialogTitle="Carga las fotos de la Cancha"
+        acceptedFiles={["image/*"]}
+        cancelButtonText={"Cancelar"}
+        submitButtonText={"Cargar Fotos"}
+        open={openUploadPhotos}
+        onClose={handleClose}
+        onSave={(files) => {
+          console.log("onSave", fileObjects);
+          handleClose();
+        }}
+        onAdd={(newFileObjs) => {
+          console.log("onAdd", newFileObjs);
+          setFileObjects([].concat(fileObjects, newFileObjs));
+        }}
+        onDelete={(deleteFileObj) => {
+          console.log("onDelete", deleteFileObj);
+          deleteFile(deleteFileObj);
+        }}
+        fileObjects={fileObjects}
+        showPreviews={true}
+        showFileNamesInPreview={true}
+        maxFileSize={50000000}
+        showPreviewsInDropzone={false}
+        previewGridProps={{
+          container: { spacing: 1, direction: "row" },
+        }}
+        previewText="Imagenes Seleccionadas"
+        filesLimit={filesLimit}
+        dropzoneText="Arrastre y suelte una foto aquí o haga Clic"
+      />
+    ) : (
+      <DropzoneAreaBase
+        dialogTitle="Carga las fotos de la Cancha"
+        acceptedFiles={["image/*"]}
+        cancelButtonText={"Cancelar"}
+        submitButtonText={"Cargar Fotos"}
+        open={openUploadPhotos}
+        onClose={handleClose}
+        onSave={(files) => {
+          console.log("onSave", fileObjects);
+          handleClose();
+        }}
+        onAdd={(newFileObjs) => {
+          console.log("onAdd", newFileObjs);
+          setFileObjects([].concat(fileObjects, newFileObjs));
+        }}
+        onDelete={(deleteFileObj) => {
+          console.log("onDelete", deleteFileObj);
+          deleteFile(deleteFileObj);
+        }}
+        fileObjects={fileObjects}
+        showPreviews={true}
+        showFileNamesInPreview={true}
+        maxFileSize={50000000}
+        showPreviewsInDropzone={false}
+        previewGridProps={{
+          container: { spacing: 1, direction: "row" },
+        }}
+        previewText="Imagenes Seleccionadas"
+        filesLimit={filesLimit}
+        dropzoneText="Arrastre y suelte una foto aquí o haga Clic"
+      />
+    )
+
   );
 };
 

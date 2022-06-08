@@ -11,6 +11,7 @@ import { InstitutionDetails } from "../../components/settings/InstitutionDetails
 import { NonWorkingDays } from "../../components/settings/NonWorkingDays";
 import { OpenAndCloseTimes } from "../../components/settings/OpenAndCloseTimes";
 import { Holidays } from "../../components/settings/Holidays";
+import { ImagesSection } from "../../components/settings/ImagesSection";
 
 const reducer = (state, action) => {
   console.log("action", action.data);
@@ -55,6 +56,10 @@ const ConfiguracionInstituciones = () => {
               </Typography>
               {/*<SettingsNotifications />*/}
 
+              <Box sx={{ pt: 3 }}>
+                {/*<SettingsNotifications />*/}
+                <ImagesSection />
+              </Box>
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}
                 <NonWorkingDays />
