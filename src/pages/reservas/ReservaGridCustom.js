@@ -42,6 +42,44 @@ import { EditRecurrenceMenuMessages } from "./localization-messages/EditRecurren
 import TextEditor from "./TextEditor";
 import { institutionConfigs } from "../../assets/mocks/institutionConfigs";
 import { set } from "date-fns";
+import Chip from "@mui/material/Chip";
+import DoneIcon from "@mui/icons-material/Done";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import notify from "devextreme/ui/notify";
+import DateCell from "./../../components/ui/devexpress/DateCell";
+import TimeCell from "./../../components/ui/devexpress/TimeCell";
+
+const theme = createTheme({
+  components: {
+    MuiChip: {
+      styleOverrides: {
+        variants: [
+          {
+            props: { variant: "dashed" },
+            style: {
+              textTransform: "none",
+              border: `2px dashed `,
+            },
+          },
+          {
+            props: { variant: "dashed", color: "secondary" },
+            style: {
+              border: `4px dashed `,
+            },
+          },
+        ],
+      },
+    },
+  },
+});
+
+const notifyDisableDate = () => {
+  notify(
+    "No se puede crear o mover una cita/evento a regiones de hora/fecha deshabilitadas.",
+    "warning",
+    1000
+  );
+};
 
 const sportsDeprecated = [
   { text: "Futbol", id: 1, color: green },
@@ -308,18 +346,32 @@ const PrioritySelector = ({ sportChange, sport }) => {
   const currentSport = sport > 1 ? sports[sport - 1] : {};
   return (
     <StyledFormControl className={classes.prioritySelector} variant="standard">
+      {/* {sports.map(({ sport_id, color, name }) => (
+        <ThemeProvider theme={theme}>
+          <Chip
+            key={sport_id}
+            onClick={() => sportChange(sport_id)}
+            onDelete={() => {}}
+            color={"default"}
+            variant={"default"}
+            deleteIcon={<DoneIcon />}
+            label={name}
+            //onClick={() => setSelectedPercentages(percentage)}
+          />
+        </ThemeProvider>
+      ))} */}
       <Select
         disableUnderline
         value={sport}
         onChange={(e) => {
           sportChange(e.target.value);
         }}
-        renderValue={() => (
+        /* renderValue={() => (
           <PrioritySelectorItem
             name={currentSport.name}
             color={currentSport.color}
           />
-        )}
+        )} */
       >
         {sports.map(({ sport_id, color, name }) => (
           <MenuItem value={sport_id} key={sport_id.toString()}>
@@ -387,10 +439,10 @@ const ReservaGridCustom = () => {
   const [currentViewName, setCurrentViewName] = useState("day");
 
   const filterTasks = (items, sport_id) =>
-    items.filter((task) => !sport_id || task.sport_id === sport_id);
+    items.filter((task) => task.sport_id === sport_id);
 
   const filterCourts = (courts, sport_id) =>
-    courts.filter((court) => !sport_id || court.sport_id === sport_id);
+    courts.filter((court) => court.sport_id === sport_id);
 
   const sportChange = (value) => {
     const nextResources = [
@@ -475,6 +527,7 @@ const ReservaGridCustom = () => {
 
   useEffect(() => {
     //
+    sportChange(1);
   }, []);
 
   const handleOnChangeCurrentSportCell = () => {
@@ -560,12 +613,18 @@ const ReservaGridCustom = () => {
     }
   });
 
+  const renderDateCell = (itemData) => <DateCell itemData={itemData} />;
+
+  const renderTimeCell = (itemData) => <TimeCell itemData={itemData} />;
+
   return (
     <Card>
       <Scheduler
         data={filterTasks(data, currentSport)}
         locale={"es-ES"}
         resources
+        dateCellRender={renderDateCell}
+        timeCellRender={renderTimeCell}
       >
         <ViewState
           currentDate={currentDate}

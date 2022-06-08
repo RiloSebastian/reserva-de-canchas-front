@@ -278,7 +278,7 @@ const FormularioHorarioPrecioCancha = ({
         </DialogContent>
 
         <Box textAlign="center">
-          <IconButton color="secondary" aria-label="delete" size="large" disabled={!daysSelected.map((daySelected) => daySelected.selected ).includes(false)}>
+          <IconButton color="secondary" aria-label="delete" size="large" disabled={!daysSelected.map((daySelected) => daySelected.selected).includes(false)}>
             <AddCircleIcon
               onClick={handleAddNewDatesSchedules}
               sx={{ fontSize: 50 }}

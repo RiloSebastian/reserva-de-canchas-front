@@ -6,6 +6,7 @@ import ConfiguracionInstituciones from "./instituciones/ConfiguracionInstitucion
 import Listainstitucions from "./instituciones/ListaInstituciones";
 import ListaPromociones from "./promociones/ListaPromociones";
 import ReservaGridCustom from "./reservas/ReservaGridCustom";
+import ReservaGridCustom2 from "./reservas/ReservaGridCustom2";
 import MisReservas from "./usuarios/clientes/MisReservas";
 import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
 import AdminProfile from "./usuarios/profile/AdminProfile";
@@ -72,7 +73,7 @@ const InstitutionRoutes = [
     id: "reservas",
     path: "/reservas",
     //component: ReservaGrid,
-    component: ReservaGridCustom,
+    component: ReservaGridCustom2,
     exact: true,
   },
   {
@@ -116,8 +117,7 @@ const InstitutionRoutes = [
 export const SocialMediaRoutes = {
   instagram: "https://www.instagram.com",
   facebook: "https://www.facebook.com",
-  github:
-    "https://github.com",
+  github: "https://github.com",
   homepage: "/homepage",
 };
 

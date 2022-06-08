@@ -1,4 +1,5 @@
 import React, { useReducer } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -10,6 +11,7 @@ import { InstitutionDetails } from "../../components/settings/InstitutionDetails
 import { NonWorkingDays } from "../../components/settings/NonWorkingDays";
 import { OpenAndCloseTimes } from "../../components/settings/OpenAndCloseTimes";
 import { Holidays } from "../../components/settings/Holidays";
+import { ImagesSection } from "../../components/settings/ImagesSection";
 
 const reducer = (state, action) => {
   console.log("action", action.data);
@@ -23,12 +25,13 @@ const reducer = (state, action) => {
 };
 
 const ConfiguracionInstituciones = () => {
-
-  const [state, dispatch] = useReducer(reducer, {
-
+  /* const [state, dispatch] = useReducer(reducer, {
     schedules: [],
+  }); */
 
-  });
+  const dispatch = useDispatch();
+
+  const configuration = useSelector((state) => state.configuration);
 
   return (
     <>
@@ -55,6 +58,10 @@ const ConfiguracionInstituciones = () => {
 
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}
+                <ImagesSection />
+              </Box>
+              <Box sx={{ pt: 3 }}>
+                {/*<SettingsNotifications />*/}
                 <NonWorkingDays />
               </Box>
               <Box sx={{ pt: 3 }}>
@@ -63,7 +70,7 @@ const ConfiguracionInstituciones = () => {
               </Box>
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}
-                <OpenAndCloseTimes state={state} dispatch={dispatch} />
+                <OpenAndCloseTimes />
               </Box>
               <Box sx={{ pt: 3 }}>
                 {/*<SettingsNotifications />*/}

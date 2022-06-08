@@ -20,9 +20,10 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import AuthService from "../../services/auth.service";
 import AppAppBar from "../home/modules/views/AppAppBar";
+import { Link, useHistory } from "react-router-dom";
+import InstitucionService from "../../services/instituciones/InstitucionService";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -34,26 +35,6 @@ const MenuProps = {
     },
   },
 };
-
-const tiposDeUsuarios = [
-  {
-    key: "ROLE_CUSTOMER",
-    name: "Cliente",
-  },
-  {
-    key: "ROLE_ADMIN",
-    name: "Administrador de Institucion",
-  },
-];
-
-function getStyles(name, tipoUsuario, theme) {
-  return {
-    fontWeight:
-      tipoUsuario.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
 
 function Copyright(props) {
   return (
@@ -76,19 +57,23 @@ function Copyright(props) {
 const theme = createTheme();
 
 const SignUpInstitution = () => {
+  let history = useHistory();
+
   const theme = useTheme();
+
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [tipoUsuario, setTipoUsuario] = useState([]);
+  const [values, setValues] = useState({
+    institutionName: "",
+    address: "",
+    phone: "",
+    adminName: "",
+    adminLastName: "",
+    email: "",
+    password: "",
+  });
 
   const [open, setOpen] = useState(false);
-
-  const [openInstitution, setOpenInstitution] = useState(
-    new Date("2014-08-18T08:00:00")
-  );
-  const [closeInstitution, setCloseInstitution] = useState(
-    new Date("2014-08-18T23:00:00")
-  );
 
   const handleClose = () => {
     setOpen(false);
@@ -99,49 +84,72 @@ const SignUpInstitution = () => {
   };
 
   const handleChange = (event) => {
-    console.log(event.target);
-    setTipoUsuario(event.target.value);
+
+    if (event.target.name === "address") {
+      console.info("Buscando geolocalizacion para " + event.target.value);
+      setValues({
+        ...values,
+        [event.target.name]: event.target.value,
+      });
+    }
+    else {
+      console.info("Seteando datos para " + event.target.name);
+      setValues({
+        ...values,
+        [event.target.name]: event.target.value,
+      });
+    }
+
+
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     // eslint-disable-next-line no-console
+    console.log("creando admin e institucion");
+    console.log(data.entries());
     console.log({
       email: data.get("email"),
       password: data.get("password"),
       horarioApertura: data.get("horarioApertura"),
     });
 
-    AuthService.register(
-      data.get("firstName"),
-      data.get("lastName"),
-      data.get("tipoUsuario"),
-      data.get("email"),
-      data.get("password")
-    )
-      .then(
-        //TODO: agregar redireccionamiento para confirmar la cuenta 
+    try {
+      const adminUser = await AuthService.register(
+        data.get("firstName"),
+        data.get("lastName"),
+        data.get("role"),
+        data.get("email"),
+        data.get("password")
       )
-      .catch(function (rej) {
-        //here when you reject the promise
-        console.log(rej);
-        handleOpen();
-      });
+        .then((data) => data)
+
+      const institution = await AuthService.register(
+        data.get("firstName"),
+        data.get("lastName"),
+        data.get("role"),
+        data.get("email"),
+        data.get("password")
+      )
+        .then((data) => data)
+
+      history.push({
+        pathname: "/account-confirmation",
+        state: adminUser,
+      })
+
+    } catch (err) {
+
+      console.error("error al crear admin e institucion")
+
+    }
   };
 
   const [loading, setLoading] = useState(false);
   function handleClick() {
     setLoading(true);
   }
-
-  const handleChangeOpen = (newValue) => {
-    setOpenInstitution(newValue);
-  };
-
-  const handleChangeClose = (newValue) => {
-    setCloseInstitution(newValue);
-  };
 
   return (
     <React.Fragment>
@@ -185,6 +193,7 @@ const SignUpInstitution = () => {
                           label="Nombre de la Institucion"
                           name="institutionName"
                           autoComplete="Nombre de la Institucion"
+                          onChange={handleChange}
                         />
                       </Grid>
                     </Grid>
@@ -202,44 +211,24 @@ const SignUpInstitution = () => {
                       fullWidth
                       id="address"
                       label="Direccion de la Institucion"
+                      onChange={handleChange}
                     />
 
                     <Box mt="1em" />
 
                     <Typography variant="h6" gutterBottom>
-                      Horarios de la institucion
+                      Telefono
                     </Typography>
 
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                      <Box display="flex">
-                        <Box flex={1} mr="0.5em">
-                          <Stack spacing={3}>
-                            <TimePicker
-                              label="Horario Apertura"
-                              name="horarioApertura"
-                              value={openInstitution}
-                              onChange={handleChangeOpen}
-                              renderInput={(params) => (
-                                <TextField {...params} />
-                              )}
-                            />
-                          </Stack>
-                        </Box>
-                        <Box flex={1} ml="0.5em">
-                          <Stack spacing={3}>
-                            <TimePicker
-                              label="Horario Clausura"
-                              name="horarioClausura"
-                              value={closeInstitution}
-                              onChange={handleChangeClose}
-                              renderInput={(params) => (
-                                <TextField {...params} />
-                              )}
-                            />
-                          </Stack>
-                        </Box>
-                      </Box>
-                    </LocalizationProvider>
+                    <TextField
+                      autoComplete="given-name"
+                      name="phone"
+                      required
+                      fullWidth
+                      id="phone"
+                      label="Telefono de la Institucion"
+                      onChange={handleChange}
+                    />
                   </Box>
 
                   <Box flex={1} ml="1em">
@@ -248,11 +237,7 @@ const SignUpInstitution = () => {
                         <Typography variant="h6" gutterBottom>
                           Administrador
                         </Typography>
-                        <Box
-                          component="form"
-                          noValidate
-                          onSubmit={handleSubmit}
-                        >
+                        <Box>
                           <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                               <TextField
@@ -262,6 +247,7 @@ const SignUpInstitution = () => {
                                 fullWidth
                                 id="firstName"
                                 label="Nombre"
+                                onChange={handleChange}
                               />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -272,6 +258,7 @@ const SignUpInstitution = () => {
                                 label="Apellido"
                                 name="lastName"
                                 autoComplete="family-name"
+                                onChange={handleChange}
                               />
                             </Grid>
                             <Grid item xs={12}>
@@ -282,6 +269,7 @@ const SignUpInstitution = () => {
                                 label="Correo Electronico"
                                 name="email"
                                 autoComplete="email"
+                                onChange={handleChange}
                               />
                             </Grid>
                             <Grid item xs={12}>
@@ -293,6 +281,7 @@ const SignUpInstitution = () => {
                                 type="password"
                                 id="password"
                                 autoComplete="new-password"
+                                onChange={handleChange}
                               />
                             </Grid>
                             <Grid item xs={12}>
@@ -304,6 +293,7 @@ const SignUpInstitution = () => {
                                 type="password"
                                 id="confirmpassword"
                                 autoComplete="new-password"
+                                onChange={handleChange}
                               />
                             </Grid>
                           </Grid>
@@ -314,6 +304,12 @@ const SignUpInstitution = () => {
                 </Box>
               </Box>
               <Toolbar>
+                <TextField
+                  name="role"
+                  id="role"
+                  value="ROLE_ADMIN"
+                  type="hidden"
+                />
                 <Box
                   sx={{ padding: 0 }}
                   display="flex"
@@ -323,11 +319,11 @@ const SignUpInstitution = () => {
                   <LoadingButton
                     fullWidth
                     color="secondary"
-                    onClick={handleSubmit}
                     loading={loading}
                     loadingPosition="start"
                     startIcon={<SaveIcon />}
                     variant="contained"
+                    type="submit"
                   >
                     Registrar Institucion
                   </LoadingButton>
