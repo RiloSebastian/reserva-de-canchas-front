@@ -1,3 +1,4 @@
+import React, { Fragment, useState } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -19,11 +20,13 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import React, { useState } from "react";
 import AuthService from "../../services/auth.service";
 import AppAppBar from "../home/modules/views/AppAppBar";
 import { Link, useHistory } from "react-router-dom";
 import InstitucionService from "../../services/instituciones/InstitucionService";
+import GeoLocalizacionService from "../../services/geolocalizacion/GeoLocalizacionService";
+import ComboBox from "../../components/ui/ComboBox";
+import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -63,9 +66,12 @@ const SignUpInstitution = () => {
 
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
+  const [showMessageError, setShowMessageError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [values, setValues] = useState({
     institutionName: "",
-    address: "",
+    address: {},
     phone: "",
     adminName: "",
     adminLastName: "",
@@ -75,32 +81,58 @@ const SignUpInstitution = () => {
 
   const [open, setOpen] = useState(false);
 
+  const [addressObtained, setAddressObtained] = useState([]);
+
   const handleClose = () => {
-    setOpen(false);
+    setShowMessageError(false);
   };
 
-  const handleOpen = () => {
-    setOpen(true);
+  const handleMessageError = (message) => {
+    setErrorMessage(message);
   };
 
-  const handleChange = (event) => {
-
+  const handleChange = async (event) => {
     if (event.target.name === "address") {
       console.info("Buscando geolocalizacion para " + event.target.value);
-      setValues({
-        ...values,
-        [event.target.name]: event.target.value,
-      });
-    }
-    else {
+
+      try {
+        const addresses = await GeoLocalizacionService.getGeoLocalization(
+          event.target.value
+        ).then((data) => data.data);
+
+        console.info("Direcciones Obtenidas ");
+        console.info(addresses);
+
+        setAddressObtained(addresses);
+
+        console.info("Seteando la direccion ");
+
+        const address = addresses[0];
+
+        const institutionAddress = {
+          geometry: {
+            coordinates: [address.lat, address.lon],
+            type: "Point",
+          },
+          textualAddress: address.display_address,
+        };
+
+        console.info(address);
+        setValues({
+          ...values,
+          [event.target.name]: institutionAddress,
+        });
+      } catch (err) {
+        console.info("Catcheando Error ");
+        console.info(err);
+      }
+    } else {
       console.info("Seteando datos para " + event.target.name);
       setValues({
         ...values,
         [event.target.name]: event.target.value,
       });
     }
-
-
   };
 
   const handleSubmit = async (event) => {
@@ -108,12 +140,7 @@ const SignUpInstitution = () => {
     const data = new FormData(event.currentTarget);
     // eslint-disable-next-line no-console
     console.log("creando admin e institucion");
-    console.log(data.entries());
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-      horarioApertura: data.get("horarioApertura"),
-    });
+    console.log(values);
 
     try {
       const adminUser = await AuthService.register(
@@ -122,8 +149,7 @@ const SignUpInstitution = () => {
         data.get("role"),
         data.get("email"),
         data.get("password")
-      )
-        .then((data) => data)
+      ).then((data) => data);
 
       const institution = await AuthService.register(
         data.get("firstName"),
@@ -131,18 +157,24 @@ const SignUpInstitution = () => {
         data.get("role"),
         data.get("email"),
         data.get("password")
-      )
-        .then((data) => data)
+      ).then((data) => data);
 
       history.push({
         pathname: "/account-confirmation",
         state: adminUser,
-      })
-
+      });
     } catch (err) {
-
-      console.error("error al crear admin e institucion")
-
+      console.error("error al crear admin e institucion");
+      handleMessageError(
+        Object.values(err.data).map((error, idx) => (
+          <Fragment key={error}>
+            {<br />}
+            {error}
+            {<br />}
+          </Fragment>
+        ))
+      );
+      setShowMessageError(true);
     }
   };
 
@@ -204,7 +236,7 @@ const SignUpInstitution = () => {
                       Direccion
                     </Typography>
 
-                    <TextField
+                    <ComboBox
                       autoComplete="given-name"
                       name="address"
                       required
@@ -212,7 +244,18 @@ const SignUpInstitution = () => {
                       id="address"
                       label="Direccion de la Institucion"
                       onChange={handleChange}
+                      addressObtained={addressObtained}
                     />
+
+                    {/*  <TextField
+                      autoComplete="given-name"
+                      name="address"
+                      required
+                      fullWidth
+                      id="address"
+                      label="Direccion de la Institucion"
+                      onChange={handleChange}
+                    /> */}
 
                     <Box mt="1em" />
 
@@ -256,7 +299,7 @@ const SignUpInstitution = () => {
                                 fullWidth
                                 id="lastName"
                                 label="Apellido"
-                                name="lastName"
+                                name="adminLastName"
                                 autoComplete="family-name"
                                 onChange={handleChange}
                               />
@@ -342,21 +385,11 @@ const SignUpInstitution = () => {
         </Container>
       </ThemeProvider>
 
-      <Dialog
-        fullWidth={true}
-        fullScreen={fullScreen}
-        open={open}
-        onClose={handleClose}
-      >
-        <DialogContent sx={{ padding: 0 }}>
-          <Stack sx={{ width: "100%" }} spacing={2}>
-            <Alert onClose={handleClose} severity="error" variant="filled">
-              <AlertTitle>Error</AlertTitle>
-              No se ha podido registrar el usuario !
-            </Alert>
-          </Stack>
-        </DialogContent>
-      </Dialog>
+      <AlertMessageComponent
+        showMessageError={showMessageError}
+        handleClose={handleClose}
+        errorMessage={errorMessage}
+      />
     </React.Fragment>
   );
 };

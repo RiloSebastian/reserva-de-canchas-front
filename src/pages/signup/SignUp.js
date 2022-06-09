@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
@@ -18,6 +18,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { Link, useHistory } from "react-router-dom";
 import AuthService from "../../services/auth.service";
 import AppAppBar from "../home/modules/views/AppAppBar";
+import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -76,12 +77,20 @@ const SignUp = () => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
+  const [showMessageError, setShowMessageError] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [tipoUsuario, setTipoUsuario] = useState([]);
 
   const [open, setOpen] = useState(false);
 
+  const handleMessageError = (message) => {
+    setErrorMessage(message);
+  };
+
   const handleClose = () => {
-    setOpen(false);
+    setShowMessageError(false);
   };
 
   const handleOpen = () => {
@@ -93,7 +102,7 @@ const SignUp = () => {
     setTipoUsuario(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     // eslint-disable-next-line no-console
@@ -103,24 +112,37 @@ const SignUp = () => {
       role: data.get("role"),
     });
 
-    AuthService.register(
-      data.get("firstName"),
-      data.get("lastName"),
-      data.get("role"),
-      data.get("email"),
-      data.get("password")
-    )
-      //.then(history.push("/dashboard/home"))
-      .then(
-        history.push({
-          pathname: "/account-confirmation",
-          state: data.get("firstName"),
-        }))
-      .catch(function (rej) {
-        //here when you reject the promise
-        console.log(rej);
-        handleOpen();
+    try {
+      const registerUser = await AuthService.register(
+        data.get("firstName"),
+        data.get("lastName"),
+        data.get("role"),
+        data.get("email"),
+        data.get("password")
+      ).then((data) => data);
+
+      console.log("usuario Creado");
+      console.log(registerUser);
+
+      history.push({
+        pathname: "/account-confirmation",
+        state: data.get("firstName"),
       });
+    } catch (err) {
+      console.error("error al registrar usuario");
+      console.log(err);
+
+      handleMessageError(
+        Object.values(err.data).map((error, idx) => (
+          <Fragment key={error}>
+            {<br />}
+            {error}
+            {<br />}
+          </Fragment>
+        ))
+      );
+      setShowMessageError(true);
+    }
   };
 
   return (
@@ -257,21 +279,11 @@ const SignUp = () => {
         </Container>
       </ThemeProvider>
 
-      <Dialog
-        fullWidth={true}
-        fullScreen={fullScreen}
-        open={open}
-        onClose={handleClose}
-      >
-        <DialogContent sx={{ padding: 0 }}>
-          <Stack sx={{ width: "100%" }} spacing={2}>
-            <Alert onClose={handleClose} severity="error" variant="filled">
-              <AlertTitle>Error</AlertTitle>
-              No se ha podido registrar el usuario !
-            </Alert>
-          </Stack>
-        </DialogContent>
-      </Dialog>
+      <AlertMessageComponent
+        showMessageError={showMessageError}
+        handleClose={handleClose}
+        errorMessage={errorMessage}
+      />
     </React.Fragment>
   );
 };
