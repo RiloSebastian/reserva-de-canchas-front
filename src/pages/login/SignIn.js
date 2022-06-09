@@ -12,14 +12,8 @@ import Typography from "@mui/material/Typography";
 import { Link, useHistory } from "react-router-dom";
 import AppAppBar from "./../home/modules/views/AppAppBar";
 import AuthService from "../../services/auth.service";
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import Stack from '@mui/material/Stack';
+
+import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 
 function Copyright(props) {
   return (
@@ -30,7 +24,7 @@ function Copyright(props) {
       {...props}
     >
       {"Copyright © "}
-      <Link color="inherit" href="#">
+      <Link color="inherit" to={"#"}>
         RESERVA TU CANCHA
       </Link>{" "}
       {new Date().getFullYear()}
@@ -55,13 +49,12 @@ const SignIn = (props) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleMessageError = (message) => {
-    setErrorMessage(message)
-  }
-
+    setErrorMessage(message);
+  };
 
   const handleClose = () => {
-    setShowMessageError(false)
-  }
+    setShowMessageError(false);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -90,12 +83,11 @@ const SignIn = (props) => {
 
       history.push("/customer/home"); */
 
-
     try {
       const user = await AuthService.login(
         data.get("username"),
         data.get("password")
-      ).then((data) => data)
+      ).then((data) => data);
 
       console.log(user);
 
@@ -159,10 +151,6 @@ const SignIn = (props) => {
                 id="password"
                 autoComplete="current-password"
               />
-              {/*<FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Recordarme"
-          />*/}
               <Button
                 type="submit"
                 fullWidth
@@ -172,11 +160,6 @@ const SignIn = (props) => {
                 {"Iniciar Sesion"}
               </Button>
               <Grid container>
-                {/*<Grid item xs>
-                  <Link to="/forgot-pass" variant="body2">
-                    Olvidaste la Contraseña?
-                  </Link>
-        </Grid>*/}
                 <Grid item>
                   <Link to="/signup" variant="body2">
                     {"Aun no tienes una Cuenta? Registrarse"}
@@ -188,16 +171,11 @@ const SignIn = (props) => {
           <Copyright sx={{ mt: 8, mb: 4 }} />
         </Container>
       </ThemeProvider>
-      <Dialog
-        open={showMessageError}
-        onClose={handleClose}
-        style={{ padding: '0px 0px 0px 0px' }}
-      >
-        <Alert onClose={handleClose} severity="error">
-          <AlertTitle >Atencion!</AlertTitle>
-          {errorMessage}
-        </Alert>
-      </Dialog>
+      <AlertMessageComponent
+        showMessageError={showMessageError}
+        handleClose={handleClose}
+        errorMessage={errorMessage}
+      />
     </React.Fragment>
   );
 };

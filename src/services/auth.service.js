@@ -17,7 +17,7 @@ const login = async (username, password) => {
       return response.data;
     })
     .catch((err) => {
-      console.log("error al registrar usuario catch");
+      console.log("error al ingresar");
       console.log(err.response);
       return Promise.reject(err.response);
     });
@@ -28,19 +28,27 @@ const logout = () => {
 };
 
 const register = async (firstName, lastName, role, email, password) => {
-  try {
-    return await axios.post(API_URL + "signup", {
+  return await axios
+    .post(API_URL + "signup", {
       firstName,
       lastName,
       role,
       email,
       password,
+    })
+    .then((response) => {
+      console.log("registrnado usuario");
+      console.log(response);
+      if (response.data.token) {
+        localStorage.setItem("user", JSON.stringify(response.data));
+      }
+      return response.data;
+    })
+    .catch((err) => {
+      console.log("error al registrar usuario catch");
+      console.log(err.response);
+      return Promise.reject(err.response);
     });
-  } catch (err) {
-    console.log("error al registrar usuario");
-    console.log(err);
-    return Promise.reject(err);
-  }
 };
 
 const getCurrentUser = () => {

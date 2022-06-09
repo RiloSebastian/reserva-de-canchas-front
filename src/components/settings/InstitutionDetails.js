@@ -9,6 +9,7 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
+import ComboBox from "../ui/ComboBox";
 
 const states = [
   {
@@ -65,7 +66,7 @@ export const InstitutionDetails = (props) => {
               />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField
+              {/* <TextField
                 fullWidth
                 label="Direccion"
                 name="address"
@@ -73,6 +74,16 @@ export const InstitutionDetails = (props) => {
                 required
                 value={values.address}
                 variant="outlined"
+              /> */}
+              <ComboBox
+                autoComplete="given-name"
+                name="address"
+                required
+                fullWidth
+                id="address"
+                label="Direccion de la Institucion"
+                value="mi direccion"
+                onChange={handleChange}
               />
             </Grid>
             <Grid item md={6} xs={12}>
