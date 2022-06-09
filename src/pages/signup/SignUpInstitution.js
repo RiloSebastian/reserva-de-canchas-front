@@ -28,6 +28,21 @@ import GeoLocalizacionService from "../../services/geolocalizacion/GeoLocalizaci
 import ComboBox from "../../components/ui/ComboBox";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 
+const themeTextArea = createTheme({
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        multiline: {
+          fontWeight: "bold",
+          fontSize: "20px",
+          color: "purple",
+          width: "50vw",
+        },
+      },
+    },
+  },
+});
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -272,6 +287,25 @@ const SignUpInstitution = () => {
                       label="Telefono de la Institucion"
                       onChange={handleChange}
                     />
+                    <Box sx={{ m: 1 }} />
+                    <Typography variant="h6" gutterBottom>
+                      Descripcion
+                    </Typography>
+
+                    <ThemeProvider theme={themeTextArea}>
+                      <TextField
+                        autoComplete="given-name"
+                        multiline
+                        rows={5}
+                        name="phone"
+                        required
+                        variant="outlined"
+                        fullWidth
+                        id="phone"
+                        label="Dejanos una breve descripcion de la Institucion"
+                        onChange={handleChange}
+                      />
+                    </ThemeProvider>
                   </Box>
 
                   <Box flex={1} ml="1em">

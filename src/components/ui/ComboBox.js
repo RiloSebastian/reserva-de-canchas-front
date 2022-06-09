@@ -1,19 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-const ComboBox = (props) => {
-  const {
-    autoComplete,
-    name,
-    required,
-    fullWidth,
-    id,
-    label,
-    onChange,
-    addressObtained,
-  } = props;
-
-  const [open, setOpen] = React.useState(false);
+const ComboBox = ({
+  autoComplete,
+  name,
+  required,
+  fullWidth,
+  id,
+  label,
+  value,
+  onChange,
+  addressObtained,
+}) => {
+  const [open, setOpen] = useState(false);
 
   return (
     <Autocomplete
