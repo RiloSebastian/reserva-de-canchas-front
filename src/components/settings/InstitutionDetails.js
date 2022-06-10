@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   Box,
   Button,
@@ -27,21 +28,25 @@ const states = [
 ];
 
 export const InstitutionDetails = (props) => {
-  const [values, setValues] = useState({
+  const institutionDetails = useSelector((state) => state.institution);
+
+  /* const [values, setValues] = useState({
     firstName: "Palermo Tenis",
     address: "Honduras 5460",
     email: "palermotenis@email.com",
     phone: "1146584589",
     state: "Alabama",
     country: "USA",
-  });
+  }); */
 
   const handleChange = (event) => {
-    setValues({
+    /* setValues({
       ...values,
       [event.target.name]: event.target.value,
-    });
+    }); */
   };
+
+  useEffect(() => {}, []);
 
   return (
     <form autoComplete="off" noValidate {...props}>
@@ -61,20 +66,11 @@ export const InstitutionDetails = (props) => {
                 name="institution_name"
                 onChange={handleChange}
                 required
-                value={values.firstName}
+                value={institutionDetails.name}
                 variant="outlined"
               />
             </Grid>
             <Grid item md={6} xs={12}>
-              {/* <TextField
-                fullWidth
-                label="Direccion"
-                name="address"
-                onChange={handleChange}
-                required
-                value={values.address}
-                variant="outlined"
-              /> */}
               <ComboBox
                 autoComplete="given-name"
                 name="address"
@@ -82,7 +78,7 @@ export const InstitutionDetails = (props) => {
                 fullWidth
                 id="address"
                 label="Direccion de la Institucion"
-                value="mi direccion"
+                value={institutionDetails.address}
                 onChange={handleChange}
               />
             </Grid>
@@ -93,7 +89,7 @@ export const InstitutionDetails = (props) => {
                 name="email"
                 onChange={handleChange}
                 required
-                value={values.email}
+                value={institutionDetails.email}
                 variant="outlined"
               />
             </Grid>
@@ -104,7 +100,7 @@ export const InstitutionDetails = (props) => {
                 name="phone"
                 onChange={handleChange}
                 type="number"
-                value={values.phone}
+                value={institutionDetails.phone}
                 variant="outlined"
               />
             </Grid>

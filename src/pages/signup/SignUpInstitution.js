@@ -262,16 +262,6 @@ const SignUpInstitution = () => {
                       addressObtained={addressObtained}
                     />
 
-                    {/*  <TextField
-                      autoComplete="given-name"
-                      name="address"
-                      required
-                      fullWidth
-                      id="address"
-                      label="Direccion de la Institucion"
-                      onChange={handleChange}
-                    /> */}
-
                     <Box mt="1em" />
 
                     <Typography variant="h6" gutterBottom>
