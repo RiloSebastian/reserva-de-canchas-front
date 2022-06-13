@@ -9,6 +9,12 @@ const get = (institution_id) => {
     return http.get(`/institutions/${institution_id}`);
 };
 
+const getInstitutionSchedules = async (institution_id) => {
+    return await http.get(`/institutions/${institution_id}/schedule`)
+        .then((response) => response)
+        .catch((err) => Promise.reject(err));
+};
+
 const create = data => {
     return http.post(`/institutions`, data);
 };
@@ -37,5 +43,6 @@ export default {
     create,
     update,
     remove,
-    removeAll
+    removeAll,
+    getInstitutionSchedules,
 };

@@ -89,6 +89,7 @@ const SignIn = (props) => {
         data.get("password")
       ).then((data) => data);
 
+      console.log("obteniendo info del login");
       console.log(user);
 
       if (user.roles[0] === "ROLE_CUSTOMER") {

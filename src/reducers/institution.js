@@ -3,7 +3,7 @@ import { GET_INSTITUTION, UPDATE_INSTITUTION } from "../actions/types";
 const initialState = {
   name: "Palermo Tenis",
   address: {
-    textualAddress: "Honduras 5460",
+    langAddress: "Honduras 5460",
     geometry: {
       coordinates: [0, 0],
       type: "Point",

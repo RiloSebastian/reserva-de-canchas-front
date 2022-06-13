@@ -11,6 +11,8 @@ const ComboBox = ({
   label,
   value,
   onChange,
+  institutionData,
+  setInstitutionData
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -29,19 +31,27 @@ const ComboBox = ({
 
       setAddressObtained(addresses);
 
-      console.info("Seteando la direccion ");
+      console.log("Seteando la direccion ");
 
       const address = addresses[0];
 
+      console.log(address);
+
       const institutionAddress = {
         geometry: {
-          coordinates: [address.lat, address.lon],
+          coordinates: [address.lon, address.lat],
           type: "Point",
         },
-        textualAddress: address.display_address,
+        langAddress: address.display_address,
       };
 
-      console.info(address);
+      console.log("seteando la institutionAddress");
+      console.log(institutionAddress);
+
+      setInstitutionData({
+        ...institutionData,
+        [event.target.name]: institutionAddress,
+      });
     } catch (err) {
       console.info("Catcheando Error ");
       console.info(err);

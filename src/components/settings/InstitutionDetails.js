@@ -46,7 +46,7 @@ export const InstitutionDetails = (props) => {
     }); */
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
 
   return (
     <form autoComplete="off" noValidate {...props}>
@@ -99,7 +99,6 @@ export const InstitutionDetails = (props) => {
                 label="Numero de Telefono"
                 name="phone"
                 onChange={handleChange}
-                type="number"
                 value={institutionDetails.phone}
                 variant="outlined"
               />

@@ -33,7 +33,6 @@ import InstitutionRoutes, {
 } from "./../../pages/routes";
 import useStyles from "./menuBarStyles";
 import getMenu from "./sideBarItems";
-import { AppBar } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -71,8 +70,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-{
-  /* const AppBar = styled(MuiAppBar, {
+
+const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
@@ -88,8 +87,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
-})); */
-}
+}));
+
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",

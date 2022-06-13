@@ -27,12 +27,12 @@ const logout = () => {
   localStorage.removeItem("user");
 };
 
-const register = async (firstName, lastName, role, email, password) => {
+const register = async (firstName, lastName, userRole, email, password) => {
   return await axios
     .post(API_URL + "signup", {
       firstName,
       lastName,
-      role,
+      userRole,
       email,
       password,
     })

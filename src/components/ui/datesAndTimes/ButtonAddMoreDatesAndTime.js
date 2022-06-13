@@ -6,6 +6,7 @@ import IconButton from "@mui/material/IconButton";
 const ButtonAddMoreDatesAndTime = ({
   daysSelected,
   handleAddNewDatesSchedules,
+  disabled
 }) => {
   return (
     <Box textAlign="center">
@@ -13,11 +14,15 @@ const ButtonAddMoreDatesAndTime = ({
         color="secondary"
         aria-label="delete"
         size="large"
-        disabled={
+        /* disabled={
           !daysSelected
             .map((daySelected) => daySelected.selected)
-            .includes(false)
-        }
+            .includes(false) ||
+
+          daysSelected.map((daySelected) => daySelected.selected).every(s => s === false)
+
+        } */
+        disabled={disabled}
       >
         <AddCircleIcon
           onClick={handleAddNewDatesSchedules}
