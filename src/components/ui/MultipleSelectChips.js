@@ -37,6 +37,7 @@ const MultipleSelectChips = ({
   setError,
   setDaysSelected,
   daysSelected,
+  //daysAndTimesId,
   daysAndTimesId,
 }) => {
   const classes = useStyles();
@@ -58,7 +59,7 @@ const MultipleSelectChips = ({
           return {
             ...day,
             selected: false,
-            daysAndTimesId: daysAndTimesId
+            daysAndTimesId: null
           }
         }
         return day;

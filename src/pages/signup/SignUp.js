@@ -109,14 +109,14 @@ const SignUp = () => {
     console.log({
       email: data.get("email"),
       password: data.get("password"),
-      role: data.get("role"),
+      role: data.get("userRole"),
     });
 
     try {
       const registerUser = await AuthService.register(
         data.get("firstName"),
         data.get("lastName"),
-        data.get("role"),
+        data.get("userRole"),
         data.get("email"),
         data.get("password")
       ).then((data) => data);
@@ -253,8 +253,8 @@ const SignUp = () => {
               </Grid>
               <TextField
                 sx={{ mt: 3, mb: 2 }}
-                name="role"
-                id="role"
+                name="userRole"
+                id="userRole"
                 value="ROLE_CUSTOMER"
                 type="hidden"
               />

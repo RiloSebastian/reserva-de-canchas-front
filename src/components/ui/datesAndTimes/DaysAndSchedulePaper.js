@@ -37,11 +37,10 @@ const DaysAndSchedulePaper = ({
   diaYHorario,
   diaYHorarioId,
   setHorario,
-  removeDaysAndSchedule,
   daysSelected,
   setDaysSelected,
+  handleChangeHorarios,
 }) => {
-  const { id } = diaYHorario;
 
   return (
     <Paper
@@ -56,35 +55,20 @@ const DaysAndSchedulePaper = ({
           <Grid item xs container direction="column" spacing={2}>
             <Grid item xs>
               <SelectWeekDays
-                //daysOptions={diaYHorario.dias}
                 setDaysSelected={setDaysSelected}
                 setHorarios={setHorario}
                 daysSelected={daysSelected}
                 daysAndTimesId={diaYHorarioId}
+                diaYHorario={diaYHorario}
               />
             </Grid>
             <Grid item>
               <Box textAlign={"center"}>
                 <p>Horarios</p>
-                <SchedulerFromTo />
+                <SchedulerFromTo handleChangeHorarios={handleChangeHorarios} diaYHorarioId={diaYHorario.id} from={diaYHorario.horario.from} to={diaYHorario.horario.to} />
               </Box>
             </Grid>
           </Grid>
-        </Grid>
-        <Grid item>
-          <IconButton>
-            <DeleteIcon
-              onClick={() => {
-                removeDaysAndSchedule(id, diaYHorarioId);
-              }}
-              fontSize="inherit"
-              sx={{
-                color: pink[500],
-                width: 50,
-                height: 50,
-              }}
-            />
-          </IconButton>
         </Grid>
       </Grid>
     </Paper>

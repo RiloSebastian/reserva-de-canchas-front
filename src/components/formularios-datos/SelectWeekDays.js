@@ -61,6 +61,7 @@ const SelectWeekDays = ({
   setHorarios,
   daysSelected,
   daysAndTimesId,
+  diaYHorario,
 }) => {
   const [days, setDays] = useState([0, 1, 2, 3, 4, 5, 6, 7]);
 
@@ -97,6 +98,7 @@ const SelectWeekDays = ({
         setDaysSelected={setDaysSelected}
         daysSelected={daysSelected}
         daysAndTimesId={daysAndTimesId}
+        diaYHorario={diaYHorario}
       />
     </Paper>
   );

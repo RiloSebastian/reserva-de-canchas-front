@@ -1,4 +1,11 @@
-import React, { Fragment, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+  useState,
+  Fragment,
+} from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -74,6 +81,24 @@ function Copyright(props) {
 
 const theme = createTheme();
 
+/* const reducer = (state, action) => {
+  console.log("action", action.data);
+  switch (action.type) {
+    case "institutionTel":
+      return { ...state, institutionTel: formatTelephoneNumber(action.data) };
+    case "expDate":
+      return { ...state, expDate: formatExpirationDate(action.data) };
+    case "securityCode": {
+      console.log("securityCode", action.data);
+      return { ...state, securityCode: formatCVC(action.data) };
+    }
+    case "cardOwner":
+      return { ...state, cardOwner: action.data };
+    default:
+      return state;
+  }
+}; */
+
 const SignUpInstitution = () => {
   let history = useHistory();
 
@@ -85,13 +110,25 @@ const SignUpInstitution = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [values, setValues] = useState({
-    institutionName: "",
-    address: {},
-    phone: "",
-    adminName: "",
-    adminLastName: "",
+    firstName: "",
+    lastName: "",
+    userRole: "ROLE_ADMIN",
     email: "",
     password: "",
+    confirmpassword: "",
+  });
+
+  const [institutionData, setInstitutionData] = useState({
+    name: "",
+    address: {
+      geometry: {
+        coordinates: ["", ""],
+        type: "Point",
+      },
+      langAddress: "",
+    },
+    institutionTel: "",
+    description: "",
   });
 
   const [open, setOpen] = useState(false);
@@ -106,48 +143,23 @@ const SignUpInstitution = () => {
     setErrorMessage(message);
   };
 
+  const handleInstitutionChange = async (event) => {
+    console.info("Seteando datos de la institucion");
+    console.info("Seteando datos para " + event.target.name);
+    setInstitutionData({
+      ...institutionData,
+      [event.target.name]: event.target.value,
+    });
+  };
+
   const handleChange = async (event) => {
-    if (event.target.name === "address") {
-      console.info("Buscando geolocalizacion para " + event.target.value);
+    console.info("Seteando datos del admin ");
+    console.info("Seteando datos para " + event.target.name);
+    setValues({
+      ...values,
+      [event.target.name]: event.target.value,
+    });
 
-      try {
-        const addresses = await GeoLocalizacionService.getGeoLocalization(
-          event.target.value
-        ).then((data) => data.data);
-
-        console.info("Direcciones Obtenidas ");
-        console.info(addresses);
-
-        setAddressObtained(addresses);
-
-        console.info("Seteando la direccion ");
-
-        const address = addresses[0];
-
-        const institutionAddress = {
-          geometry: {
-            coordinates: [address.lat, address.lon],
-            type: "Point",
-          },
-          textualAddress: address.display_address,
-        };
-
-        console.info(address);
-        setValues({
-          ...values,
-          [event.target.name]: institutionAddress,
-        });
-      } catch (err) {
-        console.info("Catcheando Error ");
-        console.info(err);
-      }
-    } else {
-      console.info("Seteando datos para " + event.target.name);
-      setValues({
-        ...values,
-        [event.target.name]: event.target.value,
-      });
-    }
   };
 
   const handleSubmit = async (event) => {
@@ -159,24 +171,25 @@ const SignUpInstitution = () => {
 
     try {
       const adminUser = await AuthService.register(
-        data.get("firstName"),
-        data.get("lastName"),
-        data.get("role"),
-        data.get("email"),
-        data.get("password")
+        values.firstName,
+        values.lastName,
+        values.userRole,
+        values.email,
+        values.password,
       ).then((data) => data);
 
-      const institution = await AuthService.register(
-        data.get("firstName"),
-        data.get("lastName"),
-        data.get("role"),
-        data.get("email"),
-        data.get("password")
-      ).then((data) => data);
+      const managers = [adminUser.email];
+
+      const data = { ...institutionData, managers };
+
+      console.log("enviando datos de la institucion");
+      console.log(data);
+
+      const institution = await InstitucionService.create(data).then((data) => data);
 
       history.push({
         pathname: "/account-confirmation",
-        state: adminUser,
+        state: values.firstName,
       });
     } catch (err) {
       console.error("error al crear admin e institucion");
@@ -236,11 +249,12 @@ const SignUpInstitution = () => {
                         <TextField
                           required
                           fullWidth
-                          id="institutionName"
+                          value={institutionData.name}
+                          id="name"
                           label="Nombre de la Institucion"
-                          name="institutionName"
+                          name="name"
                           autoComplete="Nombre de la Institucion"
-                          onChange={handleChange}
+                          onChange={handleInstitutionChange}
                         />
                       </Grid>
                     </Grid>
@@ -258,19 +272,9 @@ const SignUpInstitution = () => {
                       fullWidth
                       id="address"
                       label="Direccion de la Institucion"
-                      onChange={handleChange}
-                      addressObtained={addressObtained}
+                      institutionData={institutionData}
+                      setInstitutionData={setInstitutionData}
                     />
-
-                    {/*  <TextField
-                      autoComplete="given-name"
-                      name="address"
-                      required
-                      fullWidth
-                      id="address"
-                      label="Direccion de la Institucion"
-                      onChange={handleChange}
-                    /> */}
 
                     <Box mt="1em" />
 
@@ -280,12 +284,13 @@ const SignUpInstitution = () => {
 
                     <TextField
                       autoComplete="given-name"
-                      name="phone"
+                      name="institutionTel"
+                      value={institutionData.institutionTel}
                       required
                       fullWidth
-                      id="phone"
+                      id="institutionTel"
                       label="Telefono de la Institucion"
-                      onChange={handleChange}
+                      onChange={handleInstitutionChange}
                     />
                     <Box sx={{ m: 1 }} />
                     <Typography variant="h6" gutterBottom>
@@ -297,13 +302,14 @@ const SignUpInstitution = () => {
                         autoComplete="given-name"
                         multiline
                         rows={5}
-                        name="phone"
+                        name="description"
+                        value={institutionData.description}
                         required
                         variant="outlined"
                         fullWidth
-                        id="phone"
+                        id="description"
                         label="Dejanos una breve descripcion de la Institucion"
-                        onChange={handleChange}
+                        onChange={handleInstitutionChange}
                       />
                     </ThemeProvider>
                   </Box>
@@ -320,6 +326,7 @@ const SignUpInstitution = () => {
                               <TextField
                                 autoComplete="given-name"
                                 name="firstName"
+                                value={values.firstName}
                                 required
                                 fullWidth
                                 id="firstName"
@@ -333,7 +340,8 @@ const SignUpInstitution = () => {
                                 fullWidth
                                 id="lastName"
                                 label="Apellido"
-                                name="adminLastName"
+                                name="lastName"
+                                value={values.lastName}
                                 autoComplete="family-name"
                                 onChange={handleChange}
                               />
@@ -345,6 +353,7 @@ const SignUpInstitution = () => {
                                 id="email"
                                 label="Correo Electronico"
                                 name="email"
+                                value={values.email}
                                 autoComplete="email"
                                 onChange={handleChange}
                               />
@@ -354,6 +363,7 @@ const SignUpInstitution = () => {
                                 required
                                 fullWidth
                                 name="password"
+                                value={values.password}
                                 label="Contraseña"
                                 type="password"
                                 id="password"
@@ -366,6 +376,7 @@ const SignUpInstitution = () => {
                                 required
                                 fullWidth
                                 name="confirmpassword"
+                                value={values.confirmpassword}
                                 label="Confirmar Contraseña"
                                 type="password"
                                 id="confirmpassword"

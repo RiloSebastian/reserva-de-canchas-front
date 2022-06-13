@@ -52,15 +52,23 @@ const useStyles = makeStyles((theme) => ({
   lineHeight: "30px",
 }));
 
-const SchedulerFromTo = () => {
-  const [from, setFrom] = useState(new Date("2020-01-01 8:00"));
-  const [to, setTo] = useState(new Date("2020-01-01 23:00"));
+const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
 
   const classes = useStyles();
 
-  const handleChange = (e) => {};
+  const handleChangeFrom = (e) => {
 
-  useEffect(() => {}, []);
+    handleChangeHorarios(diaYHorarioId, e, to)
+
+  };
+
+  const handleChangeTo = (e) => {
+
+    handleChangeHorarios(diaYHorarioId, from, e)
+
+  };
+
+  useEffect(() => { }, []);
 
   return (
     <Grid container alignItems="center">
@@ -70,7 +78,7 @@ const SchedulerFromTo = () => {
             label="Desde"
             name="from"
             value={from}
-            onChange={handleChange}
+            onChange={handleChangeFrom}
             renderInput={(params) => <TextField {...params} />}
           />
         </Grid>
@@ -79,7 +87,7 @@ const SchedulerFromTo = () => {
             label="Hasta"
             name="to"
             value={to}
-            onChange={handleChange}
+            onChange={handleChangeTo}
             renderInput={(params) => <TextField {...params} />}
             shouldDisableTime={(timeValue, clockType) => {
               if (clockType === "minutes" && timeValue !== from.getMinutes()) {

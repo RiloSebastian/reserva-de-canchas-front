@@ -64,9 +64,6 @@ export const Holidays = (props) => {
 
   const renderPickerDay = (date, selectedDates, pickersDayProps) => {
 
-    console.log("renderPickerDay")
-    console.log(date)
-
     if (!values) {
       return <PickersDay {...pickersDayProps} />;
     }
@@ -82,16 +79,16 @@ export const Holidays = (props) => {
     );
   };
 
-  useEffect(async() => {
+  useEffect(async () => {
 
     const feriados = await FeriadoService.getAllFeriados().then((data) => data);
 
     const array = [];
-    
+
     feriados.forEach(feriado => {
       array.push(moment(new Date(2022, feriado.mes - 1, feriado.dia)).format("YYYY-MM-DD"))
     });
-    
+
     console.log("setValues");
     console.log(array);
     setValues(array)
@@ -127,7 +124,7 @@ export const Holidays = (props) => {
                   }}
                   renderDay={renderPickerDay}
                   renderInput={(params) => <TextField {...params} />}
-                  //inputFormat="'Week of' MMM d"
+                //inputFormat="'Week of' MMM d"
                 />
               </LocalizationProvider>
             </Grid>

@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -12,6 +12,8 @@ import { NonWorkingDays } from "../../components/settings/NonWorkingDays";
 import { OpenAndCloseTimes } from "../../components/settings/OpenAndCloseTimes";
 import { Holidays } from "../../components/settings/Holidays";
 import { ImagesSection } from "../../components/settings/ImagesSection";
+import InstitucionService from "../../services/instituciones/InstitucionService";
+import { ConfirmProvider } from 'material-ui-confirm';
 
 const reducer = (state, action) => {
   console.log("action", action.data);
@@ -32,6 +34,38 @@ const ConfiguracionInstituciones = () => {
   const dispatch = useDispatch();
 
   const configuration = useSelector((state) => state.configuration);
+
+  const handleChanges = () => {
+    console.log("actualizando datos de la institucion")
+
+    try {
+
+      const instititionDetails = InstitucionService.update()
+        .then((data) => data);
+
+
+
+    } catch (error) {
+
+    }
+
+  }
+
+  useEffect(() => {
+    //Obtener detalles de la institucion
+
+    try {
+
+      const instititionDetails = InstitucionService.get("62a655985154182a24d057c8")
+        .then((data) => data);
+
+
+
+    } catch (error) {
+
+    }
+
+  }, []);
 
   return (
     <>
@@ -54,26 +88,22 @@ const ConfiguracionInstituciones = () => {
               <Typography sx={{ mb: 3 }} variant="h4">
                 <InstitutionDetails />
               </Typography>
-              {/*<SettingsNotifications />*/}
 
               <Box sx={{ pt: 3 }}>
-                {/*<SettingsNotifications />*/}
                 <ImagesSection />
               </Box>
               <Box sx={{ pt: 3 }}>
-                {/*<SettingsNotifications />*/}
                 <NonWorkingDays />
               </Box>
               <Box sx={{ pt: 3 }}>
-                {/*<SettingsNotifications />*/}
                 <Holidays />
               </Box>
               <Box sx={{ pt: 3 }}>
-                {/*<SettingsNotifications />*/}
-                <OpenAndCloseTimes />
+                <ConfirmProvider>
+                  <OpenAndCloseTimes />
+                </ConfirmProvider>
               </Box>
               <Box sx={{ pt: 3 }}>
-                {/*<SettingsNotifications />*/}
                 <AdvancePaymentConfig />
               </Box>
             </Container>
