@@ -15,6 +15,12 @@ const getInstitutionSchedules = async (institution_id) => {
         .catch((err) => Promise.reject(err));
 };
 
+const createInstitutionSchedules = async (institution_id, data) => {
+    return await http.post(`/institutions/${institution_id}/schedule`, data)
+        .then((response) => response)
+        .catch((err) => Promise.reject(err));
+};
+
 const create = data => {
     return http.post(`/institutions`, data);
 };
@@ -45,4 +51,5 @@ export default {
     remove,
     removeAll,
     getInstitutionSchedules,
+    createInstitutionSchedules,
 };

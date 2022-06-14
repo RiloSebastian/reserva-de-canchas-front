@@ -59,29 +59,6 @@ const SignIn = (props) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    /*  console.log({
-      username: data.get("username"),
-      password: data.get("password"),
-    });
-
-    localStorage.setItem(
-        "user",
-        JSON.stringify({
-          roles: ["ROLE_ADMIN"],
-        })
-      );
-
-      history.push("/dashboard/reservas");  */
-
-    /* localStorage.setItem(
-        "user",
-        JSON.stringify({
-          roles: ["ROLE_CUSTOMER"],
-        })
-      );
-
-      history.push("/customer/home"); */
 
     try {
       const user = await AuthService.login(
@@ -95,7 +72,19 @@ const SignIn = (props) => {
       if (user.roles[0] === "ROLE_CUSTOMER") {
         history.push("/customer/home");
       } else {
+
+        //setear info de la institucion asociada
+
+        console.log("Abrir dashboard");
+
+        console.log("obteniendo la info de la institucion para dejarlo en el store");
+
+
+
         history.push("/dashboard/reservas");
+
+
+
       }
     } catch (err) {
       console.error("error al obtener usuario");
