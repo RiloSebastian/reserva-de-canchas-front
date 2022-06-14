@@ -33,7 +33,7 @@ const ConfiguracionInstituciones = () => {
 
   const dispatch = useDispatch();
 
-  const configuration = useSelector((state) => state.configuration);
+  const instititionDetails = useSelector((state) => state.institution);
 
   const handleChanges = () => {
     console.log("actualizando datos de la institucion")
@@ -51,7 +51,7 @@ const ConfiguracionInstituciones = () => {
 
   }
 
-  useEffect(() => {
+  /* useEffect(() => {
     //Obtener detalles de la institucion
 
     try {
@@ -65,7 +65,7 @@ const ConfiguracionInstituciones = () => {
 
     }
 
-  }, []);
+  }, []); */
 
   return (
     <>
@@ -100,7 +100,7 @@ const ConfiguracionInstituciones = () => {
               </Box>
               <Box sx={{ pt: 3 }}>
                 <ConfirmProvider>
-                  <OpenAndCloseTimes />
+                  <OpenAndCloseTimes institution_id={instititionDetails.id} />
                 </ConfirmProvider>
               </Box>
               <Box sx={{ pt: 3 }}>

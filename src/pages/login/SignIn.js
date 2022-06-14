@@ -14,6 +14,9 @@ import AppAppBar from "./../home/modules/views/AppAppBar";
 import AuthService from "../../services/auth.service";
 
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
+import InstitucionService from "../../services/instituciones/InstitucionService";
+import { useDispatch } from "react-redux";
+import { get } from "../../actions/institution";
 
 function Copyright(props) {
   return (
@@ -44,6 +47,8 @@ const rightLink = {
 const SignIn = (props) => {
   let history = useHistory();
 
+  const dispatch = useDispatch()
+
   const [showMessageError, setShowMessageError] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -59,29 +64,6 @@ const SignIn = (props) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    /*  console.log({
-      username: data.get("username"),
-      password: data.get("password"),
-    });
-
-    localStorage.setItem(
-        "user",
-        JSON.stringify({
-          roles: ["ROLE_ADMIN"],
-        })
-      );
-
-      history.push("/dashboard/reservas");  */
-
-    /* localStorage.setItem(
-        "user",
-        JSON.stringify({
-          roles: ["ROLE_CUSTOMER"],
-        })
-      );
-
-      history.push("/customer/home"); */
 
     try {
       const user = await AuthService.login(
@@ -95,7 +77,27 @@ const SignIn = (props) => {
       if (user.roles[0] === "ROLE_CUSTOMER") {
         history.push("/customer/home");
       } else {
-        history.push("/dashboard/reservas");
+
+        //setear info de la institucion asociada
+
+        try {
+          console.log("Abrir dashboard");
+
+          console.log("obteniendo la info de la institucion para dejarlo en el store");
+
+          dispatch(get("62a68d435a47b044aebbe512"))
+
+          /* const institutionDetails = await InstitucionService.get("62a68d435a47b044aebbe512")
+            .then(data => data);
+
+          console.log(institutionDetails); */
+
+          history.push("/dashboard/reservas");
+
+        } catch (error) {
+          console.log("Catcheando el error de la institucion");
+          console.log(error);
+        }
       }
     } catch (err) {
       console.error("error al obtener usuario");

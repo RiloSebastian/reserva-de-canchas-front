@@ -1,26 +1,32 @@
 import { GET_INSTITUTION, UPDATE_INSTITUTION } from "../actions/types";
 
 const initialState = {
-  name: "Palermo Tenis",
+  id: "",
+  name: "",
   address: {
-    langAddress: "Honduras 5460",
+    langAddress: "",
     geometry: {
       coordinates: [0, 0],
       type: "Point",
     },
   },
-  email: "palermotenis@email.com",
-  phone: "1146584589",
-  manager: "Pepito",
+  email: "",
+  phone: "",
+  manager: "",
 };
 
 export default function (state = initialState, action) {
   const { type, payload } = action;
 
+  console.log("En el dispatch de Institucion")
+  console.log("type: " + type)
+  console.log("payload")
+  console.log(payload)
+
   switch (type) {
     case GET_INSTITUTION:
       return {
-        ...state,
+        institution: payload
       };
     case UPDATE_INSTITUTION:
       return {

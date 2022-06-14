@@ -60,7 +60,7 @@ function getStyles(day1, day, theme) {
   };
 }
 
-export const OpenAndCloseTimes = ({ props, state, setHorariosYPrecios }) => {
+export const OpenAndCloseTimes = ({ props, state, setHorariosYPrecios, institution_id }) => {
 
   const confirm = useConfirm();
 
@@ -174,14 +174,6 @@ export const OpenAndCloseTimes = ({ props, state, setHorariosYPrecios }) => {
       return day;
     })
     setDiasYHorarios(diasYHorariosUpdated);
-  }
-
-  const handleSubmitSchedules = () => {
-    console.log("subiendo horarios de la institucion")
-
-    const data = handleAddDaysAvailable();
-
-    console.log(data)
   }
 
   useEffect(async () => {
@@ -307,6 +299,22 @@ export const OpenAndCloseTimes = ({ props, state, setHorariosYPrecios }) => {
       })
       .catch(() => console.log("Deletion cancelled."));
   };
+
+  const handleSubmitSchedules = () => {
+    console.log("subiendo horarios de la institucion")
+
+    const data = handleAddDaysAvailable();
+
+    try {
+
+      const schedulesCreated = InstitucionService.createInstitutionSchedules(institution_id, data);
+
+
+    } catch (error) {
+
+    }
+
+  }
 
   return (
     <form autoComplete="off" noValidate {...props}>

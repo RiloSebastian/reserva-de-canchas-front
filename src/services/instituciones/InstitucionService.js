@@ -5,12 +5,20 @@ const getAll = () => {
     return http.get(`/institutions`);
 };
 
-const get = (institution_id) => {
-    return http.get(`/institutions/${institution_id}`);
+const get = async (institution_id) => {
+    return await http.get(`/institutions/${institution_id}`)
+        .then((response) => response.data)
+        .catch((err) => Promise.reject(err));;
 };
 
 const getInstitutionSchedules = async (institution_id) => {
     return await http.get(`/institutions/${institution_id}/schedule`)
+        .then((response) => response)
+        .catch((err) => Promise.reject(err));
+};
+
+const createInstitutionSchedules = async (institution_id, data) => {
+    return await http.post(`/institutions/${institution_id}/schedule`, data)
         .then((response) => response)
         .catch((err) => Promise.reject(err));
 };
@@ -31,12 +39,6 @@ const removeAll = () => {
     return http.delete(`/institutions`);
 };
 
-/*
-const findByTitle = title => {
-    return http.get(`/tutorials?title=${title}`);
-};
-*/
-
 export default {
     getAll,
     get,
@@ -45,4 +47,5 @@ export default {
     remove,
     removeAll,
     getInstitutionSchedules,
+    createInstitutionSchedules,
 };
