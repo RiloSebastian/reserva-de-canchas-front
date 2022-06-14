@@ -18,10 +18,15 @@ const initialState = {
 export default function (state = initialState, action) {
   const { type, payload } = action;
 
+  console.log("En el dispatch de Institucion")
+  console.log("type: " + type)
+  console.log("payload")
+  console.log(payload)
+
   switch (type) {
     case GET_INSTITUTION:
       return {
-        ...state,
+        institution: payload
       };
     case UPDATE_INSTITUTION:
       return {

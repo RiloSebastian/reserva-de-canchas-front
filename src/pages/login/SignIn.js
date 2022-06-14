@@ -14,6 +14,9 @@ import AppAppBar from "./../home/modules/views/AppAppBar";
 import AuthService from "../../services/auth.service";
 
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
+import InstitucionService from "../../services/instituciones/InstitucionService";
+import { useDispatch } from "react-redux";
+import { get } from "../../actions/institution";
 
 function Copyright(props) {
   return (
@@ -43,6 +46,8 @@ const rightLink = {
 
 const SignIn = (props) => {
   let history = useHistory();
+
+  const dispatch = useDispatch()
 
   const [showMessageError, setShowMessageError] = useState(false);
 
@@ -75,16 +80,24 @@ const SignIn = (props) => {
 
         //setear info de la institucion asociada
 
-        console.log("Abrir dashboard");
+        try {
+          console.log("Abrir dashboard");
 
-        console.log("obteniendo la info de la institucion para dejarlo en el store");
+          console.log("obteniendo la info de la institucion para dejarlo en el store");
 
+          dispatch(get("62a68d435a47b044aebbe512"))
 
+          /* const institutionDetails = await InstitucionService.get("62a68d435a47b044aebbe512")
+            .then(data => data);
 
-        history.push("/dashboard/reservas");
+          console.log(institutionDetails); */
 
+          history.push("/dashboard/reservas");
 
-
+        } catch (error) {
+          console.log("Catcheando el error de la institucion");
+          console.log(error);
+        }
       }
     } catch (err) {
       console.error("error al obtener usuario");

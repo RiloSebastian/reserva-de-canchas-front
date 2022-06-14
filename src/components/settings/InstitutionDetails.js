@@ -11,6 +11,22 @@ import {
   TextField,
 } from "@mui/material";
 import ComboBox from "../ui/ComboBox";
+import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
+
+const themeTextArea = createTheme({
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        multiline: {
+          fontWeight: "bold",
+          fontSize: "20px",
+          color: "purple",
+          width: "50vw",
+        },
+      },
+    },
+  },
+});
 
 const states = [
   {
@@ -28,7 +44,7 @@ const states = [
 ];
 
 export const InstitutionDetails = (props) => {
-  const institutionDetails = useSelector((state) => state.institution);
+  const { institution } = useSelector((state) => state.institution);
 
   /* const [values, setValues] = useState({
     firstName: "Palermo Tenis",
@@ -46,7 +62,11 @@ export const InstitutionDetails = (props) => {
     }); */
   };
 
-  useEffect(() => { }, []);
+  useEffect(() => {
+
+    console.log("renderizando componente para los detalles de la institucion")
+    console.log(institution)
+  }, []);
 
   return (
     <form autoComplete="off" noValidate {...props}>
@@ -66,7 +86,7 @@ export const InstitutionDetails = (props) => {
                 name="institution_name"
                 onChange={handleChange}
                 required
-                value={institutionDetails.name}
+                value={institution.name}
                 variant="outlined"
               />
             </Grid>
@@ -78,7 +98,7 @@ export const InstitutionDetails = (props) => {
                 fullWidth
                 id="address"
                 label="Direccion de la Institucion"
-                value={institutionDetails.address}
+                value={institution.address}
                 onChange={handleChange}
               />
             </Grid>
@@ -89,7 +109,7 @@ export const InstitutionDetails = (props) => {
                 name="email"
                 onChange={handleChange}
                 required
-                value={institutionDetails.email}
+                value={institution.email}
                 variant="outlined"
               />
             </Grid>
@@ -99,9 +119,26 @@ export const InstitutionDetails = (props) => {
                 label="Numero de Telefono"
                 name="phone"
                 onChange={handleChange}
-                value={institutionDetails.phone}
+                value={institution.institutionTel}
                 variant="outlined"
               />
+            </Grid>
+            <Grid item md={6} xs={12}>
+              <ThemeProvider theme={themeTextArea}>
+                <TextField
+                  autoComplete="given-name"
+                  multiline
+                  rows={5}
+                  name="description"
+                  value={institution.description}
+                  required
+                  variant="outlined"
+                  fullWidth
+                  id="description"
+                  label="Dejanos una breve descripcion de la Institucion"
+                //onChange={handleInstitutionChange}
+                />
+              </ThemeProvider>
             </Grid>
           </Grid>
         </CardContent>
