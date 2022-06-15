@@ -10,28 +10,31 @@ const initialState = {
       type: "Point",
     },
   },
+  description: "",
   email: "",
-  phone: "",
+  institutionTel: "",
   manager: "",
 };
 
 export default function (state = initialState, action) {
   const { type, payload } = action;
 
-  console.log("En el dispatch de Institucion")
-  console.log("type: " + type)
-  console.log("payload")
+  console.log("actualizando intitucion")
   console.log(payload)
 
   switch (type) {
     case GET_INSTITUTION:
       return {
-        institution: payload
+        ...state,
+        id: payload.id,
+        name: payload.name,
+        description: payload.description,
+        institutionTel: payload.institutionTel,
       };
     case UPDATE_INSTITUTION:
       return {
         ...state,
-        isLoggedIn: false,
+        [payload.type]: payload.data
       };
     default:
       return state;

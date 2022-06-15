@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Button,
@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import ComboBox from "../ui/ComboBox";
 import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
+import { change } from "../../actions/institution";
 
 const themeTextArea = createTheme({
   components: {
@@ -44,22 +45,11 @@ const states = [
 ];
 
 export const InstitutionDetails = (props) => {
-  const { institution } = useSelector((state) => state.institution);
+  const institution = useSelector((state) => state.institution);
+  const dispatch = useDispatch()
 
-  /* const [values, setValues] = useState({
-    firstName: "Palermo Tenis",
-    address: "Honduras 5460",
-    email: "palermotenis@email.com",
-    phone: "1146584589",
-    state: "Alabama",
-    country: "USA",
-  }); */
-
-  const handleChange = (event) => {
-    /* setValues({
-      ...values,
-      [event.target.name]: event.target.value,
-    }); */
+  const handleChange = (e) => {
+    dispatch(change({ type: e.target.name, data: e.target.value }));
   };
 
   useEffect(() => {
@@ -83,7 +73,7 @@ export const InstitutionDetails = (props) => {
                 fullWidth
                 helperText="Por favor, especifique su nombre"
                 label="Nombre de la Institucion"
-                name="institution_name"
+                name="name"
                 onChange={handleChange}
                 required
                 value={institution.name}
@@ -136,6 +126,7 @@ export const InstitutionDetails = (props) => {
                   fullWidth
                   id="description"
                   label="Dejanos una breve descripcion de la Institucion"
+                  onChange={handleChange}
                 //onChange={handleInstitutionChange}
                 />
               </ThemeProvider>

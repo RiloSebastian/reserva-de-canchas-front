@@ -124,6 +124,8 @@ const SignUp = () => {
       console.log("usuario Creado");
       console.log(registerUser);
 
+      //pegarle al endpo email
+
       history.push({
         pathname: "/account-confirmation",
         state: data.get("firstName"),

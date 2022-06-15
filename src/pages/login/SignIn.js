@@ -16,7 +16,7 @@ import AuthService from "../../services/auth.service";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 import InstitucionService from "../../services/instituciones/InstitucionService";
 import { useDispatch } from "react-redux";
-import { get } from "../../actions/institution";
+import { getByAdminEmail } from "../../actions/institution";
 
 function Copyright(props) {
   return (
@@ -85,12 +85,7 @@ const SignIn = (props) => {
 
           console.log("obteniendo la info de la institucion para dejarlo en el store");
 
-          dispatch(get("62a68d435a47b044aebbe512"))
-
-          /* const institutionDetails = await InstitucionService.get("62a68d435a47b044aebbe512")
-            .then(data => data);
-
-          console.log(institutionDetails); */
+          dispatch(getByAdminEmail(data.get("username")))
 
           history.push("/dashboard/reservas");
 

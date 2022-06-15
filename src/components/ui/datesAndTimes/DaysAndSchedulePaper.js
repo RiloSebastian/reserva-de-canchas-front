@@ -67,6 +67,15 @@ const DaysAndSchedulePaper = ({
                 <p>Horarios</p>
                 <SchedulerFromTo handleChangeHorarios={handleChangeHorarios} diaYHorarioId={diaYHorario.id} from={diaYHorario.horario.from} to={diaYHorario.horario.to} />
               </Box>
+              <Box textAlign="center" sx={{ mt: 2, pb: 2 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<AddCircleOutlineIcon />}
+                //onClick={() => handleAddNewSchedule(key)}
+                >
+                  Agregar Mas Horarios
+                </Button>
+              </Box>
             </Grid>
           </Grid>
         </Grid>

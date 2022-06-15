@@ -25,6 +25,7 @@ const login = async (username, password) => {
 
 const logout = () => {
   localStorage.removeItem("user");
+  localStorage.removeItem("persist-key");
 };
 
 const register = async (firstName, lastName, userRole, email, password) => {

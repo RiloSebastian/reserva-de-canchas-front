@@ -193,15 +193,34 @@ const SignUpInstitution = () => {
       });
     } catch (err) {
       console.error("error al crear admin e institucion");
-      handleMessageError(
-        Object.values(err.data).map((error, idx) => (
-          <Fragment key={error}>
-            {<br />}
-            {error}
-            {<br />}
-          </Fragment>
-        ))
-      );
+      console.error(err);
+
+      if (err.data === undefined || err.data === null) {
+
+        handleMessageError(
+          Object.values(err).map((error, idx) => (
+            <Fragment key={error}>
+              {<br />}
+              {error}
+              {<br />}
+            </Fragment>
+          ))
+        );
+
+      } else {
+        handleMessageError(
+          Object.values(err.data).map((error, idx) => (
+            <Fragment key={error}>
+              {<br />}
+              {error}
+              {<br />}
+            </Fragment>
+          ))
+        );
+      }
+
+
+
       setShowMessageError(true);
     }
   };
