@@ -21,6 +21,7 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
+//import { TextField } from "@material-ui/core";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -34,6 +35,21 @@ import InstitucionService from "../../services/instituciones/InstitucionService"
 import GeoLocalizacionService from "../../services/geolocalizacion/GeoLocalizacionService";
 import ComboBox from "../../components/ui/ComboBox";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
+
+import IconButton from '@mui/material/IconButton';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from '@mui/material/FormControl';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import FormHelperText from '@mui/material/FormHelperText';
+import EmailService from "../../services/email/EmailService";
+
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
+import es from 'react-phone-input-2/lang/es.json'
+
 
 const themeTextArea = createTheme({
   components: {
@@ -81,24 +97,6 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-/* const reducer = (state, action) => {
-  console.log("action", action.data);
-  switch (action.type) {
-    case "institutionTel":
-      return { ...state, institutionTel: formatTelephoneNumber(action.data) };
-    case "expDate":
-      return { ...state, expDate: formatExpirationDate(action.data) };
-    case "securityCode": {
-      console.log("securityCode", action.data);
-      return { ...state, securityCode: formatCVC(action.data) };
-    }
-    case "cardOwner":
-      return { ...state, cardOwner: action.data };
-    default:
-      return state;
-  }
-}; */
-
 const SignUpInstitution = () => {
   let history = useHistory();
 
@@ -110,12 +108,24 @@ const SignUpInstitution = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [values, setValues] = useState({
-    firstName: "",
-    lastName: "",
-    userRole: "ROLE_ADMIN",
-    email: "",
-    password: "",
-    confirmpassword: "",
+    name: "",
+    address: {
+      geometry: {
+        coordinates: ["", ""],
+        type: "Point",
+      },
+      langAddress: "",
+    },
+    institutionTel: "",
+    description: "",
+    firstName: '',
+    lastName: '',
+    userRole: 'ROLE_ADMIN',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    showPassword: false,
+    showConfirmPassword: false,
   });
 
   const [institutionData, setInstitutionData] = useState({
@@ -131,6 +141,17 @@ const SignUpInstitution = () => {
     description: "",
   });
 
+  const [errors, setErrors] = useState({
+    firstName: '',
+    lastName: '',
+    userRole: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    showPassword: false,
+    showConfirmPassword: false,
+  });
+
   const [open, setOpen] = useState(false);
 
   const [addressObtained, setAddressObtained] = useState([]);
@@ -138,6 +159,24 @@ const SignUpInstitution = () => {
   const handleClose = () => {
     setShowMessageError(false);
   };
+
+  const handleOnChange = (value) => {
+    console.log("Actualizando numero de telefono")
+    console.log("[institutionTel]: " + value)
+
+    setErrors(prevState => {
+      return {
+        ...prevState,
+        institutionTel: validate("institutionTel", value)
+      };
+    });
+    setValues(prevState => {
+      return {
+        ...prevState,
+        institutionTel: value
+      };
+    });
+  }
 
   const handleMessageError = (message) => {
     setErrorMessage(message);
@@ -161,6 +200,119 @@ const SignUpInstitution = () => {
     });
 
   };
+
+  const handleClickShowPassword = () => {
+    setValues({
+      ...values,
+      showPassword: !values.showPassword,
+    });
+  };
+
+  const handleClickShowConfirmPassword = () => {
+    setValues({
+      ...values,
+      showConfirmPassword: !values.showConfirmPassword,
+    });
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const validate = (name, value) => {
+    switch (name) {
+      case "name":
+        if (!value || value.trim() === "") {
+          return "Nombre de la Institución es Requerido";
+        } else {
+          return "";
+        }
+      case "firstName":
+        if (!value || value.trim() === "") {
+          return "Nombre es Requerido";
+        } else {
+          return "";
+        }
+      case "lastName":
+        if (!value || value.trim() === "") {
+          return "Apellido es Requerido";
+        } else {
+          return "";
+        }
+      case "email":
+        if (!value) {
+          return "Email es Requerido";
+        } else if (
+          !value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)
+        ) {
+          return "Introduzca una dirección de correo electrónico válida";
+        } else {
+          return "";
+        }
+      case "institutionTel":
+        if (!value || value.trim() === "") {
+          return "Número de Telefono es Requerido";
+        } else if (!value.match(/^[6-9]\d{9}$/)) {
+          return "Introduce un número de Teléfono válido.";
+        } else {
+          return "";
+        }
+      case "description":
+        if (!value || value.trim() === "") {
+          return "La Descripción de la Institución es Requerida";
+        } else {
+          return "";
+        }
+      case "password":
+        if (!value) {
+          return "La Contraseña es Requerida";
+        } else if (value.length < 6) {
+          return "Por favor complete con al menos 6 caracteres";
+        } else if (!value.match(/[a-z]/g)) {
+          return "Por favor, Ingrese al menos una minúscula.";
+        } else if (!value.match(/[A-Z]/g)) {
+          return "Por favor, Ingrese al menos una mayúscula.";
+        } else if (!value.match(/[0-9]/g)) {
+          return "Por favor, Ingrese al menos valor numérico.";
+        } else if (!value.match(/[!@#&:;'.,?_/*~$^=<>\(\)–\[\{}\]\+]/g)) {
+          return "Por favor, Ingrese al menos un caracter especial.";
+        } else {
+          return "";
+        }
+      case "confirmPassword":
+        if (!value) {
+          return "Confirmar Contraseña es requerido";
+        } else if (value !== values.password) {
+          return "Nueva contraseña y Confirmar Contraseña deben ser Iguales";
+        } else {
+          return "";
+        }
+      default: {
+        return "";
+      }
+    }
+  };
+
+  const handleUserInput = e => {
+
+    console.log("handleUserInput")
+    console.log("[e.target.name]: " + [e.target.name] + " [e.target.value]: " + [e.target.value])
+    console.log("handleUserInput")
+
+    setErrors(prevState => {
+      return {
+        ...prevState,
+        [e.target.name]: validate(e.target.name, e.target.value)
+      };
+    });
+    setValues(prevState => {
+      return {
+        ...prevState,
+        [e.target.name]: e.target.value
+      };
+    });
+  };
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -268,12 +420,15 @@ const SignUpInstitution = () => {
                         <TextField
                           required
                           fullWidth
-                          value={institutionData.name}
+                          value={values.name}
                           id="name"
                           label="Nombre de la Institucion"
                           name="name"
                           autoComplete="Nombre de la Institucion"
-                          onChange={handleInstitutionChange}
+                          onChange={handleUserInput}
+                          onBlur={handleUserInput}
+                          helperText={errors.name}
+                          error={errors.name}
                         />
                       </Grid>
                     </Grid>
@@ -293,6 +448,8 @@ const SignUpInstitution = () => {
                       label="Direccion de la Institucion"
                       institutionData={institutionData}
                       setInstitutionData={setInstitutionData}
+                      helperText={errors.address}
+                      error={errors.address}
                     />
 
                     <Box mt="1em" />
@@ -301,16 +458,39 @@ const SignUpInstitution = () => {
                       Telefono
                     </Typography>
 
-                    <TextField
+
+                    <Grid container spacing={2}>
+                      <Grid item xs={12}>
+                        <PhoneInput
+                          inputStyle={{
+                            width: "100%",
+                            height: "54px",
+                            fontSize: "18px",
+                            paddingLeft: "48px",
+                            borderRadius: "5px"
+                          }}
+                          localization={es}
+                          country='ar'
+                          enableAreaCodes={['ar']}
+                          enableAreaCodeStretch={true}
+                          onlyCountries={['ar']}
+                          masks={{ ar: '(..) ....-....' }}
+                          onChange={handleOnChange} />
+                      </Grid>
+                    </Grid>
+                    {/* <TextField
                       autoComplete="given-name"
                       name="institutionTel"
-                      value={institutionData.institutionTel}
+                      value={values.institutionTel}
                       required
                       fullWidth
                       id="institutionTel"
                       label="Telefono de la Institucion"
-                      onChange={handleInstitutionChange}
-                    />
+                      onChange={handleUserInput}
+                      onBlur={handleUserInput}
+                      helperText={errors.institutionTel}
+                      error={errors.institutionTel}
+                    /> */}
                     <Box sx={{ m: 1 }} />
                     <Typography variant="h6" gutterBottom>
                       Descripcion
@@ -322,13 +502,16 @@ const SignUpInstitution = () => {
                         multiline
                         rows={5}
                         name="description"
-                        value={institutionData.description}
+                        value={values.description}
                         required
                         variant="outlined"
                         fullWidth
                         id="description"
                         label="Dejanos una breve descripcion de la Institucion"
-                        onChange={handleInstitutionChange}
+                        onChange={handleUserInput}
+                        onBlur={handleUserInput}
+                        helperText={errors.description}
+                        error={errors.description}
                       />
                     </ThemeProvider>
                   </Box>
@@ -350,7 +533,10 @@ const SignUpInstitution = () => {
                                 fullWidth
                                 id="firstName"
                                 label="Nombre"
-                                onChange={handleChange}
+                                onChange={handleUserInput}
+                                onBlur={handleUserInput}
+                                helperText={errors.firstName}
+                                error={errors.firstName}
                               />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -362,7 +548,10 @@ const SignUpInstitution = () => {
                                 name="lastName"
                                 value={values.lastName}
                                 autoComplete="family-name"
-                                onChange={handleChange}
+                                onChange={handleUserInput}
+                                onBlur={handleUserInput}
+                                helperText={errors.lastName}
+                                error={errors.lastName}
                               />
                             </Grid>
                             <Grid item xs={12}>
@@ -374,34 +563,66 @@ const SignUpInstitution = () => {
                                 name="email"
                                 value={values.email}
                                 autoComplete="email"
-                                onChange={handleChange}
+                                onChange={handleUserInput}
+                                onBlur={handleUserInput}
+                                helperText={errors.email}
+                                error={errors.email}
                               />
                             </Grid>
                             <Grid item xs={12}>
-                              <TextField
-                                required
-                                fullWidth
-                                name="password"
-                                value={values.password}
-                                label="Contraseña"
-                                type="password"
-                                id="password"
-                                autoComplete="new-password"
-                                onChange={handleChange}
-                              />
+                              <FormControl error={errors.password} fullWidth variant="outlined">
+                                <InputLabel required htmlFor="outlined-adornment-password">Contraseña</InputLabel>
+                                <OutlinedInput
+                                  id="outlined-adornment-password"
+                                  type={values.showPassword ? 'text' : 'password'}
+                                  value={values.password}
+                                  //onChange={handleChange('password')}
+                                  onChange={handleUserInput}
+                                  onBlur={handleUserInput}
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                      >
+                                        {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                                      </IconButton>
+                                    </InputAdornment>
+                                  }
+                                  label="Contraseña"
+                                  name="password"
+                                />
+                                <FormHelperText >{errors.password}</FormHelperText>
+                              </FormControl>
                             </Grid>
                             <Grid item xs={12}>
-                              <TextField
-                                required
-                                fullWidth
-                                name="confirmpassword"
-                                value={values.confirmpassword}
-                                label="Confirmar Contraseña"
-                                type="password"
-                                id="confirmpassword"
-                                autoComplete="new-password"
-                                onChange={handleChange}
-                              />
+                              <FormControl error={errors.confirmPassword} fullWidth variant="outlined">
+                                <InputLabel required htmlFor="outlined-adornment-password">Confirmar Contraseña</InputLabel>
+                                <OutlinedInput
+                                  id="outlined-adornment-password"
+                                  type={values.showConfirmPassword ? 'text' : 'password'}
+                                  value={values.confirmPassword}
+                                  onChange={handleUserInput}
+                                  onBlur={handleUserInput}
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowConfirmPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                      >
+                                        {values.showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                      </IconButton>
+                                    </InputAdornment>
+                                  }
+                                  label="Confirmar Contraseña"
+                                  name="confirmPassword"
+                                />
+                                <FormHelperText>{errors.confirmPassword}</FormHelperText>
+                              </FormControl>
                             </Grid>
                           </Grid>
                         </Box>
