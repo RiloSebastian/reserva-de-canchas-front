@@ -242,7 +242,7 @@ const SignUp = () => {
 
         history.push({
           pathname: "/account-confirmation",
-          state: data.get("firstName"),
+          state: registerUser,
         });
       } catch (err) {
         console.error("error al registrar usuario");
