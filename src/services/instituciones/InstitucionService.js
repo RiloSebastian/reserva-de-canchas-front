@@ -11,6 +11,12 @@ const get = async (institution_id) => {
         .catch((err) => Promise.reject(err));;
 };
 
+const getByAdminEmail = async (admin_email) => {
+    return await http.get(`/institutions/admin/${admin_email}`)
+        .then((response) => response.data)
+        .catch((err) => Promise.reject(err));;
+};
+
 const getInstitutionSchedules = async (institution_id) => {
     return await http.get(`/institutions/${institution_id}/schedule`)
         .then((response) => response)
@@ -42,6 +48,7 @@ const removeAll = () => {
 export default {
     getAll,
     get,
+    getByAdminEmail,
     create,
     update,
     remove,

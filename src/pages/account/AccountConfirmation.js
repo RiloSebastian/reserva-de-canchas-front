@@ -5,6 +5,7 @@ import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import { useHistory } from "react-router-dom";
+import EmailService from "../../services/email/EmailService";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -28,17 +29,38 @@ export default function AccountConfirmation(props) {
 
   let history = useHistory();
 
-  const [name, setName] = useState(history.location.state);
+  const [user, setUser] = useState(history.location.state);
 
   const content = {
-    header: `${name}, Ya casi terminamos...`,
+    header: `${user ? user.name : "Usuario"}, Ya casi terminamos...`,
     description:
       "Para completar el alta de tu cuenta, por favor, dirigite a la casilla de correo que agregaste previamente y hace click en el link que te enviamos para Activar tu cuenta.",
     "primary-action": "Volver al LogIn",
+    "secondary-action": "Reenviar Correo de Confirmacion",
     ...props.content,
   };
 
   const renderLogin = () => {
+    history.push("/login");
+  };
+
+  const resendConfirmationEmail = async () => {
+
+    //Reenviar email de confirmacion
+
+    try {
+
+      const emailSended = await EmailService.sendVerificationEmail(user.email)
+        .then(data => data);
+
+
+
+    } catch (error) {
+      console.log("Error al reenviar el correo de confirmacion")
+      console.log(error)
+    }
+
+
     history.push("/login");
   };
 
@@ -71,6 +93,14 @@ export default function AccountConfirmation(props) {
           className={classes.action}
         >
           {content["primary-action"]}
+        </Button>
+        <Button
+          onClick={resendConfirmationEmail}
+          variant="contained"
+          color="secondary"
+          className={classes.action}
+        >
+          {content["secondary-action"]}
         </Button>
       </Container>
     </Box>

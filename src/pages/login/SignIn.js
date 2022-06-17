@@ -16,7 +16,8 @@ import AuthService from "../../services/auth.service";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 import InstitucionService from "../../services/instituciones/InstitucionService";
 import { useDispatch } from "react-redux";
-import { get } from "../../actions/institution";
+import { getByAdminEmail } from "../../actions/institution";
+import EmailService from "../../services/email/EmailService";
 
 function Copyright(props) {
   return (
@@ -85,12 +86,7 @@ const SignIn = (props) => {
 
           console.log("obteniendo la info de la institucion para dejarlo en el store");
 
-          dispatch(get("62a68d435a47b044aebbe512"))
-
-          /* const institutionDetails = await InstitucionService.get("62a68d435a47b044aebbe512")
-            .then(data => data);
-
-          console.log(institutionDetails); */
+          dispatch(getByAdminEmail(data.get("username")))
 
           history.push("/dashboard/reservas");
 
@@ -103,8 +99,22 @@ const SignIn = (props) => {
       console.error("error al obtener usuario");
       console.log(err);
 
-      handleMessageError(err.data.error);
-      setShowMessageError(true);
+      if (err.data.error === "Esta cuenta no esta habilitada") {
+        //Renviar link de confirmacion
+        console.error("La cuenta no esta habilidata - reenviar correo");
+
+        const emailReSended = await EmailService.sendVerificationEmail(data.get("username"))
+          .then(data => data);
+
+        handleMessageError(`${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`);
+        setShowMessageError(true);
+
+      } else {
+        handleMessageError(err.data.error);
+        setShowMessageError(true);
+      }
+
+
     }
   };
 

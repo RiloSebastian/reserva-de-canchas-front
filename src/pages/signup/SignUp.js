@@ -20,36 +20,18 @@ import AuthService from "../../services/auth.service";
 import AppAppBar from "../home/modules/views/AppAppBar";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 
+import IconButton from '@mui/material/IconButton';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from '@mui/material/FormControl';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import FormHelperText from '@mui/material/FormHelperText';
+import EmailService from "../../services/email/EmailService";
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-const tiposDeUsuarios = [
-  {
-    key: "ROLE_CUSTOMER",
-    name: "Cliente",
-  },
-  {
-    key: "ROLE_ADMIN",
-    name: "Administrador de Institucion",
-  },
-];
-
-function getStyles(name, tipoUsuario, theme) {
-  return {
-    fontWeight:
-      tipoUsuario.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
 
 function Copyright(props) {
   return (
@@ -75,15 +57,32 @@ const SignUp = () => {
   let history = useHistory();
 
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+
+  const [values, setValues] = useState({
+    firstName: '',
+    lastName: '',
+    userRole: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    showPassword: false,
+    showConfirmPassword: false,
+  });
+
+  const [errors, setErrors] = useState({
+    firstName: '',
+    lastName: '',
+    userRole: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    showPassword: false,
+    showConfirmPassword: false,
+  });
 
   const [showMessageError, setShowMessageError] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
-
-  const [tipoUsuario, setTipoUsuario] = useState([]);
-
-  const [open, setOpen] = useState(false);
 
   const handleMessageError = (message) => {
     setErrorMessage(message);
@@ -93,18 +92,186 @@ const SignUp = () => {
     setShowMessageError(false);
   };
 
-  const handleOpen = () => {
-    setOpen(true);
+  const handleClickShowPassword = () => {
+    setValues({
+      ...values,
+      showPassword: !values.showPassword,
+    });
   };
 
-  const handleChange = (event) => {
-    console.log(event.target);
-    setTipoUsuario(event.target.value);
+  const handleClickShowConfirmPassword = () => {
+    setValues({
+      ...values,
+      showConfirmPassword: !values.showConfirmPassword,
+    });
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const validate = (name, value) => {
+    switch (name) {
+      case "firstName":
+        if (!value || value.trim() === "") {
+          return "Nombre es Requerido";
+        } else {
+          return "";
+        }
+      case "lastName":
+        if (!value || value.trim() === "") {
+          return "Apellido es Requerido";
+        } else {
+          return "";
+        }
+      case "email":
+        if (!value) {
+          return "Email es Requerido";
+        } else if (
+          !value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)
+        ) {
+          return "Introduzca una dirección de correo electrónico válida";
+        } else {
+          return "";
+        }
+      /* case "mobile":
+        if (!value || value.trim() === "") {
+          return "Mobile number is Required";
+        } else if (!value.match(/^[6-9]\d{9}$/)) {
+          return "Enter a valid mobile number.";
+        } else {
+          return "";
+        } */
+      case "password":
+        if (!value) {
+          return "La Contraseña es Requerida";
+        } else if (value.length < 6) {
+          return "Por favor complete con al menos 6 caracteres";
+        } else if (!value.match(/[a-z]/g)) {
+          return "Por favor, Ingrese al menos una minúscula.";
+        } else if (!value.match(/[A-Z]/g)) {
+          return "Por favor, Ingrese al menos una mayúscula.";
+        } else if (!value.match(/[0-9]/g)) {
+          return "Por favor, Ingrese al menos valor numérico.";
+        } else if (!value.match(/[!@#&:;'.,?_/*~$^=<>\(\)–\[\{}\]\+]/g)) {
+          return "Por favor, Ingrese al menos un caracter especial.";
+        } else {
+          return "";
+        }
+      case "confirmPassword":
+        if (!value) {
+          return "Confirmar Contraseña es requerido";
+        } else if (value !== values.password) {
+          return "Nueva contraseña y Confirmar Contraseña deben ser Iguales";
+        } else {
+          return "";
+        }
+      default: {
+        return "";
+      }
+    }
+  };
+
+  const handleUserInput = e => {
+
+    console.log("handleUserInput")
+    console.log("[e.target.name]: " + [e.target.name] + " [e.target.value]: " + [e.target.value])
+    console.log("handleUserInput")
+
+    setErrors(prevState => {
+      return {
+        ...prevState,
+        [e.target.name]: validate(e.target.name, e.target.value)
+      };
+    });
+    setValues(prevState => {
+      return {
+        ...prevState,
+        [e.target.name]: e.target.value
+      };
+    });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+
+    //Validar la DATA
+
+
+    let validationErrors = {};
+
+    Object.keys(values).forEach(name => {
+      const error = validate(name, values[name]);
+      if (error && error.length > 0) {
+        validationErrors[name] = error;
+      }
+    });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors({ errors: validationErrors });
+      return;
+    }
+    if (values.firstName && values.email && values.password) {
+      const data = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+        userRole: "ROLE_CUSTOMER",
+      };
+
+      console.log("----data----", data);
+
+
+      try {
+        const registerUser = await AuthService.register(
+          data.firstName,
+          data.lastName,
+          data.userRole,
+          data.email,
+          data.password
+        ).then((data) => data);
+
+        console.log("usuario Creado");
+        console.log(registerUser);
+
+        //pegarle al endpo email
+
+        const emailSended = await EmailService.sendVerificationEmail(registerUser.email)
+          .then(data => data);
+
+        history.push({
+          pathname: "/account-confirmation",
+          state: registerUser,
+        });
+      } catch (err) {
+        console.error("error al registrar usuario");
+        console.log(err);
+
+        handleMessageError(
+          Object.values(err.data).map((error, idx) => (
+            <Fragment key={error}>
+              {<br />}
+              {error}
+              {<br />}
+            </Fragment>
+          ))
+        );
+        setShowMessageError(true);
+      }
+
+    }
+
+
+    return
+
+
     const data = new FormData(event.currentTarget);
+
+
+
+
+
     // eslint-disable-next-line no-console
     console.log({
       email: data.get("email"),
@@ -123,6 +290,11 @@ const SignUp = () => {
 
       console.log("usuario Creado");
       console.log(registerUser);
+
+      //pegarle al endpo email
+
+      const emailSended = await AuthService.sendVerificationEmail(registerUser.email)
+        .then(data => data);
 
       history.push({
         pathname: "/account-confirmation",
@@ -181,6 +353,10 @@ const SignUp = () => {
                     id="firstName"
                     label="Nombre"
                     autoFocus
+                    onChange={handleUserInput}
+                    onBlur={handleUserInput}
+                    helperText={errors.firstName}
+                    error={errors.firstName}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -191,6 +367,10 @@ const SignUp = () => {
                     label="Apellido"
                     name="lastName"
                     autoComplete="family-name"
+                    onChange={handleUserInput}
+                    onBlur={handleUserInput}
+                    helperText={errors.lastName}
+                    error={errors.lastName}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -201,54 +381,66 @@ const SignUp = () => {
                     label="Correo Electronico"
                     name="email"
                     autoComplete="email"
-                  />
-                </Grid>
-                {/*
-                            <Grid item xs={12}>
-                                <FormControl fullWidth>
-                                    <InputLabel id="demo-simple-select-label">Tipo de Usuario</InputLabel>
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        value={tipoUsuario}
-                                        label="Tipo de Usuario"
-                                        name="tipoUsuario"
-                                        onChange={handleChange}
-                                    >
-                                        {tiposDeUsuarios.map((tipo) => (
-                                            <MenuItem
-                                                key={tipo.key}
-                                                value={tipo.key}
-                                                style={getStyles(tipo.name, tipo.name, theme)}
-                                            >
-                                                {tipo.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            */}
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    label="Contraseña"
-                    type="password"
-                    id="password"
-                    autoComplete="new-password"
+                    onChange={handleUserInput}
+                    onBlur={handleUserInput}
+                    helperText={errors.email}
+                    error={errors.email}
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="confirmpassword"
-                    label="Confirmar Contraseña"
-                    type="password"
-                    id="confirmpassword"
-                    autoComplete="new-password"
-                  />
+                  <FormControl error={errors.password} fullWidth variant="outlined">
+                    <InputLabel required htmlFor="outlined-adornment-password">Contraseña</InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-password"
+                      type={values.showPassword ? 'text' : 'password'}
+                      value={values.password}
+                      //onChange={handleChange('password')}
+                      onChange={handleUserInput}
+                      onBlur={handleUserInput}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Contraseña"
+                      name="password"
+                    />
+                    <FormHelperText >{errors.password}</FormHelperText>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl error={errors.confirmPassword} fullWidth variant="outlined">
+                    <InputLabel required htmlFor="outlined-adornment-password">Confirmar Contraseña</InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-password"
+                      type={values.showConfirmPassword ? 'text' : 'password'}
+                      value={values.confirmPassword}
+                      onChange={handleUserInput}
+                      onBlur={handleUserInput}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowConfirmPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {values.showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Confirmar Contraseña"
+                      name="confirmPassword"
+                    />
+                    <FormHelperText>{errors.confirmPassword}</FormHelperText>
+                  </FormControl>
                 </Grid>
               </Grid>
               <TextField

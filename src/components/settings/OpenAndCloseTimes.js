@@ -60,7 +60,7 @@ function getStyles(day1, day, theme) {
   };
 }
 
-export const OpenAndCloseTimes = ({ props, state, setHorariosYPrecios, institution_id }) => {
+export const OpenAndCloseTimes = ({ props, state, institution, institution_id }) => {
 
   const confirm = useConfirm();
 
@@ -177,6 +177,10 @@ export const OpenAndCloseTimes = ({ props, state, setHorariosYPrecios, instituti
   }
 
   useEffect(async () => {
+
+    console.log("datos de la institucion")
+    console.log(institution)
+    console.log(institution_id)
 
     try {
       //obtener horarios seteados de la institucion

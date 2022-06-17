@@ -11,8 +11,8 @@ import {
 
 import InstitucionService from "../services/instituciones/InstitucionService";
 
-export const get = (institution_id) => (dispatch) => {
-    return InstitucionService.get(institution_id).then(
+export const getByAdminEmail = (admin_email) => (dispatch) => {
+    return InstitucionService.getByAdminEmail(admin_email).then(
         (response) => {
 
             console.log("ejecutando action para obtener datos de la institucion")
@@ -40,4 +40,10 @@ export const get = (institution_id) => (dispatch) => {
             return Promise.reject();
         }
     );
+};
+
+export const change = (payload) => (dispatch) => {
+    console.log("En la action de change state")
+    console.log(payload)
+    dispatch({ type: "UPDATE_INSTITUTION", payload });
 };
