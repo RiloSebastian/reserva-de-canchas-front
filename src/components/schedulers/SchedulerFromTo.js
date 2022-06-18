@@ -53,25 +53,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
-
   const classes = useStyles();
 
   const handleChangeFrom = (e) => {
-
-    handleChangeHorarios(diaYHorarioId, e, to)
-
+    handleChangeHorarios(diaYHorarioId, e, to);
   };
 
   const handleChangeTo = (e) => {
-
-    handleChangeHorarios(diaYHorarioId, from, e)
-
+    handleChangeHorarios(diaYHorarioId, from, e);
   };
 
-  useEffect(() => { }, []);
+  useEffect(() => {}, []);
 
   return (
-    <Grid container alignItems="center">
+    <Grid sx={{ m: 1 }} container spacing={3} alignItems="center">
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Grid item xs>
           <MobileTimePicker
@@ -100,6 +95,17 @@ const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
           />
         </Grid>
       </LocalizationProvider>
+      <Grid item xs>
+        <IconButton
+          onClick={() => {
+            //removeHorario(id, diaYHorarioId);
+          }}
+          aria-label="delete"
+          size="large"
+        >
+          <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
+        </IconButton>
+      </Grid>
     </Grid>
   );
 };

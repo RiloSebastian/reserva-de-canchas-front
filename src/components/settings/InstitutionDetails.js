@@ -14,6 +14,10 @@ import ComboBox from "../ui/ComboBox";
 import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
 import { change } from "../../actions/institution";
 
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import es from "react-phone-input-2/lang/es.json";
+
 const themeTextArea = createTheme({
   components: {
     MuiTextField: {
@@ -29,29 +33,94 @@ const themeTextArea = createTheme({
   },
 });
 
-const states = [
-  {
-    value: "alabama",
-    label: "Alabama",
-  },
-  {
-    value: "new-york",
-    label: "New York",
-  },
-  {
-    value: "san-francisco",
-    label: "San Francisco",
-  },
-];
-
 export const InstitutionDetails = (props) => {
   const institution = useSelector((state) => state.institution);
   const dispatch = useDispatch();
 
   const [values, setValues] = useState(institution);
 
+  const [errors, setErrors] = useState({
+    name: "",
+    firstName: "",
+    lastName: "",
+    userRole: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    showPassword: false,
+    showConfirmPassword: false,
+  });
+
   const handleChange = (e) => {
     dispatch(change({ type: e.target.name, data: e.target.value }));
+  };
+
+  const handleOnChange = (value) => {
+    console.log("Actualizando numero de telefono");
+    console.log("[institutionTel]: " + value);
+
+    setErrors((prevState) => {
+      return {
+        ...prevState,
+        institutionTel: validate("institutionTel", value),
+      };
+    });
+    setValues((prevState) => {
+      return {
+        ...prevState,
+        institutionTel: value,
+      };
+    });
+  };
+
+  const validate = (name, value) => {
+    switch (name) {
+      case "name":
+        if (!value || value.trim() === "") {
+          return "Nombre de la Institución es Requerido";
+        } else {
+          return "";
+        }
+      case "firstName":
+        if (!value || value.trim() === "") {
+          return "Nombre es Requerido";
+        } else {
+          return "";
+        }
+      case "lastName":
+        if (!value || value.trim() === "") {
+          return "Apellido es Requerido";
+        } else {
+          return "";
+        }
+      case "email":
+        if (!value) {
+          return "Email es Requerido";
+        } else if (
+          !value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)
+        ) {
+          return "Introduzca una dirección de correo electrónico válida";
+        } else {
+          return "";
+        }
+      case "institutionTel":
+        if (!value || value.trim() === "") {
+          return "Número de Telefono es Requerido";
+        } else if (!value.match(/^[6-9]\d{9}$/)) {
+          return "Introduce un número de Teléfono válido.";
+        } else {
+          return "";
+        }
+      case "description":
+        if (!value || value.trim() === "") {
+          return "La Descripción de la Institución es Requerida";
+        } else {
+          return "";
+        }
+      default: {
+        return "";
+      }
+    }
   };
 
   useEffect(() => {
@@ -106,14 +175,31 @@ export const InstitutionDetails = (props) => {
               />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField
+              <PhoneInput
+                inputStyle={{
+                  width: "100%",
+                  height: "54px",
+                  fontSize: "18px",
+                  paddingLeft: "48px",
+                  borderRadius: "5px",
+                }}
+                value={institution.institutionTel}
+                localization={es}
+                country="ar"
+                enableAreaCodes={["ar"]}
+                enableAreaCodeStretch={true}
+                onlyCountries={["ar"]}
+                masks={{ ar: "(..) ....-...." }}
+                onChange={handleOnChange}
+              />
+              {/* <TextField
                 fullWidth
                 label="Numero de Telefono"
                 name="phone"
                 onChange={handleChange}
                 value={institution.institutionTel}
                 variant="outlined"
-              />
+              /> */}
             </Grid>
             <Grid item md={6} xs={12}>
               <ThemeProvider theme={themeTextArea}>

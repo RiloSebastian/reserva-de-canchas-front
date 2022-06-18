@@ -38,7 +38,7 @@ import { useConfirm } from "material-ui-confirm";
 import { ConfirmProvider } from "material-ui-confirm";
 import { red } from "@mui/material/colors";
 import { pink } from "@mui/material/colors";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -60,13 +60,10 @@ function getStyles(day1, day, theme) {
   };
 }
 
-export const OpenAndCloseTimes = ({ props, state, institution, institution_id }) => {
-
+export const OpenAndCloseTimes = ({ props, institution }) => {
   const confirm = useConfirm();
 
   const dispatch = useDispatch();
-
-  const configuration = useSelector((state) => state.configuration);
 
   const updateDays = (dayUpdated) => {
     dispatch({ type: "UPDATE_DAYS_AND_SCHEDULES", days: dayUpdated });
@@ -103,16 +100,38 @@ export const OpenAndCloseTimes = ({ props, state, institution, institution_id })
   const [daysSelected, setDaysSelected] = useState([
     { label: "Lunes", value: "LUNES", daysAndTimesId: null, selected: false },
     { label: "Martes", value: "MARTES", daysAndTimesId: null, selected: false },
-    { label: "Miercoles", value: "MIERCOLES", daysAndTimesId: null, selected: false },
+    {
+      label: "Miercoles",
+      value: "MIERCOLES",
+      daysAndTimesId: null,
+      selected: false,
+    },
     { label: "Jueves", value: "JUEVES", daysAndTimesId: null, selected: false },
-    { label: "Viernes", value: "VIERNES", daysAndTimesId: null, selected: false },
+    {
+      label: "Viernes",
+      value: "VIERNES",
+      daysAndTimesId: null,
+      selected: false,
+    },
     { label: "Sabado", value: "SABADO", daysAndTimesId: null, selected: false },
-    { label: "Domingo", value: "DOMINGO", daysAndTimesId: null, selected: false },
+    {
+      label: "Domingo",
+      value: "DOMINGO",
+      daysAndTimesId: null,
+      selected: false,
+    },
   ]);
 
   const nuevoDiaYHorario = {
     id: "",
+    parentId: institution.id,
     daysAvailable: [],
+    details: [
+      {
+        from: new Date("2020-01-01 8:00"),
+        to: new Date("2020-01-01 23:00"),
+      },
+    ],
     horario: {
       from: new Date("2020-01-01 8:00"),
       to: new Date("2020-01-01 23:00"),
@@ -135,7 +154,10 @@ export const OpenAndCloseTimes = ({ props, state, institution, institution_id })
     console.log("Dias Seleccionados");
     console.log(daysSelected);
 
-    const newDayAndSchedule = [...diasYHorarios, { ...nuevoDiaYHorario, id: uuidv4() }];
+    const newDayAndSchedule = [
+      ...diasYHorarios,
+      { ...nuevoDiaYHorario, id: uuidv4() },
+    ];
 
     console.log(newDayAndSchedule);
     setDiasYHorarios(newDayAndSchedule);
@@ -161,77 +183,73 @@ export const OpenAndCloseTimes = ({ props, state, institution, institution_id })
   };
 
   const handleChangeHorarios = (diaYHorarioId, from, to) => {
-    const diasYHorariosUpdated = diasYHorarios.map(day => {
+    const diasYHorariosUpdated = diasYHorarios.map((day) => {
       if (day.id === diaYHorarioId) {
         return {
           ...day,
           horario: {
             from,
-            to
+            to,
           },
-        }
+        };
       }
       return day;
-    })
+    });
     setDiasYHorarios(diasYHorariosUpdated);
-  }
+  };
 
   useEffect(async () => {
-
-    console.log("datos de la institucion")
-    console.log(institution)
-    console.log(institution_id)
+    console.log("datos de la institucion");
+    console.log(institution);
 
     try {
       //obtener horarios seteados de la institucion
 
-      const institutionSchedules = await InstitucionService.getInstitutionSchedules("62a655985154182a24d057c8")
-        .then((data) => data);
+      const institutionSchedules =
+        await InstitucionService.getInstitutionSchedules(
+          "62a655985154182a24d057c8"
+        ).then((data) => data);
 
-      console.log("horarios obtenidos")
-      console.log(institutionSchedules)
+      console.log("horarios obtenidos");
+      console.log(institutionSchedules);
 
       //setDiasYHorarios([nuevoDiaYHorario]);
-
     } catch (error) {
-      console.log("error al obtener horarios de instituciones")
-      console.log(error)
+      console.log("error al obtener horarios de instituciones");
+      console.log(error);
 
       setDiasYHorarios([{ ...nuevoDiaYHorario, id: uuidv4() }]);
     }
-
   }, []);
 
   const handleAddDaysAvailable = () => {
-
     const diasYhorariosToUpload = [];
 
-    diasYHorarios.forEach(diaYHorario => {
-
+    diasYHorarios.forEach((diaYHorario) => {
       const daysOfTheWeek = daysSelected
-        .filter(daySelected => daySelected.daysAndTimesId === diaYHorario.id)
-        .map(day => day.value)
+        .filter((daySelected) => daySelected.daysAndTimesId === diaYHorario.id)
+        .map((day) => day.value);
 
-      console.log("SETEANDO DIAS DE LA SEMANA")
-      console.log(daysOfTheWeek)
+      console.log("SETEANDO DIAS DE LA SEMANA");
+      console.log(daysOfTheWeek);
 
-      const diasYHorariosUpdated = diasYHorarios.find(diaYHorarioToUpdate => {
+      const diasYHorariosUpdated = diasYHorarios.find((diaYHorarioToUpdate) => {
         if (diaYHorarioToUpdate.id === diaYHorario.id) {
           return {
             ...diaYHorarioToUpdate,
             daysAvailable: daysOfTheWeek,
-          }
+          };
         }
+      });
 
-      })
-
-      diasYhorariosToUpload.push({ ...diasYHorariosUpdated, daysAvailable: daysOfTheWeek });
-
-    })
+      diasYhorariosToUpload.push({
+        ...diasYHorariosUpdated,
+        daysAvailable: daysOfTheWeek,
+      });
+    });
 
     return diasYhorariosToUpload;
-  }
-
+  };
 
   const firstUpdate = useRef(true);
   useEffect(() => {
@@ -243,25 +261,33 @@ export const OpenAndCloseTimes = ({ props, state, institution, institution_id })
     //Validar si es necesario desabilitar el boton de agregar mas horarios
 
     if (diasYHorarios.length === 1) {
-
-      if (daysSelected.map((daySelected) => daySelected.selected).every(d => d === true)) {
-        setDisabled(true)
-        return
+      if (
+        daysSelected
+          .map((daySelected) => daySelected.selected)
+          .every((d) => d === true)
+      ) {
+        setDisabled(true);
+        return;
       }
 
-      if (daysSelected.map((daySelected) => daySelected.selected).includes(true)) {
-        setDisabled(false)
+      if (
+        daysSelected.map((daySelected) => daySelected.selected).includes(true)
+      ) {
+        setDisabled(false);
       } else {
-        setDisabled(true)
+        setDisabled(true);
       }
-
     } else {
-
       //Validar los ids asignados a cada dia
 
-      diasYHorarios.forEach(diaYHorario => {
-        if (!daysSelected.map((daySelected) => daySelected.daysAndTimesId).includes(diaYHorario.id) &&
-          daysSelected.map((daySelected) => daySelected.selected).every(d => d === true)
+      diasYHorarios.forEach((diaYHorario) => {
+        if (
+          !daysSelected
+            .map((daySelected) => daySelected.daysAndTimesId)
+            .includes(diaYHorario.id) &&
+          daysSelected
+            .map((daySelected) => daySelected.selected)
+            .every((d) => d === true)
         ) {
           const diasYHorariosUpdated = diasYHorarios.filter(
             (d) => d.id !== diaYHorario.id
@@ -269,56 +295,54 @@ export const OpenAndCloseTimes = ({ props, state, institution, institution_id })
           setDiasYHorarios(diasYHorariosUpdated);
         }
 
-        if (daysSelected.map((daySelected) => daySelected.selected).every(d => d === true)) {
-          setDisabled(true)
-
+        if (
+          daysSelected
+            .map((daySelected) => daySelected.selected)
+            .every((d) => d === true)
+        ) {
+          setDisabled(true);
         } else {
-          setDisabled(false)
+          setDisabled(false);
         }
-
-      })
+      });
     }
   }, [daysSelected]);
 
-  const handleDelete = item => {
+  const handleDelete = (item) => {
     confirm({
-      title: '¿Esta Seguro que desea eliminar este horario?',
-      cancellationText: 'Cancelar'
+      title: "¿Esta Seguro que desea eliminar este horario?",
+      cancellationText: "Cancelar",
     })
       .then(() => {
-
-        const dayUpdated = daysSelected.map(day => {
+        const dayUpdated = daysSelected.map((day) => {
           if (day.daysAndTimesId === item.id) {
             return {
               ...day,
               selected: false,
-              daysAndTimesId: null
-            }
+              daysAndTimesId: null,
+            };
           }
           return day;
-        })
+        });
         setDaysSelected(dayUpdated);
 
-        setDiasYHorarios(diasYHorarios.filter(other => other.id !== item.id))
+        setDiasYHorarios(diasYHorarios.filter((other) => other.id !== item.id));
       })
       .catch(() => console.log("Deletion cancelled."));
   };
 
   const handleSubmitSchedules = () => {
-    console.log("subiendo horarios de la institucion")
+    console.log("subiendo horarios de la institucion");
 
     const data = handleAddDaysAvailable();
 
     try {
-
-      const schedulesCreated = InstitucionService.createInstitutionSchedules(institution_id, data);
-
-
-    } catch (error) {
-
-    }
-
-  }
+      const schedulesCreated = InstitucionService.createInstitutionSchedules(
+        institution.id,
+        data
+      );
+    } catch (error) {}
+  };
 
   return (
     <form autoComplete="off" noValidate {...props}>
@@ -329,20 +353,21 @@ export const OpenAndCloseTimes = ({ props, state, institution, institution_id })
           <Grid container spacing={3} alignItems="center">
             <Grid item xs>
               <FormControl sx={{ m: 1 }}>
-
                 <List>
-                  {diasYHorarios.map((item) => (
-                    <ListItem key={item.id}>
+                  {diasYHorarios.map((diaYHorario) => (
+                    <ListItem key={diaYHorario.id}>
                       <DaysAndSchedulePaper
+                        diasYHorarios={diasYHorarios}
                         setDaysSelected={setDaysSelected}
                         daysSelected={daysSelected}
-                        diaYHorarioId={item.id}
-                        diaYHorario={item}
+                        diaYHorarioId={diaYHorario.id}
+                        diaYHorario={diaYHorario}
+                        setDiasYHorarios={setDiasYHorarios}
                         removeDaysAndSchedule={removeDaysAndSchedule}
                         handleChangeHorarios={handleChangeHorarios}
                       />
                       <ListItemSecondaryAction>
-                        <IconButton onClick={() => handleDelete(item)}>
+                        <IconButton onClick={() => handleDelete(diaYHorario)}>
                           <DeleteIcon
                             fontSize="inherit"
                             sx={{
@@ -374,7 +399,11 @@ export const OpenAndCloseTimes = ({ props, state, institution, institution_id })
             p: 2,
           }}
         >
-          <Button onClick={handleSubmitSchedules} color="primary" variant="contained">
+          <Button
+            onClick={handleSubmitSchedules}
+            color="primary"
+            variant="contained"
+          >
             Guardar Horarios
           </Button>
         </Box>

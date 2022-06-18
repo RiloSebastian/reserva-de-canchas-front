@@ -34,6 +34,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const DaysAndSchedulePaper = ({
+  diasYHorarios,
+  setDiasYHorarios,
   diaYHorario,
   diaYHorarioId,
   setHorario,
@@ -41,6 +43,32 @@ const DaysAndSchedulePaper = ({
   setDaysSelected,
   handleChangeHorarios,
 }) => {
+  const nuevoHorario = {
+    id: "",
+    from: new Date(),
+    to: new Date(new Date().setHours(new Date().getHours() + 1)),
+    price: "",
+    enabled: true,
+  };
+
+  const handleAddNewSchedule = (id) => {
+    console.log("agregando nuevo horario para la card -> " + id);
+    console.log(nuevoHorario);
+
+    const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
+      if (diaYHorario.id === id) {
+        const horariosUpdated = [...diaYHorario.details, nuevoHorario];
+        return {
+          ...diaYHorario,
+          details: horariosUpdated,
+        };
+      } else {
+        return diaYHorario;
+      }
+    });
+
+    setDiasYHorarios(diasYHorariosUpdated);
+  };
 
   return (
     <Paper
@@ -65,13 +93,22 @@ const DaysAndSchedulePaper = ({
             <Grid item>
               <Box textAlign={"center"}>
                 <p>Horarios</p>
-                <SchedulerFromTo handleChangeHorarios={handleChangeHorarios} diaYHorarioId={diaYHorario.id} from={diaYHorario.horario.from} to={diaYHorario.horario.to} />
+                {diaYHorario.details.map((detail, key) => {
+                  return (
+                    <SchedulerFromTo
+                      handleChangeHorarios={handleChangeHorarios}
+                      diaYHorarioId={diaYHorario.id}
+                      from={detail.from}
+                      to={detail.to}
+                    />
+                  );
+                })}
               </Box>
               <Box textAlign="center" sx={{ mt: 2, pb: 2 }}>
                 <Button
                   variant="outlined"
                   startIcon={<AddCircleOutlineIcon />}
-                //onClick={() => handleAddNewSchedule(key)}
+                  onClick={() => handleAddNewSchedule(diaYHorario.id)}
                 >
                   Agregar Mas Horarios
                 </Button>
