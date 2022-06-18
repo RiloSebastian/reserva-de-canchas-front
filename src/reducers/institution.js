@@ -19,8 +19,8 @@ const initialState = {
 export default function (state = initialState, action) {
   const { type, payload } = action;
 
-  console.log("actualizando intitucion")
-  console.log(payload)
+  console.log("actualizando intitucion");
+  console.log(payload);
 
   switch (type) {
     case GET_INSTITUTION:
@@ -30,11 +30,12 @@ export default function (state = initialState, action) {
         name: payload.name,
         description: payload.description,
         institutionTel: payload.institutionTel,
+        address: payload.address,
       };
     case UPDATE_INSTITUTION:
       return {
         ...state,
-        [payload.type]: payload.data
+        [payload.type]: payload.data,
       };
     default:
       return state;

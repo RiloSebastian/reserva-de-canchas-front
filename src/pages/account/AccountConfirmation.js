@@ -32,7 +32,7 @@ export default function AccountConfirmation(props) {
   const [user, setUser] = useState(history.location.state);
 
   const content = {
-    header: `${user ? user.name : "Usuario"}, Ya casi terminamos...`,
+    header: `${user ? user.firstName : "Usuario"}, Ya casi terminamos...`,
     description:
       "Para completar el alta de tu cuenta, por favor, dirigite a la casilla de correo que agregaste previamente y hace click en el link que te enviamos para Activar tu cuenta.",
     "primary-action": "Volver al LogIn",
@@ -45,21 +45,16 @@ export default function AccountConfirmation(props) {
   };
 
   const resendConfirmationEmail = async () => {
-
     //Reenviar email de confirmacion
 
     try {
-
-      const emailSended = await EmailService.sendVerificationEmail(user.email)
-        .then(data => data);
-
-
-
+      const emailSended = await EmailService.sendVerificationEmail(
+        user.email
+      ).then((data) => data);
     } catch (error) {
-      console.log("Error al reenviar el correo de confirmacion")
-      console.log(error)
+      console.log("Error al reenviar el correo de confirmacion");
+      console.log(error);
     }
-
 
     history.push("/login");
   };

@@ -48,7 +48,7 @@ const rightLink = {
 const SignIn = (props) => {
   let history = useHistory();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const [showMessageError, setShowMessageError] = useState(false);
 
@@ -78,18 +78,18 @@ const SignIn = (props) => {
       if (user.roles[0] === "ROLE_CUSTOMER") {
         history.push("/customer/home");
       } else {
-
         //setear info de la institucion asociada
 
         try {
           console.log("Abrir dashboard");
 
-          console.log("obteniendo la info de la institucion para dejarlo en el store");
+          console.log(
+            "obteniendo la info de la institucion para dejarlo en el store"
+          );
 
-          dispatch(getByAdminEmail(data.get("username")))
+          dispatch(getByAdminEmail(data.get("username")));
 
           history.push("/dashboard/reservas");
-
         } catch (error) {
           console.log("Catcheando el error de la institucion");
           console.log(error);
@@ -103,18 +103,25 @@ const SignIn = (props) => {
         //Renviar link de confirmacion
         console.error("La cuenta no esta habilidata - reenviar correo");
 
-        const emailReSended = await EmailService.sendVerificationEmail(data.get("username"))
-          .then(data => data);
+        try {
+          const emailReSended = await EmailService.sendVerificationEmail(
+            data.get("username")
+          ).then((data) => data);
 
-        handleMessageError(`${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`);
-        setShowMessageError(true);
-
+          handleMessageError(
+            `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
+          );
+          setShowMessageError(true);
+        } catch (error) {
+          handleMessageError(
+            `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
+          );
+          setShowMessageError(true);
+        }
       } else {
         handleMessageError(err.data.error);
         setShowMessageError(true);
       }
-
-
     }
   };
 

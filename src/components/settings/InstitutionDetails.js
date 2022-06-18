@@ -46,16 +46,17 @@ const states = [
 
 export const InstitutionDetails = (props) => {
   const institution = useSelector((state) => state.institution);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  const [values, setValues] = useState(institution);
 
   const handleChange = (e) => {
     dispatch(change({ type: e.target.name, data: e.target.value }));
   };
 
   useEffect(() => {
-
-    console.log("renderizando componente para los detalles de la institucion")
-    console.log(institution)
+    console.log("renderizando componente para los detalles de la institucion");
+    console.log(institution);
   }, []);
 
   return (
@@ -88,7 +89,8 @@ export const InstitutionDetails = (props) => {
                 fullWidth
                 id="address"
                 label="Direccion de la Institucion"
-                value={institution.address}
+                address={institution.address}
+                setValues={setValues}
                 onChange={handleChange}
               />
             </Grid>
@@ -127,7 +129,7 @@ export const InstitutionDetails = (props) => {
                   id="description"
                   label="Dejanos una breve descripcion de la Institucion"
                   onChange={handleChange}
-                //onChange={handleInstitutionChange}
+                  //onChange={handleInstitutionChange}
                 />
               </ThemeProvider>
             </Grid>
