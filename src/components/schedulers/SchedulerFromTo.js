@@ -14,6 +14,11 @@ import PropTypes from "prop-types";
 import React, { useState, useEffect } from "react";
 import NumberFormat from "react-number-format";
 
+import { useConfirm } from "material-ui-confirm";
+import { ConfirmProvider } from "material-ui-confirm";
+import { red } from "@mui/material/colors";
+import { v4 as uuidv4 } from "uuid";
+
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
   props,
   ref
@@ -53,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
-  const classes = useStyles();
+  const confirm = useConfirm();
 
   const handleChangeFrom = (e) => {
     handleChangeHorarios(diaYHorarioId, e, to);
@@ -61,6 +66,30 @@ const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
 
   const handleChangeTo = (e) => {
     handleChangeHorarios(diaYHorarioId, from, e);
+  };
+
+  const removeHorario = (id, diaYHorarioId) => {
+    confirm({
+      title: "¿Esta Seguro que desea eliminar este horario?",
+      cancellationText: "Cancelar",
+    })
+      .then(() => {
+        console.log("ELIMINANDO HORARIOS");
+        /* const dayUpdated = daysSelected.map((day) => {
+          if (day.daysAndTimesId === item.id) {
+            return {
+              ...day,
+              selected: false,
+              daysAndTimesId: null,
+            };
+          }
+          return day;
+        });
+        setDaysSelected(dayUpdated);
+
+        setDiasYHorarios(diasYHorarios.filter((other) => other.id !== item.id)); */
+      })
+      .catch(() => console.log("Deletion cancelled."));
   };
 
   useEffect(() => {}, []);
@@ -98,7 +127,7 @@ const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
       <Grid item xs>
         <IconButton
           onClick={() => {
-            //removeHorario(id, diaYHorarioId);
+            removeHorario(diaYHorarioId, diaYHorarioId);
           }}
           aria-label="delete"
           size="large"

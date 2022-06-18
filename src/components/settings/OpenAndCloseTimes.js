@@ -367,17 +367,30 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
                         handleChangeHorarios={handleChangeHorarios}
                       />
                       <ListItemSecondaryAction>
-                        <IconButton onClick={() => handleDelete(diaYHorario)}>
-                          <DeleteIcon
-                            fontSize="inherit"
-                            sx={{
-                              margin: -20,
-                              color: red[900],
-                              width: 40,
-                              height: 40,
+                        <Grid
+                          item
+                          sx={{
+                            width: 40,
+                            height: 40,
+                          }}
+                        >
+                          <IconButton
+                            onClick={() => {
+                              handleDelete(diaYHorario);
                             }}
-                          />
-                        </IconButton>
+                            aria-label="delete"
+                            size="large"
+                          >
+                            <DeleteIcon
+                              fontSize="inherit"
+                              sx={{
+                                color: pink[500],
+                                width: 40,
+                                height: 40,
+                              }}
+                            />
+                          </IconButton>
+                        </Grid>
                       </ListItemSecondaryAction>
                     </ListItem>
                   ))}
