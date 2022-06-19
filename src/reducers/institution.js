@@ -1,4 +1,8 @@
-import { GET_INSTITUTION, UPDATE_INSTITUTION } from "../actions/types";
+import {
+  GET_INSTITUTION,
+  UPDATE_INSTITUTION,
+  LOAD_INSTITUTION_SCHEDULES,
+} from "../actions/types";
 
 const initialState = {
   id: "",
@@ -36,6 +40,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         [payload.type]: payload.data,
+      };
+    case LOAD_INSTITUTION_SCHEDULES:
+      return {
+        ...state,
+        schedules: payload.data,
       };
     default:
       return state;

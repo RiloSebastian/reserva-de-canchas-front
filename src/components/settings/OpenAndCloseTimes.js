@@ -40,6 +40,18 @@ import { red } from "@mui/material/colors";
 import { pink } from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
 
+import CardActions from "@mui/material/CardActions";
+import Typography from "@mui/material/Typography";
+
+const bull = (
+  <Box
+    component="span"
+    sx={{ display: "inline-block", mx: "2px", transform: "scale(0.8)" }}
+  >
+    •
+  </Box>
+);
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -64,6 +76,8 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
   const confirm = useConfirm();
 
   const dispatch = useDispatch();
+
+  const [noSchedulesLoadedOpen, setNoSchedulesLoadedOpen] = useState(false);
 
   const updateDays = (dayUpdated) => {
     dispatch({ type: "UPDATE_DAYS_AND_SCHEDULES", days: dayUpdated });
@@ -123,28 +137,19 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
   ]);
 
   const nuevoDiaYHorario = {
-    id: "",
+    id: uuidv4(),
     parentId: institution.id,
     daysAvailable: [],
     details: [
       {
+        id: uuidv4(),
         from: new Date("2020-01-01 8:00"),
         to: new Date("2020-01-01 23:00"),
       },
     ],
-    horario: {
-      from: new Date("2020-01-01 8:00"),
-      to: new Date("2020-01-01 23:00"),
-    },
   };
 
   const [day, setDay] = useState([]);
-
-  const handleChange = (e) => {
-    console.log("handleChange");
-    console.log(day);
-    dispatch({ type: e.target.name, data: e.target.value });
-  };
 
   const [diasYHorarios, setDiasYHorarios] = useState([]);
 
@@ -182,15 +187,31 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
     }
   };
 
-  const handleChangeHorarios = (diaYHorarioId, from, to) => {
+  const handleChangeHorarios = (diaYHorarioId, horarioId, from, to) => {
+    console.log("HANDLE CHANGE HORARIOS");
+
+    console.log("DIA Y HORARIO " + diaYHorarioId);
+    console.log("HORARIO " + horarioId);
+    console.log("DESDE " + from);
+    console.log("HASTA " + to);
+
     const diasYHorariosUpdated = diasYHorarios.map((day) => {
       if (day.id === diaYHorarioId) {
+        const horariosUpdated = day.details.map((horario) => {
+          if (horario.id === horarioId) {
+            return {
+              ...horario,
+              from,
+              to,
+            };
+          }
+
+          return horario;
+        });
+
         return {
           ...day,
-          horario: {
-            from,
-            to,
-          },
+          details: horariosUpdated,
         };
       }
       return day;
@@ -206,50 +227,31 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       //obtener horarios seteados de la institucion
 
       const institutionSchedules =
-        await InstitucionService.getInstitutionSchedules(
-          "62a655985154182a24d057c8"
-        ).then((data) => data);
+        await InstitucionService.getInstitutionSchedules(institution.id).then(
+          (data) => data
+        );
 
       console.log("horarios obtenidos");
       console.log(institutionSchedules);
+
+      if (institution.schedules) {
+        //Cargamos los horarios
+      } else {
+        setNoSchedulesLoadedOpen(true);
+      }
 
       //setDiasYHorarios([nuevoDiaYHorario]);
     } catch (error) {
       console.log("error al obtener horarios de instituciones");
       console.log(error);
 
-      setDiasYHorarios([{ ...nuevoDiaYHorario, id: uuidv4() }]);
+      console.log("CARGANDO NUEVOS DIAS Y HORARIOS");
+      console.log(nuevoDiaYHorario);
+
+      setDiasYHorarios([nuevoDiaYHorario]);
+      setNoSchedulesLoadedOpen(true);
     }
   }, []);
-
-  const handleAddDaysAvailable = () => {
-    const diasYhorariosToUpload = [];
-
-    diasYHorarios.forEach((diaYHorario) => {
-      const daysOfTheWeek = daysSelected
-        .filter((daySelected) => daySelected.daysAndTimesId === diaYHorario.id)
-        .map((day) => day.value);
-
-      console.log("SETEANDO DIAS DE LA SEMANA");
-      console.log(daysOfTheWeek);
-
-      const diasYHorariosUpdated = diasYHorarios.find((diaYHorarioToUpdate) => {
-        if (diaYHorarioToUpdate.id === diaYHorario.id) {
-          return {
-            ...diaYHorarioToUpdate,
-            daysAvailable: daysOfTheWeek,
-          };
-        }
-      });
-
-      diasYhorariosToUpload.push({
-        ...diasYHorariosUpdated,
-        daysAvailable: daysOfTheWeek,
-      });
-    });
-
-    return diasYhorariosToUpload;
-  };
 
   const firstUpdate = useRef(true);
   useEffect(() => {
@@ -326,22 +328,80 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
         });
         setDaysSelected(dayUpdated);
 
+        if (
+          diasYHorarios.filter((other) => other.id !== item.id).length === 0
+        ) {
+          setNoSchedulesLoadedOpen(true);
+        }
+
         setDiasYHorarios(diasYHorarios.filter((other) => other.id !== item.id));
       })
       .catch(() => console.log("Deletion cancelled."));
   };
 
-  const handleSubmitSchedules = () => {
+  const handleOpenDaysAndSchedules = () => {
+    if (diasYHorarios.length === 0) {
+      handleAddNewDatesSchedules();
+    }
+
+    setNoSchedulesLoadedOpen(false);
+  };
+
+  const handleAddDaysAvailable = () => {
+    const diasYhorariosToUpload = [];
+
+    diasYHorarios.forEach((diaYHorario) => {
+      //Setear horarios para los dias seleccionados
+      const details = [];
+
+      const daysOfTheWeek = daysSelected
+        .filter((daySelected) => daySelected.daysAndTimesId === diaYHorario.id)
+        .map((day) => day.value);
+
+      console.log("SETEANDO DIAS DE LA SEMANA");
+      console.log(daysOfTheWeek);
+
+      console.log("SETEANDO LOS HORARIOS");
+      diaYHorario.details.forEach(({ from, to }) => {
+        const timeFrame = {
+          from: from.getTime(),
+          to: to.getTime(),
+        };
+        details.push({ timeFrame });
+      });
+
+      diasYhorariosToUpload.push({
+        parentId: institution.id,
+        daysAvailable: daysOfTheWeek,
+        details,
+        forType: "INSTITUTION",
+      });
+    });
+
+    return diasYhorariosToUpload;
+  };
+
+  const handleSubmitChanges = () => {
     console.log("subiendo horarios de la institucion");
 
-    const data = handleAddDaysAvailable();
+    if (
+      daysSelected
+        .map((daySelected) => daySelected.selected)
+        .every((d) => d === false)
+    ) {
+      console.log("NO SE HA SELECCIONADO NINGUNA FECHA");
+    } else {
+      const data = handleAddDaysAvailable();
 
-    try {
-      const schedulesCreated = InstitucionService.createInstitutionSchedules(
-        institution.id,
-        data
-      );
-    } catch (error) {}
+      console.log("SUBIENDO DIAS Y HORARIOS DE LA INSTITUCION");
+      console.log(data);
+      data.forEach((card) => {
+        try {
+          const schedulesCreated =
+            InstitucionService.createInstitutionSchedules(institution.id, card);
+        } catch (error) {}
+      });
+    }
   };
 
   return (
@@ -350,59 +410,90 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
         <CardHeader title="Horarios de Apertura y Cierre" />
         <Divider />
         <CardContent>
-          <Grid container spacing={3} alignItems="center">
-            <Grid item xs>
-              <FormControl sx={{ m: 1 }}>
-                <List>
-                  {diasYHorarios.map((diaYHorario) => (
-                    <ListItem key={diaYHorario.id}>
-                      <DaysAndSchedulePaper
-                        diasYHorarios={diasYHorarios}
-                        setDaysSelected={setDaysSelected}
-                        daysSelected={daysSelected}
-                        diaYHorarioId={diaYHorario.id}
-                        diaYHorario={diaYHorario}
-                        setDiasYHorarios={setDiasYHorarios}
-                        removeDaysAndSchedule={removeDaysAndSchedule}
-                        handleChangeHorarios={handleChangeHorarios}
-                      />
-                      <ListItemSecondaryAction>
-                        <Grid
-                          item
-                          sx={{
-                            width: 40,
-                            height: 40,
-                          }}
-                        >
-                          <IconButton
-                            onClick={() => {
-                              handleDelete(diaYHorario);
+          {noSchedulesLoadedOpen ? (
+            <React.Fragment>
+              <CardContent>
+                <Typography
+                  sx={{ fontSize: 14 }}
+                  color="text.secondary"
+                  gutterBottom
+                >
+                  Dias y Horarios
+                </Typography>
+                <Typography variant="h5" component="div">
+                  La institucion aun no posee horarios de apertura y cierre
+                  cargados
+                </Typography>
+                <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                  Por favor agregue los horarios haciendo click en el boton de
+                  abajo
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button
+                  onClick={handleOpenDaysAndSchedules}
+                  variant="contained"
+                  size="small"
+                >
+                  Agregar horarios de apertura y cierre a la insittucion
+                </Button>
+              </CardActions>
+            </React.Fragment>
+          ) : (
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs>
+                <FormControl sx={{ m: 1 }}>
+                  <List>
+                    {diasYHorarios.map((diaYHorario) => (
+                      <ListItem key={diaYHorario.id}>
+                        <DaysAndSchedulePaper
+                          diasYHorarios={diasYHorarios}
+                          setDaysSelected={setDaysSelected}
+                          daysSelected={daysSelected}
+                          diaYHorarioId={diaYHorario.id}
+                          diaYHorario={diaYHorario}
+                          setDiasYHorarios={setDiasYHorarios}
+                          removeDaysAndSchedule={removeDaysAndSchedule}
+                          handleChangeHorarios={handleChangeHorarios}
+                        />
+                        <ListItemSecondaryAction>
+                          <Grid
+                            item
+                            sx={{
+                              width: 40,
+                              height: 40,
                             }}
-                            aria-label="delete"
-                            size="large"
                           >
-                            <DeleteIcon
-                              fontSize="inherit"
-                              sx={{
-                                color: pink[500],
-                                width: 40,
-                                height: 40,
+                            <IconButton
+                              onClick={() => {
+                                handleDelete(diaYHorario);
                               }}
-                            />
-                          </IconButton>
-                        </Grid>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                </List>
-                <ButtonAddMoreDatesAndTime
-                  daysSelected={daysSelected}
-                  handleAddNewDatesSchedules={handleAddNewDatesSchedules}
-                  disabled={disabled}
-                />
-              </FormControl>
+                              aria-label="delete"
+                              size="large"
+                            >
+                              <DeleteIcon
+                                fontSize="inherit"
+                                sx={{
+                                  color: pink[500],
+                                  width: 40,
+                                  height: 40,
+                                }}
+                              />
+                            </IconButton>
+                          </Grid>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
+                  <ButtonAddMoreDatesAndTime
+                    daysSelected={daysSelected}
+                    handleAddNewDatesSchedules={handleAddNewDatesSchedules}
+                    disabled={disabled}
+                  />
+                </FormControl>
+              </Grid>
             </Grid>
-          </Grid>
+          )}
         </CardContent>
         <Divider />
         <Box
@@ -413,7 +504,13 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           }}
         >
           <Button
-            onClick={handleSubmitSchedules}
+            disabled={
+              noSchedulesLoadedOpen ||
+              daysSelected
+                .map((daySelected) => daySelected.selected)
+                .every((d) => d === false)
+            }
+            onClick={handleSubmitChanges}
             color="primary"
             variant="contained"
           >

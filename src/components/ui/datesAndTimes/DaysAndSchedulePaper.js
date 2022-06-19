@@ -24,6 +24,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { pink } from "@mui/material/colors";
+import { v4 as uuidv4 } from "uuid";
+import { getNextFromTime } from "../../../validations/validationTime";
 
 const useStyles = makeStyles((theme) => ({
   ...theme.typography.body2,
@@ -51,13 +53,34 @@ const DaysAndSchedulePaper = ({
     enabled: true,
   };
 
+  const nuevoHorarioInstitucion = {
+    id: "",
+    from: new Date(),
+    to: new Date(new Date().setHours(new Date().getHours() + 1)),
+  };
+
   const handleAddNewSchedule = (id) => {
     console.log("agregando nuevo horario para la card -> " + id);
+
+    const from = getNextFromTime(diaYHorario.details);
+
+    const nuevoHorario = {
+      id: uuidv4(),
+      from,
+      to: new Date(new Date(from).setHours(new Date(from).getHours() + 1)),
+    };
+
     console.log(nuevoHorario);
 
     const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
       if (diaYHorario.id === id) {
+        console.log("HORARIOS PARA LOS DIAS SELECCIONADOS ENCONTRADO");
+        console.log(diaYHorario);
+
         const horariosUpdated = [...diaYHorario.details, nuevoHorario];
+
+        console.log("HORARIOS ACTUALIZADOS LUEGO DE AGREGAR UNO NUEVO");
+        console.log(horariosUpdated);
         return {
           ...diaYHorario,
           details: horariosUpdated,
@@ -69,6 +92,12 @@ const DaysAndSchedulePaper = ({
 
     setDiasYHorarios(diasYHorariosUpdated);
   };
+
+  useEffect(() => {
+    console.log("LOADING DIAS Y HORARIOS");
+
+    console.log(diaYHorario);
+  }, []);
 
   return (
     <Paper
@@ -98,8 +127,9 @@ const DaysAndSchedulePaper = ({
                     <SchedulerFromTo
                       handleChangeHorarios={handleChangeHorarios}
                       diaYHorarioId={diaYHorario.id}
-                      from={detail.from}
-                      to={detail.to}
+                      details={diaYHorario.details}
+                      detail={detail}
+                      setDiasYHorarios={setDiasYHorarios}
                     />
                   );
                 })}

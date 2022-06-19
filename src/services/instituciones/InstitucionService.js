@@ -1,58 +1,62 @@
-import React from 'react';
-import http from '../../http-common'
+import React from "react";
+import http from "../../http-common";
 
 const getAll = () => {
-    return http.get(`/institutions`);
+  return http.get(`/institutions`);
 };
 
 const get = async (institution_id) => {
-    return await http.get(`/institutions/${institution_id}`)
-        .then((response) => response.data)
-        .catch((err) => Promise.reject(err));;
+  return await http
+    .get(`/institutions/${institution_id}`)
+    .then((response) => response.data)
+    .catch((err) => Promise.reject(err));
 };
 
 const getByAdminEmail = async (admin_email) => {
-    return await http.get(`/institutions/admin/${admin_email}`)
-        .then((response) => response.data)
-        .catch((err) => Promise.reject(err));;
+  return await http
+    .get(`/institutions/admin/${admin_email}`)
+    .then((response) => response.data)
+    .catch((err) => Promise.reject(err));
 };
 
 const getInstitutionSchedules = async (institution_id) => {
-    return await http.get(`/institutions/${institution_id}/schedule`)
-        .then((response) => response)
-        .catch((err) => Promise.reject(err));
+  return await http
+    .get(`/institutions/${institution_id}/schedules`)
+    .then((response) => response)
+    .catch((err) => Promise.reject(err));
 };
 
 const createInstitutionSchedules = async (institution_id, data) => {
-    return await http.post(`/institutions/${institution_id}/schedule`, data)
-        .then((response) => response)
-        .catch((err) => Promise.reject(err));
+  return await http
+    .post(`/institutions/${institution_id}/schedule`, data)
+    .then((response) => response)
+    .catch((err) => Promise.reject(err));
 };
 
-const create = data => {
-    return http.post(`/institutions`, data);
+const create = (data) => {
+  return http.post(`/institutions`, data);
 };
 
 const update = (institution_id, data) => {
-    return http.put(`/institutions/${institution_id}`, data);
+  return http.put(`/institutions/${institution_id}`, data);
 };
 
-const remove = institution_id => {
-    return http.delete(`/institutions/${institution_id}`);
+const remove = (institution_id) => {
+  return http.delete(`/institutions/${institution_id}`);
 };
 
 const removeAll = () => {
-    return http.delete(`/institutions`);
+  return http.delete(`/institutions`);
 };
 
 export default {
-    getAll,
-    get,
-    getByAdminEmail,
-    create,
-    update,
-    remove,
-    removeAll,
-    getInstitutionSchedules,
-    createInstitutionSchedules,
+  getAll,
+  get,
+  getByAdminEmail,
+  create,
+  update,
+  remove,
+  removeAll,
+  getInstitutionSchedules,
+  createInstitutionSchedules,
 };

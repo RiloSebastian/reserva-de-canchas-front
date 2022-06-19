@@ -57,18 +57,55 @@ const useStyles = makeStyles((theme) => ({
   lineHeight: "30px",
 }));
 
-const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
+const SchedulerFromTo = ({
+  detail,
+  handleChangeHorarios,
+  diaYHorarioId,
+  details,
+  setDiasYHorarios,
+}) => {
   const confirm = useConfirm();
 
+  const { from, to, id } = detail;
+
+  const [valueFrom, setvalueFrom] = useState();
+  const [valueTo, setvalueTo] = useState();
+
   const handleChangeFrom = (e) => {
-    handleChangeHorarios(diaYHorarioId, e, to);
+    console.log("HANDLE CHANGE FROM HORARIO");
+    console.log(id);
+    handleChangeHorarios(diaYHorarioId, id, e, to);
+
+    /* setDiasYHorarios((prevState) => {
+      console.log("HANDLE CHANGE TO HORARIO");
+      console.log(prevState);
+      handleChangeHorarios(diaYHorarioId, id, from, e);
+
+      return {
+        ...prevState,
+      };
+    }); */
   };
 
   const handleChangeTo = (e) => {
-    handleChangeHorarios(diaYHorarioId, from, e);
+    console.log("HANDLE CHANGE TO HORARIO");
+    console.log(detail.id);
+    handleChangeHorarios(diaYHorarioId, id, from, e);
+
+    /* setDiasYHorarios((prevState) => {
+      console.log("HANDLE CHANGE TO HORARIO");
+      console.log(prevState);
+      handleChangeHorarios(diaYHorarioId, id, from, e);
+
+      return {
+        ...prevState,
+      };
+    }); */
   };
 
-  const removeHorario = (id, diaYHorarioId) => {
+  const removeHorario = (horarioId, diaYHorarioId) => {
+    console.log("REMOVER HORARIO PARA LOS DIAS SELECCIONADOS");
+
     confirm({
       title: "¿Esta Seguro que desea eliminar este horario?",
       cancellationText: "Cancelar",
@@ -91,8 +128,6 @@ const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
       })
       .catch(() => console.log("Deletion cancelled."));
   };
-
-  useEffect(() => {}, []);
 
   return (
     <Grid sx={{ m: 1 }} container spacing={3} alignItems="center">
@@ -126,13 +161,16 @@ const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
       </LocalizationProvider>
       <Grid item xs>
         <IconButton
+          disabled={details.length === 1}
+          fontSize="inherit"
+          sx={{ color: pink[500] }}
           onClick={() => {
-            removeHorario(diaYHorarioId, diaYHorarioId);
+            removeHorario(id, diaYHorarioId);
           }}
           aria-label="delete"
           size="large"
         >
-          <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
+          <DeleteIcon />
         </IconButton>
       </Grid>
     </Grid>
