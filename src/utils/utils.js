@@ -9,9 +9,9 @@ export default class Utils {
     );
   }
 
-  static isWeekend(date) {
+  static isWeekend(date, workingDays) {
     const day = date.getDay();
-    return day === 0 || day === 6;
+    return !workingDays.includes(day);
   }
 
   static isDinner(date) {

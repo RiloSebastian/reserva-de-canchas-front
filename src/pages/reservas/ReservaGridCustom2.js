@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { connectProps } from "@devexpress/dx-react-core";
 import { blue, green, orange, red, yellow } from "@mui/material/colors";
 import { styled, darken, alpha, lighten } from "@mui/material/styles";
@@ -45,10 +46,13 @@ import { TodayButtonMessages } from "./localization-messages/TodayButtonMessages
 import { ConfirmationDialogMessages } from "./localization-messages/ConfirmationDialogMessages";
 import DataCell from "../../components/schedulers/DataCell";
 import Utils from "../../utils/utils";
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import moment from "moment";
+import { getInstitutionSchedules } from "../../actions/institution";
+moment.locale("es");
 
 const PREFIX = "Demo";
 
@@ -88,9 +92,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const getBorder = (theme) =>
-  `1px solid ${theme.palette.mode === "light"
-    ? lighten(alpha(theme.palette.divider, 1), 0.88)
-    : darken(alpha(theme.palette.divider, 1), 0.68)
+  `1px solid ${
+    theme.palette.mode === "light"
+      ? lighten(alpha(theme.palette.divider, 1), 0.88)
+      : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -138,32 +143,7 @@ const StyledWeekViewTimeTableCell = styled(WeekView.TimeTableCell)(
 );
 
 const isRestTime = (date) =>
-  date.getDay() === 0 ||
-  date.getDay() === 6 ||
-  date.getHours() === 13;
-
-const TimeTableCellWeek = ({ ...restProps }) => {
-  const { startDate } = restProps;
-
-  return (<StyledWeekViewTimeTableCell {...restProps} >
-    <DataCell itemData={{ ...restProps }} />
-  </StyledWeekViewTimeTableCell>)
-
-
-
-  if (isRestTime(startDate)) {
-    return (
-      <StyledWeekViewTimeTableCell
-        {...restProps}
-        className={classes.nonWorkingCell}
-      />
-    );
-  }
-  return (<StyledWeekViewTimeTableCell {...restProps} >
-    <TimeTableCellWeek2 {...restProps} />
-  </StyledWeekViewTimeTableCell>)
-  //return ;
-};
+  date.getDay() === 0 || date.getDay() === 6 || date.getHours() === 13;
 
 // #FOLD_BLOCK
 const StyledOpacity = styled(Opacity)(() => ({
@@ -406,24 +386,19 @@ const CellBase = React.memo(
   }
 );
 
-const CellWeekBase = React.memo(
-  ({
-    startDate,
-    endDate
-  }) => {
-    return (
-      <StyledWeekDivText className={classes.textWeek}> $ 1200</StyledWeekDivText>
-    );
+const CellWeekBase = React.memo(({ startDate, endDate }) => {
+  return (
+    <StyledWeekDivText className={classes.textWeek}> $ 1200</StyledWeekDivText>
+  );
 
-    /* return (
+  /* return (
       <StyledTableCell className={classNames({
         [classes.rainBack]: true,
       })}>
         <StyledWeekDivText className={classes.textWeek}> $ 1200</StyledWeekDivText>
       </StyledTableCell>
     ); */
-  }
-);
+});
 
 const TimeTableCell = CellBase;
 
@@ -491,6 +466,37 @@ const gettingSports = () => {
 const sports = gettingSports();
 
 const ReservaGridCustom2 = () => {
+  const dispatch = useDispatch();
+
+  const institution = useSelector((state) => state.institution);
+
+  const [workingDays, setWorkingDays] = useState([]);
+
+  const TimeTableCellWeek = ({ ...restProps }) => {
+    const { startDate } = restProps;
+
+    return (
+      <StyledWeekViewTimeTableCell {...restProps}>
+        <DataCell workingDays={workingDays} itemData={{ ...restProps }} />
+      </StyledWeekViewTimeTableCell>
+    );
+
+    if (isRestTime(startDate)) {
+      return (
+        <StyledWeekViewTimeTableCell
+          {...restProps}
+          className={classes.nonWorkingCell}
+        />
+      );
+    }
+    return (
+      <StyledWeekViewTimeTableCell {...restProps}>
+        <TimeTableCellWeek2 {...restProps} />
+      </StyledWeekViewTimeTableCell>
+    );
+    //return ;
+  };
+
   const [grouping, setGrouping] = useState([
     {
       resourceName: "court_id",
@@ -743,14 +749,17 @@ const ReservaGridCustom2 = () => {
     console.log("handleChangeAddedAppointment");
     console.log(addedAppointment);
 
-    const isValidAppointment = Utils.isValidAppointment(addedAppointment, addedAppointment);
+    const isValidAppointment = Utils.isValidAppointment(
+      addedAppointment,
+      addedAppointment
+    );
     if (!isValidAppointment) {
       addedAppointment.cancel = true;
-      setShowAlert(true)
-      return
+      setShowAlert(true);
+      return;
     }
 
-    setIsValidAppointment(true)
+    setIsValidAppointment(true);
     setAddedAppointment(addedAppointment);
   };
 
@@ -758,13 +767,16 @@ const ReservaGridCustom2 = () => {
     console.log("handleChangeAppointmentChanges");
     console.log(appointmentChanges);
 
-    const isValidAppointment = Utils.isValidAppointment(addedAppointment, addedAppointment);
+    const isValidAppointment = Utils.isValidAppointment(
+      addedAppointment,
+      addedAppointment
+    );
     if (!isValidAppointment) {
       addedAppointment.cancel = true;
-      setShowAlert(true)
-      return
+      setShowAlert(true);
+      return;
     }
-    setIsValidAppointment(false)
+    setIsValidAppointment(false);
     setAppointmentChanges(appointmentChanges);
   };
 
@@ -772,24 +784,55 @@ const ReservaGridCustom2 = () => {
     console.log("handleChangeEditingAppointment");
     console.log(editingAppointment);
 
-    const isValidAppointment = Utils.isValidAppointment(addedAppointment, addedAppointment);
+    const isValidAppointment = Utils.isValidAppointment(
+      addedAppointment,
+      addedAppointment
+    );
     if (!isValidAppointment) {
       addedAppointment.cancel = true;
-      setShowAlert(true)
-      return
+      setShowAlert(true);
+      return;
     }
-    setIsValidAppointment(true)
+    setIsValidAppointment(true);
     setEditingAppointment(editingAppointment);
   };
 
   const handleCloseAlert = () => {
-    setShowAlert(false)
-    setIsValidAppointment(false)
-  }
+    setShowAlert(false);
+    setIsValidAppointment(false);
+  };
 
   useEffect(() => {
     //
     sportChange(1);
+
+    dispatch(getInstitutionSchedules(institution.id));
+
+    //OBTENER LOS DIAS LABORALES
+    institution.schedules.forEach((schedule) => {
+      schedule.daysAvailable.forEach((diaLaboral) => {
+        switch (diaLaboral) {
+          case "MIERCOLES":
+            diaLaboral = "MIÉRCOLES";
+            break;
+          case "SABADO":
+            diaLaboral = "SÁBADO";
+            break;
+          default:
+        }
+
+        console.log("OBTENIENDO DIAS LABORALES DE LA INSTITUCION");
+        console.log(
+          "dia: " + diaLaboral + " numero: " + moment().day(diaLaboral).day()
+        );
+
+        setWorkingDays((prevState) => {
+          return [...prevState, moment().day(diaLaboral).day()];
+        });
+      });
+    });
+
+    //Obtener todas las reservas hechas para la institucion
   }, []);
 
   return (
@@ -799,13 +842,15 @@ const ReservaGridCustom2 = () => {
           data={filterTasks(appointments, currentSport)}
           locale={"es-ES"}
         >
-          <EditingState onCommitChanges={handleCommitChanges}
+          <EditingState
+            onCommitChanges={handleCommitChanges}
             addedAppointment={addedAppointment}
             onAddedAppointmentChange={handleChangeAddedAppointment}
             appointmentChanges={appointmentChanges}
             onAppointmentChangesChange={handleChangeAppointmentChanges}
             editingAppointment={editingAppointment}
-            onEditingAppointmentChange={handleChangeEditingAppointment} />
+            onEditingAppointmentChange={handleChangeEditingAppointment}
+          />
           <ViewState defaultCurrentDate="2018-07-17" />
           <GroupingState grouping={grouping} />
           <WeekView
@@ -843,8 +888,16 @@ const ReservaGridCustom2 = () => {
           <TodayButton messages={TodayButtonMessages} />
         </Scheduler>
       </Paper>
-      <Snackbar open={showAlert} autoHideDuration={6000} onClose={handleCloseAlert}>
-        <Alert onClose={handleCloseAlert} severity="warning" sx={{ width: '100%' }}>
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity="warning"
+          sx={{ width: "100%" }}
+        >
           This is a success message!
         </Alert>
       </Snackbar>

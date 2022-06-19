@@ -256,12 +256,13 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
     if (isSuccess) {
       setSnackbar({
         message: "Los Horarios se han Guardado Exitosamente !",
-        severity: "success"
+        severity: "success",
       });
     } else {
       setSnackbar({
-        message: "Hubo un error al intentar guardar los Horarios. Vuelva a intentarlo",
-        severity: "error"
+        message:
+          "Hubo un error al intentar guardar los Horarios. Vuelva a intentarlo",
+        severity: "error",
       });
     }
 
@@ -313,7 +314,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
   const handleSubmitChanges = async () => {
     console.log("subiendo horarios de la institucion");
 
-
     if (
       daysSelected
         .map((daySelected) => daySelected.selected)
@@ -327,16 +327,19 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       console.log(data);
 
       try {
-        const schedulesCreated = await InstitucionService.createInstitutionSchedules(institution.id, data[0]).then((data) => data);
+        const schedulesCreated =
+          await InstitucionService.createInstitutionSchedules(
+            institution.id,
+            data[0]
+          ).then((data) => data);
 
         console.log(" DIAS Y HORARIOS DE LA INSTITUCION CARGADOS EXITOSAMENTE");
         console.log(schedulesCreated);
-        handleMessageLoaded(true)
-
+        handleMessageLoaded(true);
       } catch (error) {
         console.log(" ERROR AL CARGAR LOS DIAS Y HORARIOS DE LA INSTITUCION ");
         console.log(error);
-        handleMessageLoaded(false)
+        handleMessageLoaded(false);
       }
     }
   };
@@ -418,43 +421,64 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
         console.log("CARGAMOS LOS HORARIOS DE LA INSTITUCION ENCONTRADOS");
         console.log(institution.schedules);
 
+        const daysAlreadySelected = [];
+        const schedulersAlreadySelected = [];
 
-        const daysAlreadySelected = [
-          { label: "Lunes", value: "LUNES", daysAndTimesId: null, selected: false },
-          { label: "Martes", value: "MARTES", daysAndTimesId: null, selected: false },
-          {
-            label: "Miercoles",
-            value: "MIERCOLES",
-            daysAndTimesId: null,
-            selected: false,
-          },
-          { label: "Jueves", value: "JUEVES", daysAndTimesId: null, selected: false },
-          {
-            label: "Viernes",
-            value: "VIERNES",
-            daysAndTimesId: null,
-            selected: false,
-          },
-          { label: "Sabado", value: "SABADO", daysAndTimesId: null, selected: false },
-          {
-            label: "Domingo",
-            value: "DOMINGO",
-            daysAndTimesId: null,
-            selected: false,
-          },
-        ]
-
-        const horariosCargados = [];
+        const daysAndSchedulesAlreadyLoaded = [];
 
         institution.schedules.forEach((horario) => {
+          horario.daysAvailable.forEach((dia) => {
+            daysAlreadySelected.push({
+              label: dia.charAt(0).toUpperCase() + dia.slice(1).toLowerCase(),
+              value: dia,
+              daysAndTimesId: horario.id,
+              selected: true,
+            });
+          });
 
+          horario.details.forEach(({ timeFrame }) => {
+            schedulersAlreadySelected.push({
+              id: uuidv4(),
+              from: new Date(timeFrame.from),
+              to: new Date(timeFrame.to),
+            });
+          });
 
+          daysAndSchedulesAlreadyLoaded.push({
+            id: horario.id,
+            parentId: institution.id,
+            daysAvailable: horario.daysAvailable,
+            details: schedulersAlreadySelected,
+          });
+        });
 
-        })
+        daysSelected.forEach((diaSeleccionado) => {
+          if (
+            !daysAlreadySelected
+              .map((dia) => dia.value)
+              .includes(diaSeleccionado.value)
+          ) {
+            daysAlreadySelected.push(diaSeleccionado);
+          }
+        });
 
-        setDaysSelected()
+        const days = {
+          Lunes: 1,
+          Martes: 2,
+          Miercoles: 3,
+          Jueves: 4,
+          Viernes: 5,
+          Sabado: 6,
+          Domingo: 7,
+        };
 
-        setDiasYHorarios(horariosCargados);
+        const arraySorted = daysAlreadySelected.sort((a, b) => {
+          return days[a.label] - days[b.label];
+        });
+
+        setDaysSelected(arraySorted.sort());
+
+        setDiasYHorarios(daysAndSchedulesAlreadyLoaded);
         setNoSchedulesLoadedOpen(false);
       } else {
         setNoSchedulesLoadedOpen(true);
@@ -462,7 +486,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
 
       //setDiasYHorarios([nuevoDiaYHorario]);
     } catch (error) {
-
       setDiasYHorarios([nuevoDiaYHorario]);
       setNoSchedulesLoadedOpen(true);
     }
@@ -584,7 +607,12 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           </Box>
         </Card>
       </form>
-      <CustomizedSnackbars message={snackbar.message} severity={snackbar.severity} setOpen={setOpen} open={open} />
+      <CustomizedSnackbars
+        message={snackbar.message}
+        severity={snackbar.severity}
+        setOpen={setOpen}
+        open={open}
+      />
     </>
   );
 };
