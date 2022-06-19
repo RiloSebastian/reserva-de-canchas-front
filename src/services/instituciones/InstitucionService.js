@@ -22,7 +22,7 @@ const getByAdminEmail = async (admin_email) => {
 const getInstitutionSchedules = async (institution_id) => {
   return await http
     .get(`/institutions/${institution_id}/schedules`)
-    .then((response) => response)
+    .then((response) => response.data)
     .catch((err) => Promise.reject(err));
 };
 

@@ -44,7 +44,7 @@ export default function (state = initialState, action) {
     case LOAD_INSTITUTION_SCHEDULES:
       return {
         ...state,
-        schedules: payload.data,
+        schedules: payload,
       };
     default:
       return state;

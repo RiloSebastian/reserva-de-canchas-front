@@ -223,97 +223,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
     setDiasYHorarios(diasYHorariosUpdated);
   };
 
-  useEffect(async () => {
-    console.log("datos de la institucion");
-    console.log(institution);
-
-    try {
-      //obtener horarios seteados de la institucion
-
-      const institutionSchedules =
-        await InstitucionService.getInstitutionSchedules(institution.id).then(
-          (data) => data
-        );
-
-      console.log("horarios obtenidos");
-      console.log(institutionSchedules);
-
-      if (institution.schedules) {
-        //Cargamos los horarios
-      } else {
-        setNoSchedulesLoadedOpen(true);
-      }
-
-      //setDiasYHorarios([nuevoDiaYHorario]);
-    } catch (error) {
-      console.log("error al obtener horarios de instituciones");
-      console.log(error);
-
-      console.log("CARGANDO NUEVOS DIAS Y HORARIOS");
-      console.log(nuevoDiaYHorario);
-
-      setDiasYHorarios([nuevoDiaYHorario]);
-      setNoSchedulesLoadedOpen(true);
-    }
-  }, []);
-
-  const firstUpdate = useRef(true);
-  useEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-      return;
-    }
-
-    //Validar si es necesario desabilitar el boton de agregar mas horarios
-
-    if (diasYHorarios.length === 1) {
-      if (
-        daysSelected
-          .map((daySelected) => daySelected.selected)
-          .every((d) => d === true)
-      ) {
-        setDisabled(true);
-        return;
-      }
-
-      if (
-        daysSelected.map((daySelected) => daySelected.selected).includes(true)
-      ) {
-        setDisabled(false);
-      } else {
-        setDisabled(true);
-      }
-    } else {
-      //Validar los ids asignados a cada dia
-
-      diasYHorarios.forEach((diaYHorario) => {
-        if (
-          !daysSelected
-            .map((daySelected) => daySelected.daysAndTimesId)
-            .includes(diaYHorario.id) &&
-          daysSelected
-            .map((daySelected) => daySelected.selected)
-            .every((d) => d === true)
-        ) {
-          const diasYHorariosUpdated = diasYHorarios.filter(
-            (d) => d.id !== diaYHorario.id
-          );
-          setDiasYHorarios(diasYHorariosUpdated);
-        }
-
-        if (
-          daysSelected
-            .map((daySelected) => daySelected.selected)
-            .every((d) => d === true)
-        ) {
-          setDisabled(true);
-        } else {
-          setDisabled(false);
-        }
-      });
-    }
-  }, [daysSelected]);
-
   const handleDelete = (item) => {
     confirm({
       title: "¿Esta Seguro que desea eliminar este horario?",
@@ -431,6 +340,133 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       }
     }
   };
+
+  const firstUpdate = useRef(true);
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+
+    //Validar si es necesario desabilitar el boton de agregar mas horarios
+
+    if (diasYHorarios.length === 1) {
+      if (
+        daysSelected
+          .map((daySelected) => daySelected.selected)
+          .every((d) => d === true)
+      ) {
+        setDisabled(true);
+        return;
+      }
+
+      if (
+        daysSelected.map((daySelected) => daySelected.selected).includes(true)
+      ) {
+        setDisabled(false);
+      } else {
+        setDisabled(true);
+      }
+    } else {
+      //Validar los ids asignados a cada dia
+
+      diasYHorarios.forEach((diaYHorario) => {
+        if (
+          !daysSelected
+            .map((daySelected) => daySelected.daysAndTimesId)
+            .includes(diaYHorario.id) &&
+          daysSelected
+            .map((daySelected) => daySelected.selected)
+            .every((d) => d === true)
+        ) {
+          const diasYHorariosUpdated = diasYHorarios.filter(
+            (d) => d.id !== diaYHorario.id
+          );
+          setDiasYHorarios(diasYHorariosUpdated);
+        }
+
+        if (
+          daysSelected
+            .map((daySelected) => daySelected.selected)
+            .every((d) => d === true)
+        ) {
+          setDisabled(true);
+        } else {
+          setDisabled(false);
+        }
+      });
+    }
+  }, [daysSelected]);
+
+  useEffect(async () => {
+    console.log("datos de la institucion");
+    console.log(institution);
+
+    try {
+      //obtener horarios seteados de la institucion
+
+      const institutionSchedules =
+        await InstitucionService.getInstitutionSchedules(institution.id).then(
+          (data) => data
+        );
+
+      console.log("horarios obtenidos");
+      console.log(institutionSchedules);
+
+      if (institution.schedules) {
+        //Cargamos los horarios
+        console.log("CARGAMOS LOS HORARIOS DE LA INSTITUCION ENCONTRADOS");
+        console.log(institution.schedules);
+
+
+        const daysAlreadySelected = [
+          { label: "Lunes", value: "LUNES", daysAndTimesId: null, selected: false },
+          { label: "Martes", value: "MARTES", daysAndTimesId: null, selected: false },
+          {
+            label: "Miercoles",
+            value: "MIERCOLES",
+            daysAndTimesId: null,
+            selected: false,
+          },
+          { label: "Jueves", value: "JUEVES", daysAndTimesId: null, selected: false },
+          {
+            label: "Viernes",
+            value: "VIERNES",
+            daysAndTimesId: null,
+            selected: false,
+          },
+          { label: "Sabado", value: "SABADO", daysAndTimesId: null, selected: false },
+          {
+            label: "Domingo",
+            value: "DOMINGO",
+            daysAndTimesId: null,
+            selected: false,
+          },
+        ]
+
+        const horariosCargados = [];
+
+        institution.schedules.forEach((horario) => {
+
+
+
+        })
+
+        setDaysSelected()
+
+        setDiasYHorarios(horariosCargados);
+        setNoSchedulesLoadedOpen(false);
+      } else {
+        setNoSchedulesLoadedOpen(true);
+      }
+
+      //setDiasYHorarios([nuevoDiaYHorario]);
+    } catch (error) {
+
+      setDiasYHorarios([nuevoDiaYHorario]);
+      setNoSchedulesLoadedOpen(true);
+    }
+  }, []);
 
   return (
     <>

@@ -14,6 +14,7 @@ import { Holidays } from "../../components/settings/Holidays";
 import { ImagesSection } from "../../components/settings/ImagesSection";
 import InstitucionService from "../../services/instituciones/InstitucionService";
 import { ConfirmProvider } from "material-ui-confirm";
+import { getInstitutionSchedules } from "../../actions/institution";
 
 const reducer = (state, action) => {
   console.log("action", action.data);
@@ -42,8 +43,17 @@ const ConfiguracionInstituciones = () => {
       const instititionDetails = InstitucionService.update().then(
         (data) => data
       );
-    } catch (error) {}
+    } catch (error) { }
   };
+
+  useEffect(() => {
+    //Obtener Datos de la Institucions
+
+    dispatch(getInstitutionSchedules(institution.id))
+
+
+  }, [])
+
 
   return (
     <>

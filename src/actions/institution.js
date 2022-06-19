@@ -23,26 +23,37 @@ export const getByAdminEmail = (admin_email) => (dispatch) => {
         payload: response,
       });
 
+      return Promise.resolve();
+    },
+    (error) => {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+
+      dispatch({
+        type: GET_INSTITUTION_FAILED,
+      });
+
+      return Promise.reject();
+    }
+  );
+};
+
+export const getInstitutionSchedules = (institution_id) => (dispatch) => {
+  return InstitucionService.getInstitutionSchedules(institution_id).then(
+    (response) => {
+      console.log("ejecutando action para obtener horarios de la institucion");
+      console.log(response);
+
       //TRAIGO LOS HORARIOS DE LA INSTITUCION
 
-      try {
-        //obtener horarios seteados de la institucion
-        const institutionSchedules = InstitucionService.getInstitutionSchedules(
-          response.id
-        ).then((data) => data);
-
-        console.log("horarios obtenidos");
-        console.log(institutionSchedules);
-
-        dispatch({
-          type: LOAD_INSTITUTION_SCHEDULES,
-          payload: institutionSchedules,
-        });
-
-        //setDiasYHorarios([nuevoDiaYHorario]);
-      } catch (error) {
-        console.log("error al obtener horarios de instituciones");
-      }
+      dispatch({
+        type: LOAD_INSTITUTION_SCHEDULES,
+        payload: response,
+      });
 
       return Promise.resolve();
     },
