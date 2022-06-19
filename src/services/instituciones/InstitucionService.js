@@ -29,8 +29,17 @@ const getInstitutionSchedules = async (institution_id) => {
 const createInstitutionSchedules = async (institution_id, data) => {
   return await http
     .post(`/institutions/${institution_id}/schedule`, data)
-    .then((response) => response)
-    .catch((err) => Promise.reject(err));
+    .then((response) => {
+      console.log("CREANDO HORARIO PARA INSTITUCION");
+      console.log(response.data);
+      return response.data
+    })
+    .catch((err) => {
+      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
+      console.log(err.response);
+
+      return Promise.reject(err.response)
+    });
 };
 
 const create = (data) => {

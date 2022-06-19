@@ -42,6 +42,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import CardActions from "@mui/material/CardActions";
 import Typography from "@mui/material/Typography";
+import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 
 const bull = (
   <Box
@@ -76,6 +77,9 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
   const confirm = useConfirm();
 
   const dispatch = useDispatch();
+
+  const [open, setOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({});
 
   const [noSchedulesLoadedOpen, setNoSchedulesLoadedOpen] = useState(false);
 
@@ -339,6 +343,22 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       .catch(() => console.log("Deletion cancelled."));
   };
 
+  const handleMessageLoaded = (isSuccess) => {
+    if (isSuccess) {
+      setSnackbar({
+        message: "Los Horarios se han Guardado Exitosamente !",
+        severity: "success"
+      });
+    } else {
+      setSnackbar({
+        message: "Hubo un error al intentar guardar los Horarios. Vuelva a intentarlo",
+        severity: "error"
+      });
+    }
+
+    setOpen(true);
+  };
+
   const handleOpenDaysAndSchedules = () => {
     if (diasYHorarios.length === 0) {
       handleAddNewDatesSchedules();
@@ -381,8 +401,9 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
     return diasYhorariosToUpload;
   };
 
-  const handleSubmitChanges = () => {
+  const handleSubmitChanges = async () => {
     console.log("subiendo horarios de la institucion");
+
 
     if (
       daysSelected
@@ -395,129 +416,139 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
 
       console.log("SUBIENDO DIAS Y HORARIOS DE LA INSTITUCION");
       console.log(data);
-      data.forEach((card) => {
-        try {
-          const schedulesCreated =
-            InstitucionService.createInstitutionSchedules(institution.id, card);
-        } catch (error) {}
-      });
+
+      try {
+        const schedulesCreated = await InstitucionService.createInstitutionSchedules(institution.id, data[0]).then((data) => data);
+
+        console.log(" DIAS Y HORARIOS DE LA INSTITUCION CARGADOS EXITOSAMENTE");
+        console.log(schedulesCreated);
+        handleMessageLoaded(true)
+
+      } catch (error) {
+        console.log(" ERROR AL CARGAR LOS DIAS Y HORARIOS DE LA INSTITUCION ");
+        console.log(error);
+        handleMessageLoaded(false)
+      }
     }
   };
 
   return (
-    <form autoComplete="off" noValidate {...props}>
-      <Card>
-        <CardHeader title="Horarios de Apertura y Cierre" />
-        <Divider />
-        <CardContent>
-          {noSchedulesLoadedOpen ? (
-            <React.Fragment>
-              <CardContent>
-                <Typography
-                  sx={{ fontSize: 14 }}
-                  color="text.secondary"
-                  gutterBottom
-                >
-                  Dias y Horarios
-                </Typography>
-                <Typography variant="h5" component="div">
-                  La institucion aun no posee horarios de apertura y cierre
-                  cargados
-                </Typography>
-                <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                  Por favor agregue los horarios haciendo click en el boton de
-                  abajo
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  onClick={handleOpenDaysAndSchedules}
-                  variant="contained"
-                  size="small"
-                >
-                  Agregar horarios de apertura y cierre a la insittucion
-                </Button>
-              </CardActions>
-            </React.Fragment>
-          ) : (
-            <Grid container spacing={3} alignItems="center">
-              <Grid item xs>
-                <FormControl sx={{ m: 1 }}>
-                  <List>
-                    {diasYHorarios.map((diaYHorario) => (
-                      <ListItem key={diaYHorario.id}>
-                        <DaysAndSchedulePaper
-                          diasYHorarios={diasYHorarios}
-                          setDaysSelected={setDaysSelected}
-                          daysSelected={daysSelected}
-                          diaYHorarioId={diaYHorario.id}
-                          diaYHorario={diaYHorario}
-                          setDiasYHorarios={setDiasYHorarios}
-                          removeDaysAndSchedule={removeDaysAndSchedule}
-                          handleChangeHorarios={handleChangeHorarios}
-                        />
-                        <ListItemSecondaryAction>
-                          <Grid
-                            item
-                            sx={{
-                              width: 40,
-                              height: 40,
-                            }}
-                          >
-                            <IconButton
-                              onClick={() => {
-                                handleDelete(diaYHorario);
+    <>
+      <form autoComplete="off" noValidate {...props}>
+        <Card>
+          <CardHeader title="Horarios de Apertura y Cierre" />
+          <Divider />
+          <CardContent>
+            {noSchedulesLoadedOpen ? (
+              <React.Fragment>
+                <CardContent>
+                  <Typography
+                    sx={{ fontSize: 14 }}
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    Dias y Horarios
+                  </Typography>
+                  <Typography variant="h5" component="div">
+                    La institucion aun no posee horarios de apertura y cierre
+                    cargados
+                  </Typography>
+                  <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                    Por favor agregue los horarios haciendo click en el boton de
+                    abajo
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    onClick={handleOpenDaysAndSchedules}
+                    variant="contained"
+                    size="small"
+                  >
+                    Agregar horarios de apertura y cierre a la insittucion
+                  </Button>
+                </CardActions>
+              </React.Fragment>
+            ) : (
+              <Grid container spacing={3} alignItems="center">
+                <Grid item xs>
+                  <FormControl sx={{ m: 1 }}>
+                    <List>
+                      {diasYHorarios.map((diaYHorario) => (
+                        <ListItem key={diaYHorario.id}>
+                          <DaysAndSchedulePaper
+                            diasYHorarios={diasYHorarios}
+                            setDaysSelected={setDaysSelected}
+                            daysSelected={daysSelected}
+                            diaYHorarioId={diaYHorario.id}
+                            diaYHorario={diaYHorario}
+                            setDiasYHorarios={setDiasYHorarios}
+                            removeDaysAndSchedule={removeDaysAndSchedule}
+                            handleChangeHorarios={handleChangeHorarios}
+                          />
+                          <ListItemSecondaryAction>
+                            <Grid
+                              item
+                              sx={{
+                                width: 40,
+                                height: 40,
                               }}
-                              aria-label="delete"
-                              size="large"
                             >
-                              <DeleteIcon
-                                fontSize="inherit"
-                                sx={{
-                                  color: pink[500],
-                                  width: 40,
-                                  height: 40,
+                              <IconButton
+                                onClick={() => {
+                                  handleDelete(diaYHorario);
                                 }}
-                              />
-                            </IconButton>
-                          </Grid>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    ))}
-                  </List>
-                  <ButtonAddMoreDatesAndTime
-                    daysSelected={daysSelected}
-                    handleAddNewDatesSchedules={handleAddNewDatesSchedules}
-                    disabled={disabled}
-                  />
-                </FormControl>
+                                aria-label="delete"
+                                size="large"
+                              >
+                                <DeleteIcon
+                                  fontSize="inherit"
+                                  sx={{
+                                    color: pink[500],
+                                    width: 40,
+                                    height: 40,
+                                  }}
+                                />
+                              </IconButton>
+                            </Grid>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      ))}
+                    </List>
+                    <ButtonAddMoreDatesAndTime
+                      daysSelected={daysSelected}
+                      handleAddNewDatesSchedules={handleAddNewDatesSchedules}
+                      disabled={disabled}
+                    />
+                  </FormControl>
+                </Grid>
               </Grid>
-            </Grid>
-          )}
-        </CardContent>
-        <Divider />
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            p: 2,
-          }}
-        >
-          <Button
-            disabled={
-              noSchedulesLoadedOpen ||
-              daysSelected
-                .map((daySelected) => daySelected.selected)
-                .every((d) => d === false)
-            }
-            onClick={handleSubmitChanges}
-            color="primary"
-            variant="contained"
+            )}
+          </CardContent>
+          <Divider />
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              p: 2,
+            }}
           >
-            Guardar Horarios
-          </Button>
-        </Box>
-      </Card>
-    </form>
+            <Button
+              disabled={
+                noSchedulesLoadedOpen ||
+                daysSelected
+                  .map((daySelected) => daySelected.selected)
+                  .every((d) => d === false)
+              }
+              onClick={handleSubmitChanges}
+              color="primary"
+              variant="contained"
+            >
+              Guardar Horarios
+            </Button>
+          </Box>
+        </Card>
+      </form>
+      <CustomizedSnackbars message={snackbar.message} severity={snackbar.severity} setOpen={setOpen} open={open} />
+    </>
   );
 };
