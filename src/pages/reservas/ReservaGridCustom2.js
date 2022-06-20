@@ -92,10 +92,9 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const getBorder = (theme) =>
-  `1px solid ${
-    theme.palette.mode === "light"
-      ? lighten(alpha(theme.palette.divider, 1), 0.88)
-      : darken(alpha(theme.palette.divider, 1), 0.68)
+  `1px solid ${theme.palette.mode === "light"
+    ? lighten(alpha(theme.palette.divider, 1), 0.88)
+    : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -472,12 +471,14 @@ const ReservaGridCustom2 = () => {
 
   const [workingDays, setWorkingDays] = useState([]);
 
-  const TimeTableCellWeek = ({ ...restProps }) => {
+  const [allowAdding, setAllowAdding] = useState(true);
+
+  const TimeTableCellWeek = ({ onDoubleClick, ...restProps }) => {
     const { startDate } = restProps;
 
     return (
-      <StyledWeekViewTimeTableCell {...restProps}>
-        <DataCell workingDays={workingDays} itemData={{ ...restProps }} />
+      <StyledWeekViewTimeTableCell onDoubleClick={allowAdding ? onDoubleClick : undefined} {...restProps}>
+        <DataCell setAllowAdding={setAllowAdding} workingDays={workingDays} itemData={{ ...restProps }} />
       </StyledWeekViewTimeTableCell>
     );
 
@@ -620,6 +621,10 @@ const ReservaGridCustom2 = () => {
   };
 
   const handleCommitChanges = ({ added, changed, deleted }) => {
+    console.log("ENTRANDO A HANDLE COMMIT CHANGES")
+    console.log(added)
+    console.log(changed)
+    console.log(deleted)
     let newData = appointments;
     if (added) {
       const startingAddedId =
@@ -751,14 +756,17 @@ const ReservaGridCustom2 = () => {
 
     const isValidAppointment = Utils.isValidAppointment(
       addedAppointment,
-      addedAppointment
+      addedAppointment,
+      workingDays
     );
-    if (!isValidAppointment) {
+    if (addedAppointment && !isValidAppointment) {
       addedAppointment.cancel = true;
+      console.log("MOSTRANDO ALERTA 1");
       setShowAlert(true);
+      setAllowAdding(false)
       return;
     }
-
+    setAllowAdding(true)
     setIsValidAppointment(true);
     setAddedAppointment(addedAppointment);
   };
@@ -769,10 +777,12 @@ const ReservaGridCustom2 = () => {
 
     const isValidAppointment = Utils.isValidAppointment(
       addedAppointment,
-      addedAppointment
+      addedAppointment,
+      workingDays
     );
     if (!isValidAppointment) {
       addedAppointment.cancel = true;
+      console.log("MOSTRANDO ALERTA 2");
       setShowAlert(true);
       return;
     }
@@ -786,10 +796,12 @@ const ReservaGridCustom2 = () => {
 
     const isValidAppointment = Utils.isValidAppointment(
       addedAppointment,
-      addedAppointment
+      addedAppointment,
+      workingDays
     );
     if (!isValidAppointment) {
       addedAppointment.cancel = true;
+      console.log("MOSTRANDO ALERTA 3");
       setShowAlert(true);
       return;
     }
@@ -798,6 +810,7 @@ const ReservaGridCustom2 = () => {
   };
 
   const handleCloseAlert = () => {
+    console.log("MOSTRANDO ALERTA 4");
     setShowAlert(false);
     setIsValidAppointment(false);
   };

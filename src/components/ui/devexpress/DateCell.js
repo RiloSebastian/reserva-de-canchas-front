@@ -1,12 +1,16 @@
 import React from "react";
 import Utils from "../../../utils/utils";
 
-export default function DateCell(props) {
-  const { startDate } = props.itemData;
+export default function DateCell(children,
+  className,
+  itemData,
+  workingDays,
+) {
+  const { startDate } = itemData;
   const isDisableDate =
-    Utils.isHoliday(startDate) || Utils.isWeekend(startDate);
+    Utils.isHoliday(startDate) || Utils.isWeekend(startDate, workingDays);
   const isDinner = Utils.isDinner(startDate);
-  let cssClasses = props.className ? props.className : "";
+  let cssClasses = className ? className : "";
 
   if (isDisableDate) {
     cssClasses += " disable-date";
@@ -14,5 +18,5 @@ export default function DateCell(props) {
     cssClasses += " dinner";
   }
 
-  return <div className={cssClasses}>{props.children}</div>;
+  return <div className={cssClasses}>{children}</div>;
 }

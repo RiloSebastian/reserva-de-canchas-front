@@ -366,12 +366,12 @@ const PrioritySelector = ({ sportChange, sport }) => {
         onChange={(e) => {
           sportChange(e.target.value);
         }}
-        /* renderValue={() => (
-          <PrioritySelectorItem
-            name={currentSport.name}
-            color={currentSport.color}
-          />
-        )} */
+      /* renderValue={() => (
+        <PrioritySelectorItem
+          name={currentSport.name}
+          color={currentSport.color}
+        />
+      )} */
       >
         {sports.map(({ sport_id, color, name }) => (
           <MenuItem value={sport_id} key={sport_id.toString()}>

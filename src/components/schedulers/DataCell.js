@@ -6,6 +6,7 @@ export default function DataCell({
   className,
   itemData,
   workingDays,
+  setAllowAdding,
 }) {
   const { startDate } = itemData;
   const isDisableDate =
