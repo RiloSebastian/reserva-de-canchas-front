@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 
 import {
@@ -31,20 +31,16 @@ const useStyles = makeStyles((theme) => ({
 const MultipleSelectChips = ({
   value,
   setValue,
-  //options,
   label,
   error,
   setError,
   setDaysSelected,
   daysSelected,
-  //daysAndTimesId,
   daysAndTimesId,
 }) => {
   const classes = useStyles();
 
   const handleClick = (clickedValue, daysAndTimesId) => {
-    console.log("daysAndTimesId")
-    console.log(daysAndTimesId)
     if (setError) {
       setError("");
     }
@@ -54,48 +50,58 @@ const MultipleSelectChips = ({
       arr.splice(index, 1);
       setValue(arr);
 
-      const dayUpdated = daysSelected.map(day => {
+      const dayUpdated = daysSelected.map((day) => {
         if (day.value === clickedValue) {
           return {
             ...day,
             selected: false,
-            daysAndTimesId: null
-          }
+            daysAndTimesId: null,
+          };
         }
         return day;
-      })
+      });
       setDaysSelected(dayUpdated);
     } else {
-      const dayUpdated = daysSelected.map(day => {
+      const dayUpdated = daysSelected.map((day) => {
         if (day.value === clickedValue) {
           return {
             ...day,
             selected: true,
-            daysAndTimesId: daysAndTimesId
-          }
+            daysAndTimesId: daysAndTimesId,
+          };
         }
         return day;
-      })
-
+      });
 
       setValue([...value, clickedValue]);
       setDaysSelected(dayUpdated);
     }
   };
 
+  useEffect(() => {
+    console.log("DIAS SELECCIONADOS PROVENIENTES DEL BACK");
+    console.log(daysSelected);
+
+    /* daysSelected.map((option, i) => {
+      handleClick(option.value, daysAndTimesId);
+    }); */
+  }, []);
+
   return (
     <>
       <div className={classes.container}>
         {label && (
           <FormLabel error={Boolean(error)}>
-            <Typography variant="body2">{`${label}${value.length ? ":" : ": No ha seleccionado ningun dia."
-              } ${value.length === 7
+            <Typography variant="body2">{`${label}${
+              value.length ? ":" : ": No ha seleccionado ningun dia."
+            } ${
+              value.length === 7
                 ? "Todos los Dias"
                 : daysSelected
-                  .filter((option) => value.indexOf(option.value) !== -1)
-                  .map((option) => option.label)
-                  .join(", ")
-              }`}</Typography>
+                    .filter((option) => value.indexOf(option.value) !== -1)
+                    .map((option) => option.label)
+                    .join(", ")
+            }`}</Typography>
           </FormLabel>
         )}
         {Boolean(error) && (
@@ -109,27 +115,43 @@ const MultipleSelectChips = ({
         <div className={classes.chipsDiv}>
           {daysSelected && daysSelected.length
             ? daysSelected.map((option, i) => {
-              if (!option.selected || option.daysAndTimesId === daysAndTimesId) {
-                return (
-                  <Chip
-                    icon={option.icon}
-                    className={classes.chip}
-                    key={i}
-                    color={option.selected && option.daysAndTimesId === daysAndTimesId ? "primary" : "default"}
-                    variant={
-                      value.find((e) => e === option.value) || option.selected
-                        ? "default"
-                        : "outlined"
-                    }
-                    label={
-                      <Typography variant="body2">{`${option.label}`}</Typography>
-                    }
-                    clickable={!option.selected || option.daysAndTimesId === daysAndTimesId}
-                    onClick={!option.selected || option.daysAndTimesId === daysAndTimesId ? () => handleClick(option.value, daysAndTimesId) : undefined}
-                  />
-                )
-              }
-            })
+                if (
+                  !option.selected ||
+                  option.daysAndTimesId === daysAndTimesId
+                ) {
+                  return (
+                    <Chip
+                      icon={option.icon}
+                      className={classes.chip}
+                      key={i}
+                      color={
+                        option.selected &&
+                        option.daysAndTimesId === daysAndTimesId
+                          ? "primary"
+                          : "default"
+                      }
+                      variant={
+                        value.find((e) => e === option.value) || option.selected
+                          ? "default"
+                          : "outlined"
+                      }
+                      label={
+                        <Typography variant="body2">{`${option.label}`}</Typography>
+                      }
+                      clickable={
+                        !option.selected ||
+                        option.daysAndTimesId === daysAndTimesId
+                      }
+                      onClick={
+                        !option.selected ||
+                        option.daysAndTimesId === daysAndTimesId
+                          ? () => handleClick(option.value, daysAndTimesId)
+                          : undefined
+                      }
+                    />
+                  );
+                }
+              })
             : null}
         </div>
       </div>
