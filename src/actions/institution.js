@@ -23,7 +23,7 @@ export const getByAdminEmail = (admin_email) => (dispatch) => {
         payload: response,
       });
 
-      return Promise.resolve();
+      return response;
     },
     (error) => {
       const message =
