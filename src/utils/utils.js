@@ -14,9 +14,36 @@ export default class Utils {
     return !workingDays.includes(day);
   }
 
-  static isDinner(date) {
+  static isDinner(date, busyTime) {
     const hours = date.getHours();
-    return hours >= dinnerTime.from && hours < dinnerTime.to;
+    const day = date.getDay();
+
+    let isDinner = true;
+
+    console.log("PRINTEANDO BUSY TIMES EN UTILS")
+    console.log(busyTime)
+
+    for (const range of busyTime) {
+
+      for (const horario of range.horariosLaborales) {
+
+        console.log("VAMOS POR HORARIO")
+        console.log(horario)
+        for (var i = horario.from; i <= horario.to - 1; i++) {
+          console.log("EL DIA : " + day + " A LA HORA: " + hours + " ES LABORAL? LO COMPARAMOS CON: " + i)
+          if (range.diasLaboralesSegmentados.includes(day) && hours === i) {
+            isDinner = false
+          }
+
+        }
+      }
+    }
+    /* for (const range of dinnerTime) {
+      return hours >= range.from && hours < range.to;
+    } */
+
+    return isDinner;
+    //return hours >= dinnerTime.from && hours < dinnerTime.to;
   }
 
   static hasCoffeeCupIcon(date) {

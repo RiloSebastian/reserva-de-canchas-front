@@ -5,7 +5,6 @@ import Home from "./home/Home";
 import ConfiguracionInstituciones from "./instituciones/ConfiguracionInstituciones";
 import Listainstitucions from "./instituciones/ListaInstituciones";
 import ListaPromociones from "./promociones/ListaPromociones";
-import ReservaGridCustom from "./reservas/ReservaGridCustom";
 import ReservaGridCustom2 from "./reservas/ReservaGridCustom2";
 import MisReservas from "./usuarios/clientes/MisReservas";
 import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";

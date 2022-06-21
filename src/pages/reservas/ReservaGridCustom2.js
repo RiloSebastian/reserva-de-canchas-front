@@ -96,10 +96,9 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const getBorder = (theme) =>
-  `1px solid ${
-    theme.palette.mode === "light"
-      ? lighten(alpha(theme.palette.divider, 1), 0.88)
-      : darken(alpha(theme.palette.divider, 1), 0.68)
+  `1px solid ${theme.palette.mode === "light"
+    ? lighten(alpha(theme.palette.divider, 1), 0.88)
+    : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -117,16 +116,6 @@ const StyledWeekViewDayScaleCell = styled(WeekView.DayScaleCell)(
     },
   })
 );
-
-const DayScaleCellWeek = ({ ...restProps }) => {
-  const { startDate } = restProps;
-  if (startDate.getDay() === 0 || startDate.getDay() === 6) {
-    return (
-      <StyledWeekViewDayScaleCell {...restProps} className={classes.weekEnd} />
-    );
-  }
-  return <StyledWeekViewDayScaleCell {...restProps} />;
-};
 
 // #FOLD_BLOCK
 const StyledWeekViewTimeTableCell = styled(WeekView.TimeTableCell)(
@@ -474,12 +463,23 @@ const ReservaGridCustom2 = () => {
 
   const institution = useSelector((state) => state.institution);
 
-  const [startDayHour, setStartDayHour] = useState();
-  const [endDayHour, setEndDayHour] = useState();
+  const [startDayHour, setStartDayHour] = useState(7);
+  const [endDayHour, setEndDayHour] = useState(23);
+  const [busyTimes, setBusyTimes] = useState([])
 
   const [workingDays, setWorkingDays] = useState([]);
 
   const [allowAdding, setAllowAdding] = useState(true);
+
+  const DayScaleCellWeek = ({ ...restProps }) => {
+    const { startDate } = restProps;
+    if (Utils.isWeekend(startDate, workingDays)) {
+      return (
+        <StyledWeekViewDayScaleCell {...restProps} className={classes.weekEnd} />
+      );
+    }
+    return <StyledWeekViewDayScaleCell {...restProps} />;
+  };
 
   const TimeTableCellWeek = ({ onDoubleClick, ...restProps }) => {
     const { startDate } = restProps;
@@ -493,6 +493,7 @@ const ReservaGridCustom2 = () => {
           setAllowAdding={setAllowAdding}
           workingDays={workingDays}
           itemData={{ ...restProps }}
+          busyTimes={busyTimes}
         />
       </StyledWeekViewTimeTableCell>
     );
@@ -840,54 +841,81 @@ const ReservaGridCustom2 = () => {
 
     let endDayTime;
 
+
+
     //OBTENER LOS DIAS LABORALES
-    institution.schedules.forEach((schedule) => {
-      schedule.daysAvailable.forEach((diaLaboral) => {
-        switch (diaLaboral) {
-          case "MIERCOLES":
-            diaLaboral = "MIÉRCOLES";
-            break;
-          case "SABADO":
-            diaLaboral = "SÁBADO";
-            break;
-          default:
-        }
+    if (institution.schedules) {
+      institution.schedules.forEach((schedule) => {
+        let horariosLaborales = []
+        let diasLaboralesSegmentados = []
 
-        console.log("OBTENIENDO DIAS LABORALES DE LA INSTITUCION");
-        console.log(
-          "dia: " + diaLaboral + " numero: " + moment().day(diaLaboral).day()
-        );
+        schedule.daysAvailable.forEach((diaLaboral) => {
+          switch (diaLaboral) {
+            case "MIERCOLES":
+              diaLaboral = "MIÉRCOLES";
+              break;
+            case "SABADO":
+              diaLaboral = "SÁBADO";
+              break;
+            default:
+          }
 
-        setWorkingDays((prevState) => {
-          return [...prevState, moment().day(diaLaboral).day()];
+          console.log("OBTENIENDO DIAS LABORALES DE LA INSTITUCION");
+          console.log(
+            "dia: " + diaLaboral + " numero: " + moment().day(diaLaboral).day()
+          );
+
+          diasLaboralesSegmentados.push(moment().day(diaLaboral).day())
+
+          setWorkingDays((prevState) => {
+            return [...prevState, moment().day(diaLaboral).day()];
+          });
         });
-      });
 
-      //OBTENER LOS HORARIOS HORARIOS PARA CADA DIA LABORAL
-      schedule.details.forEach((horario) => {
-        console.log("VALIDANDO EL HORARIO MAS TEMPRANO Y MAS TARDE");
+        //OBTENER LOS HORARIOS HORARIOS PARA CADA DIA LABORAL
+        schedule.details.forEach((horario) => {
+          console.log("VALIDANDO EL HORARIO MAS TEMPRANO Y MAS TARDE");
 
-        startDayTime = validateStartDayTime(
-          startDayTime,
-          new Date(horario.timeFrame.from).getHours()
-        );
+          startDayTime = validateStartDayTime(
+            startDayTime,
+            new Date(horario.timeFrame.from).getHours()
+          );
 
-        endDayTime = validateEndtDayTime(
-          endDayTime,
-          new Date(horario.timeFrame.to).getHours()
-        );
+          endDayTime = validateEndtDayTime(
+            endDayTime,
+            new Date(horario.timeFrame.to).getHours()
+          );
 
-        console.log(
-          "horario desde: " +
+          console.log(
+            "horario desde: " +
             new Date(horario.timeFrame.from).getHours() +
             " hasta: " +
             new Date(horario.timeFrame.to).getHours()
-        );
-      });
-    });
+          );
 
-    setStartDayHour(startDayTime);
-    setEndDayHour(endDayTime);
+          horariosLaborales.push(
+            {
+              from: new Date(horario.timeFrame.from).getHours(),
+              to: new Date(horario.timeFrame.to).getHours()
+            }
+          );
+        });
+
+        console.log("GUARDANDO HORARIOS LABORALES PARA BUSY TIMES")
+        console.log({ ...horariosLaborales, diasLaboralesSegmentados })
+
+        setBusyTimes((prevState) => {
+          return [...prevState, { horariosLaborales, diasLaboralesSegmentados }];
+        });
+        //  setBusyTimes(horariosLaborales);
+      });
+
+      setStartDayHour(startDayTime);
+      setEndDayHour(endDayTime);
+
+
+    }
+
 
     //Obtener todas las reservas hechas para la institucion
   }, []);

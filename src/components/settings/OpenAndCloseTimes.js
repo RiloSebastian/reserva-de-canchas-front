@@ -331,7 +331,10 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           console.log("SUBIENDO DIAS Y HORARIOS DE LA INSTITUCION");
           console.log(data);
 
-          handleUploadChanges(data);
+          data.forEach(schedule => {
+            handleUploadChanges(schedule);
+          })
+
         }
       })
       .catch(() => console.log("Deletion cancelled."));
@@ -342,7 +345,7 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       const schedulesCreated =
         await InstitucionService.createInstitutionSchedules(
           institution.id,
-          data[0]
+          data
         ).then((data) => data);
 
       console.log(" DIAS Y HORARIOS DE LA INSTITUCION CARGADOS EXITOSAMENTE");
@@ -433,11 +436,14 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
         console.log(institution.schedules);
 
         const daysAlreadySelected = [];
-        const schedulersAlreadySelected = [];
+
 
         const daysAndSchedulesAlreadyLoaded = [];
 
         institution.schedules.forEach((horario) => {
+
+          const schedulersAlreadySelected = [];
+
           horario.daysAvailable.forEach((dia) => {
             daysAlreadySelected.push({
               label: dia.charAt(0).toUpperCase() + dia.slice(1).toLowerCase(),
@@ -486,6 +492,10 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
         const arraySorted = daysAlreadySelected.sort((a, b) => {
           return days[a.label] - days[b.label];
         });
+
+        if (!arraySorted.map(diaSeleccionado => diaSeleccionado.selected).every(d => d === true)) {
+          setDisabled(false)
+        }
 
         setDaysSelected(arraySorted.sort());
 

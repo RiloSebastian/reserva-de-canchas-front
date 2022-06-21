@@ -5,11 +5,12 @@ export default function DateCell(children,
   className,
   itemData,
   workingDays,
+  busyTimes,
 ) {
   const { startDate } = itemData;
   const isDisableDate =
     Utils.isHoliday(startDate) || Utils.isWeekend(startDate, workingDays);
-  const isDinner = Utils.isDinner(startDate);
+  const isDinner = Utils.isDinner(startDate, busyTimes);
   let cssClasses = className ? className : "";
 
   if (isDisableDate) {
