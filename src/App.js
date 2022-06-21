@@ -73,84 +73,84 @@ const App = () => {
 
   return (
     <>
-      <ProvideAuth>
-        <Router history={history}>
-          <CssBaseline />
-          <Switch>
-            <Route exact path={PATHS.login} component={SignIn} />
-            <Route exact path={PATHS.signup} component={SignUp} />
-            <Route
-              exact
-              path={PATHS.signupinstitution}
-              component={SignUpInstitution}
-            />
-            <Route exact path={PATHS.accountconfirmation} component={AccountConfirmation} />
-            <Route exact path={PATHS.forgotpass} component={ForgotPassword} />
-            <Route exact path="/">
-              <HomePage />
-            </Route>
+      <Router history={history}>
+        <CssBaseline />
+        <Switch>
+          <Route exact path={PATHS.login} component={SignIn} />
+          <Route exact path={PATHS.signup} component={SignUp} />
+          <Route
+            exact
+            path={PATHS.signupinstitution}
+            component={SignUpInstitution}
+          />
+          <Route
+            exact
+            path={PATHS.accountconfirmation}
+            component={AccountConfirmation}
+          />
+          <Route exact path={PATHS.forgotpass} component={ForgotPassword} />
+          <Route exact path="/">
+            <HomePage />
+          </Route>
 
-            <Route exact path={PATHS.homepage}>
-              <HomePage />
-            </Route>
+          <Route exact path={PATHS.homepage}>
+            <HomePage />
+          </Route>
 
-            <PrivateRoute
-              path={CustomerRoutes.map(
-                (item) => BASE_URL_CUSTOMERS.base + item.path
-              )}
-            >
-              {({ match }) => {
-                return (
-                  <ProvideAuth name={match.params.app}>
-                    <CustomerLayout>
-                      <Switch>
-                        {CustomerRoutes.map(
-                          ({ id, path, component, exact }) => (
-                            <Route
-                              key={id}
-                              path={BASE_URL_CUSTOMERS.base + path}
-                              component={component}
-                              exact={exact}
-                            />
-                          )
-                        )}
-                      </Switch>
-                    </CustomerLayout>
-                  </ProvideAuth>
-                );
-              }}
-            </PrivateRoute>
-            <PrivateRoute
-              path={InstitutionRoutes.map(
-                (item) => BASE_URL_INSTITUTIONS.base + item.path
-              )}
-            >
-              {({ match }) => {
-                return (
-                  <ProvideAuth name={match.params.app}>
-                    <InstitutionLayout>
-                      <Switch>
-                        {InstitutionRoutes.map(
-                          ({ id, path, component, exact }) => (
-                            <Route
-                              key={id}
-                              path={BASE_URL_INSTITUTIONS.base + path}
-                              component={component}
-                              exact={exact}
-                            />
-                          )
-                        )}
-                      </Switch>
-                    </InstitutionLayout>
-                  </ProvideAuth>
-                );
-              }}
-            </PrivateRoute>
+          <PrivateRoute
+            path={CustomerRoutes.map(
+              (item) => BASE_URL_CUSTOMERS.base + item.path
+            )}
+          >
+            {({ match }) => {
+              return (
+                <ProvideAuth name={match.params.app}>
+                  <CustomerLayout>
+                    <Switch>
+                      {CustomerRoutes.map(({ id, path, component, exact }) => (
+                        <Route
+                          key={id}
+                          path={BASE_URL_CUSTOMERS.base + path}
+                          component={component}
+                          exact={exact}
+                        />
+                      ))}
+                    </Switch>
+                  </CustomerLayout>
+                </ProvideAuth>
+              );
+            }}
+          </PrivateRoute>
+          <PrivateRoute
+            path={InstitutionRoutes.map(
+              (item) => BASE_URL_INSTITUTIONS.base + item.path
+            )}
+          >
+            {({ match }) => {
+              return (
+                <ProvideAuth name={match.params.app}>
+                  <InstitutionLayout>
+                    <Switch>
+                      {InstitutionRoutes.map(
+                        ({ id, path, component, exact }) => (
+                          <Route
+                            key={id}
+                            path={BASE_URL_INSTITUTIONS.base + path}
+                            component={component}
+                            exact={exact}
+                          />
+                        )
+                      )}
+                    </Switch>
+                  </InstitutionLayout>
+                </ProvideAuth>
+              );
+            }}
+          </PrivateRoute>
 
-            <Route path="*" component={NotFound} />
-          </Switch>
-        </Router>
-      </ProvideAuth>
+          <Route path="*" component={NotFound} />
+        </Switch>
+      </Router>
 
       {/* <Router history={history}>
         <CssBaseline />

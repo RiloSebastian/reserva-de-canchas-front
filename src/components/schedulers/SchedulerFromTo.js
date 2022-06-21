@@ -14,6 +14,11 @@ import PropTypes from "prop-types";
 import React, { useState, useEffect } from "react";
 import NumberFormat from "react-number-format";
 
+import { useConfirm } from "material-ui-confirm";
+import { ConfirmProvider } from "material-ui-confirm";
+import { red } from "@mui/material/colors";
+import { v4 as uuidv4 } from "uuid";
+
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
   props,
   ref
@@ -52,26 +57,80 @@ const useStyles = makeStyles((theme) => ({
   lineHeight: "30px",
 }));
 
-const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
+const SchedulerFromTo = ({
+  detail,
+  handleChangeHorarios,
+  diaYHorarioId,
+  details,
+  setDiasYHorarios,
+}) => {
+  const confirm = useConfirm();
 
-  const classes = useStyles();
+  const { from, to, id } = detail;
+
+  const [valueFrom, setvalueFrom] = useState();
+  const [valueTo, setvalueTo] = useState();
 
   const handleChangeFrom = (e) => {
+    console.log("HANDLE CHANGE FROM HORARIO");
+    console.log(id);
+    handleChangeHorarios(diaYHorarioId, id, e, to);
 
-    handleChangeHorarios(diaYHorarioId, e, to)
+    /* setDiasYHorarios((prevState) => {
+      console.log("HANDLE CHANGE TO HORARIO");
+      console.log(prevState);
+      handleChangeHorarios(diaYHorarioId, id, from, e);
 
+      return {
+        ...prevState,
+      };
+    }); */
   };
 
   const handleChangeTo = (e) => {
+    console.log("HANDLE CHANGE TO HORARIO");
+    console.log(detail.id);
+    handleChangeHorarios(diaYHorarioId, id, from, e);
 
-    handleChangeHorarios(diaYHorarioId, from, e)
+    /* setDiasYHorarios((prevState) => {
+      console.log("HANDLE CHANGE TO HORARIO");
+      console.log(prevState);
+      handleChangeHorarios(diaYHorarioId, id, from, e);
 
+      return {
+        ...prevState,
+      };
+    }); */
   };
 
-  useEffect(() => { }, []);
+  const removeHorario = (horarioId, diaYHorarioId) => {
+    console.log("REMOVER HORARIO PARA LOS DIAS SELECCIONADOS");
+
+    confirm({
+      title: "¿Esta Seguro que desea eliminar este horario?",
+      cancellationText: "Cancelar",
+    })
+      .then(() => {
+        console.log("ELIMINANDO HORARIOS");
+        /* const dayUpdated = daysSelected.map((day) => {
+          if (day.daysAndTimesId === item.id) {
+            return {
+              ...day,
+              selected: false,
+              daysAndTimesId: null,
+            };
+          }
+          return day;
+        });
+        setDaysSelected(dayUpdated);
+
+        setDiasYHorarios(diasYHorarios.filter((other) => other.id !== item.id)); */
+      })
+      .catch(() => console.log("Deletion cancelled."));
+  };
 
   return (
-    <Grid container alignItems="center">
+    <Grid sx={{ m: 1 }} container spacing={3} alignItems="center">
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Grid item xs>
           <MobileTimePicker
@@ -100,6 +159,20 @@ const SchedulerFromTo = ({ from, to, handleChangeHorarios, diaYHorarioId }) => {
           />
         </Grid>
       </LocalizationProvider>
+      <Grid item xs>
+        <IconButton
+          disabled={details.length === 1}
+          fontSize="inherit"
+          sx={{ color: pink[500] }}
+          onClick={() => {
+            removeHorario(id, diaYHorarioId);
+          }}
+          aria-label="delete"
+          size="large"
+        >
+          <DeleteIcon />
+        </IconButton>
+      </Grid>
     </Grid>
   );
 };

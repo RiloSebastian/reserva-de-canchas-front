@@ -1,4 +1,8 @@
-import { GET_INSTITUTION, UPDATE_INSTITUTION } from "../actions/types";
+import {
+  GET_INSTITUTION,
+  UPDATE_INSTITUTION,
+  LOAD_INSTITUTION_SCHEDULES,
+} from "../actions/types";
 
 const initialState = {
   id: "",
@@ -19,8 +23,8 @@ const initialState = {
 export default function (state = initialState, action) {
   const { type, payload } = action;
 
-  console.log("actualizando intitucion")
-  console.log(payload)
+  console.log("actualizando intitucion");
+  console.log(payload);
 
   switch (type) {
     case GET_INSTITUTION:
@@ -30,11 +34,17 @@ export default function (state = initialState, action) {
         name: payload.name,
         description: payload.description,
         institutionTel: payload.institutionTel,
+        address: payload.address,
       };
     case UPDATE_INSTITUTION:
       return {
         ...state,
-        [payload.type]: payload.data
+        [payload.type]: payload.data,
+      };
+    case LOAD_INSTITUTION_SCHEDULES:
+      return {
+        ...state,
+        schedules: payload,
       };
     default:
       return state;

@@ -24,6 +24,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { pink } from "@mui/material/colors";
+import { v4 as uuidv4 } from "uuid";
+import { getNextFromTime } from "../../../validations/validationTime";
 
 const useStyles = makeStyles((theme) => ({
   ...theme.typography.body2,
@@ -34,6 +36,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const DaysAndSchedulePaper = ({
+  diasYHorarios,
+  setDiasYHorarios,
   diaYHorario,
   diaYHorarioId,
   setHorario,
@@ -41,6 +45,59 @@ const DaysAndSchedulePaper = ({
   setDaysSelected,
   handleChangeHorarios,
 }) => {
+  const nuevoHorario = {
+    id: "",
+    from: new Date(),
+    to: new Date(new Date().setHours(new Date().getHours() + 1)),
+    price: "",
+    enabled: true,
+  };
+
+  const nuevoHorarioInstitucion = {
+    id: "",
+    from: new Date(),
+    to: new Date(new Date().setHours(new Date().getHours() + 1)),
+  };
+
+  const handleAddNewSchedule = (id) => {
+    console.log("agregando nuevo horario para la card -> " + id);
+
+    const from = getNextFromTime(diaYHorario.details);
+
+    const nuevoHorario = {
+      id: uuidv4(),
+      from,
+      to: new Date(new Date(from).setHours(new Date(from).getHours() + 1)),
+    };
+
+    console.log(nuevoHorario);
+
+    const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
+      if (diaYHorario.id === id) {
+        console.log("HORARIOS PARA LOS DIAS SELECCIONADOS ENCONTRADO");
+        console.log(diaYHorario);
+
+        const horariosUpdated = [...diaYHorario.details, nuevoHorario];
+
+        console.log("HORARIOS ACTUALIZADOS LUEGO DE AGREGAR UNO NUEVO");
+        console.log(horariosUpdated);
+        return {
+          ...diaYHorario,
+          details: horariosUpdated,
+        };
+      } else {
+        return diaYHorario;
+      }
+    });
+
+    setDiasYHorarios(diasYHorariosUpdated);
+  };
+
+  useEffect(() => {
+    console.log("LOADING DIAS Y HORARIOS");
+
+    console.log(diaYHorario);
+  }, []);
 
   return (
     <Paper
@@ -65,13 +122,23 @@ const DaysAndSchedulePaper = ({
             <Grid item>
               <Box textAlign={"center"}>
                 <p>Horarios</p>
-                <SchedulerFromTo handleChangeHorarios={handleChangeHorarios} diaYHorarioId={diaYHorario.id} from={diaYHorario.horario.from} to={diaYHorario.horario.to} />
+                {diaYHorario.details.map((detail, key) => {
+                  return (
+                    <SchedulerFromTo
+                      handleChangeHorarios={handleChangeHorarios}
+                      diaYHorarioId={diaYHorario.id}
+                      details={diaYHorario.details}
+                      detail={detail}
+                      setDiasYHorarios={setDiasYHorarios}
+                    />
+                  );
+                })}
               </Box>
               <Box textAlign="center" sx={{ mt: 2, pb: 2 }}>
                 <Button
                   variant="outlined"
                   startIcon={<AddCircleOutlineIcon />}
-                //onClick={() => handleAddNewSchedule(key)}
+                  onClick={() => handleAddNewSchedule(diaYHorario.id)}
                 >
                   Agregar Mas Horarios
                 </Button>

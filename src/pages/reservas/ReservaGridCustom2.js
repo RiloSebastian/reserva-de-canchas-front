@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { connectProps } from "@devexpress/dx-react-core";
 import { blue, green, orange, red, yellow } from "@mui/material/colors";
 import { styled, darken, alpha, lighten } from "@mui/material/styles";
@@ -45,10 +46,17 @@ import { TodayButtonMessages } from "./localization-messages/TodayButtonMessages
 import { ConfirmationDialogMessages } from "./localization-messages/ConfirmationDialogMessages";
 import DataCell from "../../components/schedulers/DataCell";
 import Utils from "../../utils/utils";
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import moment from "moment";
+import { getInstitutionSchedules } from "../../actions/institution";
+import {
+  validateEndtDayTime,
+  validateStartDayTime,
+} from "../../validations/validationTime";
+moment.locale("es");
 
 const PREFIX = "Demo";
 
@@ -109,16 +117,6 @@ const StyledWeekViewDayScaleCell = styled(WeekView.DayScaleCell)(
   })
 );
 
-const DayScaleCellWeek = ({ ...restProps }) => {
-  const { startDate } = restProps;
-  if (startDate.getDay() === 0 || startDate.getDay() === 6) {
-    return (
-      <StyledWeekViewDayScaleCell {...restProps} className={classes.weekEnd} />
-    );
-  }
-  return <StyledWeekViewDayScaleCell {...restProps} />;
-};
-
 // #FOLD_BLOCK
 const StyledWeekViewTimeTableCell = styled(WeekView.TimeTableCell)(
   ({ theme: { palette } }) => ({
@@ -138,32 +136,7 @@ const StyledWeekViewTimeTableCell = styled(WeekView.TimeTableCell)(
 );
 
 const isRestTime = (date) =>
-  date.getDay() === 0 ||
-  date.getDay() === 6 ||
-  date.getHours() === 13;
-
-const TimeTableCellWeek = ({ ...restProps }) => {
-  const { startDate } = restProps;
-
-  return (<StyledWeekViewTimeTableCell {...restProps} >
-    <DataCell itemData={{ ...restProps }} />
-  </StyledWeekViewTimeTableCell>)
-
-
-
-  if (isRestTime(startDate)) {
-    return (
-      <StyledWeekViewTimeTableCell
-        {...restProps}
-        className={classes.nonWorkingCell}
-      />
-    );
-  }
-  return (<StyledWeekViewTimeTableCell {...restProps} >
-    <TimeTableCellWeek2 {...restProps} />
-  </StyledWeekViewTimeTableCell>)
-  //return ;
-};
+  date.getDay() === 0 || date.getDay() === 6 || date.getHours() === 13;
 
 // #FOLD_BLOCK
 const StyledOpacity = styled(Opacity)(() => ({
@@ -406,24 +379,19 @@ const CellBase = React.memo(
   }
 );
 
-const CellWeekBase = React.memo(
-  ({
-    startDate,
-    endDate
-  }) => {
-    return (
-      <StyledWeekDivText className={classes.textWeek}> $ 1200</StyledWeekDivText>
-    );
+const CellWeekBase = React.memo(({ startDate, endDate }) => {
+  return (
+    <StyledWeekDivText className={classes.textWeek}> $ 1200</StyledWeekDivText>
+  );
 
-    /* return (
+  /* return (
       <StyledTableCell className={classNames({
         [classes.rainBack]: true,
       })}>
         <StyledWeekDivText className={classes.textWeek}> $ 1200</StyledWeekDivText>
       </StyledTableCell>
     ); */
-  }
-);
+});
 
 const TimeTableCell = CellBase;
 
@@ -491,6 +459,61 @@ const gettingSports = () => {
 const sports = gettingSports();
 
 const ReservaGridCustom2 = () => {
+  const dispatch = useDispatch();
+
+  const institution = useSelector((state) => state.institution);
+
+  const [startDayHour, setStartDayHour] = useState(7);
+  const [endDayHour, setEndDayHour] = useState(23);
+  const [busyTimes, setBusyTimes] = useState([])
+
+  const [workingDays, setWorkingDays] = useState([]);
+
+  const [allowAdding, setAllowAdding] = useState(true);
+
+  const DayScaleCellWeek = ({ ...restProps }) => {
+    const { startDate } = restProps;
+    if (Utils.isWeekend(startDate, workingDays)) {
+      return (
+        <StyledWeekViewDayScaleCell {...restProps} className={classes.weekEnd} />
+      );
+    }
+    return <StyledWeekViewDayScaleCell {...restProps} />;
+  };
+
+  const TimeTableCellWeek = ({ onDoubleClick, ...restProps }) => {
+    const { startDate } = restProps;
+
+    return (
+      <StyledWeekViewTimeTableCell
+        onDoubleClick={allowAdding ? onDoubleClick : undefined}
+        {...restProps}
+      >
+        <DataCell
+          setAllowAdding={setAllowAdding}
+          workingDays={workingDays}
+          itemData={{ ...restProps }}
+          busyTimes={busyTimes}
+        />
+      </StyledWeekViewTimeTableCell>
+    );
+
+    if (isRestTime(startDate)) {
+      return (
+        <StyledWeekViewTimeTableCell
+          {...restProps}
+          className={classes.nonWorkingCell}
+        />
+      );
+    }
+    return (
+      <StyledWeekViewTimeTableCell {...restProps}>
+        <TimeTableCellWeek2 {...restProps} />
+      </StyledWeekViewTimeTableCell>
+    );
+    //return ;
+  };
+
   const [grouping, setGrouping] = useState([
     {
       resourceName: "court_id",
@@ -614,6 +637,10 @@ const ReservaGridCustom2 = () => {
   };
 
   const handleCommitChanges = ({ added, changed, deleted }) => {
+    console.log("ENTRANDO A HANDLE COMMIT CHANGES");
+    console.log(added);
+    console.log(changed);
+    console.log(deleted);
     let newData = appointments;
     if (added) {
       const startingAddedId =
@@ -743,14 +770,20 @@ const ReservaGridCustom2 = () => {
     console.log("handleChangeAddedAppointment");
     console.log(addedAppointment);
 
-    const isValidAppointment = Utils.isValidAppointment(addedAppointment, addedAppointment);
-    if (!isValidAppointment) {
+    const isValidAppointment = Utils.isValidAppointment(
+      addedAppointment,
+      addedAppointment,
+      workingDays
+    );
+    if (addedAppointment && !isValidAppointment) {
       addedAppointment.cancel = true;
-      setShowAlert(true)
-      return
+      console.log("MOSTRANDO ALERTA 1");
+      setShowAlert(true);
+      setAllowAdding(false);
+      return;
     }
-
-    setIsValidAppointment(true)
+    setAllowAdding(true);
+    setIsValidAppointment(true);
     setAddedAppointment(addedAppointment);
   };
 
@@ -758,13 +791,18 @@ const ReservaGridCustom2 = () => {
     console.log("handleChangeAppointmentChanges");
     console.log(appointmentChanges);
 
-    const isValidAppointment = Utils.isValidAppointment(addedAppointment, addedAppointment);
+    const isValidAppointment = Utils.isValidAppointment(
+      addedAppointment,
+      addedAppointment,
+      workingDays
+    );
     if (!isValidAppointment) {
       addedAppointment.cancel = true;
-      setShowAlert(true)
-      return
+      console.log("MOSTRANDO ALERTA 2");
+      setShowAlert(true);
+      return;
     }
-    setIsValidAppointment(false)
+    setIsValidAppointment(false);
     setAppointmentChanges(appointmentChanges);
   };
 
@@ -772,24 +810,114 @@ const ReservaGridCustom2 = () => {
     console.log("handleChangeEditingAppointment");
     console.log(editingAppointment);
 
-    const isValidAppointment = Utils.isValidAppointment(addedAppointment, addedAppointment);
+    const isValidAppointment = Utils.isValidAppointment(
+      addedAppointment,
+      addedAppointment,
+      workingDays
+    );
     if (!isValidAppointment) {
       addedAppointment.cancel = true;
-      setShowAlert(true)
-      return
+      console.log("MOSTRANDO ALERTA 3");
+      setShowAlert(true);
+      return;
     }
-    setIsValidAppointment(true)
+    setIsValidAppointment(true);
     setEditingAppointment(editingAppointment);
   };
 
   const handleCloseAlert = () => {
-    setShowAlert(false)
-    setIsValidAppointment(false)
-  }
+    console.log("MOSTRANDO ALERTA 4");
+    setShowAlert(false);
+    setIsValidAppointment(false);
+  };
 
   useEffect(() => {
     //
     sportChange(1);
+
+    dispatch(getInstitutionSchedules(institution.id));
+
+    let startDayTime;
+
+    let endDayTime;
+
+
+
+    //OBTENER LOS DIAS LABORALES
+    if (institution.schedules) {
+      institution.schedules.forEach((schedule) => {
+        let horariosLaborales = []
+        let diasLaboralesSegmentados = []
+
+        schedule.daysAvailable.forEach((diaLaboral) => {
+          switch (diaLaboral) {
+            case "MIERCOLES":
+              diaLaboral = "MIÉRCOLES";
+              break;
+            case "SABADO":
+              diaLaboral = "SÁBADO";
+              break;
+            default:
+          }
+
+          console.log("OBTENIENDO DIAS LABORALES DE LA INSTITUCION");
+          console.log(
+            "dia: " + diaLaboral + " numero: " + moment().day(diaLaboral).day()
+          );
+
+          diasLaboralesSegmentados.push(moment().day(diaLaboral).day())
+
+          setWorkingDays((prevState) => {
+            return [...prevState, moment().day(diaLaboral).day()];
+          });
+        });
+
+        //OBTENER LOS HORARIOS HORARIOS PARA CADA DIA LABORAL
+        schedule.details.forEach((horario) => {
+          console.log("VALIDANDO EL HORARIO MAS TEMPRANO Y MAS TARDE");
+
+          startDayTime = validateStartDayTime(
+            startDayTime,
+            new Date(horario.timeFrame.from).getHours()
+          );
+
+          endDayTime = validateEndtDayTime(
+            endDayTime,
+            new Date(horario.timeFrame.to).getHours()
+          );
+
+          console.log(
+            "horario desde: " +
+            new Date(horario.timeFrame.from).getHours() +
+            " hasta: " +
+            new Date(horario.timeFrame.to).getHours()
+          );
+
+          horariosLaborales.push(
+            {
+              from: new Date(horario.timeFrame.from).getHours(),
+              to: new Date(horario.timeFrame.to).getHours()
+            }
+          );
+        });
+
+        console.log("GUARDANDO HORARIOS LABORALES PARA BUSY TIMES")
+        console.log({ ...horariosLaborales, diasLaboralesSegmentados })
+
+        setBusyTimes((prevState) => {
+          return [...prevState, { horariosLaborales, diasLaboralesSegmentados }];
+        });
+        //  setBusyTimes(horariosLaborales);
+      });
+
+      setStartDayHour(startDayTime);
+      setEndDayHour(endDayTime);
+
+
+    }
+
+
+    //Obtener todas las reservas hechas para la institucion
   }, []);
 
   return (
@@ -799,19 +927,21 @@ const ReservaGridCustom2 = () => {
           data={filterTasks(appointments, currentSport)}
           locale={"es-ES"}
         >
-          <EditingState onCommitChanges={handleCommitChanges}
+          <EditingState
+            onCommitChanges={handleCommitChanges}
             addedAppointment={addedAppointment}
             onAddedAppointmentChange={handleChangeAddedAppointment}
             appointmentChanges={appointmentChanges}
             onAppointmentChangesChange={handleChangeAppointmentChanges}
             editingAppointment={editingAppointment}
-            onEditingAppointmentChange={handleChangeEditingAppointment} />
+            onEditingAppointmentChange={handleChangeEditingAppointment}
+          />
           <ViewState defaultCurrentDate="2018-07-17" />
           <GroupingState grouping={grouping} />
           <WeekView
             cellDuration={60}
-            startDayHour={8}
-            endDayHour={19}
+            startDayHour={startDayHour}
+            endDayHour={endDayHour}
             timeTableCellComponent={TimeTableCellWeek}
             //timeTableCellComponent={TimeTableCellWeek2}
             dayScaleCellComponent={DayScaleCellWeek}
@@ -843,8 +973,16 @@ const ReservaGridCustom2 = () => {
           <TodayButton messages={TodayButtonMessages} />
         </Scheduler>
       </Paper>
-      <Snackbar open={showAlert} autoHideDuration={6000} onClose={handleCloseAlert}>
-        <Alert onClose={handleCloseAlert} severity="warning" sx={{ width: '100%' }}>
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity="warning"
+          sx={{ width: "100%" }}
+        >
           This is a success message!
         </Alert>
       </Snackbar>

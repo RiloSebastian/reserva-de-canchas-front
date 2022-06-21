@@ -1,7 +1,9 @@
-export const dinnerTime = { from: 12, to: 13 };
+//export const dinnerTime = { from: 12, to: 13 };
+
+export const dinnerTime = [{ from: 14, to: 15 }, { from: 18, to: 22 }, { from: 8, to: 12 }];
 
 export const holidays = [
-  new Date(2022, 3, 29),
+  new Date(2022, 6, 18),
   new Date(2022, 5, 7),
   new Date(2022, 5, 6),
 ];

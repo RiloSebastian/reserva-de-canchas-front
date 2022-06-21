@@ -36,20 +36,19 @@ import GeoLocalizacionService from "../../services/geolocalizacion/GeoLocalizaci
 import ComboBox from "../../components/ui/ComboBox";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 
-import IconButton from '@mui/material/IconButton';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormControl from '@mui/material/FormControl';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import FormHelperText from '@mui/material/FormHelperText';
+import IconButton from "@mui/material/IconButton";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import InputAdornment from "@mui/material/InputAdornment";
+import FormControl from "@mui/material/FormControl";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import FormHelperText from "@mui/material/FormHelperText";
 import EmailService from "../../services/email/EmailService";
 
-import PhoneInput from 'react-phone-input-2'
-import 'react-phone-input-2/lib/style.css'
-import es from 'react-phone-input-2/lang/es.json'
-
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import es from "react-phone-input-2/lang/es.json";
 
 const themeTextArea = createTheme({
   components: {
@@ -102,8 +101,6 @@ const SignUpInstitution = () => {
 
   const theme = useTheme();
 
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
-
   const [showMessageError, setShowMessageError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -118,87 +115,54 @@ const SignUpInstitution = () => {
     },
     institutionTel: "",
     description: "",
-    firstName: '',
-    lastName: '',
-    userRole: 'ROLE_ADMIN',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: "",
+    lastName: "",
+    userRole: "ROLE_ADMIN",
+    email: "",
+    password: "",
+    confirmPassword: "",
     showPassword: false,
     showConfirmPassword: false,
   });
 
-  const [institutionData, setInstitutionData] = useState({
-    name: "",
-    address: {
-      geometry: {
-        coordinates: ["", ""],
-        type: "Point",
-      },
-      langAddress: "",
-    },
-    institutionTel: "",
-    description: "",
-  });
-
   const [errors, setErrors] = useState({
-    firstName: '',
-    lastName: '',
-    userRole: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    firstName: "",
+    lastName: "",
+    userRole: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     showPassword: false,
     showConfirmPassword: false,
   });
 
   const [open, setOpen] = useState(false);
 
-  const [addressObtained, setAddressObtained] = useState([]);
-
   const handleClose = () => {
     setShowMessageError(false);
   };
 
   const handleOnChange = (value) => {
-    console.log("Actualizando numero de telefono")
-    console.log("[institutionTel]: " + value)
+    console.log("Actualizando numero de telefono");
+    console.log("[institutionTel]: " + value);
 
-    setErrors(prevState => {
+    setErrors((prevState) => {
       return {
         ...prevState,
-        institutionTel: validate("institutionTel", value)
+        institutionTel: validate("institutionTel", value),
       };
     });
-    setValues(prevState => {
+    setValues((prevState) => {
       return {
         ...prevState,
-        institutionTel: value
+        institutionTel: value,
       };
     });
-  }
+  };
 
   const handleMessageError = (message) => {
     setErrorMessage(message);
-  };
-
-  const handleInstitutionChange = async (event) => {
-    console.info("Seteando datos de la institucion");
-    console.info("Seteando datos para " + event.target.name);
-    setInstitutionData({
-      ...institutionData,
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  const handleChange = async (event) => {
-    console.info("Seteando datos del admin ");
-    console.info("Seteando datos para " + event.target.name);
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value,
-    });
-
   };
 
   const handleClickShowPassword = () => {
@@ -293,31 +257,32 @@ const SignUpInstitution = () => {
     }
   };
 
-  const handleUserInput = e => {
+  const handleUserInput = (e) => {
+    console.log("SETEANDO VALORES A");
+    console.log(
+      "[e.target.name]: " +
+        e.target.name +
+        " [e.target.value]: " +
+        [e.target.value]
+    );
 
-    console.log("handleUserInput")
-    console.log("[e.target.name]: " + [e.target.name] + " [e.target.value]: " + [e.target.value])
-    console.log("handleUserInput")
-
-    setErrors(prevState => {
+    setErrors((prevState) => {
       return {
         ...prevState,
-        [e.target.name]: validate(e.target.name, e.target.value)
+        [e.target.name]: validate(e.target.name, e.target.value),
       };
     });
-    setValues(prevState => {
+    setValues((prevState) => {
       return {
         ...prevState,
-        [e.target.name]: e.target.value
+        [e.target.name]: e.target.value,
       };
     });
   };
 
-
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
+
     console.log("creando admin e institucion");
     console.log(values);
 
@@ -327,28 +292,40 @@ const SignUpInstitution = () => {
         values.lastName,
         values.userRole,
         values.email,
-        values.password,
+        values.password
       ).then((data) => data);
 
       const managers = [adminUser.email];
 
-      const data = { ...institutionData, managers };
+      const { name, description, institutionTel, address } = values;
+
+      const data = {
+        name,
+        description,
+        institutionTel,
+        address,
+        managers,
+      };
 
       console.log("enviando datos de la institucion");
       console.log(data);
 
-      const institution = await InstitucionService.create(data).then((data) => data);
+      const institution = await InstitucionService.create(data).then(
+        (data) => data
+      );
+
+      console.log("INSTITUCION CREADA");
+      console.log(institution);
 
       history.push({
         pathname: "/account-confirmation",
-        state: values.firstName,
+        state: values,
       });
     } catch (err) {
       console.error("error al crear admin e institucion");
       console.error(err);
 
       if (err.data === undefined || err.data === null) {
-
         handleMessageError(
           Object.values(err).map((error, idx) => (
             <Fragment key={error}>
@@ -358,7 +335,6 @@ const SignUpInstitution = () => {
             </Fragment>
           ))
         );
-
       } else {
         handleMessageError(
           Object.values(err.data).map((error, idx) => (
@@ -371,13 +347,12 @@ const SignUpInstitution = () => {
         );
       }
 
-
-
       setShowMessageError(true);
     }
   };
 
   const [loading, setLoading] = useState(false);
+
   function handleClick() {
     setLoading(true);
   }
@@ -446,8 +421,8 @@ const SignUpInstitution = () => {
                       fullWidth
                       id="address"
                       label="Direccion de la Institucion"
-                      institutionData={institutionData}
-                      setInstitutionData={setInstitutionData}
+                      values={values}
+                      setValues={setValues}
                       helperText={errors.address}
                       error={errors.address}
                     />
@@ -458,7 +433,6 @@ const SignUpInstitution = () => {
                       Telefono
                     </Typography>
 
-
                     <Grid container spacing={2}>
                       <Grid item xs={12}>
                         <PhoneInput
@@ -467,30 +441,18 @@ const SignUpInstitution = () => {
                             height: "54px",
                             fontSize: "18px",
                             paddingLeft: "48px",
-                            borderRadius: "5px"
+                            borderRadius: "5px",
                           }}
                           localization={es}
-                          country='ar'
-                          enableAreaCodes={['ar']}
+                          country="ar"
+                          enableAreaCodes={["ar"]}
                           enableAreaCodeStretch={true}
-                          onlyCountries={['ar']}
-                          masks={{ ar: '(..) ....-....' }}
-                          onChange={handleOnChange} />
+                          onlyCountries={["ar"]}
+                          masks={{ ar: "(..) ....-...." }}
+                          onChange={handleOnChange}
+                        />
                       </Grid>
                     </Grid>
-                    {/* <TextField
-                      autoComplete="given-name"
-                      name="institutionTel"
-                      value={values.institutionTel}
-                      required
-                      fullWidth
-                      id="institutionTel"
-                      label="Telefono de la Institucion"
-                      onChange={handleUserInput}
-                      onBlur={handleUserInput}
-                      helperText={errors.institutionTel}
-                      error={errors.institutionTel}
-                    /> */}
                     <Box sx={{ m: 1 }} />
                     <Typography variant="h6" gutterBottom>
                       Descripcion
@@ -570,13 +532,23 @@ const SignUpInstitution = () => {
                               />
                             </Grid>
                             <Grid item xs={12}>
-                              <FormControl error={errors.password} fullWidth variant="outlined">
-                                <InputLabel required htmlFor="outlined-adornment-password">Contraseña</InputLabel>
+                              <FormControl
+                                error={errors.password}
+                                fullWidth
+                                variant="outlined"
+                              >
+                                <InputLabel
+                                  required
+                                  htmlFor="outlined-adornment-password"
+                                >
+                                  Contraseña
+                                </InputLabel>
                                 <OutlinedInput
                                   id="outlined-adornment-password"
-                                  type={values.showPassword ? 'text' : 'password'}
+                                  type={
+                                    values.showPassword ? "text" : "password"
+                                  }
                                   value={values.password}
-                                  //onChange={handleChange('password')}
                                   onChange={handleUserInput}
                                   onBlur={handleUserInput}
                                   endAdornment={
@@ -587,22 +559,41 @@ const SignUpInstitution = () => {
                                         onMouseDown={handleMouseDownPassword}
                                         edge="end"
                                       >
-                                        {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                                        {values.showPassword ? (
+                                          <VisibilityOff />
+                                        ) : (
+                                          <Visibility />
+                                        )}
                                       </IconButton>
                                     </InputAdornment>
                                   }
                                   label="Contraseña"
                                   name="password"
                                 />
-                                <FormHelperText >{errors.password}</FormHelperText>
+                                <FormHelperText>
+                                  {errors.password}
+                                </FormHelperText>
                               </FormControl>
                             </Grid>
                             <Grid item xs={12}>
-                              <FormControl error={errors.confirmPassword} fullWidth variant="outlined">
-                                <InputLabel required htmlFor="outlined-adornment-password">Confirmar Contraseña</InputLabel>
+                              <FormControl
+                                error={errors.confirmPassword}
+                                fullWidth
+                                variant="outlined"
+                              >
+                                <InputLabel
+                                  required
+                                  htmlFor="outlined-adornment-password"
+                                >
+                                  Confirmar Contraseña
+                                </InputLabel>
                                 <OutlinedInput
                                   id="outlined-adornment-password"
-                                  type={values.showConfirmPassword ? 'text' : 'password'}
+                                  type={
+                                    values.showConfirmPassword
+                                      ? "text"
+                                      : "password"
+                                  }
                                   value={values.confirmPassword}
                                   onChange={handleUserInput}
                                   onBlur={handleUserInput}
@@ -614,14 +605,20 @@ const SignUpInstitution = () => {
                                         onMouseDown={handleMouseDownPassword}
                                         edge="end"
                                       >
-                                        {values.showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                        {values.showConfirmPassword ? (
+                                          <VisibilityOff />
+                                        ) : (
+                                          <Visibility />
+                                        )}
                                       </IconButton>
                                     </InputAdornment>
                                   }
                                   label="Confirmar Contraseña"
                                   name="confirmPassword"
                                 />
-                                <FormHelperText>{errors.confirmPassword}</FormHelperText>
+                                <FormHelperText>
+                                  {errors.confirmPassword}
+                                </FormHelperText>
                               </FormControl>
                             </Grid>
                           </Grid>

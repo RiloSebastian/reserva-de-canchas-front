@@ -1,23 +1,25 @@
-import React from 'react';
-import Utils from '../../utils/utils';
+import React from "react";
+import Utils from "../../utils/utils";
 
-export default function DataCell(props) {
-    const { startDate } = props.itemData;
-    const isDisableDate = Utils.isHoliday(startDate) || Utils.isWeekend(startDate);
-    const isDinner = Utils.isDinner(startDate);
-    let cssClasses = props.className
-        ? props.className
-        : '';
+export default function DataCell({
+  children,
+  className,
+  itemData,
+  workingDays,
+  setAllowAdding,
+  busyTimes
+}) {
+  const { startDate } = itemData;
+  const isDisableDate =
+    Utils.isHoliday(startDate) || Utils.isWeekend(startDate, workingDays);
+  const isDinner = Utils.isDinner(startDate, busyTimes);
+  let cssClasses = className ? className : "";
 
-    if (isDisableDate) {
-        cssClasses += ' disable-date';
-    } else if (isDinner) {
-        cssClasses += ' dinner';
-    }
+  if (isDisableDate) {
+    cssClasses += " disable-date";
+  } else if (isDinner) {
+    cssClasses += " dinner";
+  }
 
-    return (
-        <div className={cssClasses}>
-            {props.children}
-        </div>
-    );
+  return <div className={cssClasses}>{children}</div>;
 }

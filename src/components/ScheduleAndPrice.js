@@ -44,14 +44,6 @@ NumberFormatCustom.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-const useStyles = makeStyles((theme) => ({
-  ...theme.typography.body2,
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-  height: 30,
-  lineHeight: "30px",
-}));
-
 const ScheduleAndPrice = ({
   horario,
   diaYHorarioId,
@@ -60,8 +52,6 @@ const ScheduleAndPrice = ({
   setHorariosYPrecios,
 }) => {
   const { id, precio, enabled, from, to } = horario;
-
-  const classes = useStyles();
 
   const handleChange = (e) => {
     if (e.target.type === "checkbox") {
