@@ -52,6 +52,10 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import moment from "moment";
 import { getInstitutionSchedules } from "../../actions/institution";
+import {
+  validateEndtDayTime,
+  validateStartDayTime,
+} from "../../validations/validationTime";
 moment.locale("es");
 
 const PREFIX = "Demo";
@@ -92,9 +96,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const getBorder = (theme) =>
-  `1px solid ${theme.palette.mode === "light"
-    ? lighten(alpha(theme.palette.divider, 1), 0.88)
-    : darken(alpha(theme.palette.divider, 1), 0.68)
+  `1px solid ${
+    theme.palette.mode === "light"
+      ? lighten(alpha(theme.palette.divider, 1), 0.88)
+      : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -469,6 +474,9 @@ const ReservaGridCustom2 = () => {
 
   const institution = useSelector((state) => state.institution);
 
+  const [startDayHour, setStartDayHour] = useState();
+  const [endDayHour, setEndDayHour] = useState();
+
   const [workingDays, setWorkingDays] = useState([]);
 
   const [allowAdding, setAllowAdding] = useState(true);
@@ -477,8 +485,15 @@ const ReservaGridCustom2 = () => {
     const { startDate } = restProps;
 
     return (
-      <StyledWeekViewTimeTableCell onDoubleClick={allowAdding ? onDoubleClick : undefined} {...restProps}>
-        <DataCell setAllowAdding={setAllowAdding} workingDays={workingDays} itemData={{ ...restProps }} />
+      <StyledWeekViewTimeTableCell
+        onDoubleClick={allowAdding ? onDoubleClick : undefined}
+        {...restProps}
+      >
+        <DataCell
+          setAllowAdding={setAllowAdding}
+          workingDays={workingDays}
+          itemData={{ ...restProps }}
+        />
       </StyledWeekViewTimeTableCell>
     );
 
@@ -621,10 +636,10 @@ const ReservaGridCustom2 = () => {
   };
 
   const handleCommitChanges = ({ added, changed, deleted }) => {
-    console.log("ENTRANDO A HANDLE COMMIT CHANGES")
-    console.log(added)
-    console.log(changed)
-    console.log(deleted)
+    console.log("ENTRANDO A HANDLE COMMIT CHANGES");
+    console.log(added);
+    console.log(changed);
+    console.log(deleted);
     let newData = appointments;
     if (added) {
       const startingAddedId =
@@ -763,10 +778,10 @@ const ReservaGridCustom2 = () => {
       addedAppointment.cancel = true;
       console.log("MOSTRANDO ALERTA 1");
       setShowAlert(true);
-      setAllowAdding(false)
+      setAllowAdding(false);
       return;
     }
-    setAllowAdding(true)
+    setAllowAdding(true);
     setIsValidAppointment(true);
     setAddedAppointment(addedAppointment);
   };
@@ -821,6 +836,10 @@ const ReservaGridCustom2 = () => {
 
     dispatch(getInstitutionSchedules(institution.id));
 
+    let startDayTime;
+
+    let endDayTime;
+
     //OBTENER LOS DIAS LABORALES
     institution.schedules.forEach((schedule) => {
       schedule.daysAvailable.forEach((diaLaboral) => {
@@ -843,7 +862,32 @@ const ReservaGridCustom2 = () => {
           return [...prevState, moment().day(diaLaboral).day()];
         });
       });
+
+      //OBTENER LOS HORARIOS HORARIOS PARA CADA DIA LABORAL
+      schedule.details.forEach((horario) => {
+        console.log("VALIDANDO EL HORARIO MAS TEMPRANO Y MAS TARDE");
+
+        startDayTime = validateStartDayTime(
+          startDayTime,
+          new Date(horario.timeFrame.from).getHours()
+        );
+
+        endDayTime = validateEndtDayTime(
+          endDayTime,
+          new Date(horario.timeFrame.to).getHours()
+        );
+
+        console.log(
+          "horario desde: " +
+            new Date(horario.timeFrame.from).getHours() +
+            " hasta: " +
+            new Date(horario.timeFrame.to).getHours()
+        );
+      });
     });
+
+    setStartDayHour(startDayTime);
+    setEndDayHour(endDayTime);
 
     //Obtener todas las reservas hechas para la institucion
   }, []);
@@ -868,8 +912,8 @@ const ReservaGridCustom2 = () => {
           <GroupingState grouping={grouping} />
           <WeekView
             cellDuration={60}
-            startDayHour={8}
-            endDayHour={19}
+            startDayHour={startDayHour}
+            endDayHour={endDayHour}
             timeTableCellComponent={TimeTableCellWeek}
             //timeTableCellComponent={TimeTableCellWeek2}
             dayScaleCellComponent={DayScaleCellWeek}

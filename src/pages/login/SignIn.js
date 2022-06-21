@@ -87,7 +87,9 @@ const SignIn = (props) => {
             "obteniendo la info de la institucion para dejarlo en el store"
           );
 
-          dispatch(getByAdminEmail(data.get("username")));
+          const institution = dispatch(getByAdminEmail(data.get("username")));
+
+          console.log(institution);
 
           history.push("/dashboard/reservas");
         } catch (error) {

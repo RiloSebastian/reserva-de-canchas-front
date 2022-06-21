@@ -312,35 +312,46 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
   };
 
   const handleSubmitChanges = async () => {
-    console.log("subiendo horarios de la institucion");
+    confirm({
+      title: "¿Esta Seguro que desea Guardar estos Cambios?",
+      cancellationText: "Cancelar",
+    })
+      .then(() => {
+        console.log("subiendo horarios de la institucion");
 
-    if (
-      daysSelected
-        .map((daySelected) => daySelected.selected)
-        .every((d) => d === false)
-    ) {
-      console.log("NO SE HA SELECCIONADO NINGUNA FECHA");
-    } else {
-      const data = handleAddDaysAvailable();
+        if (
+          daysSelected
+            .map((daySelected) => daySelected.selected)
+            .every((d) => d === false)
+        ) {
+          console.log("NO SE HA SELECCIONADO NINGUNA FECHA");
+        } else {
+          const data = handleAddDaysAvailable();
 
-      console.log("SUBIENDO DIAS Y HORARIOS DE LA INSTITUCION");
-      console.log(data);
+          console.log("SUBIENDO DIAS Y HORARIOS DE LA INSTITUCION");
+          console.log(data);
 
-      try {
-        const schedulesCreated =
-          await InstitucionService.createInstitutionSchedules(
-            institution.id,
-            data[0]
-          ).then((data) => data);
+          handleUploadChanges(data);
+        }
+      })
+      .catch(() => console.log("Deletion cancelled."));
+  };
 
-        console.log(" DIAS Y HORARIOS DE LA INSTITUCION CARGADOS EXITOSAMENTE");
-        console.log(schedulesCreated);
-        handleMessageLoaded(true);
-      } catch (error) {
-        console.log(" ERROR AL CARGAR LOS DIAS Y HORARIOS DE LA INSTITUCION ");
-        console.log(error);
-        handleMessageLoaded(false);
-      }
+  const handleUploadChanges = async (data) => {
+    try {
+      const schedulesCreated =
+        await InstitucionService.createInstitutionSchedules(
+          institution.id,
+          data[0]
+        ).then((data) => data);
+
+      console.log(" DIAS Y HORARIOS DE LA INSTITUCION CARGADOS EXITOSAMENTE");
+      console.log(schedulesCreated);
+      handleMessageLoaded(true);
+    } catch (error) {
+      console.log(" ERROR AL CARGAR LOS DIAS Y HORARIOS DE LA INSTITUCION ");
+      console.log(error);
+      handleMessageLoaded(false);
     }
   };
 

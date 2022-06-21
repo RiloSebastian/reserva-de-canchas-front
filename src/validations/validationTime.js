@@ -8,3 +8,22 @@ export function getNextFromTime(dateTimes) {
 
   return maxDateTime;
 }
+
+export function validateStartDayTime(startDayHour, startDayTime) {
+  console.log("COMPARO " + startDayHour + " CON " + startDayTime);
+
+  if (startDayHour === null || startDayHour === undefined) {
+    return startDayTime;
+  }
+
+  return startDayTime < startDayHour ? startDayTime : startDayHour;
+}
+
+export function validateEndtDayTime(endDayHour, endDayTime) {
+  console.log("COMPARO " + endDayHour + " CON " + endDayTime);
+  if (endDayHour === null || endDayHour === undefined) {
+    return endDayTime;
+  }
+
+  return endDayTime > endDayHour ? endDayTime : endDayHour;
+}

@@ -43,17 +43,14 @@ const ConfiguracionInstituciones = () => {
       const instititionDetails = InstitucionService.update().then(
         (data) => data
       );
-    } catch (error) { }
+    } catch (error) {}
   };
 
   useEffect(() => {
     //Obtener Datos de la Institucions
 
-    dispatch(getInstitutionSchedules(institution.id))
-
-
-  }, [])
-
+    dispatch(getInstitutionSchedules(institution.id));
+  }, []);
 
   return (
     <>
@@ -74,17 +71,25 @@ const ConfiguracionInstituciones = () => {
               maxWidth="lg"
             >
               <Typography sx={{ mb: 3 }} variant="h4">
-                <InstitutionDetails institution={institution} />
+                <ConfirmProvider>
+                  <InstitutionDetails institution={institution} />
+                </ConfirmProvider>
               </Typography>
 
               <Box sx={{ pt: 3 }}>
-                <ImagesSection institution={institution} />
+                <ConfirmProvider>
+                  <ImagesSection institution={institution} />
+                </ConfirmProvider>
               </Box>
               <Box sx={{ pt: 3 }}>
-                <NonWorkingDays institution={institution} />
+                <ConfirmProvider>
+                  <NonWorkingDays institution={institution} />
+                </ConfirmProvider>
               </Box>
               <Box sx={{ pt: 3 }}>
-                <Holidays institution={institution} />
+                <ConfirmProvider>
+                  <Holidays institution={institution} />
+                </ConfirmProvider>
               </Box>
               <Box sx={{ pt: 3 }}>
                 <ConfirmProvider>
@@ -92,7 +97,9 @@ const ConfiguracionInstituciones = () => {
                 </ConfirmProvider>
               </Box>
               <Box sx={{ pt: 3 }}>
-                <AdvancePaymentConfig institution={institution} />
+                <ConfirmProvider>
+                  <AdvancePaymentConfig institution={institution} />
+                </ConfirmProvider>
               </Box>
             </Container>
           </Box>
