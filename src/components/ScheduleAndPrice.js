@@ -7,7 +7,7 @@ import { pink } from "@mui/material/colors";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
-import Paper from "@mui/material/Paper";
+
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import PropTypes from "prop-types";
@@ -44,30 +44,14 @@ NumberFormatCustom.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-const useStyles = makeStyles((theme) => ({
-  ...theme.typography.body2,
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-  height: 30,
-  lineHeight: "30px",
-}));
-
 const ScheduleAndPrice = ({
   horario,
+  diaYHorarioId,
   removeHorario,
   setHorarios,
   setHorariosYPrecios,
 }) => {
   const { id, precio, enabled, from, to } = horario;
-
-  const classes = useStyles();
-
-  //const [desde, setDesde] = useState(moment());
-  //const [hasta, setHasta] = useState(moment());
-
-  //const handleChange = (event) => {
-  // setHorarioHabilitado(event.target.checked);
-  //};
 
   const handleChange = (e) => {
     if (e.target.type === "checkbox") {
@@ -93,31 +77,6 @@ const ScheduleAndPrice = ({
     }
   };
 
-  /* useEffect(() => {
- 
-         let fromTime = moment(moment(from, 'HH:mm'));
-         let toTime = moment(moment(to, 'HH:mm'));
- 
-         console.log(fromTime)
-         console.log(toTime)
- 
-         let duration = moment.duration(toTime.diff(fromTime));
- 
-         console.log(duration)
- 
-         let diff = duration.hours();
-         let array = [];
- 
-         for (var i = 0; diff > i; i++) {
-             let result = moment(fromTime).add(i, 'hours').format('HH:mm')
-             array.push({
-                 result
-             })
-         }
- 
-         console.log(array)
-     }, [from, to])*/
-
   useEffect(() => {
     setHorarios((horarios) => {
       let horariosUpdated = horarios.map((horario) =>
@@ -137,115 +96,94 @@ const ScheduleAndPrice = ({
   }, []);
 
   return (
-    <Paper className={classes}>
-      <Grid container spacing={3} alignItems="center">
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <Grid item xs>
-            <MobileTimePicker
-              label="Desde"
-              name="from"
-              value={from}
-              onChange={(newValue) => {
-                /* setHorariosYPrecios((body) => {
-                                     return { ...body, ['schedules']: horarios };
-                                 });*/
-
-                setHorarios((horarios) => {
-                  let horariosUpdated = horarios.map((horario) =>
-                    horario.id === id
-                      ? { ...horario, ["from"]: newValue }
-                      : horario
-                  );
-
-                  return [...horariosUpdated];
-                });
-              }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </Grid>
-          <Grid item xs>
-            <MobileTimePicker
-              label="Hasta"
-              name="to"
-              value={to}
-              onChange={(newValue) => {
-                setHorarios((horarios) => {
-                  let horariosUpdated = horarios.map((horario) =>
-                    horario.id === id
-                      ? { ...horario, ["to"]: newValue }
-                      : horario
-                  );
-
-                  return [...horariosUpdated];
-                });
-
-                /*     setHorariosYPrecios((body) => {
-     
-                                         return { ...body, ['schedules']: horarios };
-                                     });*/
-              }}
-              renderInput={(params) => <TextField {...params} />}
-              shouldDisableTime={(timeValue, clockType) => {
-                if (
-                  clockType === "minutes" &&
-                  timeValue !== from.getMinutes()
-                ) {
-                  return true;
-                }
-
-                return false;
-              }}
-              minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
-            />
-          </Grid>
-        </LocalizationProvider>
-
+    <Grid container spacing={3} alignItems="center">
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Grid item xs>
-          <TextField
-            name="price"
-            value={precio}
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-            label="Precio /hr"
-            onChange={handleChange}
-            id="outlined-start-adornment"
-            sx={{ m: 1, width: "25ch" }}
-            InputProps={{
-              inputComponent: NumberFormatCustom,
+          <MobileTimePicker
+            label="Desde"
+            name="from"
+            value={from}
+            onChange={(newValue) => {
+              setHorarios((horarios) => {
+                let horariosUpdated = horarios.map((horario) =>
+                  horario.id === id
+                    ? { ...horario, ["from"]: newValue }
+                    : horario
+                );
+
+                return [...horariosUpdated];
+              });
             }}
+            renderInput={(params) => <TextField {...params} />}
           />
         </Grid>
         <Grid item xs>
-          {/*<Switch
-                        checked={checked}
-                        onChange={handleChange}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                    />*/}
-          <FormControlLabel
-            control={
-              <Switch
-                name="enabled"
-                onChange={handleChange}
-                checked={enabled}
-                color="primary"
-              />
-            }
-            label={enabled ? "Activo" : "Inactivo"}
-            labelPlacement="activo"
+          <MobileTimePicker
+            label="Hasta"
+            name="to"
+            value={to}
+            onChange={(newValue) => {
+              setHorarios((horarios) => {
+                let horariosUpdated = horarios.map((horario) =>
+                  horario.id === id ? { ...horario, ["to"]: newValue } : horario
+                );
+
+                return [...horariosUpdated];
+              });
+            }}
+            renderInput={(params) => <TextField {...params} />}
+            shouldDisableTime={(timeValue, clockType) => {
+              if (clockType === "minutes" && timeValue !== from.getMinutes()) {
+                return true;
+              }
+
+              return false;
+            }}
+            minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
           />
         </Grid>
-        <Grid item xs>
-          <IconButton
-            onClick={() => {
-              removeHorario(id);
-            }}
-            aria-label="delete"
-            size="large"
-          >
-            <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
-          </IconButton>
-        </Grid>
+      </LocalizationProvider>
+
+      <Grid item xs>
+        <TextField
+          name="price"
+          value={precio}
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+          label="Precio /hr"
+          onChange={handleChange}
+          id="outlined-start-adornment"
+          sx={{ m: 1, width: "25ch" }}
+          InputProps={{
+            inputComponent: NumberFormatCustom,
+          }}
+        />
       </Grid>
-    </Paper>
+      <Grid item xs>
+        <FormControlLabel
+          control={
+            <Switch
+              name="enabled"
+              onChange={handleChange}
+              checked={enabled}
+              color="primary"
+            />
+          }
+          label={enabled ? "Activo" : "Inactivo"}
+          labelPlacement="activo"
+        />
+      </Grid>
+      <Grid item xs>
+        <IconButton
+          onClick={() => {
+            removeHorario(id, diaYHorarioId);
+          }}
+          aria-label="delete"
+          size="large"
+        >
+          <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
+        </IconButton>
+      </Grid>
+    </Grid>
   );
 };
 

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -11,6 +11,13 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { Link, useHistory } from "react-router-dom";
 import AppAppBar from "./../home/modules/views/AppAppBar";
+import AuthService from "../../services/auth.service";
+
+import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
+import InstitucionService from "../../services/instituciones/InstitucionService";
+import { useDispatch } from "react-redux";
+import { getByAdminEmail } from "../../actions/institution";
+import EmailService from "../../services/email/EmailService";
 
 function Copyright(props) {
   return (
@@ -21,7 +28,7 @@ function Copyright(props) {
       {...props}
     >
       {"Copyright © "}
-      <Link color="inherit" href="#">
+      <Link color="inherit" to={"#"}>
         RESERVA TU CANCHA
       </Link>{" "}
       {new Date().getFullYear()}
@@ -41,36 +48,83 @@ const rightLink = {
 const SignIn = (props) => {
   let history = useHistory();
 
+  const dispatch = useDispatch();
+
+  const [showMessageError, setShowMessageError] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleMessageError = (message) => {
+    setErrorMessage(message);
+  };
+
+  const handleClose = () => {
+    setShowMessageError(false);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      username: data.get("username"),
-      password: data.get("password"),
-    });
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        roles: ["ROLE_CUSTOMER"],
-      })
-    );
+    try {
+      const user = await AuthService.login(
+        data.get("username"),
+        data.get("password")
+      ).then((data) => data);
 
-    history.push("/customer/home");
+      console.log("obteniendo info del login");
+      console.log(user);
 
-    /*  const user = await AuthService.login(
-      data.get("username"),
-      data.get("password")
-    ).then((data) => data);
+      if (user.roles[0] === "ROLE_CUSTOMER") {
+        history.push("/customer/home");
+      } else {
+        //setear info de la institucion asociada
 
-    console.log(user.roles[0]);
+        try {
+          console.log("Abrir dashboard");
 
-    if (user.roles[0] === "ROLE_CUSTOMER") {
-      history.push("/customer/home");
-    } else {
-      history.push("/dashboard/reservas");
-    }*/
+          console.log(
+            "obteniendo la info de la institucion para dejarlo en el store"
+          );
+
+          const institution = dispatch(getByAdminEmail(data.get("username")));
+
+          console.log(institution);
+
+          history.push("/dashboard/reservas");
+        } catch (error) {
+          console.log("Catcheando el error de la institucion");
+          console.log(error);
+        }
+      }
+    } catch (err) {
+      console.error("error al obtener usuario");
+      console.log(err);
+
+      if (err.data.error === "Esta cuenta no esta habilitada") {
+        //Renviar link de confirmacion
+        console.error("La cuenta no esta habilidata - reenviar correo");
+
+        try {
+          const emailReSended = await EmailService.sendVerificationEmail(
+            data.get("username")
+          ).then((data) => data);
+
+          handleMessageError(
+            `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
+          );
+          setShowMessageError(true);
+        } catch (error) {
+          handleMessageError(
+            `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
+          );
+          setShowMessageError(true);
+        }
+      } else {
+        handleMessageError(err.data.error);
+        setShowMessageError(true);
+      }
+    }
   };
 
   return (
@@ -119,10 +173,6 @@ const SignIn = (props) => {
                 id="password"
                 autoComplete="current-password"
               />
-              {/*<FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Recordarme"
-          />*/}
               <Button
                 type="submit"
                 fullWidth
@@ -132,11 +182,6 @@ const SignIn = (props) => {
                 {"Iniciar Sesion"}
               </Button>
               <Grid container>
-                {/*<Grid item xs>
-                  <Link to="/forgot-pass" variant="body2">
-                    Olvidaste la Contraseña?
-                  </Link>
-        </Grid>*/}
                 <Grid item>
                   <Link to="/signup" variant="body2">
                     {"Aun no tienes una Cuenta? Registrarse"}
@@ -148,6 +193,11 @@ const SignIn = (props) => {
           <Copyright sx={{ mt: 8, mb: 4 }} />
         </Container>
       </ThemeProvider>
+      <AlertMessageComponent
+        showMessageError={showMessageError}
+        handleClose={handleClose}
+        errorMessage={errorMessage}
+      />
     </React.Fragment>
   );
 };

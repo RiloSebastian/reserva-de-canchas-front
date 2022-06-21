@@ -25,7 +25,7 @@ export const SettingsPassword = (props) => {
   return (
     <form {...props}>
       <Card>
-        <CardHeader subheader="Actualizar Contraseña" title="Contraseña" />
+        <CardHeader subheader="Cambiar Contraseña" title="Contraseña" />
         <Divider />
         <CardContent>
           <TextField
@@ -50,7 +50,7 @@ export const SettingsPassword = (props) => {
           />
           <TextField
             fullWidth
-            label="Confirmar Neuva Contraseña"
+            label="Confirmar Nueva Contraseña"
             margin="normal"
             name="confirm-new-password"
             onChange={handleChange}

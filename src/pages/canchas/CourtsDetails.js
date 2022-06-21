@@ -92,7 +92,7 @@ const CourtsDetails = ({ rowData }) => {
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Typography variant="h6" component="h6">
-          Horarios
+          Horarios Cargados
         </Typography>
         <List dense sx={{ width: "100%", bgcolor: "background.paper" }}>
           {[0, 1].map((value) => {
@@ -106,6 +106,9 @@ const CourtsDetails = ({ rowData }) => {
         </List>
       </Grid>
       <Grid item xs={12}>
+        <Typography variant="h6" component="h6">
+          Imagenes
+        </Typography>
         {photos.length > 0 ? (
           <ImageList
             sx={{ width: 500, height: 500 }}

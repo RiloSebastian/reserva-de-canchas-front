@@ -88,20 +88,17 @@ const theme = createTheme({
   },
 });
 
-const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
+const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule, date, institution }) => {
   const history = useHistory();
 
   const [courts, setCourts] = useState(schedule.courts);
 
   const [courtSelected, setCourtSelected] = useState(schedule.courts[0]);
 
-  const [date, setDate] = useState(moment(new Date()));
-
   const [selectedIndex, setSelectedIndex] = useState(
     schedule.courts[0].court_id
   );
 
-  //const [enabled, setEnabled] = useState(true);
   const [enabled, setEnabled] = useState(true);
 
   const [value, setValue] = useState(schedule.courts[0].court_id);
@@ -135,8 +132,9 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
 
     let courtFinalSelected = {
       ...court,
-      fecha: date,
-      horario: date,
+      fecha: moment(date).format("DD / MM"),
+      horario: schedule.schedule,
+      institution: institution,
     };
 
     console.log("before checkout - sending court selected");
@@ -144,7 +142,7 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
 
     history.push({
       pathname: BASE_URL_CUSTOMERS.base + "/checkout",
-      state: court,
+      state: courtFinalSelected,
     });
   };
 
@@ -185,19 +183,6 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
             <DialogContentText>
               Seleccione la cancha que desea reservar.
             </DialogContentText>
-
-            {/*<Box textAlign="left" sx={{ m: 4 }}>
-              <LocalizationProvider dateAdapter={DateAdapter}>
-                <MobileDatePicker
-                  label="Fecha"
-                  value={date}
-                  onChange={(newValue) => {
-                    setDate(newValue);
-                  }}
-                  renderInput={(params) => <TextField {...params} />}
-                />
-              </LocalizationProvider>
-                </Box>*/}
             <List
               dense
               sx={{ width: "100%", maxWidth: 500, bgcolor: "background.paper" }}
@@ -280,33 +265,6 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
                                 </Typography>
                               </Box>
                             </div>
-                            /*<GridDescription container>
-                              <GridDescription item xs>
-                                <div>{court.surface}</div>
-                              </GridDescription>
-                              <Divider
-                                orientation="vertical"
-                                variant="middle"
-                                flexItem
-                              />
-                              <GridDescription item xs>
-                                <div>
-                                  {court.isCovered ? "Techada" : "Descubierta"}
-                                </div>
-                              </GridDescription>
-                              <Divider
-                                orientation="vertical"
-                                variant="middle"
-                                flexItem
-                              />
-                              <GridDescription item xs>
-                                <div>
-                                  {court.isLighting
-                                    ? "Con Iluminacion"
-                                    : "Sin Iluminacion"}
-                                </div>
-                              </GridDescription>
-                            </GridDescription>*/
                           }
                         />
                       </ListItemButton>
@@ -332,67 +290,6 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule }) => {
           </Box>
         </Dialog>
       </div>
-      {/*<div>
-      <Dialog open={open} onClose={handleClose} maxWidth="xl">
-        <DialogTitle>Cancha 1 - Horarios</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Seleccione los horarios que desea reservar.
-          </DialogContentText>
-
-          <Box textAlign="left" sx={{ m: 4 }}>
-            <LocalizationProvider dateAdapter={DateAdapter}>
-              <MobileDatePicker
-                label="Fecha"
-                value={date}
-                onChange={(newValue) => {
-                  setDate(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
-          </Box>
-          <MaterialTable
-            options={{
-              selection: true,
-              showTitle: false,
-              draggable: false,
-              search: false,
-              paging: false,
-              toolbar: false,
-              detailPanelColumnAlignment: "right",
-              toolbarButtonAlignment: "right",
-            }}
-            onSelectionChange={(rows) => {
-              console.log(selection);
-              setSelection(rows);
-            }}
-            tableRef={tableRef}
-            icons={tableIcons}
-            columns={[
-              { title: "Horario (hs)", field: "horario" },
-              { title: "Precio ($)", field: "precio" },
-            ]}
-            data={data}
-            title="Remote Data Example"
-          />
-        </DialogContent>
-
-        <Box textAlign="center" sx={{ m: 2 }}>
-          <LoadingButton
-            color="secondary"
-            onClick={handleReservar}
-            loading={loading}
-            loadingPosition="start"
-            startIcon={<EventAvailableIcon />}
-            variant="contained"
-            disabled={enabled}
-          >
-            Reservar
-          </LoadingButton>
-        </Box>
-      </Dialog>
-          </div>*/}
     </>
   );
 };

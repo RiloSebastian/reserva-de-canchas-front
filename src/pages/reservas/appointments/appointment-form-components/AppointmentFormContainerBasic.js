@@ -16,11 +16,11 @@ const AppointmentFormContainerBasic = ({
       onFieldChange={onFieldChange}
       {...restProps}
     >
-      <AppointmentForm.Label text="Custom Field" type="title" />
+      <AppointmentForm.Label text="Correo Electronico" type="title" />
       <AppointmentForm.TextEditor
         value={appointmentData.customField}
         onValueChange={onCustomFieldChange}
-        placeholder="Custom field"
+        placeholder="Correo Electronico"
       />
     </AppointmentForm.BasicLayout>
   );

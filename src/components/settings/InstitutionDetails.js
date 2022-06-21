@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Button,
@@ -9,38 +10,123 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
+import ComboBox from "../ui/ComboBox";
+import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
+import { change } from "../../actions/institution";
 
-const states = [
-  {
-    value: "alabama",
-    label: "Alabama",
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import es from "react-phone-input-2/lang/es.json";
+
+const themeTextArea = createTheme({
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        multiline: {
+          fontWeight: "bold",
+          fontSize: "20px",
+          color: "purple",
+          width: "50vw",
+        },
+      },
+    },
   },
-  {
-    value: "new-york",
-    label: "New York",
-  },
-  {
-    value: "san-francisco",
-    label: "San Francisco",
-  },
-];
+});
 
 export const InstitutionDetails = (props) => {
-  const [values, setValues] = useState({
-    firstName: "Palermo Tenis",
-    address: "Honduras 5460",
-    email: "palermotenis@email.com",
-    phone: "1146584589",
-    state: "Alabama",
-    country: "USA",
+  const institution = useSelector((state) => state.institution);
+  const dispatch = useDispatch();
+
+  const [values, setValues] = useState(institution);
+
+  const [errors, setErrors] = useState({
+    name: "",
+    firstName: "",
+    lastName: "",
+    userRole: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    showPassword: false,
+    showConfirmPassword: false,
   });
 
-  const handleChange = (event) => {
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value,
+  const handleChange = (e) => {
+    dispatch(change({ type: e.target.name, data: e.target.value }));
+  };
+
+  const handleOnChange = (value) => {
+    console.log("Actualizando numero de telefono");
+    console.log("[institutionTel]: " + value);
+
+    setErrors((prevState) => {
+      return {
+        ...prevState,
+        institutionTel: validate("institutionTel", value),
+      };
+    });
+    setValues((prevState) => {
+      return {
+        ...prevState,
+        institutionTel: value,
+      };
     });
   };
+
+  const validate = (name, value) => {
+    switch (name) {
+      case "name":
+        if (!value || value.trim() === "") {
+          return "Nombre de la Institución es Requerido";
+        } else {
+          return "";
+        }
+      case "firstName":
+        if (!value || value.trim() === "") {
+          return "Nombre es Requerido";
+        } else {
+          return "";
+        }
+      case "lastName":
+        if (!value || value.trim() === "") {
+          return "Apellido es Requerido";
+        } else {
+          return "";
+        }
+      case "email":
+        if (!value) {
+          return "Email es Requerido";
+        } else if (
+          !value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)
+        ) {
+          return "Introduzca una dirección de correo electrónico válida";
+        } else {
+          return "";
+        }
+      case "institutionTel":
+        if (!value || value.trim() === "") {
+          return "Número de Telefono es Requerido";
+        } else if (!value.match(/^[6-9]\d{9}$/)) {
+          return "Introduce un número de Teléfono válido.";
+        } else {
+          return "";
+        }
+      case "description":
+        if (!value || value.trim() === "") {
+          return "La Descripción de la Institución es Requerida";
+        } else {
+          return "";
+        }
+      default: {
+        return "";
+      }
+    }
+  };
+
+  useEffect(() => {
+    console.log("renderizando componente para los detalles de la institucion");
+    console.log(institution);
+  }, []);
 
   return (
     <form autoComplete="off" noValidate {...props}>
@@ -57,22 +143,24 @@ export const InstitutionDetails = (props) => {
                 fullWidth
                 helperText="Por favor, especifique su nombre"
                 label="Nombre de la Institucion"
-                name="institution_name"
+                name="name"
                 onChange={handleChange}
                 required
-                value={values.firstName}
+                value={institution.name}
                 variant="outlined"
               />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Direccion"
+              <ComboBox
+                autoComplete="given-name"
                 name="address"
-                onChange={handleChange}
                 required
-                value={values.address}
-                variant="outlined"
+                fullWidth
+                id="address"
+                label="Direccion de la Institucion"
+                address={institution.address}
+                setValues={setValues}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item md={6} xs={12}>
@@ -82,20 +170,54 @@ export const InstitutionDetails = (props) => {
                 name="email"
                 onChange={handleChange}
                 required
-                value={values.email}
+                value={institution.email}
                 variant="outlined"
               />
             </Grid>
             <Grid item md={6} xs={12}>
-              <TextField
+              <PhoneInput
+                inputStyle={{
+                  width: "100%",
+                  height: "54px",
+                  fontSize: "18px",
+                  paddingLeft: "48px",
+                  borderRadius: "5px",
+                }}
+                value={institution.institutionTel}
+                localization={es}
+                country="ar"
+                enableAreaCodes={["ar"]}
+                enableAreaCodeStretch={true}
+                onlyCountries={["ar"]}
+                masks={{ ar: "(..) ....-...." }}
+                onChange={handleOnChange}
+              />
+              {/* <TextField
                 fullWidth
                 label="Numero de Telefono"
                 name="phone"
                 onChange={handleChange}
-                type="number"
-                value={values.phone}
+                value={institution.institutionTel}
                 variant="outlined"
-              />
+              /> */}
+            </Grid>
+            <Grid item md={6} xs={12}>
+              <ThemeProvider theme={themeTextArea}>
+                <TextField
+                  autoComplete="given-name"
+                  multiline
+                  rows={5}
+                  name="description"
+                  value={institution.description}
+                  required
+                  variant="outlined"
+                  fullWidth
+                  id="description"
+                  label="Dejanos una breve descripcion de la Institucion"
+                  onChange={handleChange}
+                  //onChange={handleInstitutionChange}
+                />
+              </ThemeProvider>
             </Grid>
           </Grid>
         </CardContent>

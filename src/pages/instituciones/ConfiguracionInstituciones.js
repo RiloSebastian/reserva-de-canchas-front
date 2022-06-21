@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useReducer } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -9,21 +10,48 @@ import AdvancePaymentConfig from "../../components/settings/AdvancePaymentConfig
 import { InstitutionDetails } from "../../components/settings/InstitutionDetails";
 import { NonWorkingDays } from "../../components/settings/NonWorkingDays";
 import { OpenAndCloseTimes } from "../../components/settings/OpenAndCloseTimes";
+import { Holidays } from "../../components/settings/Holidays";
+import { ImagesSection } from "../../components/settings/ImagesSection";
+import InstitucionService from "../../services/instituciones/InstitucionService";
+import { ConfirmProvider } from "material-ui-confirm";
+import { getInstitutionSchedules } from "../../actions/institution";
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="#">
-        Reserva Tu Cancha
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+const reducer = (state, action) => {
+  console.log("action", action.data);
+  console.log("state", state);
+  switch (action.type) {
+    case "schedules":
+      return { ...state, schedules: action.data };
+    default:
+      return state;
+  }
+};
 
 const ConfiguracionInstituciones = () => {
+  /* const [state, dispatch] = useReducer(reducer, {
+    schedules: [],
+  }); */
+
+  const dispatch = useDispatch();
+
+  const institution = useSelector((state) => state.institution);
+
+  const handleChanges = () => {
+    console.log("actualizando datos de la institucion");
+
+    try {
+      const instititionDetails = InstitucionService.update().then(
+        (data) => data
+      );
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    //Obtener Datos de la Institucions
+
+    dispatch(getInstitutionSchedules(institution.id));
+  }, []);
+
   return (
     <>
       <Card sx={{ minWidth: 275 }}>
@@ -43,21 +71,35 @@ const ConfiguracionInstituciones = () => {
               maxWidth="lg"
             >
               <Typography sx={{ mb: 3 }} variant="h4">
-                <InstitutionDetails />
+                <ConfirmProvider>
+                  <InstitutionDetails institution={institution} />
+                </ConfirmProvider>
               </Typography>
-              {/*<SettingsNotifications />*/}
 
               <Box sx={{ pt: 3 }}>
-                {/*<SettingsNotifications />*/}
-                <NonWorkingDays />
+                <ConfirmProvider>
+                  <ImagesSection institution={institution} />
+                </ConfirmProvider>
               </Box>
               <Box sx={{ pt: 3 }}>
-                {/*<SettingsNotifications />*/}
-                <OpenAndCloseTimes />
+                <ConfirmProvider>
+                  <NonWorkingDays institution={institution} />
+                </ConfirmProvider>
               </Box>
               <Box sx={{ pt: 3 }}>
-                {/*<SettingsNotifications />*/}
-                <AdvancePaymentConfig />
+                <ConfirmProvider>
+                  <Holidays institution={institution} />
+                </ConfirmProvider>
+              </Box>
+              <Box sx={{ pt: 3 }}>
+                <ConfirmProvider>
+                  <OpenAndCloseTimes institution={institution} />
+                </ConfirmProvider>
+              </Box>
+              <Box sx={{ pt: 3 }}>
+                <ConfirmProvider>
+                  <AdvancePaymentConfig institution={institution} />
+                </ConfirmProvider>
               </Box>
             </Container>
           </Box>

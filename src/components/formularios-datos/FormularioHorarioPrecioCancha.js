@@ -17,6 +17,18 @@ import TextField from "@mui/material/TextField";
 import moment from "moment";
 import ScheduleAndPrice from "./../ScheduleAndPrice";
 import SelectWeekDays from "./SelectWeekDays";
+import Paper from "@mui/material/Paper";
+import { makeStyles } from "@material-ui/core/styles";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import Button from "@mui/material/Button";
+
+const useStyles = makeStyles((theme) => ({
+  ...theme.typography.body2,
+  textAlign: "center",
+  color: theme.palette.text.secondary,
+  height: 30,
+  lineHeight: "30px",
+}));
 
 const FormularioHorarioPrecioCancha = ({
   open,
@@ -27,7 +39,17 @@ const FormularioHorarioPrecioCancha = ({
 }) => {
   const { excluirDiasNoLaborales, porcentajeSenia } = horariosYPrecios;
 
-  //const [open, setOpen] = useState(false);
+  const classes = useStyles();
+
+  const [daysSelected, setDaysSelected] = useState([
+    { label: "Lunes", value: 1, daysAndTimesId: null, selected: false },
+    { label: "Martes", value: 2, daysAndTimesId: null, selected: false },
+    { label: "Miercoles", value: 3, daysAndTimesId: null, selected: false },
+    { label: "Jueves", value: 4, daysAndTimesId: null, selected: false },
+    { label: "Viernes", value: 5, daysAndTimesId: null, selected: false },
+    { label: "Sabado", value: 6, daysAndTimesId: null, selected: false },
+    { label: "Domingo", value: 7, daysAndTimesId: null, selected: false },
+  ]);
 
   const [loading, setLoading] = useState(false);
 
@@ -45,6 +67,8 @@ const FormularioHorarioPrecioCancha = ({
 
   const [horarios, setHorarios] = useState([]);
 
+  const [diasYHorarios, setDiasYHorarios] = useState([]);
+
   const [dates, setDates] = useState([]);
 
   const nuevoHorario = {
@@ -55,13 +79,30 @@ const FormularioHorarioPrecioCancha = ({
     enabled: true,
   };
 
+  const nuevoDiaYHorario = {
+    id: "",
+    dias: daysSelected,
+    horarios: [nuevoHorario],
+  };
+
   useEffect(() => {
     //traer los horarios guardados por la institucion
     //getHorarios();
 
-    const newSchedule = [...horarios, nuevoHorario];
-    setHorarios(newSchedule);
+    //const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
+    //const newSchedule = [...horarios, nuevoHorario];
+    setDiasYHorarios([nuevoDiaYHorario]);
+    //setHorarios(newSchedule);
   }, []);
+
+  useEffect(() => {
+    //Actualizar todos los dias seleccionados 
+
+    console.log("Actualizar todos los dias seleccionados")
+    console.log(daysSelected)
+
+
+  }, [daysSelected]);
 
   const handleChange = (e) => {
     if (e.target.type === "checkbox") {
@@ -92,21 +133,69 @@ const FormularioHorarioPrecioCancha = ({
     setOpen(false);
   };
 
-  const handleAddNewSchedule = () => {
-    console.log("agregando nuevo horario");
+  const handleAddNewSchedule = (id) => {
+    console.log("agregando nuevo horario para la card -> " + id);
     console.log(nuevoHorario);
 
-    const newSchedule = [...horarios, nuevoHorario];
+    //const newSchedule = [...horarios, nuevoHorario];
 
-    console.log(newSchedule);
-    setHorarios(newSchedule);
+    console.log(diasYHorarios);
+    //setHorarios(newSchedule);
+
+    const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
+      if (diaYHorario.id === id) {
+        const horariosUpdated = [...diaYHorario.horarios, nuevoHorario];
+        return {
+          ...diaYHorario,
+          horarios: horariosUpdated,
+        };
+      } else {
+        return diaYHorario;
+      }
+    });
+
+    setDiasYHorarios(diasYHorariosUpdated);
+    /* setDiasYHorarios((prevState) => {
+      return [
+        {
+          ...prevState,
+          horarios: [...horarios, nuevoHorario],
+        },
+      ];
+    }); */
   };
 
-  const removeHorario = (id) => {
+  const handleAddNewDatesSchedules = () => {
+    console.log("agregando nuevos dias y horarios");
+    console.log(nuevoDiaYHorario);
+
+    const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
+
+    console.log(newDayAndSchedule);
+    setDiasYHorarios(newDayAndSchedule);
+  };
+
+  const removeHorario = (id, diaYHorarioId) => {
     if (window.confirm("Esta Seguro que desea eliminar este horario?" + id)) {
-      setHorarios((horarios) => {
-        return horarios.filter((horario) => horario.id !== id);
+      const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
+        if (diaYHorario.id === diaYHorarioId) {
+          const horariosUpdated = diaYHorario.horarios.filter(
+            (horario) => horario.id !== id
+          );
+
+          return {
+            ...diaYHorario,
+            horarios: horariosUpdated,
+          };
+        }
+
+        return diaYHorario;
       });
+      /*  setHorarios((horarios) => {
+        return horarios.filter((horario) => horario.id !== id);
+      }); */
+
+      setDiasYHorarios(diasYHorariosUpdated);
     }
   };
 
@@ -120,35 +209,6 @@ const FormularioHorarioPrecioCancha = ({
             seleccionadas.
           </DialogContentText>
 
-          <Box textAlign="center" sx={{ mt: 4 }}>
-            {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
-            <p>Dias de la Semana</p>
-            <SelectWeekDays setHorariosYPrecios={setHorariosYPrecios} />
-          </Box>
-
-          <Grid
-            container
-            spacing={0}
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Box sx={{ m: 1 }}>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="excluirDiasNoLaborales"
-                      checked={excluirDiasNoLaborales}
-                      onChange={handleChange}
-                      defaultChecked
-                    />
-                  }
-                  label="Excluir dias no Laborales"
-                />
-              </FormGroup>
-            </Box>
-          </Grid>
           {isMultipleEdit && (
             <Box textAlign="left" sx={{ m: 4 }}>
               <TextField
@@ -168,27 +228,59 @@ const FormularioHorarioPrecioCancha = ({
             </Box>
           )}
 
-          {horarios.map((horario, key) => {
-            horario.id = key;
+          {diasYHorarios.map((diaYHorario, key) => {
+            diaYHorario.id = key;
 
             return (
-              <Box key={key} textAlign="center" sx={{ m: 4 }}>
-                <ScheduleAndPrice
-                  key={key}
-                  horario={horario}
-                  removeHorario={removeHorario}
-                  setHorarios={setHorarios}
-                  setHorariosYPrecios={setHorariosYPrecios}
-                />
-              </Box>
+              <Paper className={classes}>
+                <Box key={key} textAlign="center" sx={{ m: 4 }}>
+                  <Box textAlign="left" sx={{ mt: 4 }}>
+                    {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
+                    <p>Dias de la Semana</p>
+                    <SelectWeekDays
+                      //daysOptions={diaYHorario.dias}
+                      setDaysSelected={setDaysSelected}
+                      setHorariosYPrecios={setHorariosYPrecios}
+                      daysSelected={daysSelected}
+                      daysAndTimesId={diaYHorario.id}
+                    />
+                  </Box>
+                  <Box textAlign="left" sx={{ mt: 4 }}>
+                    <p>Horarios</p>
+                    {diaYHorario.horarios.map((horario, key) => {
+                      horario.id = key;
+                      return (
+                        <ScheduleAndPrice
+                          key={key}
+                          horario={horario}
+                          diaYHorarioId={diaYHorario.id}
+                          removeHorario={removeHorario}
+                          setHorarios={setHorarios}
+                          setHorariosYPrecios={setHorariosYPrecios}
+                        />
+                      );
+                    })}
+
+                    <Box textAlign="center" sx={{ mt: 2, pb: 2 }}>
+                      <Button
+                        variant="outlined"
+                        startIcon={<AddCircleOutlineIcon />}
+                        onClick={() => handleAddNewSchedule(key)}
+                      >
+                        Agregar Mas Horarios
+                      </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              </Paper>
             );
           })}
         </DialogContent>
 
         <Box textAlign="center">
-          <IconButton color="secondary" aria-label="delete" size="large">
+          <IconButton color="secondary" aria-label="delete" size="large" disabled={!daysSelected.map((daySelected) => daySelected.selected).includes(false)}>
             <AddCircleIcon
-              onClick={handleAddNewSchedule}
+              onClick={handleAddNewDatesSchedules}
               sx={{ fontSize: 50 }}
             />
           </IconButton>

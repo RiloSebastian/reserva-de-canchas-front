@@ -70,6 +70,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
+
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -87,6 +88,7 @@ const AppBar = styled(MuiAppBar, {
     }),
   }),
 }));
+
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -196,6 +198,7 @@ const MenuBar = (props) => {
       return (
         visible && (
           <Tooltip
+            key={name}
             disableHoverListener={disableHoverListener}
             title={name}
             placement="right"
@@ -233,7 +236,7 @@ const MenuBar = (props) => {
     >
       <MenuItem
         component={Link}
-        to={"/dashboard/perfil"}
+        to={`${BASE_URL.base}/perfil`}
         onClick={handleOpenProfile}
       >
         Perfil
@@ -260,7 +263,7 @@ const MenuBar = (props) => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
+      {/*<MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="error">
             <MailIcon />
@@ -279,7 +282,7 @@ const MenuBar = (props) => {
           </Badge>
         </IconButton>
         <p>Notificaciones</p>
-      </MenuItem>
+    </MenuItem>*/}
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           size="large"
@@ -317,7 +320,7 @@ const MenuBar = (props) => {
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
+            {/*<IconButton
               size="large"
               aria-label="show 4 new mails"
               color="inherit"
@@ -334,7 +337,7 @@ const MenuBar = (props) => {
               <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+          </IconButton>*/}
             <IconButton
               size="large"
               edge="end"

@@ -55,6 +55,10 @@ const HistoryReservations = () => {
     { title: "Institucion", field: "institucion" },
     { title: "Direccion", field: "direccion" },
     { title: "Fecha", field: "date", initialEditValue: "initial edit value" },
+    {
+      title: "Estado", field: "status", render: rowData =>
+        <Chip color={rowData.status === "FINALIZADO" ? "success" : "error"} label={rowData.status} />
+    },
   ]);
 
   const [data, setData] = useState([
@@ -66,6 +70,7 @@ const HistoryReservations = () => {
       institucion: "Palermo Tennis",
       direccion: "Santa Fe 1234",
       feedbackSended: false,
+      status: "FINALIZADO",
     },
     {
       reservation_id: 2,
@@ -75,6 +80,17 @@ const HistoryReservations = () => {
       institucion: "Futbol Plaza",
       direccion: "Corrientes 2345",
       feedbackSended: false,
+      status: "FINALIZADO",
+    },
+    {
+      reservation_id: 2,
+      name: "Cancha 5",
+      date: "15/5 19:00",
+      birthYear: "18:30",
+      institucion: "Futbol Plaza",
+      direccion: "Corrientes 2345",
+      feedbackSended: false,
+      status: "CANELADO",
     },
   ]);
 
@@ -134,9 +150,12 @@ const HistoryReservations = () => {
         ]}
         components={{
           Action: (props) => (
+
+            (props.data.status === "FINALIZADO") &&
+
             <Chip
               onClick={(event) => props.action.onClick(event, props.data)}
-              onDelete={props.data.feedbackSended && (() => {})}
+              onDelete={props.data.feedbackSended && (() => { })}
               color={props.data.feedbackSended ? "success" : "info"}
               clickable={!props.data.feedbackSended}
               deleteIcon={<DoneIcon />}

@@ -15,9 +15,11 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import React, { forwardRef } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import HistoryReservations from "../../../components/my-reservations/HistoryReservations";
 import NextReservations from "../../../components/my-reservations/NextReservations";
+import ReservationService from "../../../services/reservations/ReservationService";
+import { useHistory } from "react-router-dom";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -44,7 +46,7 @@ const tableIcons = {
 };
 
 const MisReservas = () => {
-  const { useState } = React;
+  const history = useHistory();
 
   const [columns, setColumns] = useState([
     { title: "Cancha", field: "name" },
@@ -75,6 +77,47 @@ const MisReservas = () => {
     },
   ]);
 
+  const [nextReservations, setNextReservations] = useState([]);
+
+  const [historyReservations, setHistoryReservations] = useState([]);
+
+  const getCustomerReservations = async (customerId) => {
+    try {
+      const reservationList = await ReservationService.getAllByCustomerId(customerId);
+
+      console.log("reservationList");
+      console.log(reservationList);
+
+      const data = reservationList.data;
+
+      if (data) {
+        
+        //TODO: separar reservas finalizadas de las pendientes
+
+        data.forEach((reservation) => {
+          console.log("reservation");
+          console.log(reservation);
+
+          if(reservation.status === "PENDING"){
+
+          }else {
+
+          }
+
+        });
+      }
+    } catch (err) {
+      //TODO: manejar el error si no se pueden obtener las reservas del cliente! 
+      console.log("error al cargar las reservas del cliente")
+    }
+  }
+
+  useEffect(() => {
+
+    getCustomerReservations();
+
+  }, [])
+
   return (
     <>
       <Box
@@ -82,14 +125,13 @@ const MisReservas = () => {
         sx={{
           flexGrow: 1,
           pt: 2,
-          pb: 8,
         }}
       >
         <Container
           sx={{
             margin: 0,
           }}
-          maxWidth="lg"
+          maxWidth="100%"
         >
           <NextReservations />
         </Container>
@@ -100,14 +142,13 @@ const MisReservas = () => {
         sx={{
           flexGrow: 1,
           pt: 2,
-          pb: 8,
         }}
       >
         <Container
           sx={{
             margin: 0,
           }}
-          maxWidth="lg"
+          maxWidth="100%"
         >
           <HistoryReservations />
         </Container>

@@ -28,7 +28,7 @@ const get = async (institution_id, court_id) => {
 const create = async (institution_id, data) => {
   try {
     const canchaCreada = await http.post(
-      `/institutions/${institution_id}/courts`,
+      `/institutions/${institution_id}/feedbacks`,
       data,
       {
         headers: AuthHeader(),

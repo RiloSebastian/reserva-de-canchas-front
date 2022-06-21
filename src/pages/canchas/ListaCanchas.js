@@ -1,3 +1,4 @@
+import { MenuItem, Select } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Delete } from "@material-ui/icons";
 import AddBox from "@material-ui/icons/AddBox";
@@ -25,35 +26,16 @@ import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import MaterialTable from "material-table";
 import moment from "moment";
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState, useRef } from "react";
 import { useHistory } from "react-router-dom";
+import { courtList } from "../../assets/mocks/courtList";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
 import CanchaService from "../../services/canchas/CanchaService";
 import DeporteService from "../../services/deportes/DeporteService";
 import PhotoService from "../../services/photos/PhotoService";
 import CourtsDetails from "./CourtsDetails";
-
-/*const useStyles = makeStyles(() =>
-  createStyles({
-    container: {
-      padding: "1rem",
-      height: "fit-content",
-    },
-  })
-);*/
-
-function srcset(image, width, height) {
-  return {
-    src: `${image}?w=${width}&h=${height}&fit=crop&auto=format`,
-    srcSet: `${image}?w=${width}&h=${height}&fit=crop&auto=format&dpr=2 2x`,
-  };
-}
-
-const flexContainer = {
-  display: "flex",
-  flexDirection: "row",
-  padding: 0,
-};
+import UploadImage from "./../../components/UploadImage";
+import UploadPhotos from "../../components/ui/UploadPhotos";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -67,22 +49,75 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const itemData = [
+const getSurfaces = (sport) => {
+  return surfacesArray.filter((s) => sport.id === s.sport_id);
+};
+
+const sportArray = [
+  { id: "61a68dbc107957730042e154", name: "TENIS" },
+  { id: "61a68dbc107957730042e153", name: "FUTBOL" },
+  { id: "61a68dbc107957730042e155", name: "PADEL" },
+];
+
+const surfacesArray = [
   {
-    img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-    title: "Breakfast",
-    author: "@bkristastucchio",
-    featured: true,
+    sport_id: "61a68dbc107957730042e154",
+    surface: [
+      {
+        id: 0,
+        name: "Polvo de Ladrillo",
+      },
+      {
+        id: 1,
+        name: "Cemento",
+      },
+      {
+        id: 2,
+        name: "Césped",
+      },
+    ],
   },
   {
-    img: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-    title: "Burger",
-    author: "@rollelflex_graphy726",
+    sport_id: "61a68dbc107957730042e153",
+    surface: [
+      {
+        id: 0,
+        name: "Césped Sintetico",
+      },
+      {
+        id: 1,
+        name: "Cesped Natural",
+      },
+      {
+        id: 2,
+        name: "Alfombra",
+      },
+      {
+        id: 3,
+        name: "Cemento",
+      },
+    ],
   },
   {
-    img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
-    title: "Camera",
-    author: "@helloimnik",
+    sport_id: "61a68dbc107957730042e155",
+    surface: [
+      {
+        id: 0,
+        name: "Césped Artificial",
+      },
+      {
+        id: 1,
+        name: "Cemento",
+      },
+      {
+        id: 2,
+        name: "Hormigón Poroso",
+      },
+      {
+        id: 3,
+        name: "Recubrimiento Sintético",
+      },
+    ],
   },
 ];
 
@@ -125,22 +160,23 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [open, setOpen] = useState(false);
 
+  const [openUploadPhotos, setOpenUploadPhotos] = useState(false);
+
+  const [enableSelectSurface, setEnableSelectSurface] = useState(false);
+
   const [isMultipleEdit, setIsMultipleEdit] = useState(false);
 
   const [enableButtons, setEnableButtons] = useState(true);
+
+  const [sportSelected, setSportSelected] = useState({});
 
   const [data, setData] = useState([]);
 
   const [photoData, setPhotoData] = useState([]);
 
-  const [images, setImages] = useState({
-    selectedFiles: undefined,
-    previewImages: [],
-    progressInfos: [],
-    message: [],
+  const [images, setImages] = useState([]);
 
-    imageInfos: [],
-  });
+  const [fileObjects, setFileObjects] = useState([]);
 
   const [horariosYPrecios, setHorariosYPrecios] = useState({
     excluirDiasNoLaborales: true,
@@ -148,52 +184,84 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [sport, setSport] = useState({});
 
+  const [surfaces, setSurfaces] = useState([]);
+
   const [switchState, setSwitchState] = useState(false);
 
   const handleSwitchChange = (oldRow, e) => {
     const changeData = { [e.target.name]: e.target.checked };
     const newRow = { ...oldRow, ...changeData };
 
-    console.log("habilitando canchsa");
+    console.log("habilitando cancha");
     console.log(changeData);
     console.log(oldRow);
     console.log(newRow);
   };
 
-  const ariaLabel = { "aria-label": "description" };
+  const handleSelectedSport = (sport_id) => {
+    console.log("handleSelectedSport");
+    console.log(sport_id);
+  };
 
   const columns = [
-    {
-      title: "Nombre Cancha",
-      field: "name",
-      validate: (rowData) =>
-        rowData.name === undefined || rowData.name === ""
-          ? {
-              isValid: false,
-              helperText: "El nombre de la cancha no puede estar vacio",
-            }
-          : true,
-    },
-    { title: "Descripcion", field: "description" },
-    //{ title: 'Birth Year', field: 'birthYear', type: 'numeric' },
     {
       title: "Deporte",
       field: "sport",
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-              isValid: false,
-              helperText: "Debe seleccionar un deporte para la cancha",
-            }
+            isValid: false,
+            helperText: "Debe seleccionar un deporte para la cancha",
+          }
           : true,
       lookup: sport,
       render: (rowData) => rowData.sport.name,
+      editComponent: (rowData) => {
+        return (
+          <Select
+            value={rowData.value || "string"}
+            onChange={(e) => {
+              rowData.onChange(String(e.target.value));
+              setSportSelected(e.target.value);
+            }}
+          >
+            {sportArray.map((type) => (
+              <MenuItem value={type.id}>{type.name}</MenuItem>
+            ))}
+          </Select>
+        );
+      },
     },
+    {
+      title: "Nombre Cancha",
+      field: "name",
+      validate: (rowData) =>
+        rowData.name === undefined || rowData.name === ""
+          ? {
+            isValid: false,
+            helperText: "El nombre de la cancha no puede estar vacio",
+          }
+          : true,
+    },
+    {
+      title: "Superficie",
+      field: "surface",
+      validate: (rowData) =>
+        rowData.sport === undefined
+          ? {
+            isValid: false,
+            helperText: "Debe seleccionar la Superficie de la Cancha",
+          }
+          : true,
+      //lookup: (rowData) => getSurfaces(rowData.sport),
+      lookup: surfaces,
+      render: (rowData) => rowData.surface,
+    },
+    { title: "Descripcion", field: "description" },
     {
       title: "Seña",
       field: "signPercentage",
       type: "numeric",
-      // validate: rowData => rowData.signPercentage === undefined || (rowData.sensignPercentageia >= 0 && rowData.signPercentage <= 100),
       render: (rowData) =>
         rowData.signPercentage === undefined || rowData.signPercentage === 0
           ? "no requiere seña"
@@ -234,6 +302,38 @@ const ListaCanchas = ({ institutionId }) => {
       ),
     },
     {
+      title: "Techada",
+      field: "techada",
+      render: (rowData) => (rowData.enabled ? "Techada" : "Descubierta"),
+      editComponent: (props) => (
+        <FormControlLabel
+          control={
+            <Switch
+              onChange={(e) => props.onChange(e.target.checked)}
+              checked={props.value}
+            />
+          }
+          label={props.value ? "Techada" : "Descubierta"}
+        />
+      ),
+    },
+    {
+      title: "Iluminacion",
+      field: "iluminacion",
+      render: (rowData) => (rowData.enabled ? "Si" : "No"),
+      editComponent: (props) => (
+        <FormControlLabel
+          control={
+            <Switch
+              onChange={(e) => props.onChange(e.target.checked)}
+              checked={props.value}
+            />
+          }
+          label={props.value ? "Si" : "No"}
+        />
+      ),
+    },
+    {
       field: "schedule",
       filtering: false,
       editComponent: (props) => (
@@ -246,34 +346,66 @@ const ListaCanchas = ({ institutionId }) => {
       field: "images",
       filtering: false,
       editComponent: (props) => (
-        <label htmlFor="icon-button-file">
-          <InputImage
-            accept="image/*"
-            multiple
-            id="icon-button-file"
-            type="file"
-            //value={props.value}
-            onChange={/*e => props.onChange(e.target.value)*/ handleUploadImage}
-          />
-          <IconButton
-            color="primary"
-            aria-label="upload picture"
-            component="span"
-          >
-            <PhotoCamera />
-          </IconButton>
-        </label>
+        <IconButton
+          color="primary"
+          aria-label="upload picture"
+          component="span"
+          onClick={() => {
+            setOpenUploadPhotos(true);
+          }}
+        >
+          <PhotoCamera />
+        </IconButton>
       ),
     },
   ];
 
   useEffect(() => {
-    retrieveCourts("61a6d2b35df5ed18eec54355");
-    retrieveSportsList();
+    //retrieveCourts("61a6d2b35df5ed18eec54355");
+    //retrieveSportsList();
+
+    const dynamicLookupObject = sportArray.reduce(function (acc, cur, i) {
+      acc[cur.id] = cur.name;
+
+      return acc;
+    }, {});
+
+    console.log(dynamicLookupObject);
+
+    setSport(dynamicLookupObject);
+    setData(courtList);
   }, []);
 
-  const handleUploadImage = (event) => {
-    let images = [];
+  const firstUpdate = useRef(true);
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+
+    console.log("surfacesArray");
+    console.log(surfacesArray);
+    console.log("sportSelected");
+    console.log(sportSelected);
+
+    const surfacesArrayFiltered = surfacesArray.filter(
+      (s) => s.sport_id == sportSelected
+    );
+
+    const dynamicLookupSurfaces = surfacesArrayFiltered[0].surface.reduce(
+      function (acc, cur, i) {
+        acc[cur.id] = cur.name;
+
+        return acc;
+      },
+      {}
+    );
+
+    setSurfaces(dynamicLookupSurfaces);
+  }, [sportSelected]);
+
+  const handleUploadImage = (e) => {
+    /* let images = [];
 
     for (let i = 0; i < event.target.files.length; i++) {
       images.push(URL.createObjectURL(event.target.files[i]));
@@ -284,17 +416,15 @@ const ListaCanchas = ({ institutionId }) => {
       message: [],
       selectedFiles: event.target.files,
       previewImages: images,
-    });
+    }); 
+    setOpenUploadPhotos(true);*/
 
-    /*    let file = event.target.files[0];
-            let imageData = new FormData();
-            imageData.append('imageFile', event.target.files[0])
-        
-            console.log('guardando imagen');
-            console.log(imageData.values);
-            console.log(file);
-            console.log(URL.createObjectURL(file));
-            setImages(file)*/
+    let ImagesArray = Object.entries(e.target.files).map((e) =>
+      URL.createObjectURL(e[1])
+    );
+    console.log(ImagesArray);
+    setImages([...images, ...ImagesArray]);
+    console.log("images", images);
   };
 
   const retrieveCourts = async (institutionId) => {
@@ -376,16 +506,13 @@ const ListaCanchas = ({ institutionId }) => {
   const createCancha = async (newCancha) => {
     console.log("newCancha");
 
-    //const cancha = { ...newCancha, ['horarios']: horariosYPrecios, ['images']: images }
-    //let cancha = { ...newCancha, ['schedule']: horariosYPrecios }
-
     const horarios = horariosYPrecios.schedules.map((s) =>
       s
         ? {
-            ...s,
-            ["from"]: moment(s.from).format("HH:mm"),
-            ["to"]: moment(s.to).format("HH:mm"),
-          }
+          ...s,
+          ["from"]: moment(s.from).format("HH:mm"),
+          ["to"]: moment(s.to).format("HH:mm"),
+        }
         : s
     );
     horariosYPrecios.schedules = horarios;
@@ -429,7 +556,6 @@ const ListaCanchas = ({ institutionId }) => {
   const updateCancha = async (canchaToUpdated) => {
     console.log("canchaToUpdated");
 
-    //const cancha = { ...newCancha, ['horarios']: horariosYPrecios, ['images']: images }
     const cancha = { ...canchaToUpdated, ["schedule"]: horariosYPrecios };
 
     console.log(cancha);
@@ -564,6 +690,20 @@ const ListaCanchas = ({ institutionId }) => {
             }),
         }}
       />
+      {openUploadPhotos && (
+        <UploadPhotos
+          openUploadPhotos={openUploadPhotos}
+          setOpenUploadPhotos={setOpenUploadPhotos}
+          setImages={setImages}
+          images={images}
+          isMultipleEdit={isMultipleEdit}
+          handleUploadImage={handleUploadImage}
+          fileObjects={fileObjects}
+          setFileObjects={setFileObjects}
+          filesLimit={6}
+          isModal={true}
+        />
+      )}
       {open && (
         <FormularioHorarioPrecioCancha
           open={open}

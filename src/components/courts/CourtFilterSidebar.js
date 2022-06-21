@@ -66,13 +66,18 @@ const SORT_BY_OPTIONS = [
   { value: "priceDesc", label: "Precio: Mayor-Menor" },
   { value: "priceAsc", label: "Precio: Menor-Mayor" },
 ];
-const FILTER_GENDER_OPTIONS = ["Men", "Women", "Kids"];
-const FILTER_CATEGORY_OPTIONS = ["All", "Shose", "Apparel", "Accessories"];
+const FILTER_GENDER_OPTIONS = ["Polvo de Ladrillo", "Cesped", "Cemento"];
+const FILTER_CATEGORY_OPTIONS = [
+  "Techada",
+  "Descubierta",
+  "Con Luz",
+  "Sin Luz",
+];
 const FILTER_RATING_OPTIONS = ["up4Star", "up3Star", "up2Star", "up1Star"];
 const FILTER_PRICE_OPTIONS = [
-  { value: "below", label: "Below $25" },
-  { value: "between", label: "Between $25 - $75" },
-  { value: "above", label: "Above $75" },
+  { value: "below", label: "Debajo de $2000" },
+  { value: "between", label: "Entre $2000 - $2500" },
+  { value: "above", label: "Above $2500" },
 ];
 const FILTER_COLOR_OPTIONS = [
   "#00AB55",
@@ -133,7 +138,7 @@ const CourtFilterSideBar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
           <Stack spacing={3} sx={{ p: 3 }}>
             <div>
               <Typography variant="subtitle1" gutterBottom>
-                Gender
+                Superficie
               </Typography>
               <FormGroup>
                 {FILTER_GENDER_OPTIONS.map((item) => (
@@ -148,14 +153,13 @@ const CourtFilterSideBar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
 
             <div>
               <Typography variant="subtitle1" gutterBottom>
-                Category
+                Caracteristicas
               </Typography>
               <RadioGroup>
                 {FILTER_CATEGORY_OPTIONS.map((item) => (
                   <FormControlLabel
                     key={item}
-                    value={item}
-                    control={<Radio />}
+                    control={<Checkbox />}
                     label={item}
                   />
                 ))}
@@ -164,20 +168,7 @@ const CourtFilterSideBar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
 
             <div>
               <Typography variant="subtitle1" gutterBottom>
-                Colors
-              </Typography>
-              {/*<ColorManyPicker
-                name="colors"
-                colors={FILTER_COLOR_OPTIONS}
-                onChange={handleChange}
-                 onChecked={(color) => values.colors.includes(color)}
-                sx={{ maxWidth: 38 * 4 }}
-                />*/}
-            </div>
-
-            <div>
-              <Typography variant="subtitle1" gutterBottom>
-                Price
+                Precio
               </Typography>
               <RadioGroup>
                 {FILTER_PRICE_OPTIONS.map((item) => (
@@ -208,7 +199,7 @@ const CourtFilterSideBar = ({ isOpenFilter, onOpenFilter, onCloseFilter }) => {
                         checkedIcon={<Rating readOnly value={4 - index} />}
                       />
                     }
-                    label="& Up"
+                    label="& Superior"
                     sx={{
                       my: 0.5,
                       borderRadius: 1,

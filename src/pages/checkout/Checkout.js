@@ -12,6 +12,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import ReservationService from "../../services/reservations/ReservationService";
 import { BASE_URL_CUSTOMERS } from "../routes";
 import MisReservas from "./../usuarios/clientes/MisReservas";
 import PaymentForm from "./PaymentForm";
@@ -42,20 +43,20 @@ const Checkout = () => {
 
   const [validatedPaymentMethod, setValidatedPaymentMethod] = useState(false);
 
-  const [courtSelected, setCourtSelected] = useState(history.location.state);
+  const [reservation, setReservation] = useState(history.location.state);
 
-  const getStepContent = (step, courtSelected) => {
+  const getStepContent = (step, reservation) => {
     console.log("step");
     console.log(step);
     switch (step) {
       case 0:
-        return <PreReview reservation={courtSelected} />;
+        return <PreReview reservation={reservation} setReservation={setReservation} />;
       case 1:
         return (
-          <PaymentForm setValidatedPaymentMethod={setValidatedPaymentMethod} />
+          <PaymentForm setValidatedPaymentMethod={setValidatedPaymentMethod} setReservation={setReservation} />
         );
       case 2:
-        return <Review />;
+        return <Review reservation={reservation} />;
       case 3:
         return <MisReservas />;
       default:
@@ -63,7 +64,30 @@ const Checkout = () => {
     }
   };
 
+  const createReservation = async (newReservation) => {
+    const reservationCreated = await ReservationService.create(newReservation);
+    return reservationCreated;
+  }
+
   const handleNext = () => {
+
+    if (activeStep === 0) {
+      console.log("Show PreReview")
+
+    }
+
+    if (activeStep === steps.length - 1) {
+      console.log("generar la reserva")
+
+      const reservationCreated = createReservation(reservation);
+
+      const data = reservationCreated;
+
+      console.log("reserva generada")
+      console.log(data)
+
+    }
+
     setActiveStep(activeStep + 1);
   };
 
@@ -145,7 +169,7 @@ const Checkout = () => {
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {getStepContent(activeStep, courtSelected)}
+                {getStepContent(activeStep, reservation)}
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   {activeStep !== 0 && (
                     <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
