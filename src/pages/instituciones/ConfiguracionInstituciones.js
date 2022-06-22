@@ -54,57 +54,47 @@ const ConfiguracionInstituciones = () => {
 
   return (
     <>
-      <Card sx={{ minWidth: 275 }}>
-        <CardContent>
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              pt: 2,
-              pb: 8,
-            }}
-          >
-            <Container
+      <ConfirmProvider>
+        <Card sx={{ minWidth: 275 }}>
+          <CardContent>
+            <Box
+              component="main"
               sx={{
-                margin: 0,
+                flexGrow: 1,
+                pt: 2,
+                pb: 8,
               }}
-              maxWidth="lg"
             >
-              <Typography sx={{ mb: 3 }} variant="h4">
-                <ConfirmProvider>
+              <Container
+                sx={{
+                  margin: 0,
+                }}
+                maxWidth="lg"
+              >
+                <Typography sx={{ mb: 3 }} variant="h4">
                   <InstitutionDetails institution={institution} />
-                </ConfirmProvider>
-              </Typography>
+                </Typography>
 
-              <Box sx={{ pt: 3 }}>
-                <ConfirmProvider>
+                <Box sx={{ pt: 3 }}>
                   <ImagesSection institution={institution} />
-                </ConfirmProvider>
-              </Box>
-              <Box sx={{ pt: 3 }}>
-                <ConfirmProvider>
+                </Box>
+                <Box sx={{ pt: 3 }}>
                   <NonWorkingDays institution={institution} />
-                </ConfirmProvider>
-              </Box>
-              <Box sx={{ pt: 3 }}>
-                <ConfirmProvider>
+                </Box>
+                <Box sx={{ pt: 3 }}>
                   <Holidays institution={institution} />
-                </ConfirmProvider>
-              </Box>
-              <Box sx={{ pt: 3 }}>
-                <ConfirmProvider>
+                </Box>
+                <Box sx={{ pt: 3 }}>
                   <OpenAndCloseTimes institution={institution} />
-                </ConfirmProvider>
-              </Box>
-              <Box sx={{ pt: 3 }}>
-                <ConfirmProvider>
+                </Box>
+                <Box sx={{ pt: 3 }}>
                   <AdvancePaymentConfig institution={institution} />
-                </ConfirmProvider>
-              </Box>
-            </Container>
-          </Box>
-        </CardContent>
-      </Card>
+                </Box>
+              </Container>
+            </Box>
+          </CardContent>
+        </Card>
+      </ConfirmProvider>
     </>
   );
 };

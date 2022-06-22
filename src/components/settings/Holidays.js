@@ -10,13 +10,17 @@ import {
   TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import StaticDatePicker from "@mui/lab/StaticDatePicker";
 import PickersDay from "@mui/lab/PickersDay";
 import startOfDay from "date-fns/startOfDay";
 import FeriadoService from "../../services/feriados/FeriadoService";
 import moment from "moment";
+
+import InstitucionService from "../../services/instituciones/InstitucionService";
+import CustomizedSnackbars from "../ui/CustomizedSnackbars";
+import { useConfirm } from "material-ui-confirm";
 
 const states = [
   {
@@ -49,7 +53,11 @@ const CustomPickersDay = styled(PickersDay, {
   }),
 }));
 
-export const Holidays = (props) => {
+export const Holidays = ({ props, institution }) => {
+  const confirm = useConfirm();
+  const [open, setOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({});
+
   const [values, setValues] = useState([]);
 
   const findDate = (dates, date) => {
@@ -63,7 +71,6 @@ export const Holidays = (props) => {
   };
 
   const renderPickerDay = (date, selectedDates, pickersDayProps) => {
-
     if (!values) {
       return <PickersDay {...pickersDayProps} />;
     }
@@ -79,39 +86,83 @@ export const Holidays = (props) => {
     );
   };
 
-  useEffect(async () => {
+  const handleMessageLoaded = (isSuccess) => {
+    if (isSuccess) {
+      setSnackbar({
+        message: "Los Horarios se han Guardado Exitosamente !",
+        severity: "success",
+      });
+    } else {
+      setSnackbar({
+        message:
+          "Hubo un error al intentar guardar los Horarios. Vuelva a intentarlo",
+        severity: "error",
+      });
+    }
 
+    setOpen(true);
+  };
+
+  const handleSubmitChanges = async () => {
+    confirm({
+      title: "¿Esta Seguro que desea Guardar estos Cambios?",
+      cancellationText: "Cancelar",
+    })
+      .then(() => {
+        console.log("subiendo horarios de la institucion");
+
+        handleUploadChanges(values);
+      })
+      .catch(() => console.log("Deletion cancelled."));
+  };
+
+  const handleUploadChanges = async (data) => {
+    try {
+      const holidays = await InstitucionService.uploadFeriados(
+        institution.id,
+        data
+      ).then((data) => data);
+      handleMessageLoaded(true);
+    } catch (error) {
+      handleMessageLoaded(false);
+    }
+  };
+
+  useEffect(async () => {
     const feriados = await FeriadoService.getAllFeriados().then((data) => data);
 
     const array = [];
 
-    feriados.forEach(feriado => {
-      array.push(moment(new Date(2022, feriado.mes - 1, feriado.dia)).format("YYYY-MM-DD"))
+    feriados.forEach((feriado) => {
+      array.push(
+        moment(new Date(2022, feriado.mes - 1, feriado.dia)).format(
+          "YYYY-MM-DD"
+        )
+      );
     });
 
     console.log("setValues");
     console.log(array);
-    setValues(array)
-
-  }, [])
-
+    setValues(array);
+  }, []);
 
   return (
-    <form autoComplete="off" noValidate {...props}>
-      <Card>
-        <CardHeader title="Feriados" />
-        <Divider />
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item md={6} xs={12}>
-              <LocalizationProvider dateAdapter={AdapterMoment}>
-                <StaticDatePicker
-                  displayStaticWrapperAs="desktop"
-                  label="Week picker"
-                  value={values}
-                  onChange={(newValue) => {
-                    //copying the values array
-                    /* const array = [...values];
+    <>
+      <form autoComplete="off" noValidate {...props}>
+        <Card>
+          <CardHeader title="Feriados" />
+          <Divider />
+          <CardContent>
+            <Grid container spacing={3}>
+              <Grid item md={6} xs={12}>
+                <LocalizationProvider dateAdapter={AdapterMoment}>
+                  <StaticDatePicker
+                    displayStaticWrapperAs="desktop"
+                    label="Week picker"
+                    value={values}
+                    onChange={(newValue) => {
+                      //copying the values array
+                      /* const array = [...values];
                     const date = startOfDay(newValue);
                     const index = findIndexDate(array, date);
                     if (index >= 0) {
@@ -121,28 +172,39 @@ export const Holidays = (props) => {
                     }
                     console.log(array);
                     setValues(array); */
-                  }}
-                  renderDay={renderPickerDay}
-                  renderInput={(params) => <TextField {...params} />}
-                //inputFormat="'Week of' MMM d"
-                />
-              </LocalizationProvider>
+                    }}
+                    renderDay={renderPickerDay}
+                    renderInput={(params) => <TextField {...params} />}
+                    //inputFormat="'Week of' MMM d"
+                  />
+                </LocalizationProvider>
+              </Grid>
             </Grid>
-          </Grid>
-        </CardContent>
-        <Divider />
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            p: 2,
-          }}
-        >
-          <Button color="primary" variant="contained">
-            Guardar Feriados
-          </Button>
-        </Box>
-      </Card>
-    </form>
+          </CardContent>
+          <Divider />
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              p: 2,
+            }}
+          >
+            <Button
+              onClick={handleSubmitChanges}
+              color="primary"
+              variant="contained"
+            >
+              Guardar Feriados
+            </Button>
+          </Box>
+        </Card>
+      </form>
+      <CustomizedSnackbars
+        message={snackbar.message}
+        severity={snackbar.severity}
+        setOpen={setOpen}
+        open={open}
+      />
+    </>
   );
 };

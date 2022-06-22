@@ -32,14 +32,78 @@ const createInstitutionSchedules = async (institution_id, data) => {
     .then((response) => {
       console.log("CREANDO HORARIO PARA INSTITUCION");
       console.log(response.data);
-      return response.data
+      return response.data;
     })
     .catch((err) => {
       console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
       console.log(err.response);
 
-      return Promise.reject(err.response)
+      return Promise.reject(err.response);
     });
+};
+
+const uploadImages = async (institution_id, data) => {
+  /* return await http
+    .post(`/institutions/${institution_id}/images`, data)
+    .then((response) => {
+      console.log("CREANDO HORARIO PARA INSTITUCION");
+      console.log(response.data);
+      return response.data;
+    })
+    .catch((err) => {
+      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
+      console.log(err.response);
+
+      return Promise.reject(err.response);
+    }); */
+};
+
+const uploadFeriados = async (institution_id, data) => {
+  /* return await http
+    .post(`/institutions/${institution_id}/images`, data)
+    .then((response) => {
+      console.log("CREANDO HORARIO PARA INSTITUCION");
+      console.log(response.data);
+      return response.data;
+    })
+    .catch((err) => {
+      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
+      console.log(err.response);
+
+      return Promise.reject(err.response);
+    }); */
+};
+
+const uploadNonWorkingDays = async (institution_id, data) => {
+  /* return await http
+    .post(`/institutions/${institution_id}/images`, data)
+    .then((response) => {
+      console.log("CREANDO HORARIO PARA INSTITUCION");
+      console.log(response.data);
+      return response.data;
+    })
+    .catch((err) => {
+      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
+      console.log(err.response);
+
+      return Promise.reject(err.response);
+    }); */
+};
+
+const uploadAdvancePayment = async (institution_id, data) => {
+  /* return await http
+    .post(`/institutions/${institution_id}/images`, data)
+    .then((response) => {
+      console.log("CREANDO HORARIO PARA INSTITUCION");
+      console.log(response.data);
+      return response.data;
+    })
+    .catch((err) => {
+      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
+      console.log(err.response);
+
+      return Promise.reject(err.response);
+    }); */
 };
 
 const create = (data) => {
@@ -68,4 +132,8 @@ export default {
   removeAll,
   getInstitutionSchedules,
   createInstitutionSchedules,
+  uploadImages,
+  uploadFeriados,
+  uploadNonWorkingDays,
+  uploadAdvancePayment,
 };

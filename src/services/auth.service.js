@@ -1,4 +1,5 @@
 import axios from "axios";
+import { persistor } from "../store";
 
 const API_URL = "http://localhost:8080/api/auth/";
 
@@ -25,7 +26,7 @@ const login = async (username, password) => {
 
 const logout = () => {
   localStorage.removeItem("user");
-  localStorage.removeItem("persist");
+  persistor.purge();
 };
 
 const register = async (firstName, lastName, userRole, email, password) => {
@@ -60,7 +61,7 @@ const getCurrentUser = () => {
 const sendVerificationEmail = async (email) => {
   return await axios
     .post(API_URL + "verification", {
-      email
+      email,
     })
     .then((response) => {
       console.log("email enviado correctamente al usuario");

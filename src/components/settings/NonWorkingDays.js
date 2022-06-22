@@ -32,6 +32,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EventIcon from "@mui/icons-material/Event";
 
 import { useConfirm } from "material-ui-confirm";
+import InstitucionService from "../../services/instituciones/InstitucionService";
+import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 
 function generate(element) {
   return [0, 1, 2].map((value) =>
@@ -61,8 +63,10 @@ const CustomPickersDay = styled(PickersDay, {
   }),
 }));
 
-export const NonWorkingDays = (props) => {
+export const NonWorkingDays = ({ props, institution }) => {
   const confirm = useConfirm();
+  const [open, setOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({});
 
   const [values, setValues] = useState([]);
 
@@ -95,6 +99,23 @@ export const NonWorkingDays = (props) => {
     );
   };
 
+  const handleMessageLoaded = (isSuccess) => {
+    if (isSuccess) {
+      setSnackbar({
+        message: "Los Horarios se han Guardado Exitosamente !",
+        severity: "success",
+      });
+    } else {
+      setSnackbar({
+        message:
+          "Hubo un error al intentar guardar los Horarios. Vuelva a intentarlo",
+        severity: "error",
+      });
+    }
+
+    setOpen(true);
+  };
+
   const handleSubmitChanges = async () => {
     confirm({
       title: "¿Esta Seguro que desea Guardar estos Cambios?",
@@ -111,10 +132,17 @@ export const NonWorkingDays = (props) => {
       .catch(() => console.log("Deletion cancelled."));
   };
 
-  const handleUploadChanges = (diasNoLaborales) => {
-    console.log("ENVIANDO DIAS NO LABORALES DE LA INSTITUCION AL BACK");
+  const handleUploadChanges = async (data) => {
+    try {
+      const images = await InstitucionService.uploadNonWorkingDays(
+        institution.id,
+        data
+      ).then((data) => data);
 
-    console.log(diasNoLaborales);
+      handleMessageLoaded(true);
+    } catch (error) {
+      handleMessageLoaded(false);
+    }
   };
 
   return (
@@ -238,6 +266,12 @@ export const NonWorkingDays = (props) => {
           </Box>
         </Card>
       </form>
+      <CustomizedSnackbars
+        message={snackbar.message}
+        severity={snackbar.severity}
+        setOpen={setOpen}
+        open={open}
+      />
     </>
   );
 };

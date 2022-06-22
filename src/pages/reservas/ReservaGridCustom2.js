@@ -96,9 +96,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const getBorder = (theme) =>
-  `1px solid ${theme.palette.mode === "light"
-    ? lighten(alpha(theme.palette.divider, 1), 0.88)
-    : darken(alpha(theme.palette.divider, 1), 0.68)
+  `1px solid ${
+    theme.palette.mode === "light"
+      ? lighten(alpha(theme.palette.divider, 1), 0.88)
+      : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -465,7 +466,7 @@ const ReservaGridCustom2 = () => {
 
   const [startDayHour, setStartDayHour] = useState(7);
   const [endDayHour, setEndDayHour] = useState(23);
-  const [busyTimes, setBusyTimes] = useState([])
+  const [busyTimes, setBusyTimes] = useState([]);
 
   const [workingDays, setWorkingDays] = useState([]);
 
@@ -475,7 +476,10 @@ const ReservaGridCustom2 = () => {
     const { startDate } = restProps;
     if (Utils.isWeekend(startDate, workingDays)) {
       return (
-        <StyledWeekViewDayScaleCell {...restProps} className={classes.weekEnd} />
+        <StyledWeekViewDayScaleCell
+          {...restProps}
+          className={classes.weekEnd}
+        />
       );
     }
     return <StyledWeekViewDayScaleCell {...restProps} />;
@@ -832,8 +836,14 @@ const ReservaGridCustom2 = () => {
   };
 
   useEffect(() => {
-    //
+    console.log("CARGANDO EL COMPONENTE DE RESERVAS");
+    //OBTENER LAS RESERVAS POR INSTITUCION
+
     sportChange(1);
+
+    //OBTENER LOS DIAS LABORALES
+
+    //OBTENER LOS HORARIOS DE LA INSTITUCION
 
     dispatch(getInstitutionSchedules(institution.id));
 
@@ -841,13 +851,11 @@ const ReservaGridCustom2 = () => {
 
     let endDayTime;
 
-
-
     //OBTENER LOS DIAS LABORALES
     if (institution.schedules) {
       institution.schedules.forEach((schedule) => {
-        let horariosLaborales = []
-        let diasLaboralesSegmentados = []
+        let horariosLaborales = [];
+        let diasLaboralesSegmentados = [];
 
         schedule.daysAvailable.forEach((diaLaboral) => {
           switch (diaLaboral) {
@@ -865,7 +873,7 @@ const ReservaGridCustom2 = () => {
             "dia: " + diaLaboral + " numero: " + moment().day(diaLaboral).day()
           );
 
-          diasLaboralesSegmentados.push(moment().day(diaLaboral).day())
+          diasLaboralesSegmentados.push(moment().day(diaLaboral).day());
 
           setWorkingDays((prevState) => {
             return [...prevState, moment().day(diaLaboral).day()];
@@ -886,36 +894,27 @@ const ReservaGridCustom2 = () => {
             new Date(horario.timeFrame.to).getHours()
           );
 
-          console.log(
-            "horario desde: " +
-            new Date(horario.timeFrame.from).getHours() +
-            " hasta: " +
-            new Date(horario.timeFrame.to).getHours()
-          );
-
-          horariosLaborales.push(
-            {
-              from: new Date(horario.timeFrame.from).getHours(),
-              to: new Date(horario.timeFrame.to).getHours()
-            }
-          );
+          horariosLaborales.push({
+            from: new Date(horario.timeFrame.from).getHours(),
+            to: new Date(horario.timeFrame.to).getHours(),
+          });
         });
 
-        console.log("GUARDANDO HORARIOS LABORALES PARA BUSY TIMES")
-        console.log({ ...horariosLaborales, diasLaboralesSegmentados })
+        console.log("GUARDANDO HORARIOS LABORALES PARA BUSY TIMES");
+        console.log({ ...horariosLaborales, diasLaboralesSegmentados });
 
         setBusyTimes((prevState) => {
-          return [...prevState, { horariosLaborales, diasLaboralesSegmentados }];
+          return [
+            ...prevState,
+            { horariosLaborales, diasLaboralesSegmentados },
+          ];
         });
         //  setBusyTimes(horariosLaborales);
       });
 
       setStartDayHour(startDayTime);
       setEndDayHour(endDayTime);
-
-
     }
-
 
     //Obtener todas las reservas hechas para la institucion
   }, []);

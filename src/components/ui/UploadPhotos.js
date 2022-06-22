@@ -80,73 +80,69 @@ const UploadPhotos = ({
 
   //const [fileObjects, setFileObjects] = useState([]);
 
-  return (
-    isModal ? (
-      <DropzoneDialogBase
-        dialogTitle="Carga las fotos de la Cancha"
-        acceptedFiles={["image/*"]}
-        cancelButtonText={"Cancelar"}
-        submitButtonText={"Cargar Fotos"}
-        open={openUploadPhotos}
-        onClose={handleClose}
-        onSave={(files) => {
-          console.log("onSave", fileObjects);
-          handleClose();
-        }}
-        onAdd={(newFileObjs) => {
-          console.log("onAdd", newFileObjs);
-          setFileObjects([].concat(fileObjects, newFileObjs));
-        }}
-        onDelete={(deleteFileObj) => {
-          console.log("onDelete", deleteFileObj);
-          deleteFile(deleteFileObj);
-        }}
-        fileObjects={fileObjects}
-        showPreviews={true}
-        showFileNamesInPreview={true}
-        maxFileSize={50000000}
-        showPreviewsInDropzone={false}
-        previewGridProps={{
-          container: { spacing: 1, direction: "row" },
-        }}
-        previewText="Imagenes Seleccionadas"
-        filesLimit={filesLimit}
-        dropzoneText="Arrastre y suelte una foto aquí o haga Clic"
-      />
-    ) : (
-      <DropzoneAreaBase
-        dialogTitle="Carga las fotos de la Cancha"
-        acceptedFiles={["image/*"]}
-        cancelButtonText={"Cancelar"}
-        submitButtonText={"Cargar Fotos"}
-        open={openUploadPhotos}
-        onClose={handleClose}
-        onSave={(files) => {
-          console.log("onSave", fileObjects);
-          handleClose();
-        }}
-        onAdd={(newFileObjs) => {
-          console.log("onAdd", newFileObjs);
-          setFileObjects([].concat(fileObjects, newFileObjs));
-        }}
-        onDelete={(deleteFileObj) => {
-          console.log("onDelete", deleteFileObj);
-          deleteFile(deleteFileObj);
-        }}
-        fileObjects={fileObjects}
-        showPreviews={true}
-        showFileNamesInPreview={true}
-        maxFileSize={50000000}
-        showPreviewsInDropzone={false}
-        previewGridProps={{
-          container: { spacing: 1, direction: "row" },
-        }}
-        previewText="Imagenes Seleccionadas"
-        filesLimit={filesLimit}
-        dropzoneText="Arrastre y suelte una foto aquí o haga Clic"
-      />
-    )
-
+  return isModal ? (
+    <DropzoneDialogBase
+      dialogTitle="Carga las fotos de la Cancha"
+      acceptedFiles={["image/*"]}
+      cancelButtonText={"Cancelar"}
+      submitButtonText={"Cargar Fotos"}
+      open={openUploadPhotos}
+      onClose={handleClose}
+      onSave={(files) => {
+        console.log("onSave", fileObjects);
+        handleClose();
+      }}
+      onAdd={(newFileObjs) => {
+        console.log("onAdd", newFileObjs);
+        setFileObjects([].concat(fileObjects, newFileObjs));
+      }}
+      onDelete={(deleteFileObj) => {
+        console.log("onDelete", deleteFileObj);
+        deleteFile(deleteFileObj);
+      }}
+      fileObjects={fileObjects}
+      showPreviews={true}
+      showFileNamesInPreview={true}
+      maxFileSize={50000000}
+      showPreviewsInDropzone={false}
+      previewGridProps={{
+        container: { spacing: 1, direction: "row" },
+      }}
+      previewText="Imagenes Seleccionadas"
+      filesLimit={filesLimit}
+      dropzoneText="Arrastre y suelte una foto aquí o haga Clic"
+    />
+  ) : (
+    <DropzoneAreaBase
+      acceptedFiles={["image/*"]}
+      cancelButtonText={"Cancelar"}
+      submitButtonText={"Cargar Fotos"}
+      open={openUploadPhotos}
+      onClose={handleClose}
+      onSave={(files) => {
+        console.log("onSave", fileObjects);
+        handleClose();
+      }}
+      onAdd={(newFileObjs) => {
+        console.log("onAdd", newFileObjs);
+        setFileObjects([].concat(fileObjects, newFileObjs));
+      }}
+      onDelete={(deleteFileObj) => {
+        console.log("onDelete", deleteFileObj);
+        deleteFile(deleteFileObj);
+      }}
+      fileObjects={fileObjects}
+      showPreviews={true}
+      showFileNamesInPreview={true}
+      maxFileSize={50000000}
+      showPreviewsInDropzone={false}
+      previewGridProps={{
+        container: { spacing: 1, direction: "row" },
+      }}
+      previewText="Imagenes Seleccionadas"
+      filesLimit={filesLimit}
+      dropzoneText="Arrastre y suelte una foto aquí o haga Clic"
+    />
   );
 };
 
