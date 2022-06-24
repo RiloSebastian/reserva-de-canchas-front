@@ -58,6 +58,10 @@ export const getInstitutionSchedules = (institution_id) => (dispatch) => {
       return Promise.resolve();
     },
     (error) => {
+      console.log(
+        "ERROR -> ejecutando action para obtener horarios de la institucion"
+      );
+      console.log(error);
       const message =
         (error.response &&
           error.response.data &&

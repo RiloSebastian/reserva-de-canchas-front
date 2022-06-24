@@ -75,6 +75,48 @@ const SignIn = (props) => {
       console.log("obteniendo info del login");
       console.log(user);
 
+      const userRole = user.roles[0];
+      switch (userRole) {
+        case "ROLE_CUSTOMER":
+          console.log("ROLE_CUSTOMER");
+          history.push("/customer/home");
+          break;
+        case "ROLE_ADMIN":
+          console.log("ROLE_ADMIN");
+
+          //setear info de la institucion asociada
+
+          try {
+            console.log("Abrir dashboard");
+
+            dispatch(getByAdminEmail(data.get("username")));
+
+            console.log(
+              "obteniendo la info de la institucion para dejarlo en el store"
+            );
+
+            history.push("/dashboard/reservas");
+          } catch (error) {
+            console.log("Catcheando el error de la institucion");
+            console.log(error);
+          }
+
+          break;
+        case "ROLE_EMPLOYEE":
+          console.log("ROLE_EMPLOYEE");
+          break;
+        case "ROLE_COACH":
+          console.log("ROLE_COACH");
+          break;
+        case "ROLE_SUPER_ADMIN":
+          console.log("ROLE_SUPER_ADMIN");
+          break;
+        default:
+          console.log(
+            `Lo sentimos, no existen permisos para este rol > ${userRole}.`
+          );
+      }
+      /* 
       if (user.roles[0] === "ROLE_CUSTOMER") {
         history.push("/customer/home");
       } else {
@@ -96,7 +138,7 @@ const SignIn = (props) => {
           console.log("Catcheando el error de la institucion");
           console.log(error);
         }
-      }
+      } */
     } catch (err) {
       console.error("error al obtener usuario");
       console.log(err);

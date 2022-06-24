@@ -47,7 +47,7 @@ export default class Utils {
     return hours === dinnerTime.from && minutes === 0;
   }
 
-  static isValidAppointment(component, appointmentData, workingDays) {
+  static isValidAppointment(component, appointmentData, workingDays, busyTime) {
     console.log("VALIDANDO SI ES UN APPOINTMENT VALIDO");
     console.log(component);
     console.log(appointmentData);
@@ -59,7 +59,8 @@ export default class Utils {
       startDate,
       endDate,
       cellDuration,
-      workingDays
+      workingDays,
+      busyTime
     );
   }
 
@@ -67,18 +68,19 @@ export default class Utils {
     startDate,
     endDate,
     cellDuration,
-    workingDays
+    workingDays,
+    busyTime
   ) {
     const edgeEndDate = new Date(endDate.getTime() - 1);
 
-    if (!Utils.isValidAppointmentDate(edgeEndDate, workingDays)) {
+    if (!Utils.isValidAppointmentDate(edgeEndDate, workingDays, busyTime)) {
       return false;
     }
 
     const durationInMs = cellDuration * 60 * 1000;
     const date = startDate;
     while (date <= endDate) {
-      if (!Utils.isValidAppointmentDate(date, workingDays)) {
+      if (!Utils.isValidAppointmentDate(date, workingDays, busyTime)) {
         return false;
       }
       const newDateTime = date.getTime() + durationInMs - 1;
@@ -88,10 +90,10 @@ export default class Utils {
     return true;
   }
 
-  static isValidAppointmentDate(date, workingDays) {
+  static isValidAppointmentDate(date, workingDays, busyTime) {
     return (
       !Utils.isHoliday(date) &&
-      !Utils.isDinner(date) &&
+      !Utils.isDinner(date, busyTime) &&
       !Utils.isWeekend(date, workingDays)
     );
   }
