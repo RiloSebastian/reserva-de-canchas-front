@@ -462,7 +462,7 @@ const sports = gettingSports();
 const ReservaGridCustom2 = () => {
   const dispatch = useDispatch();
 
-  const institution = useSelector((state) => state.institution);
+  //const institution = useSelector((state) => state.institution);
 
   const [startDayHour, setStartDayHour] = useState(7);
   const [endDayHour, setEndDayHour] = useState(23);
@@ -841,6 +841,8 @@ const ReservaGridCustom2 = () => {
 
   useEffect(() => {
     console.log("CARGANDO EL COMPONENTE DE RESERVAS");
+
+    const institution = JSON.parse(localStorage.getItem("institution"));
     //OBTENER LAS RESERVAS POR INSTITUCION
 
     sportChange(1);
@@ -849,7 +851,7 @@ const ReservaGridCustom2 = () => {
 
     //OBTENER LOS HORARIOS DE LA INSTITUCION
 
-    dispatch(getInstitutionSchedules(institution.id));
+    //dispatch(getInstitutionSchedules(institution.id));
 
     let startDayTime;
 

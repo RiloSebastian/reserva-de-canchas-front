@@ -16,6 +16,34 @@ const getByAdminEmail = async (admin_email) => {
   return await http
     .get(`/institutions/admin/${admin_email}`)
     .then((response) => response.data)
+    .then(async (institution) => {
+      console.log("institution obtenida");
+
+      console.log(institution);
+
+      const schedules = await getInstitutionSchedules(institution.id)
+        .then((schedules) => {
+          console.log("horarios obtenidos");
+
+          console.log(schedules);
+          return schedules;
+        })
+        .catch((err) => Promise.reject(err));
+
+      const institutionWithSchedules = {
+        ...institution,
+        schedules,
+      };
+
+      if (institution) {
+        localStorage.setItem(
+          "institution",
+          JSON.stringify(institutionWithSchedules)
+        );
+      }
+
+      return institutionWithSchedules;
+    })
     .catch((err) => Promise.reject(err));
 };
 

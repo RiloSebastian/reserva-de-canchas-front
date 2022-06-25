@@ -83,3 +83,9 @@ export const change = (payload) => (dispatch) => {
   console.log(payload);
   dispatch({ type: "UPDATE_INSTITUTION", payload });
 };
+
+export const setInstitution = (payload) => (dispatch) => {
+  console.log("En la action de setInstitution state");
+  console.log(payload);
+  dispatch({ type: "SET_INSTITUTION", payload });
+};

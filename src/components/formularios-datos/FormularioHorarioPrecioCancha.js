@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SaveIcon from "@mui/icons-material/Save";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -21,6 +22,8 @@ import Paper from "@mui/material/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Button from "@mui/material/Button";
+import { days } from "../../utils/days/days";
+import { v4 as uuidv4 } from "uuid";
 
 const useStyles = makeStyles((theme) => ({
   ...theme.typography.body2,
@@ -37,19 +40,15 @@ const FormularioHorarioPrecioCancha = ({
   setHorariosYPrecios,
   isMultipleEdit,
 }) => {
+  const institution = useSelector((state) => state.institution);
+
   const { excluirDiasNoLaborales, porcentajeSenia } = horariosYPrecios;
 
   const classes = useStyles();
 
-  const [daysSelected, setDaysSelected] = useState([
-    { label: "Lunes", value: 1, daysAndTimesId: null, selected: false },
-    { label: "Martes", value: 2, daysAndTimesId: null, selected: false },
-    { label: "Miercoles", value: 3, daysAndTimesId: null, selected: false },
-    { label: "Jueves", value: 4, daysAndTimesId: null, selected: false },
-    { label: "Viernes", value: 5, daysAndTimesId: null, selected: false },
-    { label: "Sabado", value: 6, daysAndTimesId: null, selected: false },
-    { label: "Domingo", value: 7, daysAndTimesId: null, selected: false },
-  ]);
+  const [daysSelected, setDaysSelected] = useState([]);
+
+  const [disableAddMoreDays, setDisableAddMoreDays] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -84,25 +83,6 @@ const FormularioHorarioPrecioCancha = ({
     dias: daysSelected,
     horarios: [nuevoHorario],
   };
-
-  useEffect(() => {
-    //traer los horarios guardados por la institucion
-    //getHorarios();
-
-    //const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
-    //const newSchedule = [...horarios, nuevoHorario];
-    setDiasYHorarios([nuevoDiaYHorario]);
-    //setHorarios(newSchedule);
-  }, []);
-
-  useEffect(() => {
-    //Actualizar todos los dias seleccionados 
-
-    console.log("Actualizar todos los dias seleccionados")
-    console.log(daysSelected)
-
-
-  }, [daysSelected]);
 
   const handleChange = (e) => {
     if (e.target.type === "checkbox") {
@@ -199,6 +179,79 @@ const FormularioHorarioPrecioCancha = ({
     }
   };
 
+  const handleDisableAddNewDatesSchedules = () => {
+    console.log("VALIDANDO DIAS SELECCIONADOS");
+
+    const addNewDaysAndSchedulesAvailable = daysSelected
+      .filter(
+        (daySelected) =>
+          daySelected.daysAndTimesId ===
+          diasYHorarios[diasYHorarios.length - 1].id
+      )
+      .map((daySelected) => daySelected.selected)
+      .every((d) => d === false);
+
+    setDisableAddMoreDays(addNewDaysAndSchedulesAvailable);
+  };
+
+  useEffect(() => {
+    //traer los horarios guardados por la institucion
+    //getHorarios();
+
+    //const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
+    //const newSchedule = [...horarios, nuevoHorario];
+    setDiasYHorarios([nuevoDiaYHorario]);
+    //setHorarios(newSchedule);
+  }, []);
+
+  useEffect(() => {
+    //Validar si corresponde deshabilitar boton
+
+    handleDisableAddNewDatesSchedules();
+  }, [daysSelected]);
+
+  useEffect(() => {
+    //Obtener los dias habiles de la institucion
+
+    let institutionsDaysAvailable = [];
+
+    if (institution.schedules) {
+      institution.schedules.forEach((schedule) => {
+        const daysAndTimesId = uuidv4();
+
+        schedule.daysAvailable.forEach((dayAvailable) => {
+          institutionsDaysAvailable.push({
+            label:
+              dayAvailable.charAt(0).toUpperCase() +
+              dayAvailable.slice(1).toLowerCase(),
+            value: dayAvailable,
+            daysAndTimesId,
+            selected: false,
+          });
+        });
+      });
+
+      const arraySorted = institutionsDaysAvailable.sort((a, b) => {
+        return days[a.label] - days[b.label];
+      });
+
+      console.log("setear los dias habiles de la institucion");
+      console.log(arraySorted);
+
+      setDaysSelected(arraySorted);
+    } else {
+      setDaysSelected([
+        { label: "Lunes", value: 1, daysAndTimesId: null, selected: false },
+        { label: "Martes", value: 2, daysAndTimesId: null, selected: false },
+        { label: "Miercoles", value: 3, daysAndTimesId: null, selected: false },
+        { label: "Jueves", value: 4, daysAndTimesId: null, selected: false },
+        { label: "Viernes", value: 5, daysAndTimesId: null, selected: false },
+        { label: "Sabado", value: 6, daysAndTimesId: null, selected: false },
+        { label: "Domingo", value: 7, daysAndTimesId: null, selected: false },
+      ]);
+    }
+  }, [institution.schedules]);
+
   return (
     <div>
       <Dialog open={open} onClose={handleClose} maxWidth="xl">
@@ -230,7 +283,7 @@ const FormularioHorarioPrecioCancha = ({
 
           {diasYHorarios.map((diaYHorario, key) => {
             diaYHorario.id = key;
-
+            //diaYHorario.id = uuidv4();
             return (
               <Paper className={classes}>
                 <Box key={key} textAlign="center" sx={{ m: 4 }}>
@@ -278,7 +331,20 @@ const FormularioHorarioPrecioCancha = ({
         </DialogContent>
 
         <Box textAlign="center">
-          <IconButton color="secondary" aria-label="delete" size="large" disabled={!daysSelected.map((daySelected) => daySelected.selected).includes(false)}>
+          <IconButton
+            color="secondary"
+            aria-label="delete"
+            size="large"
+            disabled={
+              (daysSelected
+                .map((daySelected) => daySelected.selected)
+                .every((d) => d === false) ||
+                daysSelected
+                  .map((daySelected) => daySelected.selected)
+                  .every((d) => d === true)) &&
+              disableAddMoreDays
+            }
+          >
             <AddCircleIcon
               onClick={handleAddNewDatesSchedules}
               sx={{ fontSize: 50 }}
@@ -294,6 +360,9 @@ const FormularioHorarioPrecioCancha = ({
             loadingPosition="start"
             startIcon={<SaveIcon />}
             variant="contained"
+            disabled={daysSelected
+              .map((daySelected) => daySelected.selected)
+              .every((d) => d === false)}
           >
             Guardar Horarios y Precios
           </LoadingButton>

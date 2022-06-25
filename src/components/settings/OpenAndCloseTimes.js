@@ -43,6 +43,7 @@ import { v4 as uuidv4 } from "uuid";
 import CardActions from "@mui/material/CardActions";
 import Typography from "@mui/material/Typography";
 import CustomizedSnackbars from "../ui/CustomizedSnackbars";
+import { days } from "../../utils/days/days";
 
 const bull = (
   <Box
@@ -152,8 +153,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       },
     ],
   };
-
-  const [day, setDay] = useState([]);
 
   const [diasYHorarios, setDiasYHorarios] = useState([]);
 
@@ -331,10 +330,9 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           console.log("SUBIENDO DIAS Y HORARIOS DE LA INSTITUCION");
           console.log(data);
 
-          data.forEach(schedule => {
+          data.forEach((schedule) => {
             handleUploadChanges(schedule);
-          })
-
+          });
         }
       })
       .catch(() => console.log("Deletion cancelled."));
@@ -437,11 +435,9 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
 
         const daysAlreadySelected = [];
 
-
         const daysAndSchedulesAlreadyLoaded = [];
 
         institution.schedules.forEach((horario) => {
-
           const schedulersAlreadySelected = [];
 
           horario.daysAvailable.forEach((dia) => {
@@ -479,7 +475,7 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           }
         });
 
-        const days = {
+        /* const days = {
           Lunes: 1,
           Martes: 2,
           Miercoles: 3,
@@ -487,14 +483,18 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           Viernes: 5,
           Sabado: 6,
           Domingo: 7,
-        };
+        }; */
 
         const arraySorted = daysAlreadySelected.sort((a, b) => {
           return days[a.label] - days[b.label];
         });
 
-        if (!arraySorted.map(diaSeleccionado => diaSeleccionado.selected).every(d => d === true)) {
-          setDisabled(false)
+        if (
+          !arraySorted
+            .map((diaSeleccionado) => diaSeleccionado.selected)
+            .every((d) => d === true)
+        ) {
+          setDisabled(false);
         }
 
         setDaysSelected(arraySorted.sort());

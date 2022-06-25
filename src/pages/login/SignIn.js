@@ -16,7 +16,11 @@ import AuthService from "../../services/auth.service";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 import InstitucionService from "../../services/instituciones/InstitucionService";
 import { useDispatch } from "react-redux";
-import { getByAdminEmail } from "../../actions/institution";
+import {
+  getByAdminEmail,
+  getInstitutionSchedules,
+  setInstitution,
+} from "../../actions/institution";
 import EmailService from "../../services/email/EmailService";
 
 function Copyright(props) {
@@ -89,11 +93,20 @@ const SignIn = (props) => {
           try {
             console.log("Abrir dashboard");
 
-            dispatch(getByAdminEmail(data.get("username")));
+            /*   const institutcion = dispatch(
+              getByAdminEmail(data.get("username"))
+            ); */
 
+            const institution = await InstitucionService.getByAdminEmail(
+              user.email
+            ).then((data) => data);
             console.log(
               "obteniendo la info de la institucion para dejarlo en el store"
             );
+
+            console.log(institution);
+
+            dispatch(setInstitution(institution));
 
             history.push("/dashboard/reservas");
           } catch (error) {
