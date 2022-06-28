@@ -37,7 +37,8 @@ const create = async (institution_id, data) => {
     console.log(canchaCreada);
     return canchaCreada;
   } catch (err) {
-    console.log(err);
+    console.log(err.response);
+    return Promise.reject(err.response);
   }
 };
 

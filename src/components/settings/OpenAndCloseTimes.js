@@ -475,16 +475,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           }
         });
 
-        /* const days = {
-          Lunes: 1,
-          Martes: 2,
-          Miercoles: 3,
-          Jueves: 4,
-          Viernes: 5,
-          Sabado: 6,
-          Domingo: 7,
-        }; */
-
         const arraySorted = daysAlreadySelected.sort((a, b) => {
           return days[a.label] - days[b.label];
         });

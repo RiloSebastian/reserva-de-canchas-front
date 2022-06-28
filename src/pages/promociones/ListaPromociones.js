@@ -17,6 +17,37 @@ import ViewColumn from "@material-ui/icons/ViewColumn";
 import MaterialTable from "material-table";
 import React, { forwardRef, useState } from "react";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import Select from '@mui/material/Select';
+import Checkbox from '@mui/material/Checkbox';
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+const names = [
+  'Oliver Hansen',
+  'Van Henry',
+  'April Tucker',
+  'Ralph Hubbard',
+  'Omar Alexander',
+  'Carlos Abbott',
+  'Miriam Wagner',
+  'Bradley Wilkerson',
+  'Virginia Andrews',
+  'Kelly Snyder',
+];
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -43,6 +74,19 @@ const tableIcons = {
 };
 
 const ListaPromociones = () => {
+  const [personName, setPersonName] = useState([]);
+
+  const handleChange = (event) => {
+    console.log("actualizando beneficiarios")
+    const {
+      target: { value },
+    } = event;
+    setPersonName(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
   const [open, setOpen] = useState(false);
 
   const [columns, setColumns] = useState([
@@ -50,10 +94,35 @@ const ListaPromociones = () => {
     {
       title: "Descripcion",
       field: "description",
-      initialEditValue: "initial edit value",
     },
     //{ title: 'Birth Year', field: 'birthYear', type: 'numeric' },
     { title: "Porcentaje de Descuento", field: "descuento" },
+    {
+      title: "Beneficiarios", field: "beneficiarios", editComponent: props => (
+        <div>
+          <FormControl sx={{ m: 1, width: 300 }}>
+            <InputLabel id="demo-multiple-checkbox-label">Beneficiarios</InputLabel>
+            <Select
+              labelId="demo-multiple-checkbox-label"
+              id="demo-multiple-checkbox"
+              multiple
+              value={personName}
+              onChange={handleChange}
+              input={<OutlinedInput label="Beneficiarios" />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+            >
+              {names.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={personName.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+      )
+    },
   ]);
 
   const [data, setData] = useState([
