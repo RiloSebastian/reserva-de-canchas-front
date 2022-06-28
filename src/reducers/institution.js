@@ -1,5 +1,5 @@
 import {
-  GET_INSTITUTION,
+  SET_INSTITUTION,
   UPDATE_INSTITUTION,
   LOAD_INSTITUTION_SCHEDULES,
 } from "../actions/types";
@@ -18,6 +18,7 @@ const initialState = {
   email: "",
   institutionTel: "",
   manager: "",
+  schedules: [],
 };
 
 export default function (state = initialState, action) {
@@ -27,7 +28,7 @@ export default function (state = initialState, action) {
   console.log(payload);
 
   switch (type) {
-    case GET_INSTITUTION:
+    case SET_INSTITUTION:
       return {
         ...state,
         id: payload.id,
@@ -35,6 +36,7 @@ export default function (state = initialState, action) {
         description: payload.description,
         institutionTel: payload.institutionTel,
         address: payload.address,
+        schedules: payload.schedules,
       };
     case UPDATE_INSTITUTION:
       return {

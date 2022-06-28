@@ -20,21 +20,15 @@ export default class Utils {
 
     let isDinner = true;
 
-    console.log("PRINTEANDO BUSY TIMES EN UTILS")
-    console.log(busyTime)
+    /*   console.log("PRINTEANDO BUSY TIMES EN UTILS");
+    console.log(busyTime); */
 
     for (const range of busyTime) {
-
       for (const horario of range.horariosLaborales) {
-
-        console.log("VAMOS POR HORARIO")
-        console.log(horario)
         for (var i = horario.from; i <= horario.to - 1; i++) {
-          console.log("EL DIA : " + day + " A LA HORA: " + hours + " ES LABORAL? LO COMPARAMOS CON: " + i)
           if (range.diasLaboralesSegmentados.includes(day) && hours === i) {
-            isDinner = false
+            isDinner = false;
           }
-
         }
       }
     }
@@ -53,28 +47,40 @@ export default class Utils {
     return hours === dinnerTime.from && minutes === 0;
   }
 
-  static isValidAppointment(component, appointmentData, workingDays) {
-    console.log("VALIDANDO SI ES UN APPOINTMENT VALIDO")
-    console.log(component)
-    console.log(appointmentData)
-    console.log(workingDays)
+  static isValidAppointment(component, appointmentData, workingDays, busyTime) {
+    console.log("VALIDANDO SI ES UN APPOINTMENT VALIDO");
+    console.log(component);
+    console.log(appointmentData);
+    console.log(workingDays);
     const startDate = new Date(appointmentData.startDate);
     const endDate = new Date(appointmentData.endDate);
     const cellDuration = 60;
-    return Utils.isValidAppointmentInterval(startDate, endDate, cellDuration, workingDays);
+    return Utils.isValidAppointmentInterval(
+      startDate,
+      endDate,
+      cellDuration,
+      workingDays,
+      busyTime
+    );
   }
 
-  static isValidAppointmentInterval(startDate, endDate, cellDuration, workingDays) {
+  static isValidAppointmentInterval(
+    startDate,
+    endDate,
+    cellDuration,
+    workingDays,
+    busyTime
+  ) {
     const edgeEndDate = new Date(endDate.getTime() - 1);
 
-    if (!Utils.isValidAppointmentDate(edgeEndDate, workingDays)) {
+    if (!Utils.isValidAppointmentDate(edgeEndDate, workingDays, busyTime)) {
       return false;
     }
 
     const durationInMs = cellDuration * 60 * 1000;
     const date = startDate;
     while (date <= endDate) {
-      if (!Utils.isValidAppointmentDate(date, workingDays)) {
+      if (!Utils.isValidAppointmentDate(date, workingDays, busyTime)) {
         return false;
       }
       const newDateTime = date.getTime() + durationInMs - 1;
@@ -84,9 +90,11 @@ export default class Utils {
     return true;
   }
 
-  static isValidAppointmentDate(date, workingDays) {
+  static isValidAppointmentDate(date, workingDays, busyTime) {
     return (
-      !Utils.isHoliday(date) && !Utils.isDinner(date) && !Utils.isWeekend(date, workingDays)
+      !Utils.isHoliday(date) &&
+      !Utils.isDinner(date, busyTime) &&
+      !Utils.isWeekend(date, workingDays)
     );
   }
 }

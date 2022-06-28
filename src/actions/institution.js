@@ -58,6 +58,10 @@ export const getInstitutionSchedules = (institution_id) => (dispatch) => {
       return Promise.resolve();
     },
     (error) => {
+      console.log(
+        "ERROR -> ejecutando action para obtener horarios de la institucion"
+      );
+      console.log(error);
       const message =
         (error.response &&
           error.response.data &&
@@ -78,4 +82,10 @@ export const change = (payload) => (dispatch) => {
   console.log("En la action de change state");
   console.log(payload);
   dispatch({ type: "UPDATE_INSTITUTION", payload });
+};
+
+export const setInstitution = (payload) => (dispatch) => {
+  console.log("En la action de setInstitution state");
+  console.log(payload);
+  dispatch({ type: "SET_INSTITUTION", payload });
 };
