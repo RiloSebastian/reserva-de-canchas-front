@@ -59,6 +59,7 @@ import {
 } from "../../validations/validationTime";
 import Container from "@material-ui/core/Container";
 import Box from "@material-ui/core/Box";
+import { LOAD_INSTITUTION_TIMES } from "../../actions/types";
 moment.locale("es");
 
 const PREFIX = "Demo";
@@ -99,9 +100,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const getBorder = (theme) =>
-  `1px solid ${theme.palette.mode === "light"
-    ? lighten(alpha(theme.palette.divider, 1), 0.88)
-    : darken(alpha(theme.palette.divider, 1), 0.68)
+  `1px solid ${
+    theme.palette.mode === "light"
+      ? lighten(alpha(theme.palette.divider, 1), 0.88)
+      : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -468,7 +470,7 @@ const ReservaGridCustom2 = () => {
 
   //const institution = useSelector((state) => state.institution);
 
-  const [institutionHasCourts, setInstitutionHasCourts] = useState(false);
+  const [institutionHasCourts, setInstitutionHasCourts] = useState(true);
 
   const [startDayHour, setStartDayHour] = useState(7);
   const [endDayHour, setEndDayHour] = useState(23);
@@ -928,6 +930,11 @@ const ReservaGridCustom2 = () => {
         //  setBusyTimes(horariosLaborales);
       });
 
+      dispatch({
+        type: LOAD_INSTITUTION_TIMES,
+        payload: { startDayTime, endDayTime },
+      });
+
       setStartDayHour(startDayTime);
       setEndDayHour(endDayTime);
     }
@@ -935,117 +942,110 @@ const ReservaGridCustom2 = () => {
     //Obtener todas las reservas hechas para la institucion
   }, []);
 
-  return (
-
-    institutionHasCourts ? (
-
-      <>
-        <Paper>
-          <Scheduler
-            data={filterTasks(appointments, currentSport)}
-            locale={"es-ES"}
-          >
-            <EditingState
-              onCommitChanges={handleCommitChanges}
+  return institutionHasCourts ? (
+    <>
+      <Paper>
+        <Scheduler
+          data={filterTasks(appointments, currentSport)}
+          locale={"es-ES"}
+        >
+          <EditingState
+            onCommitChanges={handleCommitChanges}
             /* addedAppointment={addedAppointment}0  
             onAddedAppointmentChange={handleChangeAddedAppointment}
             appointmentChanges={appointmentChanges}
             onAppointmentChangesChange={handleChangeAppointmentChanges}
             editingAppointment={editingAppointment}
             onEditingAppointmentChange={handleChangeEditingAppointment} */
-            />
-            <ViewState defaultCurrentDate="2018-07-17" />
-            <GroupingState grouping={grouping} />
-            <WeekView
-              cellDuration={60}
-              startDayHour={startDayHour}
-              endDayHour={endDayHour}
-              timeTableCellComponent={TimeTableCellWeek}
-              //timeTableCellComponent={TimeTableCellWeek2}
-              dayScaleCellComponent={DayScaleCellWeek}
-            />
+          />
+          <ViewState defaultCurrentDate="2018-07-17" />
+          <GroupingState grouping={grouping} />
+          <WeekView
+            cellDuration={60}
+            startDayHour={startDayHour}
+            endDayHour={endDayHour}
+            timeTableCellComponent={TimeTableCellWeek}
+            //timeTableCellComponent={TimeTableCellWeek2}
+            dayScaleCellComponent={DayScaleCellWeek}
+          />
 
-            <DayView cellDuration={60} startDayHour={9} endDayHour={19} />
-            <MonthView
-              timeTableCellComponent={TimeTableCell}
-              dayScaleCellComponent={DayScaleCell}
-            />
+          <DayView cellDuration={60} startDayHour={9} endDayHour={19} />
+          <MonthView
+            timeTableCellComponent={TimeTableCell}
+            dayScaleCellComponent={DayScaleCell}
+          />
 
-            <Appointments
-              appointmentComponent={Appointment}
-              appointmentContentComponent={AppointmentContent}
-            />
-            <Resources data={resources} mainResourceName="court_id" />
-            <Toolbar flexibleSpaceComponent={flexibleSpace} />
-            <DateNavigator />
-            <EditRecurrenceMenu />
-            <IntegratedGrouping />
-            <IntegratedEditing />
+          <Appointments
+            appointmentComponent={Appointment}
+            appointmentContentComponent={AppointmentContent}
+          />
+          <Resources data={resources} mainResourceName="court_id" />
+          <Toolbar flexibleSpaceComponent={flexibleSpace} />
+          <DateNavigator />
+          <EditRecurrenceMenu />
+          <IntegratedGrouping />
+          <IntegratedEditing />
 
-            <ConfirmationDialog messages={ConfirmationDialogMessages} />
+          <ConfirmationDialog messages={ConfirmationDialogMessages} />
 
-            <AppointmentTooltip showCloseButton showDeleteButton showOpenButton />
-            <AppointmentForm />
-            <GroupingPanel />
-            <ViewSwitcher />
-            <TodayButton messages={TodayButtonMessages} />
-          </Scheduler>
-        </Paper>
-        <Snackbar
-          open={showAlert}
-          autoHideDuration={6000}
-          onClose={handleCloseAlert}
-        >
-          <Alert
-            onClose={handleCloseAlert}
-            severity="warning"
-            sx={{ width: "100%" }}
-          >
-            This is a success message!
-          </Alert>
-        </Snackbar>
-      </>
-
-    ) : (
-
-      <Paper>
-
-        <Box
-          width="100%"
-          top={0}
-          p={4}
-          zIndex="modal"
-          color="textSecondary"
-          bgcolor="background.header"
-        >
-          <Container maxWidth="md" className={classes.container}>
-            <Typography
-              variant="h5"
-              component="h2"
-              gutterBottom={true}
-              className={classes.header}
-            >
-              La Institucion aun no Posee Canchas Registradas
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary" paragraph={true}>
-              Haga Click en el siguiente Boton para crear su primer Cancha
-            </Typography>
-            <Button
-              onClick={renderCourtPage}
-              variant="contained"
-              color="primary"
-              className={classes.action}
-            >
-              Ir al Menu de Canchas
-            </Button>
-          </Container>
-        </Box>
-
+          <AppointmentTooltip showCloseButton showDeleteButton showOpenButton />
+          <AppointmentForm />
+          <GroupingPanel />
+          <ViewSwitcher />
+          <TodayButton messages={TodayButtonMessages} />
+        </Scheduler>
       </Paper>
-
-    )
-
-
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity="warning"
+          sx={{ width: "100%" }}
+        >
+          This is a success message!
+        </Alert>
+      </Snackbar>
+    </>
+  ) : (
+    <Paper>
+      <Box
+        width="100%"
+        top={0}
+        p={4}
+        zIndex="modal"
+        color="textSecondary"
+        bgcolor="background.header"
+      >
+        <Container maxWidth="md" className={classes.container}>
+          <Typography
+            variant="h5"
+            component="h2"
+            gutterBottom={true}
+            className={classes.header}
+          >
+            La Institucion aun no Posee Canchas Registradas
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            color="textSecondary"
+            paragraph={true}
+          >
+            Haga Click en el siguiente Boton para crear su primer Cancha
+          </Typography>
+          <Button
+            onClick={renderCourtPage}
+            variant="contained"
+            color="primary"
+            className={classes.action}
+          >
+            Ir al Menu de Canchas
+          </Button>
+        </Container>
+      </Box>
+    </Paper>
   );
 };
 export default ReservaGridCustom2;

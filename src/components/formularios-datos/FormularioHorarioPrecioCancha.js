@@ -42,6 +42,10 @@ const FormularioHorarioPrecioCancha = ({
 }) => {
   const institution = useSelector((state) => state.institution);
 
+  const [min, setMin] = useState(new Date());
+
+  const [max, setMax] = useState(new Date());
+
   const { excluirDiasNoLaborales, porcentajeSenia } = horariosYPrecios;
 
   const classes = useStyles();
@@ -72,8 +76,8 @@ const FormularioHorarioPrecioCancha = ({
 
   const nuevoHorario = {
     id: "",
-    from: new Date(),
-    to: new Date(new Date().setHours(new Date().getHours() + 1)),
+    from: min,
+    to: max,
     price: "",
     enabled: true,
   };
@@ -197,10 +201,43 @@ const FormularioHorarioPrecioCancha = ({
   useEffect(() => {
     //traer los horarios guardados por la institucion
     //getHorarios();
-
     //const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
     //const newSchedule = [...horarios, nuevoHorario];
-    setDiasYHorarios([nuevoDiaYHorario]);
+    //setDiasYHorarios([nuevoDiaYHorario]);
+
+    const minTime = new Date(
+      new Date(new Date().setHours(institution.times.startDayTime)).setMinutes(
+        0
+      )
+    );
+
+    const maxTime = new Date(
+      new Date(new Date().setHours(institution.times.endDayTime)).setMinutes(0)
+    );
+
+    console.log("SETEANDO HORARIOS MINIMOS Y MAXIMOS PARA LAS CANCHAS");
+    console.log(minTime);
+    console.log(maxTime);
+
+    setMin(minTime);
+
+    setMax(maxTime);
+
+    setDiasYHorarios([
+      {
+        id: "",
+        dias: daysSelected,
+        horarios: [
+          {
+            id: "",
+            from: minTime,
+            to: maxTime,
+            price: "",
+            enabled: true,
+          },
+        ],
+      },
+    ]);
     //setHorarios(newSchedule);
   }, []);
 
@@ -251,6 +288,41 @@ const FormularioHorarioPrecioCancha = ({
       ]);
     }
   }, [institution.schedules]);
+
+  /*  useEffect(() => {
+    //Obtener los dias horarios minimos y maximos de apertura y cierre de la institucion
+
+    const minTime = new Date(
+      new Date(new Date().setHours(institution.times.startDayTime)).setMinutes(
+        0
+      )
+    );
+
+    const maxTime = new Date(
+      new Date(new Date().setHours(institution.times.endDayTime)).setMinutes(0)
+    );
+
+    console.log("SETEANDO HORARIOS MINIMOS Y MAXIMOS PARA LAS CANCHAS");
+    console.log(minTime);
+    console.log(maxTime);
+
+    setMin(minTime);
+
+    setMax(maxTime);
+
+    setDiasYHorarios([
+      {
+        ...nuevoDiaYHorario,
+        horarios: {
+          id: "",
+          from: minTime,
+          to: maxTime,
+          price: "",
+          enabled: true,
+        },
+      },
+    ]);
+  }, [institution.times]); */
 
   return (
     <div>
@@ -310,6 +382,8 @@ const FormularioHorarioPrecioCancha = ({
                           removeHorario={removeHorario}
                           setHorarios={setHorarios}
                           setHorariosYPrecios={setHorariosYPrecios}
+                          min={min}
+                          max={max}
                         />
                       );
                     })}
