@@ -56,13 +56,20 @@ const HistoryReservations = () => {
     { title: "Direccion", field: "direccion" },
     { title: "Fecha", field: "date", initialEditValue: "initial edit value" },
     {
-      title: "Estado", field: "status", render: rowData =>
-        <Chip color={rowData.status === "FINALIZADO" ? "success" : "error"} label={rowData.status} />
+      title: "Estado",
+      field: "status",
+      render: (rowData) => (
+        <Chip
+          color={rowData.status === "FINALIZADO" ? "success" : "error"}
+          label={rowData.status}
+        />
+      ),
     },
   ]);
 
   const [data, setData] = useState([
     {
+      court_id: 1,
       reservation_id: 1,
       name: "Cancha 1",
       date: "23/2 15:00",
@@ -73,6 +80,7 @@ const HistoryReservations = () => {
       status: "FINALIZADO",
     },
     {
+      court_id: 2,
       reservation_id: 2,
       name: "Cancha 5",
       date: "15/5 19:00",
@@ -83,6 +91,7 @@ const HistoryReservations = () => {
       status: "FINALIZADO",
     },
     {
+      court_id: 3,
       reservation_id: 2,
       name: "Cancha 5",
       date: "15/5 19:00",
@@ -90,7 +99,7 @@ const HistoryReservations = () => {
       institucion: "Futbol Plaza",
       direccion: "Corrientes 2345",
       feedbackSended: false,
-      status: "CANELADO",
+      status: "CANCELADO",
     },
   ]);
 
@@ -149,21 +158,21 @@ const HistoryReservations = () => {
           },
         ]}
         components={{
-          Action: (props) => (
-
-            (props.data.status === "FINALIZADO") &&
-
-            <Chip
-              onClick={(event) => props.action.onClick(event, props.data)}
-              onDelete={props.data.feedbackSended && (() => { })}
-              color={props.data.feedbackSended ? "success" : "info"}
-              clickable={!props.data.feedbackSended}
-              deleteIcon={<DoneIcon />}
-              label={
-                props.data.feedbackSended ? "Feedback Enviado" : "Dar Feedback"
-              }
-            />
-          ),
+          Action: (props) =>
+            props.data.status === "FINALIZADO" && (
+              <Chip
+                onClick={(event) => props.action.onClick(event, props.data)}
+                onDelete={props.data.feedbackSended && (() => {})}
+                color={props.data.feedbackSended ? "success" : "info"}
+                clickable={!props.data.feedbackSended}
+                deleteIcon={<DoneIcon />}
+                label={
+                  props.data.feedbackSended
+                    ? "Feedback Enviado"
+                    : "Dar Feedback"
+                }
+              />
+            ),
         }}
         options={{
           actionsColumnIndex: -1,

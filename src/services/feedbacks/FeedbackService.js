@@ -25,21 +25,20 @@ const get = async (institution_id, court_id) => {
   }
 };
 
-const create = async (institution_id, data) => {
-  try {
-    const canchaCreada = await http.post(
-      `/institutions/${institution_id}/feedbacks`,
-      data,
-      {
-        headers: AuthHeader(),
-      }
-    );
-    console.log("cancha creada");
-    console.log(canchaCreada);
-    return canchaCreada;
-  } catch (err) {
-    console.log(err);
-  }
+const create = async (data) => {
+  return await http
+    .post(`/feedback`, data)
+    .then((feedbackCreado) => {
+      console.log("feedback creado");
+      console.log(feedbackCreado);
+      return feedbackCreado;
+    })
+    .catch((err) => {
+      console.log("ERROR AL CREAR FEEDBACK");
+      console.log(err.response);
+      return Promise.reject(err.response);
+      //return { message: "Por el momento forzamos la respuesta ok !" };
+    });
 };
 
 const update = async (institution_id, data) => {
