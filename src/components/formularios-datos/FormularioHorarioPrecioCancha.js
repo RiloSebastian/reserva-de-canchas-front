@@ -25,6 +25,11 @@ import Button from "@mui/material/Button";
 import { days } from "../../utils/days/days";
 import { v4 as uuidv4 } from "uuid";
 
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 const useStyles = makeStyles((theme) => ({
   ...theme.typography.body2,
   textAlign: "center",
@@ -372,7 +377,7 @@ const FormularioHorarioPrecioCancha = ({
                   </Box>
                   <Box textAlign="left" sx={{ mt: 4 }}>
                     <p>Horarios</p>
-                    {diaYHorario.horarios.map((horario, key) => {
+                    {/* {diaYHorario.horarios.map((horario, key) => {
                       horario.id = key;
                       return (
                         <ScheduleAndPrice
@@ -386,7 +391,24 @@ const FormularioHorarioPrecioCancha = ({
                           max={max}
                         />
                       );
-                    })}
+                    })} */}
+
+                    <List>
+                      {diaYHorario.horarios.map((horario) => (
+                        <ListItem key={horario.id}>
+                          <ScheduleAndPrice
+                            key={key}
+                            horario={horario}
+                            diaYHorarioId={diaYHorario.id}
+                            removeHorario={removeHorario}
+                            setHorarios={setHorarios}
+                            setHorariosYPrecios={setHorariosYPrecios}
+                            min={min}
+                            max={max}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
 
                     <Box textAlign="center" sx={{ mt: 2, pb: 2 }}>
                       <Button

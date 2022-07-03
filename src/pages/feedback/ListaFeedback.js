@@ -1,4 +1,5 @@
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -16,6 +17,7 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import MaterialTable from "material-table";
 import RatingCourts from "../../components/RatingCourts";
+import FeedbackService from "../../services/feedbacks/FeedbackService";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -42,6 +44,8 @@ const tableIcons = {
 };
 
 const ListaFeedback = () => {
+  const institution = useSelector((state) => state.institution);
+
   const [open, setOpen] = useState(false);
 
   const [columns, setColumns] = useState([
@@ -82,6 +86,29 @@ const ListaFeedback = () => {
     setOpen(true);
   };
 
+  const handleGetFeedbacks = async () => {
+    try {
+      const feedbackList = await FeedbackService.getAllByInstitution(
+        institution.id
+      ).then((data) => data);
+
+      setData(feedbackList);
+    } catch (error) {
+      console.log(
+        "MANEJANDO ERROR AL OBTENER TODOS LOS FEEDBACKS DE LA INSTITUCION"
+      );
+      //setData([]);
+    }
+  };
+
+  useEffect(() => {
+    // OBTENER TODOS LOS FEEDBACKS DE LA INSTITUCION
+
+    console.log("OBTENER TODOS LOS FEEDBACKS DE LA INSTITUCION");
+
+    handleGetFeedbacks();
+  }, []);
+
   return (
     <>
       <MaterialTable
@@ -92,6 +119,34 @@ const ListaFeedback = () => {
         options={{
           grouping: true,
           filtering: true,
+        }}
+        localization={{
+          pagination: {
+            labelDisplayedRows: "{from}-{to} de {count}",
+            labelRowsSelect: "feedbacks",
+            nextTooltip: "Proxima Pagina",
+            previousTooltip: "Pagina Previa",
+            firstTooltip: "Primer Pagina",
+            lastTooltip: "Ultima Pagina",
+          },
+          toolbar: {
+            nRowsSelected: "{0} Feedback(s) seleccionado(s)",
+            searchTooltip: "Buscar",
+            searchPlaceholder: "Buscar Feedback",
+          },
+          header: {
+            actions: "Opciones",
+          },
+          body: {
+            emptyDataSourceMessage:
+              "Aun no existen feedbacks asociados a la institucion",
+            filterRow: {
+              filterTooltip: "Filter",
+            },
+          },
+          grouping: {
+            placeholder: "Arrastre los encabezados aquí para agruparlos",
+          },
         }}
       />
     </>

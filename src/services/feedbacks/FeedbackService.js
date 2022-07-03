@@ -3,18 +3,19 @@ import AuthHeader from "../auth-header";
 import { Redirect } from "react-router";
 
 const getAllByInstitution = async (institution_id) => {
-  try {
-    const listadoCanchas = await http.get(
-      `/institutions/${institution_id}/courts`
-    );
-    console.log("listadoCanchas");
-    console.log(listadoCanchas);
-    return listadoCanchas;
-  } catch (err) {
-    console.log(" error al obtener todas las canchas");
-    console.log(err);
-    return Promise.reject(err);
-  }
+  return await http
+    .get(`/institutions/${institution_id}/feedback`)
+    .then((feedbackList) => {
+      console.log("feedbacks obtenidos");
+      console.log(feedbackList);
+      return feedbackList;
+    })
+    .catch((err) => {
+      console.log("ERROR AL OBTENER FEEDBACKS");
+      console.log(err.response);
+      return Promise.reject(err.response);
+      //return { message: "Por el momento forzamos la respuesta ok !" };
+    });
 };
 
 const get = async (institution_id, court_id) => {

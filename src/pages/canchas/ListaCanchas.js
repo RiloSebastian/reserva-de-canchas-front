@@ -260,7 +260,7 @@ const ListaCanchas = ({ institutionId }) => {
     },
     {
       title: "Superficie",
-      field: "surface",
+      field: "courtType",
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
@@ -334,7 +334,7 @@ const ListaCanchas = ({ institutionId }) => {
     },
     {
       title: "Iluminacion",
-      field: "iluminacion",
+      field: "courtIllumination",
       render: (rowData) => (rowData.enabled ? "Si" : "No"),
       editComponent: (props) => (
         <FormControlLabel
@@ -427,7 +427,7 @@ const ListaCanchas = ({ institutionId }) => {
     console.log("newCancha");
     console.log(newCancha);
 
-    let cancha = newCancha;
+    let cancha = { newCancha };
 
     if (horariosYPrecios.schedules) {
       const horarios = horariosYPrecios.schedules.map((s) =>
