@@ -53,6 +53,7 @@ const ScheduleAndPrice = ({
   setHorariosYPrecios,
   min,
   max,
+  fieldsToShow,
 }) => {
   const { id, precio, enabled, from, to } = horario;
 
@@ -108,6 +109,8 @@ const ScheduleAndPrice = ({
             value={from}
             onChange={(newValue) => {
               setHorarios((horarios) => {
+                console.log("modificando horario de cancha desde");
+                console.log(horarios);
                 let horariosUpdated = horarios.map((horario) =>
                   horario.id === id
                     ? { ...horario, ["from"]: newValue }
@@ -163,7 +166,7 @@ const ScheduleAndPrice = ({
           }}
         />
       </Grid>
-      <Grid item xs>
+      <Grid hidden={fieldsToShow.enabled} item xs>
         <FormControlLabel
           control={
             <Switch
@@ -177,7 +180,7 @@ const ScheduleAndPrice = ({
           labelPlacement="activo"
         />
       </Grid>
-      <Grid item xs>
+      <Grid hidden={fieldsToShow.delete} item xs>
         <IconButton
           onClick={() => {
             removeHorario(id, diaYHorarioId);

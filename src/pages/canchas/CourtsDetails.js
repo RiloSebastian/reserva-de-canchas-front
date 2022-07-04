@@ -11,6 +11,16 @@ import Typography from "@mui/material/Typography";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import ScheduleAndPrice from "./../../components/ScheduleAndPrice";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import Paper from "@mui/material/Paper";
+
+const theme = createTheme({ palette: { mode: "light" } });
+
+const Item = styled(Paper)(({ theme }) => ({
+  ...theme.typography.body2,
+  textAlign: "center",
+  color: theme.palette.text.secondary,
+}));
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -18,6 +28,11 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const CourtsDetails = ({ rowData }) => {
   const { photos } = rowData;
+
+  const [fieldsToShow, setFieldsToShow] = useState({
+    delete: true,
+    enabled: true,
+  });
 
   const [horario, setHorario] = useState({
     id: "",
@@ -91,67 +106,79 @@ const CourtsDetails = ({ rowData }) => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Typography variant="h6" component="h6">
-          Horarios Cargados
-        </Typography>
-        <List dense sx={{ width: "100%", bgcolor: "background.paper" }}>
-          {[0, 1].map((value) => {
-            const labelId = `checkbox-list-secondary-label-${value}`;
-            return (
-              <ListItem key={value} disablePadding>
-                <ScheduleAndPrice horario={horario} setHorarios={setHorarios} />
-              </ListItem>
-            );
-          })}
-        </List>
+        <ThemeProvider theme={theme}>
+          <Item elevation={2}>
+            <Typography variant="h6" component="h6">
+              Horarios Cargados
+            </Typography>
+            <List dense sx={{ width: "100%", bgcolor: "background.paper" }}>
+              {[0, 1].map((value) => {
+                const labelId = `checkbox-list-secondary-label-${value}`;
+                return (
+                  <ListItem key={value} disablePadding>
+                    <ScheduleAndPrice
+                      horario={horario}
+                      setHorarios={setHorarios}
+                      fieldsToShow={fieldsToShow}
+                    />
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Item>
+        </ThemeProvider>
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="h6" component="h6">
-          Imagenes
-        </Typography>
-        {photos.length > 0 ? (
-          <ImageList
-            sx={{ width: 500, height: 500 }}
-            style={{ display: "flex", flexDirection: "row", padding: 0 }}
-            rowHeight={164}
-          >
-            {photos.map((item) => (
-              <ImageListItem key={item.img}>
-                <img
-                  //{...srcset(item.img, 250, 250, 0, 0)}
-                  src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
-                  srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
-                  alt={item.title}
-                  loading="lazy"
-                />
-                <ImageListItemBar
-                  sx={{
-                    background:
-                      "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, " +
-                      "rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
-                  }}
-                  title={item.title}
-                  position="top"
-                  actionIcon={
-                    <IconButton
-                      sx={{ color: "white" }}
-                      aria-label={`star ${item.title}`}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  }
-                  actionPosition="left"
-                />
-              </ImageListItem>
-            ))}
-          </ImageList>
-        ) : (
-          <Grid container justifyContent="center">
-            <Alert severity="warning">
-              no hay imagenes cargadas para esta cancha
-            </Alert>
-          </Grid>
-        )}
+        <ThemeProvider theme={theme}>
+          <Item elevation={2}>
+            <Typography variant="h6" component="h6">
+              Imagenes Cargadas
+            </Typography>
+            {photos.length > 0 ? (
+              <ImageList
+                sx={{ width: 500, height: 500 }}
+                style={{ display: "flex", flexDirection: "row", padding: 0 }}
+                rowHeight={164}
+              >
+                {photos.map((item) => (
+                  <ImageListItem key={item.img}>
+                    <img
+                      //{...srcset(item.img, 250, 250, 0, 0)}
+                      src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
+                      srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                      alt={item.title}
+                      loading="lazy"
+                    />
+                    <ImageListItemBar
+                      sx={{
+                        background:
+                          "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, " +
+                          "rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)",
+                      }}
+                      title={item.title}
+                      position="top"
+                      actionIcon={
+                        <IconButton
+                          sx={{ color: "white" }}
+                          aria-label={`star ${item.title}`}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      }
+                      actionPosition="left"
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
+            ) : (
+              <Grid container justifyContent="center">
+                <Alert severity="warning">
+                  no hay imagenes cargadas para esta cancha
+                </Alert>
+              </Grid>
+            )}
+          </Item>
+        </ThemeProvider>
       </Grid>
     </Grid>
   );

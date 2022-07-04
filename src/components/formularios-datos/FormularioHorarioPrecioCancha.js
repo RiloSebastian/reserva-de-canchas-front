@@ -63,6 +63,11 @@ const FormularioHorarioPrecioCancha = ({
 
   const [withSenia, setWithSenia] = useState(false);
 
+  const [fieldsToShow, setFieldsToShow] = useState({
+    delete: false,
+    enabled: false,
+  });
+
   const [horario, setHorario] = useState({
     id: "",
     desde: moment(new Date("2018-01-01T00:00:00.000Z")),
@@ -373,6 +378,7 @@ const FormularioHorarioPrecioCancha = ({
                       setHorariosYPrecios={setHorariosYPrecios}
                       daysSelected={daysSelected}
                       daysAndTimesId={diaYHorario.id}
+                      fieldsToShow={fieldsToShow}
                     />
                   </Box>
                   <Box textAlign="left" sx={{ mt: 4 }}>
@@ -405,6 +411,7 @@ const FormularioHorarioPrecioCancha = ({
                             setHorariosYPrecios={setHorariosYPrecios}
                             min={min}
                             max={max}
+                            fieldsToShow={fieldsToShow}
                           />
                         </ListItem>
                       ))}

@@ -544,6 +544,7 @@ const ListaCanchas = ({ institutionId }) => {
       }
     } catch (err) {
       //history.push("/login");
+      setData(courtList);
     }
   };
 
