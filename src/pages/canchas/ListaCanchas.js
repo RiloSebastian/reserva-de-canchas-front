@@ -349,7 +349,7 @@ const ListaCanchas = ({ institutionId }) => {
       ),
     },
     {
-      field: "schedule",
+      field: "schedules",
       filtering: false,
       editComponent: (props) => (
         <Button color="info" variant="contained" onClick={desplegarModal}>
@@ -662,7 +662,7 @@ const ListaCanchas = ({ institutionId }) => {
         }}
         detailPanel={[
           {
-            tooltip: "Mostrar Imagenes",
+            tooltip: "Mostrar Detalle de Cancha",
             render: (rowData) => <CourtsDetails rowData={rowData} />,
           },
         ]}

@@ -1,14 +1,16 @@
 import axios from "axios";
 
 const API_URL =
-  "https://api.locationiq.com/v1/autocomplete.php?key=pk.41bea2e968099330596a319f3318662b&q=";
+  "https://api.locationiq.com/v1/autocomplete?key=pk.41bea2e968099330596a319f3318662b&q=";
 
 const getGeoLocalization = async (address) => {
   console.log("URL FORMADA");
-  console.log(`${API_URL}${address}&countrycodes=AR&limit=5&dedupe=1`);
+  console.log(`${API_URL}${address}&countrycodes=AR&dedupe=1`);
 
   return await axios
-    .get(`${API_URL}${address}&countrycodes=AR&limit=10&dedupe=1`)
+    .get(
+      `${API_URL}${address}&countrycodes=AR&limit=50&dedupe=1&accept-language=native`
+    )
     .then((response) => {
       console.log("RESPUESTA OBTENIDA");
       console.log(response);
