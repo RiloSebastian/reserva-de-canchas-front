@@ -38,8 +38,8 @@ import CourtsDetails from "./CourtsDetails";
 import UploadImage from "./../../components/UploadImage";
 import UploadPhotos from "../../components/ui/UploadPhotos";
 import InstitucionService from "../../services/instituciones/InstitucionService";
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import { Stack } from "@mui/material";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -167,8 +167,8 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [openSnackbar, setOpenSnackbar] = useState({
     open: false,
-    vertical: 'top',
-    horizontal: 'center',
+    vertical: "top",
+    horizontal: "center",
     message: "",
     severity: "",
   });
@@ -225,9 +225,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-            isValid: false,
-            helperText: "Debe seleccionar un deporte para la cancha",
-          }
+              isValid: false,
+              helperText: "Debe seleccionar un deporte para la cancha",
+            }
           : true,
       lookup: sport,
       render: (rowData) => rowData.sport.name,
@@ -253,20 +253,20 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.name === undefined || rowData.name === ""
           ? {
-            isValid: false,
-            helperText: "El nombre de la cancha no puede estar vacio",
-          }
+              isValid: false,
+              helperText: "El nombre de la cancha no puede estar vacio",
+            }
           : true,
     },
     {
       title: "Superficie",
-      field: "surface",
+      field: "courtType",
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-            isValid: false,
-            helperText: "Debe seleccionar la Superficie de la Cancha",
-          }
+              isValid: false,
+              helperText: "Debe seleccionar la Superficie de la Cancha",
+            }
           : true,
       //lookup: (rowData) => getSurfaces(rowData.sport),
       lookup: surfaces,
@@ -334,7 +334,7 @@ const ListaCanchas = ({ institutionId }) => {
     },
     {
       title: "Iluminacion",
-      field: "iluminacion",
+      field: "courtIllumination",
       render: (rowData) => (rowData.enabled ? "Si" : "No"),
       editComponent: (props) => (
         <FormControlLabel
@@ -349,7 +349,7 @@ const ListaCanchas = ({ institutionId }) => {
       ),
     },
     {
-      field: "schedule",
+      field: "schedules",
       filtering: false,
       editComponent: (props) => (
         <Button color="info" variant="contained" onClick={desplegarModal}>
@@ -376,8 +376,6 @@ const ListaCanchas = ({ institutionId }) => {
   ];
 
   const handleUploadImage = (e) => {
-
-
     let ImagesArray = Object.entries(e.target.files).map((e) =>
       URL.createObjectURL(e[1])
     );
@@ -429,34 +427,28 @@ const ListaCanchas = ({ institutionId }) => {
     console.log("newCancha");
     console.log(newCancha);
 
-    let cancha = newCancha;
+    let cancha = { newCancha };
 
     if (horariosYPrecios.schedules) {
-
       const horarios = horariosYPrecios.schedules.map((s) =>
         s
           ? {
-            ...s,
-            ["from"]: moment(s.from).format("HH:mm"),
-            ["to"]: moment(s.to).format("HH:mm"),
-          }
+              ...s,
+              ["from"]: moment(s.from).format("HH:mm"),
+              ["to"]: moment(s.to).format("HH:mm"),
+            }
           : s
       );
       horariosYPrecios.schedules = horarios;
 
       cancha = { ...newCancha, ["schedule"]: horariosYPrecios };
-
     } else {
-      console.log("no hay horarios cargados")
+      console.log("no hay horarios cargados");
     }
     console.log(cancha);
 
     try {
-
-      const canchaCreated = await CanchaService.create(
-        institution.id,
-        cancha
-      );
+      const canchaCreated = await CanchaService.create(institution.id, cancha);
 
       const data = canchaCreated.data;
 
@@ -484,14 +476,9 @@ const ListaCanchas = ({ institutionId }) => {
       console.log(canchaCreated);
       console.log(data);
       return data;
-
-
     } catch (error) {
-
       return Promise.reject(error.data);
-
     }
-
   };
 
   const updateCancha = async (canchaToUpdated) => {
@@ -501,10 +488,7 @@ const ListaCanchas = ({ institutionId }) => {
 
     console.log(cancha);
 
-    const canchaUpdated = await CanchaService.update(
-      institution.id,
-      cancha
-    );
+    const canchaUpdated = await CanchaService.update(institution.id, cancha);
     const data = canchaUpdated.data;
 
     console.log("cancha actualizada");
@@ -514,10 +498,7 @@ const ListaCanchas = ({ institutionId }) => {
   };
 
   const deleteCancha = async (id) => {
-    const canchaCreated = await CanchaService.remove(
-      institution.id,
-      id
-    );
+    const canchaCreated = await CanchaService.remove(institution.id, id);
     const data = canchaCreated.data;
     return data;
   };
@@ -563,6 +544,7 @@ const ListaCanchas = ({ institutionId }) => {
       }
     } catch (err) {
       //history.push("/login");
+      setData(courtList);
     }
   };
 
@@ -583,28 +565,35 @@ const ListaCanchas = ({ institutionId }) => {
     );
 
     if (surfacesArrayFiltered.length > 0) {
+      /* const dynamicLookupSurfaces = sportArray.surfaces.reduce(function (
+        acc,
+        cur,
+        i
+      ) {
+        acc[cur.id] = cur.name;
 
-      const dynamicLookupSurfaces = surfacesArrayFiltered[0].surface.reduce(
-        function (acc, cur, i) {
-          acc[cur.id] = cur.name;
+        return acc;
+      },
+      {}); */
 
-          return acc;
-        },
-        {}
-      );
+      const dynamicLookupSurfaces = surfacesArray[0].surface.reduce(function (
+        acc,
+        cur,
+        i
+      ) {
+        acc[cur.id] = cur.name;
+
+        return acc;
+      },
+      {});
 
       setSurfaces(dynamicLookupSurfaces);
-
     } else {
-
-      console.log("no hay superficies cargadas")
-
+      console.log("no hay superficies cargadas");
     }
-
   }, [sportSelected]);
 
   useEffect(() => {
-
     //DEVOLVER LAS CANCHAS DE LA INSTITUCION
     retrieveCourts(institution.id);
 
@@ -673,7 +662,7 @@ const ListaCanchas = ({ institutionId }) => {
         }}
         detailPanel={[
           {
-            tooltip: "Mostrar Imagenes",
+            tooltip: "Mostrar Detalle de Cancha",
             render: (rowData) => <CourtsDetails rowData={rowData} />,
           },
         ]}
@@ -694,24 +683,30 @@ const ListaCanchas = ({ institutionId }) => {
           onRowAdd: (newData) =>
             new Promise(async (resolve, reject) => {
               const cancha = await createCancha(newData)
-                .then(cancha => {
+                .then((cancha) => {
                   console.log("agregar cancha a la lista");
                   console.log(cancha);
 
                   setData([...data, cancha]);
 
-                  setOpenSnackbar({ open: true, severity: "success", message: "Cancha creada Exitosamente!", })
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "success",
+                    message: "Cancha creada Exitosamente!",
+                  });
 
                   resolve();
                 })
-                .catch(err => {
+                .catch((err) => {
                   console.log("error al agregar cancha a la lista");
                   console.log(err);
-                  setOpenSnackbar({ open: true, severity: "error", message: err.message, })
-                  reject()
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: err.message,
+                  });
+                  reject();
                 });
-
-
             }),
           onRowUpdate: (newData, oldData) =>
             new Promise(async (resolve, reject) => {
@@ -767,17 +762,23 @@ const ListaCanchas = ({ institutionId }) => {
         />
       )}
       <div>
-        <Stack spacing={2} sx={{ width: '100%' }}>
+        <Stack spacing={2} sx={{ width: "100%" }}>
           <Snackbar
             autoHideDuration={4000}
             anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'center',
+              vertical: "top",
+              horizontal: "center",
             }}
             open={openSnackbar.open}
             onClose={handleCloseSnackbar}
           >
-            <Alert severity={openSnackbar.severity} onClose={handleCloseSnackbar} sx={{ width: '100%' }}>{openSnackbar.message}</Alert>
+            <Alert
+              severity={openSnackbar.severity}
+              onClose={handleCloseSnackbar}
+              sx={{ width: "100%" }}
+            >
+              {openSnackbar.message}
+            </Alert>
           </Snackbar>
         </Stack>
       </div>

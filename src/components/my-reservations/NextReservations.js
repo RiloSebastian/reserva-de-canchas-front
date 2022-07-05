@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useEffect } from "react";
+import React, { forwardRef, useState, useEffect, Fragment } from "react";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -21,6 +21,8 @@ import SaveIcon from "@mui/icons-material/Save";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
 import CancelReservationDialog from "./CancelReservationDialog";
+import ReservationService from "../../services/reservations/ReservationService";
+import SnackbarAlertMessageComponent from "./../ui/SnackbarAlertMessageComponent";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -54,13 +56,29 @@ const NextReservations = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const [openSnackbar, setOpenSnackbar] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severity: "",
+  });
+
   const [columns, setColumns] = useState([
     { title: "Cancha", field: "name" },
     { title: "Institucion", field: "institucion" },
     { title: "Direccion", field: "direccion" },
     { title: "Fecha", field: "date", initialEditValue: "initial edit value" },
-    { title: "Seña", field: "advancePayment", render: rowData => `$ ${rowData.advancePayment}` },
-    { title: "Precio Total", field: "price", render: rowData => `$ ${rowData.price}` },
+    {
+      title: "Seña",
+      field: "advancePayment",
+      render: (rowData) => `$ ${rowData.advancePayment}`,
+    },
+    {
+      title: "Precio Total",
+      field: "price",
+      render: (rowData) => `$ ${rowData.price}`,
+    },
   ]);
 
   const [data, setData] = useState([
@@ -73,9 +91,9 @@ const NextReservations = () => {
       direccion: "Santa Fe 1234",
       feedbackSended: false,
       status: "PENDING",
-      price: 1200.00,
-      advancePayment: 600.00,
-      returnableDeposit: true
+      price: 1200.0,
+      advancePayment: 600.0,
+      returnableDeposit: true,
     },
     {
       reservation_id: 2,
@@ -86,19 +104,70 @@ const NextReservations = () => {
       direccion: "Corrientes 2345",
       feedbackSended: false,
       status: "PENDING",
-      price: 1800.00,
-      advancePayment: 900.00,
-      returnableDeposit: false
+      price: 1800.0,
+      advancePayment: 900.0,
+      returnableDeposit: false,
     },
   ]);
 
-  const handleCancelReservation = (rowData) => {
+  const handleCheckCancellationFee = async (reservation_id) => {
+    console.log("VERIFICAR SI SE LE DEBE DEVOLVER LA SEñA");
+    console.log(reservation_id);
+
+    try {
+      const mustReturnDeposit =
+        await ReservationService.validateDepositShouldBeReturned(
+          reservation_id
+        ).then((data) => data);
+
+      console.log(
+        "LA VALIDACION SI SE DEBE DEVOLVER LA SEñA FUE REALIZADA CORRECTAMENTE"
+      );
+      console.log(mustReturnDeposit);
+      return mustReturnDeposit;
+    } catch (error) {
+      console.log(
+        "MANEJANDO EL ERROR SI NO SE PUDO VALIDAR SI SE DEBE DEVOLVER LA SEñA"
+      );
+      console.log(error);
+      setOpenSnackbar({
+        open: true,
+        severity: "error",
+        message: Object.values(error.data).map((error, idx) => (
+          <Fragment key={error}>
+            {<br />}
+            {error}
+            {<br />}
+          </Fragment>
+        )),
+      });
+      return null;
+    }
+  };
+
+  const handleCancelReservation = async (rowData) => {
     console.log("handleCancelReservation");
     console.log(rowData);
 
-    if (rowData.status !== "CANCELED") {
+    const returnDepositPaid = await handleCheckCancellationFee(
+      rowData.reservation_id
+    );
+
+    console.log("MANEJAR REPUESTA PARA DEVOLVER SEñA");
+    console.log(returnDepositPaid);
+
+    /* if (rowData.status !== "CANCELED") {
       setLoading(true);
       setOpenCancelReservationModal(true);
+    } */
+
+    if (returnDepositPaid) {
+      console.log(
+        "MOSTRAMOS EL MODAL CON EL MENSAJE SI SE DEVUELVE O NO LA SEñA AL CLIENTE"
+      );
+      setLoading(true);
+      setOpenCancelReservationModal(true);
+    } else {
     }
   };
 
@@ -145,7 +214,7 @@ const NextReservations = () => {
                 loading={
                   loading &&
                   selectedReservation.reservation_id ===
-                  props.data.reservation_id &&
+                    props.data.reservation_id &&
                   selectedReservation.status !== "CANCELED"
                 }
                 loadingPosition="start"
@@ -176,6 +245,10 @@ const NextReservations = () => {
         setOpenCancelReservationModal={setOpenCancelReservationModal}
         updateRervationStatus={updateRervationStatus}
         setLoading={setLoading}
+      />
+      <SnackbarAlertMessageComponent
+        openSnackbar={openSnackbar}
+        setOpenSnackbar={setOpenSnackbar}
       />
     </>
   );

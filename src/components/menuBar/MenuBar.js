@@ -33,6 +33,7 @@ import InstitutionRoutes, {
 } from "./../../pages/routes";
 import useStyles from "./menuBarStyles";
 import getMenu from "./sideBarItems";
+import { ConfirmProvider } from "material-ui-confirm";
 
 const drawerWidth = 240;
 
@@ -70,7 +71,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -88,7 +88,6 @@ const AppBar = styled(MuiAppBar, {
     }),
   }),
 }));
-
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",

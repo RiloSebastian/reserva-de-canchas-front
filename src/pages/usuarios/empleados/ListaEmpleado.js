@@ -24,6 +24,9 @@ import DoneIcon from "@mui/icons-material/Done";
 import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
 import ChipState from "../../../components/employees/ChipState";
 import { TextField } from "@material-ui/core";
+import authService from "../../../services/auth.service";
+import EmailService from "../../../services/email/EmailService";
+import { USER_ROLE } from "../../../constants/userRole";
 
 const theme = createTheme({
   components: {
@@ -67,31 +70,88 @@ const tableIcons = {
 const ListaEmpleado = () => {
   const [open, setOpen] = useState(false);
 
+  const [openSnackbar, setOpenSnackbar] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severity: "",
+  });
+
   const [activo, setActivo] = useState(false);
 
   const [columns, setColumns] = useState([
-    { title: "Nombre", field: "name" },
-    { title: "Apellido", field: "lastName" },
+    {
+      title: "Nombre",
+      field: "firstName",
+      validate: (rowData) =>
+        rowData.firstName === undefined ||
+        rowData.firstName === "" ||
+        rowData.firstName.trim() === ""
+          ? {
+              isValid: false,
+              helperText: "El nombre del usuario no puede estar vacio",
+            }
+          : true,
+    },
+    {
+      title: "Apellido",
+      field: "lastName",
+      validate: (rowData) =>
+        rowData.lastName === undefined ||
+        rowData.lastName === "" ||
+        rowData.lastName.trim() === ""
+          ? {
+              isValid: false,
+              helperText: "El apellido del usuario no puede estar vacio",
+            }
+          : true,
+    },
     {
       title: "Correo Electronico",
       field: "email",
-      editComponent: (props) => (
-        <TextField
-          required
-          fullWidth
-          id="email"
-          label="Correo Electronico"
-          name="email"
-          autoComplete="email"
-        />
-      ),
+      validate: (rowData) => {
+        if (
+          rowData.email === undefined ||
+          rowData.email === "" ||
+          rowData.email.trim() === ""
+        ) {
+          console.log("EMAIL REQUERIDO");
+          return {
+            isValid: false,
+            helperText: "El email del usuario no puede estar vacio",
+          };
+        } else if (
+          !rowData.email.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)
+        ) {
+          console.log("EMAIL FORMATO");
+          return {
+            isValid: false,
+            helperText: "Introduzca una dirección de correo electrónico válida",
+          };
+        } else {
+          console.log("EMAIL OKAY");
+          return true;
+        }
+      },
     },
     //{ title: 'Descripcion', field: 'description', initialEditValue: 'initial edit value' },
     //{ title: 'Birth Year', field: 'birthYear', type: 'numeric' },
     {
       title: "Tipo",
-      field: "tipo",
-      lookup: { 1: "Empleado", 2: "Administrador", 3: "Entrenador" },
+      field: "userRole",
+      lookup: {
+        ROLE_EMPLOYEE: "Empleado",
+        ROLE_ADMIN: "Administrador",
+        ROLE_COACH: "Entrenador",
+      },
+      validate: (rowData) =>
+        rowData.userRole === undefined || rowData.userRole === ""
+          ? {
+              isValid: false,
+              helperText: "El tipo de usuario debe estar seleccionado",
+            }
+          : true,
     },
     {
       title: "Estado",
@@ -112,48 +172,49 @@ const ListaEmpleado = () => {
       render: (rowData, renderType) => (
         <ChipState rowData={rowData} renderType={renderType} />
       ),
+      editable: "onUpdate",
     },
   ]);
 
   const [data, setData] = useState([
     {
-      name: "Marcos",
+      firstName: "Marcos",
       lastName: "Gonzalez",
       email: "marcos@email.com",
       description: "Cancha de Polvo de Ladrillos",
-      tipo: 1,
+      userRole: "ROLE_EMPLOYEE",
       estado: true,
     },
     {
-      name: "Claudia",
+      firstName: "Claudia",
       lastName: "Solis",
       email: "claudia@email.com",
       description: "Cancha de Cemento",
-      tipo: 1,
+      userRole: "ROLE_EMPLOYEE",
       estado: true,
     },
     {
-      name: "Raul",
+      firstName: "Raul",
       lastName: "Perez",
       email: "raul@email.com",
       description: "Cancha de 5 Sintetica",
-      tipo: 2,
+      userRole: "ROLE_ADMIN",
       estado: false,
     },
     {
-      name: "Susana",
+      firstName: "Susana",
       lastName: "Carbone",
       email: "susana@email.com",
       description: "Cancha de 9 de pasto natural",
-      tipo: 2,
+      userRole: "ROLE_ADMIN",
       estado: true,
     },
     {
-      name: "Vanina",
+      firstName: "Vanina",
       lastName: "Sanchez",
       email: "vaninca@email.com",
       description: "Cancha de Cemento",
-      tipo: 3,
+      userRole: USER_ROLE.ADMIN.role,
       estado: false,
     },
   ]);
@@ -164,6 +225,44 @@ const ListaEmpleado = () => {
 
   const handleChange = () => {
     setActivo(true);
+  };
+
+  const createNewUser = async (newUser) => {
+    console.log("newUser");
+    console.log(newUser);
+
+    let user = { newUser };
+
+    try {
+      const registerUser = await authService
+        .register(
+          data.firstName,
+          data.lastName,
+          data.userRole,
+          data.email,
+          data.password
+        )
+        .then((data) => data);
+
+      console.log("usuario Creado");
+      console.log(registerUser);
+
+      //pegarle al endpo email
+
+      const emailSended = await EmailService.sendVerificationEmail(
+        registerUser.email
+      ).then((data) => data);
+
+      console.log("usuario creado");
+      console.log(registerUser);
+
+      console.log("email de confirmacion enviado");
+      console.log(emailSended);
+
+      return registerUser;
+    } catch (error) {
+      return Promise.reject(error.data);
+    }
   };
 
   return (
@@ -213,12 +312,34 @@ const ListaEmpleado = () => {
         ]}
         editable={{
           onRowAdd: (newData) =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                setData([...data, newData]);
+            new Promise(async (resolve, reject) => {
+              const user = await createNewUser(newData)
+                .then((user) => {
+                  console.log("agregar usuario a la institucion");
+                  console.log(user);
 
-                resolve();
-              }, 1000);
+                  setData([...data, user]);
+
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "success",
+                    message: "Usuario creado Exitosamente!",
+                  });
+
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log(
+                    "error al agregar un nuevo usuario a la institucion"
+                  );
+                  console.log(err);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: err.message,
+                  });
+                  reject();
+                });
             }),
           onRowUpdate: (newData, oldData) =>
             new Promise((resolve, reject) => {

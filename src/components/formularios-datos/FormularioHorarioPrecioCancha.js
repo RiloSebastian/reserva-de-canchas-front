@@ -25,6 +25,11 @@ import Button from "@mui/material/Button";
 import { days } from "../../utils/days/days";
 import { v4 as uuidv4 } from "uuid";
 
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import DeleteIcon from "@mui/icons-material/Delete";
+
 const useStyles = makeStyles((theme) => ({
   ...theme.typography.body2,
   textAlign: "center",
@@ -42,6 +47,10 @@ const FormularioHorarioPrecioCancha = ({
 }) => {
   const institution = useSelector((state) => state.institution);
 
+  const [min, setMin] = useState(new Date());
+
+  const [max, setMax] = useState(new Date());
+
   const { excluirDiasNoLaborales, porcentajeSenia } = horariosYPrecios;
 
   const classes = useStyles();
@@ -53,6 +62,11 @@ const FormularioHorarioPrecioCancha = ({
   const [loading, setLoading] = useState(false);
 
   const [withSenia, setWithSenia] = useState(false);
+
+  const [fieldsToShow, setFieldsToShow] = useState({
+    delete: false,
+    enabled: false,
+  });
 
   const [horario, setHorario] = useState({
     id: "",
@@ -72,8 +86,8 @@ const FormularioHorarioPrecioCancha = ({
 
   const nuevoHorario = {
     id: "",
-    from: new Date(),
-    to: new Date(new Date().setHours(new Date().getHours() + 1)),
+    from: min,
+    to: max,
     price: "",
     enabled: true,
   };
@@ -197,10 +211,43 @@ const FormularioHorarioPrecioCancha = ({
   useEffect(() => {
     //traer los horarios guardados por la institucion
     //getHorarios();
-
     //const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
     //const newSchedule = [...horarios, nuevoHorario];
-    setDiasYHorarios([nuevoDiaYHorario]);
+    //setDiasYHorarios([nuevoDiaYHorario]);
+
+    const minTime = new Date(
+      new Date(new Date().setHours(institution.times.startDayTime)).setMinutes(
+        0
+      )
+    );
+
+    const maxTime = new Date(
+      new Date(new Date().setHours(institution.times.endDayTime)).setMinutes(0)
+    );
+
+    console.log("SETEANDO HORARIOS MINIMOS Y MAXIMOS PARA LAS CANCHAS");
+    console.log(minTime);
+    console.log(maxTime);
+
+    setMin(minTime);
+
+    setMax(maxTime);
+
+    setDiasYHorarios([
+      {
+        id: "",
+        dias: daysSelected,
+        horarios: [
+          {
+            id: "",
+            from: minTime,
+            to: maxTime,
+            price: "",
+            enabled: true,
+          },
+        ],
+      },
+    ]);
     //setHorarios(newSchedule);
   }, []);
 
@@ -252,6 +299,41 @@ const FormularioHorarioPrecioCancha = ({
     }
   }, [institution.schedules]);
 
+  /*  useEffect(() => {
+    //Obtener los dias horarios minimos y maximos de apertura y cierre de la institucion
+
+    const minTime = new Date(
+      new Date(new Date().setHours(institution.times.startDayTime)).setMinutes(
+        0
+      )
+    );
+
+    const maxTime = new Date(
+      new Date(new Date().setHours(institution.times.endDayTime)).setMinutes(0)
+    );
+
+    console.log("SETEANDO HORARIOS MINIMOS Y MAXIMOS PARA LAS CANCHAS");
+    console.log(minTime);
+    console.log(maxTime);
+
+    setMin(minTime);
+
+    setMax(maxTime);
+
+    setDiasYHorarios([
+      {
+        ...nuevoDiaYHorario,
+        horarios: {
+          id: "",
+          from: minTime,
+          to: maxTime,
+          price: "",
+          enabled: true,
+        },
+      },
+    ]);
+  }, [institution.times]); */
+
   return (
     <div>
       <Dialog open={open} onClose={handleClose} maxWidth="xl">
@@ -296,11 +378,12 @@ const FormularioHorarioPrecioCancha = ({
                       setHorariosYPrecios={setHorariosYPrecios}
                       daysSelected={daysSelected}
                       daysAndTimesId={diaYHorario.id}
+                      fieldsToShow={fieldsToShow}
                     />
                   </Box>
                   <Box textAlign="left" sx={{ mt: 4 }}>
                     <p>Horarios</p>
-                    {diaYHorario.horarios.map((horario, key) => {
+                    {/* {diaYHorario.horarios.map((horario, key) => {
                       horario.id = key;
                       return (
                         <ScheduleAndPrice
@@ -310,9 +393,29 @@ const FormularioHorarioPrecioCancha = ({
                           removeHorario={removeHorario}
                           setHorarios={setHorarios}
                           setHorariosYPrecios={setHorariosYPrecios}
+                          min={min}
+                          max={max}
                         />
                       );
-                    })}
+                    })} */}
+
+                    <List>
+                      {diaYHorario.horarios.map((horario) => (
+                        <ListItem key={horario.id}>
+                          <ScheduleAndPrice
+                            key={key}
+                            horario={horario}
+                            diaYHorarioId={diaYHorario.id}
+                            removeHorario={removeHorario}
+                            setHorarios={setHorarios}
+                            setHorariosYPrecios={setHorariosYPrecios}
+                            min={min}
+                            max={max}
+                            fieldsToShow={fieldsToShow}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
 
                     <Box textAlign="center" sx={{ mt: 2, pb: 2 }}>
                       <Button

@@ -79,6 +79,26 @@ const removeAll = async (institution_id) => {
   }
 };
 
+const findCourtsByCustomerPreferences = async (customer_preferences) => {
+  console.log("DENTRO DE CANCHA SERVICE => findCourtsByCustomerPreferences");
+  try {
+    const canchasEncontradas = await http.post(
+      `/search/courts`,
+      customer_preferences,
+      {
+        headers: AuthHeader(),
+      }
+    );
+    console.log("canchas encontradas para el usuario");
+    console.log(canchasEncontradas);
+    return canchasEncontradas;
+  } catch (err) {
+    console.log("error al buscar canchas para el usuario");
+    console.log(err.response);
+    return Promise.reject(err.response);
+  }
+};
+
 /*
 const findByTitle = title => {
     return http.get(`/tutorials?title=${title}`);
@@ -92,4 +112,5 @@ export default {
   update,
   remove,
   removeAll,
+  findCourtsByCustomerPreferences,
 };

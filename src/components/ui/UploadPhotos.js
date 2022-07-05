@@ -94,7 +94,12 @@ const UploadPhotos = ({
       }}
       onAdd={(newFileObjs) => {
         console.log("onAdd", newFileObjs);
-        setFileObjects([].concat(fileObjects, newFileObjs));
+        console.log("files limit", filesLimit);
+        if (filesLimit === 1) {
+          setFileObjects([].concat(newFileObjs));
+        } else {
+          setFileObjects([].concat(fileObjects, newFileObjs));
+        }
       }}
       onDelete={(deleteFileObj) => {
         console.log("onDelete", deleteFileObj);
@@ -125,7 +130,12 @@ const UploadPhotos = ({
       }}
       onAdd={(newFileObjs) => {
         console.log("onAdd", newFileObjs);
-        setFileObjects([].concat(fileObjects, newFileObjs));
+        console.log("files limit", filesLimit);
+        if (filesLimit === 1) {
+          setFileObjects([].concat(newFileObjs));
+        } else {
+          setFileObjects([].concat(fileObjects, newFileObjs));
+        }
       }}
       onDelete={(deleteFileObj) => {
         console.log("onDelete", deleteFileObj);

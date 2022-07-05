@@ -18,52 +18,6 @@ import InstitucionService from "../../services/instituciones/InstitucionService"
 import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 import { useConfirm } from "material-ui-confirm";
 
-function DatePickerWrapper(props) {
-  const {
-    input: { name, onChange, value, ...restInput },
-    meta,
-    ...rest
-  } = props;
-  const showError =
-    ((meta.submitError && !meta.dirtySinceLastSubmit) || meta.error) &&
-    meta.touched;
-
-  return (
-    <DatePicker
-      {...rest}
-      name={name}
-      helperText={showError ? meta.error || meta.submitError : undefined}
-      error={showError}
-      inputProps={restInput}
-      onChange={onChange}
-      value={value === "" ? null : value}
-    />
-  );
-}
-
-function TimePickerWrapper(props) {
-  const {
-    input: { name, onChange, value, ...restInput },
-    meta,
-    ...rest
-  } = props;
-  const showError =
-    ((meta.submitError && !meta.dirtySinceLastSubmit) || meta.error) &&
-    meta.touched;
-
-  return (
-    <TimePicker
-      {...rest}
-      name={name}
-      helperText={showError ? meta.error || meta.submitError : undefined}
-      error={showError}
-      inputProps={restInput}
-      onChange={onChange}
-      value={value === "" ? null : value}
-    />
-  );
-}
-
 const validate = (values) => {
   const errors = {};
   if (!values.firstName) {
@@ -82,13 +36,15 @@ const BEFORE_RESERVATION = "anterior a la reserva";
 
 const AdvancePaymentConfig = ({ props, institution }) => {
   const confirm = useConfirm();
-  const [advancePaymentPeriod, setAdvancePaymentPeriod] = useState(24);
+  const [advancePaymentPeriod, setAdvancePaymentPeriod] = useState(1);
   const [value, setValue] = useState({});
 
   const [open, setOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({});
 
   const handleChange = (event) => {
+    console.log("MODIFICANDO DETALLES DE LA SEñA");
+    console.log(event.target.value);
     setAdvancePaymentPeriod(event.target.value || "");
   };
 
@@ -157,6 +113,7 @@ const AdvancePaymentConfig = ({ props, institution }) => {
                     label="Hasta"
                     onChange={handleChange}
                   >
+                    <MenuItem value={1}>INDEFINIDO</MenuItem>
                     <MenuItem value={12}>12 hs {BEFORE_RESERVATION}</MenuItem>
                     <MenuItem value={24}>1 dia {BEFORE_RESERVATION}</MenuItem>
                     <MenuItem value={48}>2 dias {BEFORE_RESERVATION}</MenuItem>

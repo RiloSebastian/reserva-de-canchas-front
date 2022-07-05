@@ -1,3 +1,5 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
@@ -11,7 +13,6 @@ import IconButton from "@mui/material/IconButton";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import PropTypes from "prop-types";
-import React, { useEffect } from "react";
 import NumberFormat from "react-number-format";
 
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
@@ -50,6 +51,9 @@ const ScheduleAndPrice = ({
   removeHorario,
   setHorarios,
   setHorariosYPrecios,
+  min,
+  max,
+  fieldsToShow,
 }) => {
   const { id, precio, enabled, from, to } = horario;
 
@@ -105,6 +109,8 @@ const ScheduleAndPrice = ({
             value={from}
             onChange={(newValue) => {
               setHorarios((horarios) => {
+                console.log("modificando horario de cancha desde");
+                console.log(horarios);
                 let horariosUpdated = horarios.map((horario) =>
                   horario.id === id
                     ? { ...horario, ["from"]: newValue }
@@ -115,6 +121,7 @@ const ScheduleAndPrice = ({
               });
             }}
             renderInput={(params) => <TextField {...params} />}
+            minTime={min}
           />
         </Grid>
         <Grid item xs>
@@ -139,7 +146,8 @@ const ScheduleAndPrice = ({
 
               return false;
             }}
-            minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
+            maxTime={max}
+            minTime={min}
           />
         </Grid>
       </LocalizationProvider>
@@ -158,7 +166,7 @@ const ScheduleAndPrice = ({
           }}
         />
       </Grid>
-      <Grid item xs>
+      <Grid hidden={fieldsToShow.enabled} item xs>
         <FormControlLabel
           control={
             <Switch
@@ -172,7 +180,7 @@ const ScheduleAndPrice = ({
           labelPlacement="activo"
         />
       </Grid>
-      <Grid item xs>
+      <Grid hidden={fieldsToShow.delete} item xs>
         <IconButton
           onClick={() => {
             removeHorario(id, diaYHorarioId);

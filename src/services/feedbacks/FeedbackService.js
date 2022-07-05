@@ -3,18 +3,19 @@ import AuthHeader from "../auth-header";
 import { Redirect } from "react-router";
 
 const getAllByInstitution = async (institution_id) => {
-  try {
-    const listadoCanchas = await http.get(
-      `/institutions/${institution_id}/courts`
-    );
-    console.log("listadoCanchas");
-    console.log(listadoCanchas);
-    return listadoCanchas;
-  } catch (err) {
-    console.log(" error al obtener todas las canchas");
-    console.log(err);
-    return Promise.reject(err);
-  }
+  return await http
+    .get(`/institutions/${institution_id}/feedback`)
+    .then((feedbackList) => {
+      console.log("feedbacks obtenidos");
+      console.log(feedbackList);
+      return feedbackList;
+    })
+    .catch((err) => {
+      console.log("ERROR AL OBTENER FEEDBACKS");
+      console.log(err.response);
+      return Promise.reject(err.response);
+      //return { message: "Por el momento forzamos la respuesta ok !" };
+    });
 };
 
 const get = async (institution_id, court_id) => {
@@ -25,21 +26,20 @@ const get = async (institution_id, court_id) => {
   }
 };
 
-const create = async (institution_id, data) => {
-  try {
-    const canchaCreada = await http.post(
-      `/institutions/${institution_id}/feedbacks`,
-      data,
-      {
-        headers: AuthHeader(),
-      }
-    );
-    console.log("cancha creada");
-    console.log(canchaCreada);
-    return canchaCreada;
-  } catch (err) {
-    console.log(err);
-  }
+const create = async (data) => {
+  return await http
+    .post(`/feedback`, data)
+    .then((feedbackCreado) => {
+      console.log("feedback creado");
+      console.log(feedbackCreado);
+      return feedbackCreado;
+    })
+    .catch((err) => {
+      console.log("ERROR AL CREAR FEEDBACK");
+      console.log(err.response);
+      return Promise.reject(err.response);
+      //return { message: "Por el momento forzamos la respuesta ok !" };
+    });
 };
 
 const update = async (institution_id, data) => {

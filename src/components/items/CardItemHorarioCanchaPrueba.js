@@ -32,6 +32,9 @@ import moment from "moment";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { BASE_URL_CUSTOMERS } from "../../pages/routes";
+import ReservationService from "../../services/reservations/ReservationService";
+import AlertMessageComponent from "../ui/AlertMessageComponent";
+import SnackbarAlertMessageComponent from "../ui/SnackbarAlertMessageComponent";
 
 const GridDescription = styled(MuiGrid)(({ theme }) => ({
   width: "100%",
@@ -88,8 +91,22 @@ const theme = createTheme({
   },
 });
 
-const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule, date, institution }) => {
+const CardItemHorarioCanchaPrueba = ({
+  open,
+  setOpen,
+  schedule,
+  date,
+  institution,
+}) => {
   const history = useHistory();
+
+  const [openSnackbar, setOpenSnackbar] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severity: "",
+  });
 
   const [courts, setCourts] = useState(schedule.courts);
 
@@ -123,6 +140,30 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule, date, institutio
     setLoading(true);
 
     setOpen(false);
+  };
+
+  const handleSelectedCourt = async (court) => {
+    //VALIDAR SI LA CANCHA AUN ESTA DISPONIBLE
+    console.log("VALIDANDO SI LA CANCHA AUN ESTA DISPONIBLE");
+
+    try {
+      const reservedCourt =
+        await ReservationService.validateAvailableReservation(court).then(
+          (data) => data
+        );
+
+      console.log("OBTENIENDO LA VALIDACION SI LA CANCHA SIGUE DISPONIBLE");
+      console.log(reservedCourt);
+      //handleReservar(reservedCourt);
+      handleReservar(court);
+    } catch (error) {
+      console.log("ERROR AL VALIDAR SI LA CANCHA SEGUIA DISPONIBLE");
+      setOpenSnackbar({
+        open: true,
+        severity: "error",
+        message: error.data.message,
+      });
+    }
   };
 
   const handleReservar = (court) => {
@@ -278,7 +319,7 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule, date, institutio
           <Box textAlign="center" sx={{ m: 2 }}>
             <LoadingButton
               color="secondary"
-              onClick={() => handleReservar(courtSelected)}
+              onClick={() => handleSelectedCourt(courtSelected)}
               loading={loading}
               loadingPosition="start"
               startIcon={<EventAvailableIcon />}
@@ -290,6 +331,11 @@ const CardItemHorarioCanchaPrueba = ({ open, setOpen, schedule, date, institutio
           </Box>
         </Dialog>
       </div>
+
+      <SnackbarAlertMessageComponent
+        openSnackbar={openSnackbar}
+        setOpenSnackbar={setOpenSnackbar}
+      />
     </>
   );
 };

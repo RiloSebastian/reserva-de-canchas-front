@@ -28,7 +28,8 @@ const getByAdminEmail = async (admin_email) => {
           console.log(schedules);
           return schedules;
         })
-        .catch((err) => Promise.reject(err));
+        .catch((err) => []);
+      //.catch((err) => Promise.reject(err));
 
       const institutionWithSchedules = {
         ...institution,
