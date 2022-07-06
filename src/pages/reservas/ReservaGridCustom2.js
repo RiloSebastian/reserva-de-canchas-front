@@ -67,6 +67,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import AppointmentFormContainerBasic from "../../components/ui/devexpress/AppointmentFormContainerBasic";
+import { set } from "date-fns";
 
 moment.locale("es");
 
@@ -494,7 +495,7 @@ const ReservaGridCustom2 = () => {
 
   const [workingDays, setWorkingDays] = useState([]);
 
-  const [allowAdding, setAllowAdding] = useState(true);
+  // const [allowAdding, setAllowAdding] = useState(true);
 
   const [addedAppointment, setAddedAppointment] = useState({});
 
@@ -518,7 +519,16 @@ const ReservaGridCustom2 = () => {
   };
 
   const TimeTableCellWeek = ({ onDoubleClick, ...restProps }) => {
-    const { startDate } = restProps;
+    const { startDate, className } = restProps;
+    const isDisableDate =
+      Utils.isHoliday(startDate) || Utils.isWeekend(startDate, workingDays);
+    const isDinner = Utils.isDinner(startDate, busyTimes);
+
+    let allowAdding = true;
+
+    if (isDisableDate || isDinner) {
+      allowAdding = false;
+    }
 
     return (
       <StyledWeekViewTimeTableCell
@@ -526,29 +536,33 @@ const ReservaGridCustom2 = () => {
         {...restProps}
       >
         <DataCell
-          setAllowAdding={setAllowAdding}
-          workingDays={workingDays}
+          isDisableDate={isDisableDate}
+          isDinner={isDinner}
+          allowAdding={allowAdding}
           itemData={{ ...restProps }}
-          busyTimes={busyTimes}
+        //busyTimes={busyTimes}
         />
       </StyledWeekViewTimeTableCell>
     );
-
-    if (isRestTime(startDate)) {
-      return (
-        <StyledWeekViewTimeTableCell
-          {...restProps}
-          className={classes.nonWorkingCell}
-        />
-      );
-    }
-    return (
-      <StyledWeekViewTimeTableCell {...restProps}>
-        <TimeTableCellWeek2 {...restProps} />
-      </StyledWeekViewTimeTableCell>
-    );
-    //return ;
   };
+
+  /*  const TimeTableCellWeek = React.useCallback(React.memo(({ onDoubleClick, ...restProps }) => {
+     const allowAdding = true
+     return (
+       < StyledWeekViewTimeTableCell
+         onDoubleClick={allowAdding ? onDoubleClick : undefined}
+         {...restProps}
+       >
+         <DataCell
+           // setAllowAdding={setAllowAdding}
+           workingDays={workingDays}
+           itemData={{ ...restProps }}
+           busyTimes={busyTimes}
+         />
+       </StyledWeekViewTimeTableCell >
+     )
+   }
+   ), []); */
 
   const [grouping, setGrouping] = useState([
     {
@@ -866,11 +880,11 @@ const ReservaGridCustom2 = () => {
       addedAppointment.cancel = true;
       console.log("MOSTRANDO ALERTA 1");
       setShowAlert(true);
-      setAllowAdding(false);
+      //setAllowAdding(false);
       setAddedAppointment(addedAppointment);
       return;
     }
-    setAllowAdding(true);
+    // setAllowAdding(true);
     setAddedAppointment(addedAppointment);
   };
 
@@ -888,11 +902,11 @@ const ReservaGridCustom2 = () => {
       addedAppointment.cancel = true;
       console.log("MOSTRANDO ALERTA 2");
       setShowAlert(true);
-      setAllowAdding(false);
+      //setAllowAdding(false);
       setAppointmentChanges(appointmentChanges);
       return;
     }
-    setAllowAdding(true);
+    // setAllowAdding(true);
     setAppointmentChanges(appointmentChanges);
   };
 
@@ -917,7 +931,7 @@ const ReservaGridCustom2 = () => {
     /* this.setState((state) => {
       const { data, deletedAppointmentId } = state;
       const nextData = data.filter(appointment => appointment.id !== deletedAppointmentId);
-
+   
       return { data: nextData, deletedAppointmentId: null };
     }); */
     toggleConfirmationVisible();
@@ -1014,6 +1028,30 @@ const ReservaGridCustom2 = () => {
     //Obtener todas las reservas hechas para la institucion
   }, []);
 
+  const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
+    const onCustomFieldChange = (nextValue) => {
+      onFieldChange({ customField: nextValue });
+    };
+
+    return (
+      <AppointmentForm.BasicLayout
+        appointmentData={appointmentData}
+        onFieldChange={onFieldChange}
+        {...restProps}
+      >
+        <AppointmentForm.Label
+          text="Custom Field"
+          type="title"
+        />
+        <AppointmentForm.TextEditor
+          value={appointmentData.customField}
+          onValueChange={onCustomFieldChange}
+          placeholder="Custom field"
+        />
+      </AppointmentForm.BasicLayout>
+    );
+  };
+
   return institutionHasCourts ? (
     <>
       <Paper>
@@ -1064,7 +1102,8 @@ const ReservaGridCustom2 = () => {
 
           <AppointmentTooltip showCloseButton showDeleteButton showOpenButton />
           <AppointmentForm
-            overlayComponent={appointmentForm}
+            //overlayComponent={appointmentForm}
+            basicLayoutComponent={BasicLayout}
             visible={editingFormVisible}
             onVisibilityChange={toggleEditingFormVisibility}
           />
