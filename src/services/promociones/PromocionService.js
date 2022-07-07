@@ -1,89 +1,58 @@
 import http from "../../http-common";
 import AuthHeader from "../auth-header";
-import { Redirect } from "react-router";
 
-const getAll = async (institution_id) => {
-  try {
-    const listadoCanchas = await http.get(
-      `/institutions/${institution_id}/courts`
-    );
-    console.log("listadoCanchas");
-    console.log(listadoCanchas);
-    return listadoCanchas;
-  } catch (err) {
-    console.log(" error al obtener todas las canchas");
-    console.log(err);
-    return Promise.reject(err);
-  }
+const getAll = async () => {
+  return await http
+    .get(`/promotions`)
+    .then((response) => response.data)
+    .catch((err) => Promise.reject(err));
+};
+
+const getAllByInstitutionId = async (institution_id) => {
+  return await http
+    .get(`/promotions/${institution_id}`)
+    .then((response) => response.data)
+    .catch((err) => Promise.reject(err));
 };
 
 const get = async (institution_id, court_id) => {
-  try {
-    return await http.get(`/institutions/${institution_id}/courts/${court_id}`);
-  } catch (err) {
-    console.log(err);
-  }
+  return await http.get(`/institutions/${institution_id}/courts/${court_id}`);
 };
 
 const create = async (institution_id, data) => {
-  try {
-    const canchaCreada = await http.post(
-      `/institutions/${institution_id}/courts`,
-      data,
-      {
-        headers: AuthHeader(),
-      }
-    );
-    console.log("cancha creada");
-    console.log(canchaCreada);
-    return canchaCreada;
-  } catch (err) {
-    console.log(err);
-  }
+  return await http
+    .post(`/promotions`, { ...data, institutionId: institution_id })
+    .then((response) => response.data)
+    .catch((err) => Promise.reject(err.response));
 };
 
-const update = async (institution_id, data) => {
-  try {
-    return await http.patch(
-      `/institutions/${institution_id}/courts/${data.id}`,
-      data,
-      {
-        headers: AuthHeader(),
-      }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+const update = async (promo_id, data) => {
+  return await http
+    .put(`/promotions/${promo_id}/courts`, data)
+    .then((response) => response.data)
+    .catch((err) => Promise.reject(err.response));
 };
 
-const remove = async (institution_id, court_id) => {
-  try {
-    return await http.delete(
-      `/institutions/${institution_id}/courts/${court_id}`,
-      {
-        headers: AuthHeader(),
-      }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+const remove = async (promo_id) => {
+  return await http
+    .delete(`/promotions/${promo_id}`)
+    .then((response) => response.data)
+    .catch((err) => Promise.reject(err.response));
 };
 
-const removeAll = async (institution_id) => {
-  try {
-    return await http.delete(`/institutions/${institution_id}/courts`, {
-      headers: AuthHeader(),
-    });
-  } catch (err) {
-    console.log(err);
-  }
+const removeAllById = async (promos_ids) => {
+  return await http
+    .delete(`/promotions/`, promos_ids)
+    .then((response) => response.data)
+    .catch((err) => Promise.reject(err.response));
 };
 
 export default {
   getAll,
+  getAllByInstitutionId,
   get,
   create,
   update,
   remove,
-  removeAll,
+  removeAllById,
 };

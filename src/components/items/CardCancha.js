@@ -80,7 +80,7 @@ const CardCancha = ({ institution, state }) => {
             <Stack direction="row" spacing={1}>
               {institution.sport.schedules.map((schedule) => (
                 <Chip
-                  key={schedule}
+                  key={schedule.id}
                   label={schedule.schedule + ` pm`}
                   onClick={() => desplegarModal(schedule)}
                 />

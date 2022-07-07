@@ -142,9 +142,9 @@ export const SettingsPassword = (props) => {
     console.log("handleUserInput");
     console.log(
       "[e.target.name]: " +
-        [e.target.name] +
-        " [e.target.value]: " +
-        [e.target.value]
+      [e.target.name] +
+      " [e.target.value]: " +
+      [e.target.value]
     );
     console.log("handleUserInput");
 
@@ -190,7 +190,7 @@ export const SettingsPassword = (props) => {
         user.id,
         values.newPassword
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   useEffect(() => {

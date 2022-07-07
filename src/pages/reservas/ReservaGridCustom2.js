@@ -61,17 +61,17 @@ import Container from "@material-ui/core/Container";
 import Box from "@material-ui/core/Box";
 import { LOAD_INSTITUTION_TIMES } from "../../actions/types";
 
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import AppointmentFormContainerBasic from "../../components/ui/devexpress/AppointmentFormContainerBasic";
+import { set } from "date-fns";
+import { AppointmentFormMessages } from "./localization-messages/AppointmentFormMessages";
+import AppointmentFormActions from "../../components/ui/devexpress/AppointmentFormActions";
 
 moment.locale("es");
-
-
-
 
 const PREFIX = "Demo";
 
@@ -111,9 +111,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const getBorder = (theme) =>
-  `1px solid ${theme.palette.mode === "light"
-    ? lighten(alpha(theme.palette.divider, 1), 0.88)
-    : darken(alpha(theme.palette.divider, 1), 0.68)
+  `1px solid ${
+    theme.palette.mode === "light"
+      ? lighten(alpha(theme.palette.divider, 1), 0.88)
+      : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -494,7 +495,7 @@ const ReservaGridCustom2 = () => {
 
   const [workingDays, setWorkingDays] = useState([]);
 
-  const [allowAdding, setAllowAdding] = useState(true);
+  // const [allowAdding, setAllowAdding] = useState(true);
 
   const [addedAppointment, setAddedAppointment] = useState({});
 
@@ -518,7 +519,16 @@ const ReservaGridCustom2 = () => {
   };
 
   const TimeTableCellWeek = ({ onDoubleClick, ...restProps }) => {
-    const { startDate } = restProps;
+    const { startDate, className } = restProps;
+    const isDisableDate =
+      Utils.isHoliday(startDate) || Utils.isWeekend(startDate, workingDays);
+    const isDinner = Utils.isDinner(startDate, busyTimes);
+
+    let allowAdding = true;
+
+    if (isDisableDate || isDinner) {
+      allowAdding = false;
+    }
 
     return (
       <StyledWeekViewTimeTableCell
@@ -526,29 +536,33 @@ const ReservaGridCustom2 = () => {
         {...restProps}
       >
         <DataCell
-          setAllowAdding={setAllowAdding}
-          workingDays={workingDays}
+          isDisableDate={isDisableDate}
+          isDinner={isDinner}
+          allowAdding={allowAdding}
           itemData={{ ...restProps }}
-          busyTimes={busyTimes}
+          //busyTimes={busyTimes}
         />
       </StyledWeekViewTimeTableCell>
     );
-
-    if (isRestTime(startDate)) {
-      return (
-        <StyledWeekViewTimeTableCell
-          {...restProps}
-          className={classes.nonWorkingCell}
-        />
-      );
-    }
-    return (
-      <StyledWeekViewTimeTableCell {...restProps}>
-        <TimeTableCellWeek2 {...restProps} />
-      </StyledWeekViewTimeTableCell>
-    );
-    //return ;
   };
+
+  /*  const TimeTableCellWeek = React.useCallback(React.memo(({ onDoubleClick, ...restProps }) => {
+     const allowAdding = true
+     return (
+       < StyledWeekViewTimeTableCell
+         onDoubleClick={allowAdding ? onDoubleClick : undefined}
+         {...restProps}
+       >
+         <DataCell
+           // setAllowAdding={setAllowAdding}
+           workingDays={workingDays}
+           itemData={{ ...restProps }}
+           busyTimes={busyTimes}
+         />
+       </StyledWeekViewTimeTableCell >
+     )
+   }
+   ), []); */
 
   const [grouping, setGrouping] = useState([
     {
@@ -698,7 +712,7 @@ const ReservaGridCustom2 = () => {
         (appointment) => appointment.id !== deleted
       ); */
       setDeletedAppointmentId(deleted);
-      toggleConfirmationVisible()
+      toggleConfirmationVisible();
     }
     setAppointments(newData);
   };
@@ -818,21 +832,89 @@ const ReservaGridCustom2 = () => {
   };
 
   const toggleConfirmationVisible = () => {
+    console.log("ENTRANDO AL toggleConfirmationVisible");
 
-    console.log("ENTRANDO AL toggleConfirmationVisible")
-
-    setConfirmationVisible(!confirmationVisible)
-  }
+    setConfirmationVisible(!confirmationVisible);
+  };
 
   const toggleEditingFormVisibility = () => {
-    setEditingFormVisible(!editingFormVisible)
-  }
+    setEditingFormVisible(!editingFormVisible);
+  };
+
+  /* const appointmentForm = connectProps(AppointmentFormContainerBasic, () => {
+    const currentAppointment =
+      appointments.filter(
+        (appointment) =>
+          editingAppointment && appointment.id === editingAppointment.id
+      )[0] || addedAppointment;
+    const cancelAppointment = () => {
+      if (isNewAppointment) {
+        this.setState({
+          editingAppointment: previousAppointment,
+          isNewAppointment: false,
+        });
+      }
+    };
+
+    return {
+      visible: editingFormVisible,
+      appointmentData: currentAppointment,
+      commitChanges: handleCommitChanges,
+      visibleChange: toggleEditingFormVisibility,
+      onEditingAppointmentChange: handleChangeEditingAppointment,
+      cancelAppointment,
+    };
+  }); */
+
+  const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
+    const onCustomFieldChange = (nextValue) => {
+      onFieldChange({ customField: nextValue });
+    };
+
+    const currentAppointment =
+      appointments.filter(
+        (appointment) =>
+          editingAppointment && appointment.id === editingAppointment.id
+      )[0] || addedAppointment;
+    const cancelAppointment = () => {
+      if (isNewAppointment) {
+        this.setState({
+          editingAppointment: previousAppointment,
+          isNewAppointment: false,
+        });
+      }
+    };
+
+    return (
+      <AppointmentForm.BasicLayout
+        appointmentData={appointmentData}
+        onFieldChange={onFieldChange}
+        {...restProps}
+      >
+        <AppointmentForm.Label text="Correo Electronico" type="title" />
+        <AppointmentForm.TextEditor
+          value={appointmentData.customField}
+          onValueChange={onCustomFieldChange}
+          placeholder="Correo Electronico"
+        />
+        <AppointmentFormActions
+          visible={editingFormVisible}
+          visibleChange={toggleEditingFormVisibility}
+          appointmentData={currentAppointment}
+          cancelAppointment={cancelAppointment}
+          commitChanges={handleCommitChanges}
+          onEditingAppointmentChange={handleChangeEditingAppointment}
+        />
+      </AppointmentForm.BasicLayout>
+    );
+  };
 
   const appointmentForm = connectProps(AppointmentFormContainerBasic, () => {
-
-    const currentAppointment = appointments
-      .filter(appointment => editingAppointment && appointment.id === editingAppointment.id)[0]
-      || addedAppointment;
+    const currentAppointment =
+      appointments.filter(
+        (appointment) =>
+          editingAppointment && appointment.id === editingAppointment.id
+      )[0] || addedAppointment;
     const cancelAppointment = () => {
       if (isNewAppointment) {
         this.setState({
@@ -866,11 +948,11 @@ const ReservaGridCustom2 = () => {
       addedAppointment.cancel = true;
       console.log("MOSTRANDO ALERTA 1");
       setShowAlert(true);
-      setAllowAdding(false);
+      //setAllowAdding(false);
       setAddedAppointment(addedAppointment);
       return;
     }
-    setAllowAdding(true);
+    // setAllowAdding(true);
     setAddedAppointment(addedAppointment);
   };
 
@@ -888,11 +970,11 @@ const ReservaGridCustom2 = () => {
       addedAppointment.cancel = true;
       console.log("MOSTRANDO ALERTA 2");
       setShowAlert(true);
-      setAllowAdding(false);
+      //setAllowAdding(false);
       setAppointmentChanges(appointmentChanges);
       return;
     }
-    setAllowAdding(true);
+    // setAllowAdding(true);
     setAppointmentChanges(appointmentChanges);
   };
 
@@ -906,7 +988,6 @@ const ReservaGridCustom2 = () => {
   };
 
   const commitDeletedAppointment = () => {
-
     let newData = appointments;
 
     newData = appointments.filter(
@@ -917,11 +998,11 @@ const ReservaGridCustom2 = () => {
     /* this.setState((state) => {
       const { data, deletedAppointmentId } = state;
       const nextData = data.filter(appointment => appointment.id !== deletedAppointmentId);
-
+   
       return { data: nextData, deletedAppointmentId: null };
     }); */
     toggleConfirmationVisible();
-  }
+  };
 
   useEffect(() => {
     console.log("CARGANDO EL COMPONENTE DE RESERVAS");
@@ -1014,6 +1095,23 @@ const ReservaGridCustom2 = () => {
     //Obtener todas las reservas hechas para la institucion
   }, []);
 
+  const RecurrenceLayoutEditor = (props) => {
+    // eslint-disable-next-line react/destructuring-assignment
+    console.log("RENDERING RecurrenceLayoutEditor PROPS");
+    console.log(props);
+    return <AppointmentForm.RecurrenceLayout {...props} />;
+  };
+
+  const TextEditor = (props) => {
+    // eslint-disable-next-line react/destructuring-assignment
+    console.log("RENDERING TextEditor PROPS");
+    console.log(props);
+    if (props.type === "multilineTextEditor") {
+      return null;
+    }
+    return <AppointmentForm.TextEditor {...props} />;
+  };
+
   return institutionHasCourts ? (
     <>
       <Paper>
@@ -1024,8 +1122,8 @@ const ReservaGridCustom2 = () => {
           <EditingState
             onCommitChanges={handleCommitChanges}
             onEditingAppointmentChange={handleChangeEditingAppointment}
-          //onAddedAppointmentChange={handleChangeAddedAppointment}
-          /* addedAppointment={addedAppointment}0  
+            //onAddedAppointmentChange={handleChangeAddedAppointment}
+            /* addedAppointment={addedAppointment}0  
           onAddedAppointmentChange={handleChangeAddedAppointment}
           appointmentChanges={appointmentChanges}
           onAppointmentChangesChange={handleChangeAppointmentChanges}
@@ -1064,9 +1162,13 @@ const ReservaGridCustom2 = () => {
 
           <AppointmentTooltip showCloseButton showDeleteButton showOpenButton />
           <AppointmentForm
-            overlayComponent={appointmentForm}
+            //overlayComponent={appointmentForm}
+            basicLayoutComponent={BasicLayout}
             visible={editingFormVisible}
             onVisibilityChange={toggleEditingFormVisibility}
+            textEditorComponent={TextEditor}
+            recurrenceLayoutComponent={RecurrenceLayoutEditor}
+            messages={AppointmentFormMessages}
           />
           <GroupingPanel />
           <ViewSwitcher />
@@ -1074,22 +1176,26 @@ const ReservaGridCustom2 = () => {
         </Scheduler>
       </Paper>
 
-      <Dialog
-        open={confirmationVisible}
-      >
-        <DialogTitle>
-          Eliminar Reserva
-        </DialogTitle>
+      <Dialog open={confirmationVisible}>
+        <DialogTitle>Eliminar Reserva</DialogTitle>
         <DialogContent>
           <DialogContentText>
             ¿Está seguro de que desea eliminar esta reserva?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleConfirmationVisible} color="primary" variant="outlined">
+          <Button
+            onClick={toggleConfirmationVisible}
+            color="primary"
+            variant="outlined"
+          >
             Cancelar
           </Button>
-          <Button onClick={commitDeletedAppointment} color="secondary" variant="outlined">
+          <Button
+            onClick={commitDeletedAppointment}
+            color="secondary"
+            variant="outlined"
+          >
             Eliminar
           </Button>
         </DialogActions>
