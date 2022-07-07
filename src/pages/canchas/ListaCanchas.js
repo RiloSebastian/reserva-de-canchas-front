@@ -488,13 +488,17 @@ const ListaCanchas = ({ institutionId }) => {
 
     console.log(cancha);
 
-    const canchaUpdated = await CanchaService.update(institution.id, cancha);
-    const data = canchaUpdated.data;
+    try {
+      const canchaUpdated = await CanchaService.update(institution.id, cancha);
+      const data = canchaUpdated.data;
 
-    console.log("cancha actualizada");
-    console.log(canchaUpdated);
-    console.log(data);
-    return data;
+      console.log("cancha actualizada");
+      console.log(canchaUpdated);
+      console.log(data);
+      return data;
+    } catch (error) {
+      return Promise.reject(error.data);
+    }
   };
 
   const deleteCancha = async (id) => {
