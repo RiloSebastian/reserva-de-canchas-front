@@ -108,8 +108,8 @@ const SignUpInstitution = () => {
     name: "",
     address: {
       geometry: {
-        coordinates: ["", ""],
-        type: "Point",
+        x: "",
+        y: "",
       },
       langAddress: "",
     },
@@ -292,7 +292,14 @@ const SignUpInstitution = () => {
         values.lastName,
         values.userRole,
         values.email,
-        values.password
+        values.password,
+        values.institutionTel
+      ).then((data) => data);
+
+      //pegarle al endpoint email async
+
+      const emailSended = await EmailService.sendVerificationEmail(
+        registerUser.email
       ).then((data) => data);
 
       const managers = [adminUser.email];

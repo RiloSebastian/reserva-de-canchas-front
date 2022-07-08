@@ -57,7 +57,7 @@ const getInstitutionSchedules = async (institution_id) => {
 
 const createInstitutionSchedules = async (institution_id, data) => {
   return await http
-    .post(`/institutions/${institution_id}/schedule`, data)
+    .post(`/institutions/${institution_id}/schedules`, data)
     .then((response) => {
       console.log("CREANDO HORARIO PARA INSTITUCION");
       console.log(response.data);

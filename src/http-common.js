@@ -7,7 +7,7 @@ function getLocalRefreshToken() {
 }
 
 function refreshToken() {
-  return instance.post("/auth/refreshtoken", {
+  return instance.get("/auth/refreshtoken", {
     refreshToken: getLocalRefreshToken(),
   });
 }
@@ -46,9 +46,9 @@ instance.interceptors.response.use(
 
         try {
           const rs = await refreshToken();
-          const { accessToken } = rs.data;
-          window.localStorage.setItem("accessToken", accessToken);
-          instance.defaults.headers.common["x-access-token"] = accessToken;
+          const { token } = rs.data;
+          window.localStorage.setItem("token", token);
+          instance.defaults.headers.common["x-access-token"] = token;
 
           return instance(originalConfig);
         } catch (_error) {

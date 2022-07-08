@@ -22,10 +22,18 @@ const ComboBox = ({ address, setValues }) => {
   const handleListItemClick = (event, option) => {
     console.log("SETEANDO LA DIRECCION SELECCIONADA ");
     //Agregar la direccion de la institucion
-    const address = {
+    /*  const address = {
       geometry: {
         coordinates: [option.lon, option.lat],
         type: "Point",
+      },
+      langAddress: option.display_address,
+    }; */
+
+    const address = {
+      geometry: {
+        x: Number(option.lon),
+        y: Number(option.lat),
       },
       langAddress: option.display_address,
     };

@@ -66,6 +66,7 @@ const FormularioHorarioPrecioCancha = ({
   const [fieldsToShow, setFieldsToShow] = useState({
     delete: false,
     enabled: false,
+    readOnly: false,
   });
 
   const [horario, setHorario] = useState({

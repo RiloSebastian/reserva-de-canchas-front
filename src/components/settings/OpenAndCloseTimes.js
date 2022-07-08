@@ -293,8 +293,8 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       console.log("SETEANDO LOS HORARIOS");
       diaYHorario.details.forEach(({ from, to }) => {
         const timeFrame = {
-          from: from.getTime(),
-          to: to.getTime(),
+          from,
+          to,
         };
         details.push({ timeFrame });
       });
@@ -330,9 +330,10 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           console.log("SUBIENDO DIAS Y HORARIOS DE LA INSTITUCION");
           console.log(data);
 
-          data.forEach((schedule) => {
+          /* data.forEach((schedule) => {
             handleUploadChanges(schedule);
-          });
+          }); */
+          handleUploadChanges(data);
         }
       })
       .catch(() => console.log("Deletion cancelled."));

@@ -13,9 +13,20 @@ const login = async (username, password) => {
       console.log("obteniendo usuario");
       console.log(response);
       if (response.data.token) {
-        localStorage.setItem("user", JSON.stringify(response.data));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...response.data,
+            photo:
+              "https://upload.wikimedia.org/wikipedia/commons/e/e4/Roger_Federer_%2818566686046%29.jpg",
+          })
+        );
       }
-      return response.data;
+      return {
+        ...response.data,
+        photo:
+          "https://upload.wikimedia.org/wikipedia/commons/e/e4/Roger_Federer_%2818566686046%29.jpg",
+      };
     })
     .catch((err) => {
       console.log("error al ingresar");
@@ -30,7 +41,14 @@ const logout = () => {
   persistor.purge();
 };
 
-const register = async (firstName, lastName, userRole, email, password) => {
+const register = async (
+  firstName,
+  lastName,
+  userRole,
+  email,
+  password,
+  telephone
+) => {
   return await axios
     .post(API_URL + "signup", {
       firstName,
@@ -38,6 +56,7 @@ const register = async (firstName, lastName, userRole, email, password) => {
       userRole,
       email,
       password,
+      telephone,
     })
     .then((response) => {
       console.log("registrnado usuario");

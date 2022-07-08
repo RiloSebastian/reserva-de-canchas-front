@@ -13,6 +13,7 @@ import {
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import es from "react-phone-input-2/lang/es.json";
+import ar from "react-phone-input-2/lang/ar.json";
 
 import UserService from "../../services/user.service";
 import { useConfirm } from "material-ui-confirm";
@@ -26,7 +27,6 @@ export const AccountProfileDetails = (props) => {
   const [snackbar, setSnackbar] = useState({});
 
   const [enabledModify, setEnabledModify] = useState(true);
-
 
   const [values, setValues] = useState(user);
 
@@ -73,7 +73,9 @@ export const AccountProfileDetails = (props) => {
       case "phone":
         if (!value) {
           return "Número de Telefono es Requerido";
-        } else if (!value.match(/^[+]?[(]?[0-9]{1,4}[)]?[\s]?[0-9]{4}[-]?[0-9]{4}$/)) {
+        } else if (
+          !value.match(/^[+]?[(]?[0-9]{1,4}[)]?[\s]?[0-9]{4}[-]?[0-9]{4}$/)
+        ) {
           return "Introduce un número de Teléfono válido.";
         } else {
           return "";
@@ -88,9 +90,9 @@ export const AccountProfileDetails = (props) => {
     console.log("SETEANDO VALORES A");
     console.log(
       "[e.target.name]: " +
-      e.target.name +
-      " [e.target.value]: " +
-      [e.target.value]
+        e.target.name +
+        " [e.target.value]: " +
+        [e.target.value]
     );
 
     setErrors((prevState) => {
@@ -152,7 +154,7 @@ export const AccountProfileDetails = (props) => {
         user.id,
         values.newPassword
       );
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const validateErrors = () => {
@@ -236,19 +238,21 @@ export const AccountProfileDetails = (props) => {
                     paddingLeft: "48px",
                     borderRadius: "5px",
                   }}
+                  placeholder="+54 (11) 1234-1234"
                   value={user.phone}
-                  localization={es}
+                  localization={ar}
                   country="ar"
                   enableAreaCodes={["ar"]}
                   enableAreaCodeStretch={true}
                   onlyCountries={["ar"]}
+                  preferredCountries={["ar"]}
+                  preserveOrder={["onlyCountries", "preferredCountries"]}
                   masks={{ ar: "(..) ....-...." }}
                   onChange={handleOnChange}
                   isValid={(value, country) => {
                     if (errors.phone !== "") {
-                      return 'Numero Invalido: ' + value + ', ' + country.name;
-                    }
-                    else {
+                      return "Numero Invalido: " + value + ", " + country.name;
+                    } else {
                       return true;
                     }
                   }}
@@ -264,7 +268,12 @@ export const AccountProfileDetails = (props) => {
               p: 2,
             }}
           >
-            <Button disabled={enabledModify} onClick={handleConfirmChanges} color="primary" variant="contained">
+            <Button
+              disabled={enabledModify}
+              onClick={handleConfirmChanges}
+              color="primary"
+              variant="contained"
+            >
               Guardar Cambios
             </Button>
           </Box>
