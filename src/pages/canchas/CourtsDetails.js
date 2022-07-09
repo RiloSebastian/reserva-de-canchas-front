@@ -16,6 +16,12 @@ import Paper from "@mui/material/Paper";
 import InfoIcon from "@mui/icons-material/Info";
 import ListSubheader from "@mui/material/ListSubheader";
 
+const flexContainer = {
+  display: "flex",
+  flexDirection: "row",
+  padding: 0,
+};
+
 const theme = createTheme({ palette: { mode: "light" } });
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -34,6 +40,7 @@ const CourtsDetails = ({ rowData }) => {
   const [fieldsToShow, setFieldsToShow] = useState({
     delete: true,
     enabled: true,
+    readOnly: true,
   });
 
   const [horario, setHorario] = useState({
@@ -146,10 +153,13 @@ const CourtsDetails = ({ rowData }) => {
               Imagenes Cargadas
             </Typography>
             {photos.length > 0 ? (
-              <ImageList sx={{ width: "100%", height: 450 }}>
+              <ImageList
+                style={flexContainer}
+                sx={{ width: "100%", height: 150 }}
+              >
                 {itemData.map((item) => (
                   <ImageListItem
-                    sx={{ width: 500, height: 450 }}
+                    sx={{ width: 150, height: 100 }}
                     key={item.img}
                   >
                     <img

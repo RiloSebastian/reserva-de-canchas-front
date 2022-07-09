@@ -47,9 +47,7 @@ const AccountProfile = (props) => {
           >
             <Avatar
               //src={user.avatar}
-              src={
-                "https://upload.wikimedia.org/wikipedia/commons/e/e4/Roger_Federer_%2818566686046%29.jpg"
-              }
+              src={user.photo}
               sx={{
                 height: 64,
                 mb: 2,

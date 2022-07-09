@@ -104,6 +104,7 @@ const ScheduleAndPrice = ({
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Grid item xs>
           <MobileTimePicker
+            InputProps={{ readOnly: true }}
             label="Desde"
             name="from"
             value={from}
@@ -126,6 +127,7 @@ const ScheduleAndPrice = ({
         </Grid>
         <Grid item xs>
           <MobileTimePicker
+            InputProps={{ readOnly: true }}
             label="Hasta"
             name="to"
             value={to}
@@ -163,6 +165,7 @@ const ScheduleAndPrice = ({
           sx={{ m: 1, width: "25ch" }}
           InputProps={{
             inputComponent: NumberFormatCustom,
+            readOnly: fieldsToShow.readOnly,
           }}
         />
       </Grid>

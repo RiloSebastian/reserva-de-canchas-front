@@ -57,6 +57,7 @@ export const InstitutionDetails = (props) => {
     confirmPassword: "",
     showPassword: false,
     showConfirmPassword: false,
+    institutionTel: "",
   });
 
   const handleChange = (e) => {
@@ -243,6 +244,13 @@ export const InstitutionDetails = (props) => {
                   onlyCountries={["ar"]}
                   masks={{ ar: "(..) ....-...." }}
                   onChange={handleOnChange}
+                  isValid={(value, country) => {
+                    if (errors.institutionTel !== "") {
+                      return "Numero Invalido: " + value + ", " + country.name;
+                    } else {
+                      return true;
+                    }
+                  }}
                 />
                 {/* <TextField
                 fullWidth

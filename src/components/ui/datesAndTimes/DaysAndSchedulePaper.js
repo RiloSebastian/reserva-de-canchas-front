@@ -39,7 +39,6 @@ const DaysAndSchedulePaper = ({
   diasYHorarios,
   setDiasYHorarios,
   diaYHorario,
-  diaYHorarioId,
   setHorario,
   daysSelected,
   setDaysSelected,
@@ -93,6 +92,32 @@ const DaysAndSchedulePaper = ({
     setDiasYHorarios(diasYHorariosUpdated);
   };
 
+  const handleDeleteHorarios = (horarioId, diaYHorarioId) => {
+    console.log("HANDLE DELETE HORARIOS");
+    console.log("HORARIO " + horarioId);
+
+    console.log(diasYHorarios);
+    console.log(diaYHorarioId);
+
+    const diasYHorariosUpdated = diasYHorarios.map((day) => {
+      if (day.id === diaYHorarioId) {
+        const horariosUpdated = day.details.filter(
+          (horario) => horario.id !== horarioId
+        );
+
+        return {
+          ...day,
+          details: horariosUpdated,
+        };
+      }
+      return day;
+    });
+
+    console.log(" HORARIOS ACTUALIZADOS");
+    console.log(diasYHorariosUpdated);
+    setDiasYHorarios(diasYHorariosUpdated);
+  };
+
   useEffect(() => {
     console.log("LOADING DIAS Y HORARIOS");
 
@@ -115,7 +140,7 @@ const DaysAndSchedulePaper = ({
                 setDaysSelected={setDaysSelected}
                 setHorarios={setHorario}
                 daysSelected={daysSelected}
-                daysAndTimesId={diaYHorarioId}
+                daysAndTimesId={diaYHorario.id}
                 diaYHorario={diaYHorario}
               />
             </Grid>
@@ -130,6 +155,7 @@ const DaysAndSchedulePaper = ({
                       details={diaYHorario.details}
                       detail={detail}
                       setDiasYHorarios={setDiasYHorarios}
+                      handleDeleteHorarios={handleDeleteHorarios}
                     />
                   );
                 })}

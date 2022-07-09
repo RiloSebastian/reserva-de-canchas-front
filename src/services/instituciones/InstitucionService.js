@@ -16,6 +16,13 @@ const getByAdminEmail = async (admin_email) => {
   return await http
     .get(`/institutions/admin/${admin_email}`)
     .then((response) => response.data)
+    .catch((err) => Promise.reject(err));
+};
+
+/* const getByAdminEmail = async (admin_email) => {
+  return await http
+    .get(`/institutions/admin/${admin_email}`)
+    .then((response) => response.data)
     .then(async (institution) => {
       console.log("institution obtenida");
 
@@ -46,7 +53,7 @@ const getByAdminEmail = async (admin_email) => {
       return institutionWithSchedules;
     })
     .catch((err) => Promise.reject(err));
-};
+}; */
 
 const getInstitutionSchedules = async (institution_id) => {
   return await http
@@ -57,7 +64,7 @@ const getInstitutionSchedules = async (institution_id) => {
 
 const createInstitutionSchedules = async (institution_id, data) => {
   return await http
-    .post(`/institutions/${institution_id}/schedule`, data)
+    .post(`/institutions/${institution_id}/schedules`, data)
     .then((response) => {
       console.log("CREANDO HORARIO PARA INSTITUCION");
       console.log(response.data);
