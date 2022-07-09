@@ -38,6 +38,7 @@ const login = async (username, password) => {
 const logout = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("institution");
+  localStorage.removeItem("token");
   persistor.purge();
 };
 

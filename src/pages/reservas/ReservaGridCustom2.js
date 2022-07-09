@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { connectProps } from "@devexpress/dx-react-core";
@@ -70,8 +70,6 @@ import AppointmentFormContainerBasic from "../../components/ui/devexpress/Appoin
 import { set } from "date-fns";
 import { AppointmentFormMessages } from "./localization-messages/AppointmentFormMessages";
 import AppointmentFormActions from "../../components/ui/devexpress/AppointmentFormActions";
-
-moment.locale("es");
 
 const PREFIX = "Demo";
 
@@ -479,7 +477,7 @@ const ReservaGridCustom2 = () => {
 
   let history = useHistory();
 
-  //const institution = useSelector((state) => state.institution);
+  const institution = useSelector((state) => state.institution);
 
   const [confirmationVisible, setConfirmationVisible] = useState(false);
   const [previousAppointment, setPreviousAppointment] = useState(undefined);
@@ -1004,12 +1002,24 @@ const ReservaGridCustom2 = () => {
     toggleConfirmationVisible();
   };
 
-  useEffect(() => {
-    console.log("CARGANDO EL COMPONENTE DE RESERVAS");
+  const RecurrenceLayoutEditor = (props) => {
+    // eslint-disable-next-line react/destructuring-assignment
+    console.log("RENDERING RecurrenceLayoutEditor PROPS");
+    console.log(props);
+    return <AppointmentForm.RecurrenceLayout {...props} />;
+  };
 
-    const institution = JSON.parse(localStorage.getItem("institution"));
-    //OBTENER LAS RESERVAS POR INSTITUCION
+  const TextEditor = (props) => {
+    // eslint-disable-next-line react/destructuring-assignment
+    console.log("RENDERING TextEditor PROPS");
+    console.log(props);
+    if (props.type === "multilineTextEditor") {
+      return null;
+    }
+    return <AppointmentForm.TextEditor {...props} />;
+  };
 
+  const updateBookingGrid = () => {
     sportChange(1);
 
     //OBTENER LOS DIAS LABORALES
@@ -1018,9 +1028,9 @@ const ReservaGridCustom2 = () => {
 
     //dispatch(getInstitutionSchedules(institution.id));
 
-    let startDayTime;
+    /*  let startDayTime;
 
-    let endDayTime;
+    let endDayTime; */
 
     //OBTENER LOS DIAS LABORALES
     if (institution.schedules) {
@@ -1055,7 +1065,7 @@ const ReservaGridCustom2 = () => {
         schedule.details.forEach((horario) => {
           console.log("VALIDANDO EL HORARIO MAS TEMPRANO Y MAS TARDE");
 
-          startDayTime = validateStartDayTime(
+          /* startDayTime = validateStartDayTime(
             startDayTime,
             new Date(horario.timeFrame.from).getHours()
           );
@@ -1063,7 +1073,7 @@ const ReservaGridCustom2 = () => {
           endDayTime = validateEndtDayTime(
             endDayTime,
             new Date(horario.timeFrame.to).getHours()
-          );
+          ); */
 
           horariosLaborales.push({
             from: new Date(horario.timeFrame.from).getHours(),
@@ -1083,34 +1093,44 @@ const ReservaGridCustom2 = () => {
         //  setBusyTimes(horariosLaborales);
       });
 
-      dispatch({
+      /* dispatch({
         type: LOAD_INSTITUTION_TIMES,
         payload: { startDayTime, endDayTime },
-      });
+      }); */
 
-      setStartDayHour(startDayTime);
-      setEndDayHour(endDayTime);
+      console.log("SETEANDO HORARIO MINIM Y MAXIMO DE LA INSTITUCION");
+      console.log(moment(institution.scheduleMinTime).hour());
+      console.log(moment(institution.scheduleMaxTime).hour());
+
+      //setStartDayHour(moment(institution.scheduleMinTime).hour());
+      //setEndDayHour(moment(institution.scheduleMaxTime).hour());
+      setStartDayHour(8);
+      setEndDayHour(23);
     }
 
     //Obtener todas las reservas hechas para la institucion
+  };
+
+  useEffect(() => {
+    console.log("CARGANDO EL COMPONENTE DE RESERVAS");
+
+    updateBookingGrid();
+
+    //const institution = JSON.parse(localStorage.getItem("institution"));
+    //OBTENER LAS RESERVAS POR INSTITUCION
   }, []);
 
-  const RecurrenceLayoutEditor = (props) => {
-    // eslint-disable-next-line react/destructuring-assignment
-    console.log("RENDERING RecurrenceLayoutEditor PROPS");
-    console.log(props);
-    return <AppointmentForm.RecurrenceLayout {...props} />;
-  };
-
-  const TextEditor = (props) => {
-    // eslint-disable-next-line react/destructuring-assignment
-    console.log("RENDERING TextEditor PROPS");
-    console.log(props);
-    if (props.type === "multilineTextEditor") {
-      return null;
+  const firstUpdate = useRef(true);
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
     }
-    return <AppointmentForm.TextEditor {...props} />;
-  };
+    console.log("ACTUALIZAR CADA VEZ QUE SE MODIFIQUEN LOS HORARIOS");
+
+    updateBookingGrid();
+    //Obtener todas las reservas hechas para la institucion
+  }, [institution.schedules]);
 
   return institutionHasCourts ? (
     <>

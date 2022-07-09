@@ -49,6 +49,7 @@ import EmailService from "../../services/email/EmailService";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import es from "react-phone-input-2/lang/es.json";
+import ar from "react-phone-input-2/lang/ar.json";
 
 const themeTextArea = createTheme({
   components: {
@@ -135,6 +136,7 @@ const SignUpInstitution = () => {
     confirmPassword: "",
     showPassword: false,
     showConfirmPassword: false,
+    telephone: "",
   });
 
   const [open, setOpen] = useState(false);
@@ -296,10 +298,10 @@ const SignUpInstitution = () => {
         values.institutionTel
       ).then((data) => data);
 
-      //pegarle al endpoint email async
+      //pegarle al endpoint email
 
       const emailSended = await EmailService.sendVerificationEmail(
-        registerUser.email
+        adminUser.email
       ).then((data) => data);
 
       const managers = [adminUser.email];
@@ -437,7 +439,7 @@ const SignUpInstitution = () => {
                     <Box mt="1em" />
 
                     <Typography variant="h6" gutterBottom>
-                      Telefono
+                      Telefono Institucion
                     </Typography>
 
                     <Grid container spacing={2}>
@@ -521,6 +523,43 @@ const SignUpInstitution = () => {
                                 onBlur={handleUserInput}
                                 helperText={errors.lastName}
                                 error={errors.lastName}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <PhoneInput
+                                inputStyle={{
+                                  width: "100%",
+                                  height: "54px",
+                                  fontSize: "18px",
+                                  paddingLeft: "48px",
+                                  borderRadius: "5px",
+                                }}
+                                placeholder="+54 (11) 1234-1234"
+                                value={values.telephone}
+                                localization={ar}
+                                country="ar"
+                                enableAreaCodes={["ar"]}
+                                enableAreaCodeStretch={true}
+                                onlyCountries={["ar"]}
+                                preferredCountries={["ar"]}
+                                preserveOrder={[
+                                  "onlyCountries",
+                                  "preferredCountries",
+                                ]}
+                                masks={{ ar: "(..) ....-...." }}
+                                onChange={handleOnChange}
+                                isValid={(value, country) => {
+                                  if (errors.telephone !== "") {
+                                    return (
+                                      "Numero Invalido: " +
+                                      value +
+                                      ", " +
+                                      country.name
+                                    );
+                                  } else {
+                                    return true;
+                                  }
+                                }}
                               />
                             </Grid>
                             <Grid item xs={12}>

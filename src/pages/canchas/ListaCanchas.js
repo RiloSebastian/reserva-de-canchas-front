@@ -197,7 +197,7 @@ const ListaCanchas = ({ institutionId }) => {
     excluirDiasNoLaborales: true,
   });
 
-  const [sport, setSport] = useState({});
+  const [sports, setSports] = useState({});
 
   const [surfaces, setSurfaces] = useState([]);
 
@@ -229,7 +229,7 @@ const ListaCanchas = ({ institutionId }) => {
               helperText: "Debe seleccionar un deporte para la cancha",
             }
           : true,
-      lookup: sport,
+      lookup: sports,
       render: (rowData) => rowData.sport.name,
       editComponent: (rowData) => {
         return (
@@ -262,7 +262,7 @@ const ListaCanchas = ({ institutionId }) => {
       title: "Superficie",
       field: "courtType",
       validate: (rowData) =>
-        rowData.sport === undefined
+        rowData.courtType === undefined
           ? {
               isValid: false,
               helperText: "Debe seleccionar la Superficie de la Cancha",
@@ -394,16 +394,17 @@ const ListaCanchas = ({ institutionId }) => {
       const data = listadoDeportes.data;
 
       if (data) {
-        const sport = {};
-        data.map((s) => (sport[s.id] = s.name));
+        const sports = {};
+        data.map((s) => (sports[s.id] = s.name));
 
-        console.log(sport);
+        console.log(sports);
 
-        setSport(sport);
+        setSports(sports);
         setSportArray(data);
       }
     } catch (err) {
       //history.push("/login");
+      console.log("ERROR AL OBTENER LA LISTA DE DEPORTES");
     }
   };
 

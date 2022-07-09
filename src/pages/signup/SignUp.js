@@ -30,6 +30,11 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import FormHelperText from "@mui/material/FormHelperText";
 import EmailService from "../../services/email/EmailService";
 
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import es from "react-phone-input-2/lang/es.json";
+import ar from "react-phone-input-2/lang/ar.json";
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
@@ -67,6 +72,7 @@ const SignUp = () => {
     confirmPassword: "",
     showPassword: false,
     showConfirmPassword: false,
+    telephone: "",
   });
 
   const [errors, setErrors] = useState({
@@ -78,6 +84,7 @@ const SignUp = () => {
     confirmPassword: "",
     showPassword: false,
     showConfirmPassword: false,
+    telephone: "",
   });
 
   const [showMessageError, setShowMessageError] = useState(false);
@@ -142,6 +149,16 @@ const SignUp = () => {
         } else {
           return "";
         } */
+      case "telephone":
+        if (!value) {
+          return "Número de Telefono es Requerido";
+        } else if (
+          !value.match(/^[+]?[(]?[0-9]{1,4}[)]?[\s]?[0-9]{4}[-]?[0-9]{4}$/)
+        ) {
+          return "Introduce un número de Teléfono válido.";
+        } else {
+          return "";
+        }
       case "password":
         if (!value) {
           return "La Contraseña es Requerida";
@@ -192,6 +209,25 @@ const SignUp = () => {
       return {
         ...prevState,
         [e.target.name]: e.target.value,
+      };
+    });
+  };
+
+  const handleOnChange = (value) => {
+    console.log("Actualizando numero de telefono");
+    console.log("[telephone]: ");
+    console.log(value.toString());
+
+    setErrors((prevState) => {
+      return {
+        ...prevState,
+        telephone: validate("telephone", value.toString()),
+      };
+    });
+    setValues((prevState) => {
+      return {
+        ...prevState,
+        telephone: value,
       };
     });
   };
@@ -369,6 +405,37 @@ const SignUp = () => {
                     onBlur={handleUserInput}
                     helperText={errors.lastName}
                     error={errors.lastName}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <PhoneInput
+                    inputStyle={{
+                      width: "100%",
+                      height: "54px",
+                      fontSize: "18px",
+                      paddingLeft: "48px",
+                      borderRadius: "5px",
+                    }}
+                    placeholder="+54 (11) 1234-1234"
+                    value={values.telephone}
+                    localization={ar}
+                    country="ar"
+                    enableAreaCodes={["ar"]}
+                    enableAreaCodeStretch={true}
+                    onlyCountries={["ar"]}
+                    preferredCountries={["ar"]}
+                    preserveOrder={["onlyCountries", "preferredCountries"]}
+                    masks={{ ar: "(..) ....-...." }}
+                    onChange={handleOnChange}
+                    isValid={(value, country) => {
+                      if (errors.telephone !== "") {
+                        return (
+                          "Numero Invalido: " + value + ", " + country.name
+                        );
+                      } else {
+                        return true;
+                      }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>

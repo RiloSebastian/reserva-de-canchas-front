@@ -19,6 +19,8 @@ import { ConfirmProvider } from "material-ui-confirm";
 import { red } from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
 
+import moment from "moment";
+
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
   props,
   ref
@@ -63,6 +65,7 @@ const SchedulerFromTo = ({
   diaYHorarioId,
   details,
   setDiasYHorarios,
+  handleDeleteHorarios,
 }) => {
   const confirm = useConfirm();
 
@@ -112,22 +115,20 @@ const SchedulerFromTo = ({
     })
       .then(() => {
         console.log("ELIMINANDO HORARIOS");
-        /* const dayUpdated = daysSelected.map((day) => {
-          if (day.daysAndTimesId === item.id) {
-            return {
-              ...day,
-              selected: false,
-              daysAndTimesId: null,
-            };
-          }
-          return day;
-        });
-        setDaysSelected(dayUpdated);
 
-        setDiasYHorarios(diasYHorarios.filter((other) => other.id !== item.id)); */
+        handleDeleteHorarios(horarioId, diaYHorarioId);
       })
       .catch(() => console.log("Deletion cancelled."));
   };
+
+  useEffect(() => {
+    console.log("CARGANDO HORARIOS DESDE - HASTA");
+    console.log(detail);
+    console.log(handleChangeHorarios);
+    console.log(diaYHorarioId);
+    console.log(details);
+    console.log(setDiasYHorarios);
+  }, []);
 
   return (
     <Grid sx={{ m: 1 }} container spacing={3} alignItems="center">
@@ -148,14 +149,14 @@ const SchedulerFromTo = ({
             value={to}
             onChange={handleChangeTo}
             renderInput={(params) => <TextField {...params} />}
-            shouldDisableTime={(timeValue, clockType) => {
+            /* shouldDisableTime={(timeValue, clockType) => {
               if (clockType === "minutes" && timeValue !== from.getMinutes()) {
                 return true;
               }
 
               return false;
-            }}
-            minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
+            }}*/
+            minTime={new Date(new Date(from).setHours(moment(from).hour() + 1))}
           />
         </Grid>
       </LocalizationProvider>

@@ -39,6 +39,8 @@ export default function (state = initialState, action) {
         institutionTel: payload.institutionTel,
         address: payload.address,
         schedules: payload.schedules,
+        scheduleMinTime: payload.scheduleMinTime,
+        scheduleMaxTime: payload.scheduleMaxTime,
       };
     case UPDATE_INSTITUTION:
       return {
