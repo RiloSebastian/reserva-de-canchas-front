@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SaveIcon from "@mui/icons-material/Save";
@@ -50,6 +50,8 @@ const FormularioHorarioPrecioCancha = ({
   const [min, setMin] = useState(new Date());
 
   const [max, setMax] = useState(new Date());
+
+  const [disabled, setDisabled] = useState(true);
 
   const { excluirDiasNoLaborales, porcentajeSenia } = horariosYPrecios;
 
@@ -118,8 +120,6 @@ const FormularioHorarioPrecioCancha = ({
       return { ...body, ["schedules"]: horarios };
     });
 
-    // saveHorarios(horarios);
-
     setOpen(false);
   };
 
@@ -132,10 +132,7 @@ const FormularioHorarioPrecioCancha = ({
     console.log("agregando nuevo horario para la card -> " + id);
     console.log(nuevoHorario);
 
-    //const newSchedule = [...horarios, nuevoHorario];
-
     console.log(diasYHorarios);
-    //setHorarios(newSchedule);
 
     const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
       if (diaYHorario.id === id) {
@@ -150,14 +147,6 @@ const FormularioHorarioPrecioCancha = ({
     });
 
     setDiasYHorarios(diasYHorariosUpdated);
-    /* setDiasYHorarios((prevState) => {
-      return [
-        {
-          ...prevState,
-          horarios: [...horarios, nuevoHorario],
-        },
-      ];
-    }); */
   };
 
   const handleAddNewDatesSchedules = () => {
@@ -186,9 +175,6 @@ const FormularioHorarioPrecioCancha = ({
 
         return diaYHorario;
       });
-      /*  setHorarios((horarios) => {
-        return horarios.filter((horario) => horario.id !== id);
-      }); */
 
       setDiasYHorarios(diasYHorariosUpdated);
     }
@@ -210,20 +196,16 @@ const FormularioHorarioPrecioCancha = ({
   };
 
   useEffect(() => {
-    //traer los horarios guardados por la institucion
-    //getHorarios();
-    //const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
-    //const newSchedule = [...horarios, nuevoHorario];
-    //setDiasYHorarios([nuevoDiaYHorario]);
-
     const minTime = new Date(
-      new Date(new Date().setHours(institution.times.startDayTime)).setMinutes(
-        0
-      )
+      new Date(
+        new Date().setHours(moment(institution.scheduleMinTime).hour())
+      ).setMinutes(0)
     );
 
     const maxTime = new Date(
-      new Date(new Date().setHours(institution.times.endDayTime)).setMinutes(0)
+      new Date(
+        new Date().setHours(moment(institution.scheduleMaxTime).hour())
+      ).setMinutes(0)
     );
 
     console.log("SETEANDO HORARIOS MINIMOS Y MAXIMOS PARA LAS CANCHAS");
@@ -249,13 +231,74 @@ const FormularioHorarioPrecioCancha = ({
         ],
       },
     ]);
-    //setHorarios(newSchedule);
   }, []);
 
+  const firstUpdate = useRef(true);
   useEffect(() => {
-    //Validar si corresponde deshabilitar boton
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
 
-    handleDisableAddNewDatesSchedules();
+    console.log("VALIDANDO CADA VEZ QUE SE SELECCIONA UN DIA");
+    console.log(daysSelected);
+
+    //Validar si es necesario desabilitar el boton de agregar mas horarios
+
+    if (diasYHorarios.length === 1) {
+      if (
+        daysSelected
+          .map((daySelected) => daySelected.selected)
+          .every((d) => d === true)
+      ) {
+        setDisabled(true);
+        return;
+      }
+
+      if (
+        daysSelected.map((daySelected) => daySelected.selected).includes(true)
+      ) {
+        setDisabled(false);
+      } else {
+        setDisabled(true);
+      }
+    } else {
+      //Validar los ids asignados a cada dia
+
+      diasYHorarios.forEach((diaYHorario) => {
+        if (
+          !daysSelected
+            .map((daySelected) => daySelected.daysAndTimesId)
+            .includes(diaYHorario.id) &&
+          daysSelected
+            .map((daySelected) => daySelected.selected)
+            .every((d) => d === true)
+        ) {
+          const diasYHorariosUpdated = diasYHorarios.filter(
+            (d) => d.id !== diaYHorario.id
+          );
+          setDiasYHorarios(diasYHorariosUpdated);
+        }
+
+        console.log(
+          daysSelected.map((daySelected) => daySelected.daysAndTimesId)
+        );
+
+        if (
+          daysSelected
+            .map((daySelected) => daySelected.selected)
+            .every((d) => d === true) ||
+          !daysSelected
+            .map((daySelected) => daySelected.daysAndTimesId)
+            .includes(diaYHorario.id)
+        ) {
+          console.log("DESHABILITAR BOTON PARA AGREGAR MAS DIAS");
+          setDisabled(true);
+        } else {
+          setDisabled(false);
+        }
+      });
+    }
   }, [daysSelected]);
 
   useEffect(() => {
@@ -300,41 +343,6 @@ const FormularioHorarioPrecioCancha = ({
     }
   }, [institution.schedules]);
 
-  /*  useEffect(() => {
-    //Obtener los dias horarios minimos y maximos de apertura y cierre de la institucion
-
-    const minTime = new Date(
-      new Date(new Date().setHours(institution.times.startDayTime)).setMinutes(
-        0
-      )
-    );
-
-    const maxTime = new Date(
-      new Date(new Date().setHours(institution.times.endDayTime)).setMinutes(0)
-    );
-
-    console.log("SETEANDO HORARIOS MINIMOS Y MAXIMOS PARA LAS CANCHAS");
-    console.log(minTime);
-    console.log(maxTime);
-
-    setMin(minTime);
-
-    setMax(maxTime);
-
-    setDiasYHorarios([
-      {
-        ...nuevoDiaYHorario,
-        horarios: {
-          id: "",
-          from: minTime,
-          to: maxTime,
-          price: "",
-          enabled: true,
-        },
-      },
-    ]);
-  }, [institution.times]); */
-
   return (
     <div>
       <Dialog open={open} onClose={handleClose} maxWidth="xl">
@@ -371,10 +379,8 @@ const FormularioHorarioPrecioCancha = ({
               <Paper className={classes}>
                 <Box key={key} textAlign="center" sx={{ m: 4 }}>
                   <Box textAlign="left" sx={{ mt: 4 }}>
-                    {/*<SelectDate setHorariosYPrecios={setHorariosYPrecios} />*/}
                     <p>Dias de la Semana</p>
                     <SelectWeekDays
-                      //daysOptions={diaYHorario.dias}
                       setDaysSelected={setDaysSelected}
                       setHorariosYPrecios={setHorariosYPrecios}
                       daysSelected={daysSelected}
@@ -384,21 +390,6 @@ const FormularioHorarioPrecioCancha = ({
                   </Box>
                   <Box textAlign="left" sx={{ mt: 4 }}>
                     <p>Horarios</p>
-                    {/* {diaYHorario.horarios.map((horario, key) => {
-                      horario.id = key;
-                      return (
-                        <ScheduleAndPrice
-                          key={key}
-                          horario={horario}
-                          diaYHorarioId={diaYHorario.id}
-                          removeHorario={removeHorario}
-                          setHorarios={setHorarios}
-                          setHorariosYPrecios={setHorariosYPrecios}
-                          min={min}
-                          max={max}
-                        />
-                      );
-                    })} */}
 
                     <List>
                       {diaYHorario.horarios.map((horario) => (

@@ -277,6 +277,14 @@ const ListaCanchas = ({ institutionId }) => {
       title: "Seña",
       field: "signPercentage",
       type: "numeric",
+      validate: (rowData) =>
+        rowData.signPercentage < 0 ||
+        rowData.signPercentage > 100 ||
+        rowData.signPercentage === undefined
+          ? {
+              isValid: false,
+            }
+          : true,
       render: (rowData) =>
         rowData.signPercentage === undefined || rowData.signPercentage === 0
           ? "no requiere seña"
@@ -292,8 +300,12 @@ const ListaCanchas = ({ institutionId }) => {
               ? "La Seña debe ser entre 0 y 100"
               : ""
           }
+          error={
+            props.value < 0 || props.value > 100 || props.value === undefined
+          }
           onChange={(e) => props.onChange(e.target.value)}
           InputProps={{
+            inputProps: { min: 0, max: 100 },
             startAdornment: <InputAdornment position="start">%</InputAdornment>,
           }}
           variant="standard"
