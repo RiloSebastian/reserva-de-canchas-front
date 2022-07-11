@@ -41,8 +41,8 @@ const useStyles = makeStyles((theme) => ({
 const FormularioHorarioPrecioCancha = ({
   open,
   setOpen,
-  horariosYPrecios,
-  setHorariosYPrecios,
+  schedules,
+  setSchedules,
   isMultipleEdit,
 }) => {
   const institution = useSelector((state) => state.institution);
@@ -53,7 +53,7 @@ const FormularioHorarioPrecioCancha = ({
 
   const [disabled, setDisabled] = useState(true);
 
-  const { excluirDiasNoLaborales, porcentajeSenia } = horariosYPrecios;
+  //const { excluirDiasNoLaborales, porcentajeSenia } = horariosYPrecios;
 
   const classes = useStyles();
 
@@ -193,6 +193,38 @@ const FormularioHorarioPrecioCancha = ({
       .every((d) => d === false);
 
     setDisableAddMoreDays(addNewDaysAndSchedulesAvailable);
+  };
+
+  const handleChangeHorarios = (diaYHorarioId, horarioId, from, to) => {
+    console.log("HANDLE CHANGE HORARIOS");
+
+    console.log("DIA Y HORARIO " + diaYHorarioId);
+    console.log("HORARIO " + horarioId);
+    console.log("DESDE " + from);
+    console.log("HASTA " + to);
+
+    const diasYHorariosUpdated = diasYHorarios.map((day) => {
+      if (day.id === diaYHorarioId) {
+        const horariosUpdated = day.details.map((horario) => {
+          if (horario.id === horarioId) {
+            return {
+              ...horario,
+              from,
+              to,
+            };
+          }
+
+          return horario;
+        });
+
+        return {
+          ...day,
+          details: horariosUpdated,
+        };
+      }
+      return day;
+    });
+    setDiasYHorarios(diasYHorariosUpdated);
   };
 
   useEffect(() => {
@@ -382,7 +414,6 @@ const FormularioHorarioPrecioCancha = ({
                     <p>Dias de la Semana</p>
                     <SelectWeekDays
                       setDaysSelected={setDaysSelected}
-                      setHorariosYPrecios={setHorariosYPrecios}
                       daysSelected={daysSelected}
                       daysAndTimesId={diaYHorario.id}
                       fieldsToShow={fieldsToShow}
@@ -395,12 +426,12 @@ const FormularioHorarioPrecioCancha = ({
                       {diaYHorario.horarios.map((horario) => (
                         <ListItem key={horario.id}>
                           <ScheduleAndPrice
+                            handleChangeHorarios={handleChangeHorarios}
                             key={key}
                             horario={horario}
                             diaYHorarioId={diaYHorario.id}
                             removeHorario={removeHorario}
                             setHorarios={setHorarios}
-                            setHorariosYPrecios={setHorariosYPrecios}
                             min={min}
                             max={max}
                             fieldsToShow={fieldsToShow}

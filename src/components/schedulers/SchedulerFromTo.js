@@ -71,39 +71,16 @@ const SchedulerFromTo = ({
 
   const { from, to, id } = detail;
 
-  const [valueFrom, setvalueFrom] = useState();
-  const [valueTo, setvalueTo] = useState();
-
   const handleChangeFrom = (e) => {
     console.log("HANDLE CHANGE FROM HORARIO");
     console.log(id);
     handleChangeHorarios(diaYHorarioId, id, e, to);
-
-    /* setDiasYHorarios((prevState) => {
-      console.log("HANDLE CHANGE TO HORARIO");
-      console.log(prevState);
-      handleChangeHorarios(diaYHorarioId, id, from, e);
-
-      return {
-        ...prevState,
-      };
-    }); */
   };
 
   const handleChangeTo = (e) => {
     console.log("HANDLE CHANGE TO HORARIO");
     console.log(detail.id);
     handleChangeHorarios(diaYHorarioId, id, from, e);
-
-    /* setDiasYHorarios((prevState) => {
-      console.log("HANDLE CHANGE TO HORARIO");
-      console.log(prevState);
-      handleChangeHorarios(diaYHorarioId, id, from, e);
-
-      return {
-        ...prevState,
-      };
-    }); */
   };
 
   const removeHorario = (horarioId, diaYHorarioId) => {

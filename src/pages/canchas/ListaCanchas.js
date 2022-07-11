@@ -193,9 +193,7 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [fileObjects, setFileObjects] = useState([]);
 
-  const [horariosYPrecios, setHorariosYPrecios] = useState({
-    excluirDiasNoLaborales: true,
-  });
+  const [schedules, setSchedules] = useState([]);
 
   const [sports, setSports] = useState({});
 
@@ -225,9 +223,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
-              isValid: false,
-              helperText: "Debe seleccionar un deporte para la cancha",
-            }
+            isValid: false,
+            helperText: "Debe seleccionar un deporte para la cancha",
+          }
           : true,
       lookup: sports,
       render: (rowData) => rowData.sport.name,
@@ -253,9 +251,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.name === undefined || rowData.name === ""
           ? {
-              isValid: false,
-              helperText: "El nombre de la cancha no puede estar vacio",
-            }
+            isValid: false,
+            helperText: "El nombre de la cancha no puede estar vacio",
+          }
           : true,
     },
     {
@@ -264,9 +262,9 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.courtType === undefined
           ? {
-              isValid: false,
-              helperText: "Debe seleccionar la Superficie de la Cancha",
-            }
+            isValid: false,
+            helperText: "Debe seleccionar la Superficie de la Cancha",
+          }
           : true,
       //lookup: (rowData) => getSurfaces(rowData.sport),
       lookup: surfaces,
@@ -279,11 +277,11 @@ const ListaCanchas = ({ institutionId }) => {
       type: "numeric",
       validate: (rowData) =>
         rowData.signPercentage < 0 ||
-        rowData.signPercentage > 100 ||
-        rowData.signPercentage === undefined
+          rowData.signPercentage > 100 ||
+          rowData.signPercentage === undefined
           ? {
-              isValid: false,
-            }
+            isValid: false,
+          }
           : true,
       render: (rowData) =>
         rowData.signPercentage === undefined || rowData.signPercentage === 0
@@ -442,19 +440,19 @@ const ListaCanchas = ({ institutionId }) => {
 
     let cancha = { newCancha };
 
-    if (horariosYPrecios.schedules) {
-      const horarios = horariosYPrecios.schedules.map((s) =>
+    if (schedules) {
+      const horarios = schedules.map((s) =>
         s
           ? {
-              ...s,
-              ["from"]: moment(s.from).format("HH:mm"),
-              ["to"]: moment(s.to).format("HH:mm"),
-            }
+            ...s,
+            ["from"]: moment(s.from).format("HH:mm"),
+            ["to"]: moment(s.to).format("HH:mm"),
+          }
           : s
       );
-      horariosYPrecios.schedules = horarios;
+      schedules = horarios;
 
-      cancha = { ...newCancha, ["schedule"]: horariosYPrecios };
+      cancha = { ...newCancha, ["schedules"]: schedules };
     } else {
       console.log("no hay horarios cargados");
     }
@@ -497,7 +495,7 @@ const ListaCanchas = ({ institutionId }) => {
   const updateCancha = async (canchaToUpdated) => {
     console.log("canchaToUpdated");
 
-    const cancha = { ...canchaToUpdated, ["schedule"]: horariosYPrecios };
+    const cancha = { ...canchaToUpdated, ["schedules"]: schedules };
 
     console.log(cancha);
 
@@ -602,7 +600,7 @@ const ListaCanchas = ({ institutionId }) => {
 
         return acc;
       },
-      {});
+        {});
 
       setSurfaces(dynamicLookupSurfaces);
     } else {
@@ -773,8 +771,8 @@ const ListaCanchas = ({ institutionId }) => {
         <FormularioHorarioPrecioCancha
           open={open}
           setOpen={setOpen}
-          horariosYPrecios={horariosYPrecios}
-          setHorariosYPrecios={setHorariosYPrecios}
+          schedules={schedules}
+          setSchedules={setSchedules}
           isMultipleEdit={isMultipleEdit}
         />
       )}

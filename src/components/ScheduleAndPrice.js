@@ -46,11 +46,11 @@ NumberFormatCustom.propTypes = {
 };
 
 const ScheduleAndPrice = ({
+  handleChangeHorarios,
   horario,
   diaYHorarioId,
   removeHorario,
   setHorarios,
-  setHorariosYPrecios,
   min,
   max,
   fieldsToShow,
@@ -99,47 +99,35 @@ const ScheduleAndPrice = ({
     });
   }, []);
 
+  const handleChangeFrom = (e) => {
+    console.log("HANDLE CHANGE FROM HORARIO");
+    handleChangeHorarios(diaYHorarioId, id, e, to);
+  };
+
+  const handleChangeTo = (e) => {
+    console.log("HANDLE CHANGE TO HORARIO");
+    handleChangeHorarios(diaYHorarioId, id, from, e);
+  };
+
   return (
     <Grid container spacing={3} alignItems="center">
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Grid item xs>
           <MobileTimePicker
-            InputProps={{ readOnly: true }}
             label="Desde"
             name="from"
             value={from}
-            onChange={(newValue) => {
-              setHorarios((horarios) => {
-                console.log("modificando horario de cancha desde");
-                console.log(horarios);
-                let horariosUpdated = horarios.map((horario) =>
-                  horario.id === id
-                    ? { ...horario, ["from"]: newValue }
-                    : horario
-                );
-
-                return [...horariosUpdated];
-              });
-            }}
+            onChange={handleChangeFrom}
             renderInput={(params) => <TextField {...params} />}
             minTime={min}
           />
         </Grid>
         <Grid item xs>
           <MobileTimePicker
-            InputProps={{ readOnly: true }}
             label="Hasta"
             name="to"
             value={to}
-            onChange={(newValue) => {
-              setHorarios((horarios) => {
-                let horariosUpdated = horarios.map((horario) =>
-                  horario.id === id ? { ...horario, ["to"]: newValue } : horario
-                );
-
-                return [...horariosUpdated];
-              });
-            }}
+            onChange={handleChangeTo}
             renderInput={(params) => <TextField {...params} />}
             shouldDisableTime={(timeValue, clockType) => {
               if (clockType === "minutes" && timeValue !== from.getMinutes()) {
