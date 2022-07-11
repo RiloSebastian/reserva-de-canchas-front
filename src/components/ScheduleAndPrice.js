@@ -15,6 +15,8 @@ import TextField from "@mui/material/TextField";
 import PropTypes from "prop-types";
 import NumberFormat from "react-number-format";
 
+import { useConfirm } from "material-ui-confirm";
+
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
   props,
   ref
@@ -49,12 +51,15 @@ const ScheduleAndPrice = ({
   handleChangeHorarios,
   horario,
   diaYHorarioId,
-  removeHorario,
   setHorarios,
   min,
   max,
   fieldsToShow,
+  handleDeleteHorarios,
+  details
 }) => {
+  const confirm = useConfirm();
+
   const { id, precio, enabled, from, to } = horario;
 
   const handleChange = (e) => {
@@ -81,6 +86,31 @@ const ScheduleAndPrice = ({
     }
   };
 
+  const handleChangeFrom = (e) => {
+    console.log("HANDLE CHANGE FROM HORARIO");
+    handleChangeHorarios(diaYHorarioId, id, e, to);
+  };
+
+  const handleChangeTo = (e) => {
+    console.log("HANDLE CHANGE TO HORARIO");
+    handleChangeHorarios(diaYHorarioId, id, from, e);
+  };
+
+  const removeHorario = (horarioId, diaYHorarioId) => {
+    console.log("REMOVER HORARIO PARA LOS DIAS SELECCIONADOS");
+
+    confirm({
+      title: "¿Esta Seguro que desea eliminar este horario?",
+      cancellationText: "Cancelar",
+    })
+      .then(() => {
+        console.log("ELIMINANDO HORARIOS");
+
+        handleDeleteHorarios(horarioId, diaYHorarioId);
+      })
+      .catch(() => console.log("Deletion cancelled."));
+  };
+
   useEffect(() => {
     setHorarios((horarios) => {
       let horariosUpdated = horarios.map((horario) =>
@@ -98,16 +128,6 @@ const ScheduleAndPrice = ({
       return [...horariosUpdated];
     });
   }, []);
-
-  const handleChangeFrom = (e) => {
-    console.log("HANDLE CHANGE FROM HORARIO");
-    handleChangeHorarios(diaYHorarioId, id, e, to);
-  };
-
-  const handleChangeTo = (e) => {
-    console.log("HANDLE CHANGE TO HORARIO");
-    handleChangeHorarios(diaYHorarioId, id, from, e);
-  };
 
   return (
     <Grid container spacing={3} alignItems="center">
@@ -173,13 +193,16 @@ const ScheduleAndPrice = ({
       </Grid>
       <Grid hidden={fieldsToShow.delete} item xs>
         <IconButton
+          disabled={details.length === 1}
+          fontSize="inherit"
+          sx={{ color: pink[500] }}
           onClick={() => {
             removeHorario(id, diaYHorarioId);
           }}
           aria-label="delete"
           size="large"
         >
-          <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
+          <DeleteIcon />
         </IconButton>
       </Grid>
     </Grid>

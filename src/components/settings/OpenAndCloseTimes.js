@@ -85,18 +85,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
 
   const [noSchedulesLoadedOpen, setNoSchedulesLoadedOpen] = useState(false);
 
-  const updateDays = (dayUpdated) => {
-    dispatch({ type: "UPDATE_DAYS_AND_SCHEDULES", days: dayUpdated });
-  };
-
-  const addNewDaysAndSchechedules = (dayUpdated) => {
-    dispatch({ type: "add", days: dayUpdated });
-  };
-
-  const removeDaysAndSchechedules = () => {
-    dispatch({ type: "remove" });
-  };
-
   const useStyles = makeStyles((theme) => ({
     ...theme.typography.body2,
     textAlign: "center",
@@ -108,12 +96,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
   const classes = useStyles();
 
   const theme = useTheme();
-
-  const [institutionSchedule, setInstitutionSchedule] = useState({
-    forType: "INSTITUTION",
-    daysAvailable: [],
-    details: [],
-  });
 
   const [disabled, setDisabled] = useState(true);
 

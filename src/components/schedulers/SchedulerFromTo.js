@@ -64,7 +64,6 @@ const SchedulerFromTo = ({
   handleChangeHorarios,
   diaYHorarioId,
   details,
-  setDiasYHorarios,
   handleDeleteHorarios,
 }) => {
   const confirm = useConfirm();
@@ -97,15 +96,6 @@ const SchedulerFromTo = ({
       })
       .catch(() => console.log("Deletion cancelled."));
   };
-
-  useEffect(() => {
-    console.log("CARGANDO HORARIOS DESDE - HASTA");
-    console.log(detail);
-    console.log(handleChangeHorarios);
-    console.log(diaYHorarioId);
-    console.log(details);
-    console.log(setDiasYHorarios);
-  }, []);
 
   return (
     <Grid sx={{ m: 1 }} container spacing={3} alignItems="center">

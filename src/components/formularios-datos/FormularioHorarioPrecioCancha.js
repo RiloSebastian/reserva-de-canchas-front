@@ -29,6 +29,13 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ButtonAddMoreDatesAndTime from "../ui/datesAndTimes/ButtonAddMoreDatesAndTime";
+
+import FormControl from "@mui/material/FormControl";
+import DaysAndSchedulePaper from "../ui/datesAndTimes/DaysAndSchedulePaper";
+import { useConfirm } from "material-ui-confirm";
+import { pink } from "@mui/material/colors";
+import { getNextFromTime } from "../../validations/validationTime";
 
 const useStyles = makeStyles((theme) => ({
   ...theme.typography.body2,
@@ -45,7 +52,11 @@ const FormularioHorarioPrecioCancha = ({
   setSchedules,
   isMultipleEdit,
 }) => {
+  const confirm = useConfirm();
   const institution = useSelector((state) => state.institution);
+
+  const [noSchedulesLoadedOpen, setNoSchedulesLoadedOpen] = useState(false);
+
 
   const [min, setMin] = useState(new Date());
 
@@ -98,7 +109,7 @@ const FormularioHorarioPrecioCancha = ({
   const nuevoDiaYHorario = {
     id: "",
     dias: daysSelected,
-    horarios: [nuevoHorario],
+    details: [nuevoHorario],
   };
 
   const handleChange = (e) => {
@@ -114,6 +125,8 @@ const FormularioHorarioPrecioCancha = ({
   };
 
   const handleGuardarHorariosYPrecios = () => {
+    console.log("GUARDANDO PRECIOS Y HORARIOS DE LA CANCHA")
+    console.log(horarios)
     /* setLoading(true);
 
     setHorariosYPrecios((body) => {
@@ -128,18 +141,67 @@ const FormularioHorarioPrecioCancha = ({
     setOpen(false);
   };
 
+  const handleAddNewDatesSchedules = () => {
+    setDisabled(true);
+    console.log("agregando nuevos dias y horarios");
+    console.log(nuevoDiaYHorario);
+    console.log("Dias Seleccionados");
+    console.log(daysSelected);
+
+    const newDayAndSchedule = [
+      ...diasYHorarios,
+      { ...nuevoDiaYHorario, id: uuidv4() },
+    ];
+
+    console.log(newDayAndSchedule);
+    setDiasYHorarios(newDayAndSchedule);
+  };
+
+  const removeDaysAndSchedule = (diaYHorarioId) => {
+    if (
+      window.confirm(
+        "Esta Seguro que desea eliminar estos dias y horarios?" + diaYHorarioId
+      )
+    ) {
+      console.log("removiendo dias y horarios");
+      console.log(diasYHorarios);
+      const diasYHorariosUpdated = diasYHorarios.filter(
+        (diaYHorario) => diaYHorario.id !== diaYHorarioId
+      );
+
+      console.log("y quedan !!! ");
+      console.log(diasYHorariosUpdated);
+
+      setDiasYHorarios(diasYHorariosUpdated);
+    }
+  };
+
   const handleAddNewSchedule = (id) => {
     console.log("agregando nuevo horario para la card -> " + id);
-    console.log(nuevoHorario);
 
-    console.log(diasYHorarios);
+    const diaYHorario = diasYHorarios.filter((diaYHorario) => diaYHorario.id === id)
+    const from = getNextFromTime(diaYHorario[0].details);
+
+    const nuevoHorario = {
+      id: uuidv4(),
+      from,
+      to: new Date(new Date(from).setHours(new Date(from).getHours() + 1)),
+    };
+
+    console.log(nuevoHorario);
 
     const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
       if (diaYHorario.id === id) {
-        const horariosUpdated = [...diaYHorario.horarios, nuevoHorario];
+        console.log("HORARIOS PARA LOS DIAS SELECCIONADOS ENCONTRADO");
+        console.log(diaYHorario);
+
+        const horariosUpdated = [...diaYHorario.details, nuevoHorario];
+
+        console.log("HORARIOS ACTUALIZADOS LUEGO DE AGREGAR UNO NUEVO");
+        console.log(horariosUpdated);
         return {
           ...diaYHorario,
-          horarios: horariosUpdated,
+          details: horariosUpdated,
         };
       } else {
         return diaYHorario;
@@ -149,35 +211,30 @@ const FormularioHorarioPrecioCancha = ({
     setDiasYHorarios(diasYHorariosUpdated);
   };
 
-  const handleAddNewDatesSchedules = () => {
-    console.log("agregando nuevos dias y horarios");
-    console.log(nuevoDiaYHorario);
+  const handleDeleteHorarios = (horarioId, diaYHorarioId) => {
+    console.log("HANDLE DELETE HORARIOS");
+    console.log("HORARIO " + horarioId);
 
-    const newDayAndSchedule = [...diasYHorarios, nuevoDiaYHorario];
+    console.log(diasYHorarios);
+    console.log(diaYHorarioId);
 
-    console.log(newDayAndSchedule);
-    setDiasYHorarios(newDayAndSchedule);
-  };
+    const diasYHorariosUpdated = diasYHorarios.map((day) => {
+      if (day.id === diaYHorarioId) {
+        const horariosUpdated = day.details.filter(
+          (horario) => horario.id !== horarioId
+        );
 
-  const removeHorario = (id, diaYHorarioId) => {
-    if (window.confirm("Esta Seguro que desea eliminar este horario?" + id)) {
-      const diasYHorariosUpdated = diasYHorarios.map((diaYHorario) => {
-        if (diaYHorario.id === diaYHorarioId) {
-          const horariosUpdated = diaYHorario.horarios.filter(
-            (horario) => horario.id !== id
-          );
+        return {
+          ...day,
+          details: horariosUpdated,
+        };
+      }
+      return day;
+    });
 
-          return {
-            ...diaYHorario,
-            horarios: horariosUpdated,
-          };
-        }
-
-        return diaYHorario;
-      });
-
-      setDiasYHorarios(diasYHorariosUpdated);
-    }
+    console.log(" HORARIOS ACTUALIZADOS");
+    console.log(diasYHorariosUpdated);
+    setDiasYHorarios(diasYHorariosUpdated);
   };
 
   const handleDisableAddNewDatesSchedules = () => {
@@ -227,6 +284,35 @@ const FormularioHorarioPrecioCancha = ({
     setDiasYHorarios(diasYHorariosUpdated);
   };
 
+  const handleDelete = (item) => {
+    confirm({
+      title: "¿Esta Seguro que desea eliminar este horario?",
+      cancellationText: "Cancelar",
+    })
+      .then(() => {
+        const dayUpdated = daysSelected.map((day) => {
+          if (day.daysAndTimesId === item.id) {
+            return {
+              ...day,
+              selected: false,
+              daysAndTimesId: null,
+            };
+          }
+          return day;
+        });
+        setDaysSelected(dayUpdated);
+
+        if (
+          diasYHorarios.filter((other) => other.id !== item.id).length === 0
+        ) {
+          setNoSchedulesLoadedOpen(true);
+        }
+
+        setDiasYHorarios(diasYHorarios.filter((other) => other.id !== item.id));
+      })
+      .catch(() => console.log("Deletion cancelled."));
+  };
+
   useEffect(() => {
     const minTime = new Date(
       new Date(
@@ -250,11 +336,11 @@ const FormularioHorarioPrecioCancha = ({
 
     setDiasYHorarios([
       {
-        id: "",
+        id: uuidv4(),
         dias: daysSelected,
-        horarios: [
+        details: [
           {
-            id: "",
+            id: uuidv4(),
             from: minTime,
             to: maxTime,
             price: "",
@@ -404,79 +490,100 @@ const FormularioHorarioPrecioCancha = ({
             </Box>
           )}
 
-          {diasYHorarios.map((diaYHorario, key) => {
-            diaYHorario.id = key;
-            //diaYHorario.id = uuidv4();
-            return (
-              <Paper className={classes}>
-                <Box key={key} textAlign="center" sx={{ m: 4 }}>
-                  <Box textAlign="left" sx={{ mt: 4 }}>
-                    <p>Dias de la Semana</p>
-                    <SelectWeekDays
-                      setDaysSelected={setDaysSelected}
-                      daysSelected={daysSelected}
-                      daysAndTimesId={diaYHorario.id}
-                      fieldsToShow={fieldsToShow}
-                    />
-                  </Box>
-                  <Box textAlign="left" sx={{ mt: 4 }}>
-                    <p>Horarios</p>
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs>
+              <FormControl sx={{ m: 1 }}>
+                <List>
+                  {diasYHorarios.map((diaYHorario) => (
+                    <ListItem key={diaYHorario.id}>
+                      <Paper className={classes}>
+                        <Box key={diaYHorario.id} textAlign="center" sx={{ m: 4 }}>
+                          <Box textAlign="left" sx={{ mt: 4 }}>
+                            <p>Dias de la Semana</p>
+                            <SelectWeekDays
+                              setDaysSelected={setDaysSelected}
+                              daysSelected={daysSelected}
+                              daysAndTimesId={diaYHorario.id}
+                              fieldsToShow={fieldsToShow}
+                            />
+                          </Box>
+                          <Box textAlign="left" sx={{ mt: 4 }}>
+                            <p>Horarios</p>
 
-                    <List>
-                      {diaYHorario.horarios.map((horario) => (
-                        <ListItem key={horario.id}>
-                          <ScheduleAndPrice
-                            handleChangeHorarios={handleChangeHorarios}
-                            key={key}
-                            horario={horario}
-                            diaYHorarioId={diaYHorario.id}
-                            removeHorario={removeHorario}
-                            setHorarios={setHorarios}
-                            min={min}
-                            max={max}
-                            fieldsToShow={fieldsToShow}
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
+                            <List>
+                              {diaYHorario.details.map((horario) => (
+                                <ListItem key={horario.id}>
+                                  <ScheduleAndPrice
+                                    handleChangeHorarios={handleChangeHorarios}
+                                    horario={horario}
+                                    diaYHorarioId={diaYHorario.id}
+                                    setHorarios={setHorarios}
+                                    min={min}
+                                    max={max}
+                                    fieldsToShow={fieldsToShow}
+                                    handleDeleteHorarios={handleDeleteHorarios}
+                                    details={diaYHorario.details}
+                                  />
+                                </ListItem>
+                              ))}
+                            </List>
 
-                    <Box textAlign="center" sx={{ mt: 2, pb: 2 }}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<AddCircleOutlineIcon />}
-                        onClick={() => handleAddNewSchedule(key)}
-                      >
-                        Agregar Mas Horarios
-                      </Button>
-                    </Box>
-                  </Box>
-                </Box>
-              </Paper>
-            );
-          })}
+                            <Box textAlign="center" sx={{ mt: 2, pb: 2 }}>
+                              <Button
+                                variant="outlined"
+                                startIcon={<AddCircleOutlineIcon />}
+                                onClick={() => handleAddNewSchedule(diaYHorario.id)}
+                              >
+                                Agregar Mas Horarios
+                              </Button>
+                            </Box>
+                          </Box>
+                        </Box>
+                        <ListItemSecondaryAction>
+                          <Grid
+                            item
+                            sx={{
+                              width: 40,
+                              height: 40,
+                            }}
+                          >
+                            <IconButton
+                              disabled={diasYHorarios.length === 1}
+                              onClick={() => {
+                                handleDelete(diaYHorario);
+                              }}
+                              aria-label="delete"
+                              size="large"
+                              sx={{
+                                color: pink[500],
+                                width: 40,
+                                height: 40,
+                              }}
+                            >
+                              <DeleteIcon
+                                fontSize="inherit"
+                                sx={{
+                                  width: 40,
+                                  height: 40,
+                                }}
+                              />
+                            </IconButton>
+                          </Grid>
+                        </ListItemSecondaryAction>
+                      </Paper>
+                    </ListItem>
+                  ))}
+                </List>
+              </FormControl>
+            </Grid>
+          </Grid>
         </DialogContent>
 
-        <Box textAlign="center">
-          <IconButton
-            color="secondary"
-            aria-label="delete"
-            size="large"
-            disabled={
-              (daysSelected
-                .map((daySelected) => daySelected.selected)
-                .every((d) => d === false) ||
-                daysSelected
-                  .map((daySelected) => daySelected.selected)
-                  .every((d) => d === true)) &&
-              disableAddMoreDays
-            }
-          >
-            <AddCircleIcon
-              onClick={handleAddNewDatesSchedules}
-              sx={{ fontSize: 50 }}
-            />
-          </IconButton>
-        </Box>
+        <ButtonAddMoreDatesAndTime
+          daysSelected={daysSelected}
+          handleAddNewDatesSchedules={handleAddNewDatesSchedules}
+          disabled={disabled}
+        />
 
         <Box textAlign="center" sx={{ m: 2 }}>
           <LoadingButton

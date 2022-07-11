@@ -137,10 +137,8 @@ const DaysAndSchedulePaper = ({
             <Grid item xs>
               <SelectWeekDays
                 setDaysSelected={setDaysSelected}
-                setHorarios={setHorario}
                 daysSelected={daysSelected}
                 daysAndTimesId={diaYHorario.id}
-                diaYHorario={diaYHorario}
               />
             </Grid>
             <Grid item>
