@@ -102,7 +102,7 @@ const FormularioHorarioPrecioCancha = ({
   };
 
   const handleChange = (e) => {
-    if (e.target.type === "checkbox") {
+    /* if (e.target.type === "checkbox") {
       setHorariosYPrecios((form) => {
         return { ...form, [e.target.name]: e.target.checked };
       });
@@ -110,17 +110,17 @@ const FormularioHorarioPrecioCancha = ({
       setHorariosYPrecios((form) => {
         return { ...form, [e.target.name]: e.target.value };
       });
-    }
+    } */
   };
 
   const handleGuardarHorariosYPrecios = () => {
-    setLoading(true);
+    /* setLoading(true);
 
     setHorariosYPrecios((body) => {
       return { ...body, ["schedules"]: horarios };
     });
 
-    setOpen(false);
+    setOpen(false); */
   };
 
   const handleClose = () => {
