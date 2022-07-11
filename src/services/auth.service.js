@@ -1,4 +1,5 @@
 import axios from "axios";
+import { persistor } from "../store";
 
 const API_URL = "http://localhost:8080/api/auth/";
 
@@ -12,9 +13,20 @@ const login = async (username, password) => {
       console.log("obteniendo usuario");
       console.log(response);
       if (response.data.token) {
-        localStorage.setItem("user", JSON.stringify(response.data));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...response.data,
+            photo:
+              "https://upload.wikimedia.org/wikipedia/commons/e/e4/Roger_Federer_%2818566686046%29.jpg",
+          })
+        );
       }
-      return response.data;
+      return {
+        ...response.data,
+        photo:
+          "https://upload.wikimedia.org/wikipedia/commons/e/e4/Roger_Federer_%2818566686046%29.jpg",
+      };
     })
     .catch((err) => {
       console.log("error al ingresar");
@@ -25,10 +37,19 @@ const login = async (username, password) => {
 
 const logout = () => {
   localStorage.removeItem("user");
-  localStorage.removeItem("persist");
+  localStorage.removeItem("institution");
+  localStorage.removeItem("token");
+  persistor.purge();
 };
 
-const register = async (firstName, lastName, userRole, email, password) => {
+const register = async (
+  firstName,
+  lastName,
+  userRole,
+  email,
+  password,
+  telephone
+) => {
   return await axios
     .post(API_URL + "signup", {
       firstName,
@@ -36,6 +57,7 @@ const register = async (firstName, lastName, userRole, email, password) => {
       userRole,
       email,
       password,
+      telephone,
     })
     .then((response) => {
       console.log("registrnado usuario");
@@ -60,7 +82,7 @@ const getCurrentUser = () => {
 const sendVerificationEmail = async (email) => {
   return await axios
     .post(API_URL + "verification", {
-      email
+      email,
     })
     .then((response) => {
       console.log("email enviado correctamente al usuario");

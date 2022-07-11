@@ -43,6 +43,8 @@ import { v4 as uuidv4 } from "uuid";
 import CardActions from "@mui/material/CardActions";
 import Typography from "@mui/material/Typography";
 import CustomizedSnackbars from "../ui/CustomizedSnackbars";
+import { days } from "../../utils/days/days";
+import { setInstitution } from "../../actions/institution";
 
 const bull = (
   <Box
@@ -83,18 +85,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
 
   const [noSchedulesLoadedOpen, setNoSchedulesLoadedOpen] = useState(false);
 
-  const updateDays = (dayUpdated) => {
-    dispatch({ type: "UPDATE_DAYS_AND_SCHEDULES", days: dayUpdated });
-  };
-
-  const addNewDaysAndSchechedules = (dayUpdated) => {
-    dispatch({ type: "add", days: dayUpdated });
-  };
-
-  const removeDaysAndSchechedules = () => {
-    dispatch({ type: "remove" });
-  };
-
   const useStyles = makeStyles((theme) => ({
     ...theme.typography.body2,
     textAlign: "center",
@@ -106,12 +96,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
   const classes = useStyles();
 
   const theme = useTheme();
-
-  const [institutionSchedule, setInstitutionSchedule] = useState({
-    forType: "INSTITUTION",
-    daysAvailable: [],
-    details: [],
-  });
 
   const [disabled, setDisabled] = useState(true);
 
@@ -153,11 +137,10 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
     ],
   };
 
-  const [day, setDay] = useState([]);
-
   const [diasYHorarios, setDiasYHorarios] = useState([]);
 
   const handleAddNewDatesSchedules = () => {
+    setDisabled(true);
     console.log("agregando nuevos dias y horarios");
     console.log(nuevoDiaYHorario);
     console.log("Dias Seleccionados");
@@ -294,8 +277,8 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       console.log("SETEANDO LOS HORARIOS");
       diaYHorario.details.forEach(({ from, to }) => {
         const timeFrame = {
-          from: from.getTime(),
-          to: to.getTime(),
+          from,
+          to,
         };
         details.push({ timeFrame });
       });
@@ -331,10 +314,10 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           console.log("SUBIENDO DIAS Y HORARIOS DE LA INSTITUCION");
           console.log(data);
 
-          data.forEach(schedule => {
+          /* data.forEach((schedule) => {
             handleUploadChanges(schedule);
-          })
-
+          }); */
+          handleUploadChanges(data);
         }
       })
       .catch(() => console.log("Deletion cancelled."));
@@ -348,8 +331,15 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           data
         ).then((data) => data);
 
-      console.log(" DIAS Y HORARIOS DE LA INSTITUCION CARGADOS EXITOSAMENTE");
+      console.log("DIAS Y HORARIOS DE LA INSTITUCION CARGADOS EXITOSAMENTE");
       console.log(schedulesCreated);
+
+      const institutionUpdated = await InstitucionService.get(
+        institution.id
+      ).then((data) => data);
+
+      dispatch(setInstitution(institutionUpdated));
+
       handleMessageLoaded(true);
     } catch (error) {
       console.log(" ERROR AL CARGAR LOS DIAS Y HORARIOS DE LA INSTITUCION ");
@@ -364,6 +354,9 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       firstUpdate.current = false;
       return;
     }
+
+    console.log("VALIDANDO CADA VEZ QUE SE SELECCIONA UN DIA");
+    console.log(daysSelected);
 
     //Validar si es necesario desabilitar el boton de agregar mas horarios
 
@@ -402,11 +395,19 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           setDiasYHorarios(diasYHorariosUpdated);
         }
 
+        console.log(
+          daysSelected.map((daySelected) => daySelected.daysAndTimesId)
+        );
+
         if (
           daysSelected
             .map((daySelected) => daySelected.selected)
-            .every((d) => d === true)
+            .every((d) => d === true) ||
+          !daysSelected
+            .map((daySelected) => daySelected.daysAndTimesId)
+            .includes(diaYHorario.id)
         ) {
+          console.log("DESHABILITAR BOTON PARA AGREGAR MAS DIAS");
           setDisabled(true);
         } else {
           setDisabled(false);
@@ -422,33 +423,26 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
     try {
       //obtener horarios seteados de la institucion
 
-      const institutionSchedules =
-        await InstitucionService.getInstitutionSchedules(institution.id).then(
-          (data) => data
-        );
-
-      console.log("horarios obtenidos");
-      console.log(institutionSchedules);
-
-      if (institution.schedules) {
+      if (institution.schedules && institution.schedules.length > 0) {
         //Cargamos los horarios
         console.log("CARGAMOS LOS HORARIOS DE LA INSTITUCION ENCONTRADOS");
         console.log(institution.schedules);
 
-        const daysAlreadySelected = [];
+        setDiasYHorarios(institution.schedules);
 
+        let daysAlreadySelected = [];
 
-        const daysAndSchedulesAlreadyLoaded = [];
+        let daysAndSchedulesAlreadyLoaded = [];
 
         institution.schedules.forEach((horario) => {
-
-          const schedulersAlreadySelected = [];
+          let id = uuidv4();
+          let schedulersAlreadySelected = [];
 
           horario.daysAvailable.forEach((dia) => {
             daysAlreadySelected.push({
               label: dia.charAt(0).toUpperCase() + dia.slice(1).toLowerCase(),
               value: dia,
-              daysAndTimesId: horario.id,
+              daysAndTimesId: id,
               selected: true,
             });
           });
@@ -456,14 +450,13 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           horario.details.forEach(({ timeFrame }) => {
             schedulersAlreadySelected.push({
               id: uuidv4(),
-              from: new Date(timeFrame.from),
-              to: new Date(timeFrame.to),
+              from: timeFrame.from,
+              to: timeFrame.to,
             });
           });
 
           daysAndSchedulesAlreadyLoaded.push({
-            id: horario.id,
-            parentId: institution.id,
+            id,
             daysAvailable: horario.daysAvailable,
             details: schedulersAlreadySelected,
           });
@@ -479,22 +472,16 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
           }
         });
 
-        const days = {
-          Lunes: 1,
-          Martes: 2,
-          Miercoles: 3,
-          Jueves: 4,
-          Viernes: 5,
-          Sabado: 6,
-          Domingo: 7,
-        };
-
         const arraySorted = daysAlreadySelected.sort((a, b) => {
           return days[a.label] - days[b.label];
         });
 
-        if (!arraySorted.map(diaSeleccionado => diaSeleccionado.selected).every(d => d === true)) {
-          setDisabled(false)
+        if (
+          !arraySorted
+            .map((diaSeleccionado) => diaSeleccionado.selected)
+            .every((d) => d === true)
+        ) {
+          setDisabled(false);
         }
 
         setDaysSelected(arraySorted.sort());
@@ -507,7 +494,7 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
 
       //setDiasYHorarios([nuevoDiaYHorario]);
     } catch (error) {
-      setDiasYHorarios([nuevoDiaYHorario]);
+      setDiasYHorarios([]);
       setNoSchedulesLoadedOpen(true);
     }
   }, []);
@@ -559,7 +546,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
                             diasYHorarios={diasYHorarios}
                             setDaysSelected={setDaysSelected}
                             daysSelected={daysSelected}
-                            diaYHorarioId={diaYHorario.id}
                             diaYHorario={diaYHorario}
                             setDiasYHorarios={setDiasYHorarios}
                             removeDaysAndSchedule={removeDaysAndSchedule}

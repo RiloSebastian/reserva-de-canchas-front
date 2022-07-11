@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { connectProps } from "@devexpress/dx-react-core";
 import { blue, green, orange, red, yellow } from "@mui/material/colors";
 import { styled, darken, alpha, lighten } from "@mui/material/styles";
@@ -56,7 +57,19 @@ import {
   validateEndtDayTime,
   validateStartDayTime,
 } from "../../validations/validationTime";
-moment.locale("es");
+import Container from "@material-ui/core/Container";
+import Box from "@material-ui/core/Box";
+import { LOAD_INSTITUTION_TIMES } from "../../actions/types";
+
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import AppointmentFormContainerBasic from "../../components/ui/devexpress/AppointmentFormContainerBasic";
+import { set } from "date-fns";
+import { AppointmentFormMessages } from "./localization-messages/AppointmentFormMessages";
+import AppointmentFormActions from "../../components/ui/devexpress/AppointmentFormActions";
 
 const PREFIX = "Demo";
 
@@ -96,9 +109,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const getBorder = (theme) =>
-  `1px solid ${theme.palette.mode === "light"
-    ? lighten(alpha(theme.palette.divider, 1), 0.88)
-    : darken(alpha(theme.palette.divider, 1), 0.68)
+  `1px solid ${
+    theme.palette.mode === "light"
+      ? lighten(alpha(theme.palette.divider, 1), 0.88)
+      : darken(alpha(theme.palette.divider, 1), 0.68)
   }`;
 
 const DayScaleCell = (props) => (
@@ -461,28 +475,58 @@ const sports = gettingSports();
 const ReservaGridCustom2 = () => {
   const dispatch = useDispatch();
 
+  let history = useHistory();
+
   const institution = useSelector((state) => state.institution);
+
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
+  const [previousAppointment, setPreviousAppointment] = useState(undefined);
+  const [deletedAppointmentId, setDeletedAppointmentId] = useState(undefined);
+  const [editingFormVisible, setEditingFormVisible] = useState(false);
+  const [isNewAppointment, setIsNewAppointment] = useState(false);
+
+  const [institutionHasCourts, setInstitutionHasCourts] = useState(true);
 
   const [startDayHour, setStartDayHour] = useState(7);
   const [endDayHour, setEndDayHour] = useState(23);
-  const [busyTimes, setBusyTimes] = useState([])
+  const [busyTimes, setBusyTimes] = useState([]);
 
   const [workingDays, setWorkingDays] = useState([]);
 
-  const [allowAdding, setAllowAdding] = useState(true);
+  // const [allowAdding, setAllowAdding] = useState(true);
+
+  const [addedAppointment, setAddedAppointment] = useState({});
+
+  const [appointmentChanges, setAppointmentChanges] = useState({});
+
+  const [editingAppointment, setEditingAppointment] = useState(undefined);
+
+  const [showAlert, setShowAlert] = useState(false);
 
   const DayScaleCellWeek = ({ ...restProps }) => {
     const { startDate } = restProps;
     if (Utils.isWeekend(startDate, workingDays)) {
       return (
-        <StyledWeekViewDayScaleCell {...restProps} className={classes.weekEnd} />
+        <StyledWeekViewDayScaleCell
+          {...restProps}
+          className={classes.weekEnd}
+        />
       );
     }
     return <StyledWeekViewDayScaleCell {...restProps} />;
   };
 
   const TimeTableCellWeek = ({ onDoubleClick, ...restProps }) => {
-    const { startDate } = restProps;
+    const { startDate, className } = restProps;
+    const isDisableDate =
+      Utils.isHoliday(startDate) || Utils.isWeekend(startDate, workingDays);
+    const isDinner = Utils.isDinner(startDate, busyTimes);
+
+    let allowAdding = true;
+
+    if (isDisableDate || isDinner) {
+      allowAdding = false;
+    }
 
     return (
       <StyledWeekViewTimeTableCell
@@ -490,29 +534,33 @@ const ReservaGridCustom2 = () => {
         {...restProps}
       >
         <DataCell
-          setAllowAdding={setAllowAdding}
-          workingDays={workingDays}
+          isDisableDate={isDisableDate}
+          isDinner={isDinner}
+          allowAdding={allowAdding}
           itemData={{ ...restProps }}
-          busyTimes={busyTimes}
+          //busyTimes={busyTimes}
         />
       </StyledWeekViewTimeTableCell>
     );
-
-    if (isRestTime(startDate)) {
-      return (
-        <StyledWeekViewTimeTableCell
-          {...restProps}
-          className={classes.nonWorkingCell}
-        />
-      );
-    }
-    return (
-      <StyledWeekViewTimeTableCell {...restProps}>
-        <TimeTableCellWeek2 {...restProps} />
-      </StyledWeekViewTimeTableCell>
-    );
-    //return ;
   };
+
+  /*  const TimeTableCellWeek = React.useCallback(React.memo(({ onDoubleClick, ...restProps }) => {
+     const allowAdding = true
+     return (
+       < StyledWeekViewTimeTableCell
+         onDoubleClick={allowAdding ? onDoubleClick : undefined}
+         {...restProps}
+       >
+         <DataCell
+           // setAllowAdding={setAllowAdding}
+           workingDays={workingDays}
+           itemData={{ ...restProps }}
+           busyTimes={busyTimes}
+         />
+       </StyledWeekViewTimeTableCell >
+     )
+   }
+   ), []); */
 
   const [grouping, setGrouping] = useState([
     {
@@ -650,6 +698,7 @@ const ReservaGridCustom2 = () => {
       newData = [...appointments, { id: startingAddedId, ...added }];
     }
     if (changed) {
+      console.log("ENTRANDO AL CHANGED");
       newData = appointments.map((appointment) =>
         changed[appointment.id]
           ? { ...appointment, ...changed[appointment.id] }
@@ -657,9 +706,11 @@ const ReservaGridCustom2 = () => {
       );
     }
     if (deleted !== undefined) {
-      newData = appointments.filter(
+      /* newData = appointments.filter(
         (appointment) => appointment.id !== deleted
-      );
+      ); */
+      setDeletedAppointmentId(deleted);
+      toggleConfirmationVisible();
     }
     setAppointments(newData);
   };
@@ -756,15 +807,130 @@ const ReservaGridCustom2 = () => {
     };
   });
 
-  const [addedAppointment, setAddedAppointment] = useState({});
+  const handleChangeEditingAppointment = (editingAppointment) => {
+    console.log("handleChangeEditingAppointment");
+    console.log(editingAppointment);
 
-  const [appointmentChanges, setAppointmentChanges] = useState({});
+    /* const isValidAppointment = Utils.isValidAppointment(
+      addedAppointment,
+      addedAppointment,
+      workingDays,
+      busyTimes
+    );
+    if (!isValidAppointment) {
+      addedAppointment.cancel = true;
+      console.log("MOSTRANDO ALERTA 3");
+      setShowAlert(true);
+      setAllowAdding(false);
+      setEditingAppointment(editingAppointment);
+      return;
+    }
+    setAllowAdding(true); */
+    setEditingAppointment(editingAppointment);
+  };
 
-  const [editingAppointment, setEditingAppointment] = useState({});
+  const toggleConfirmationVisible = () => {
+    console.log("ENTRANDO AL toggleConfirmationVisible");
 
-  const [isValidAppointment, setIsValidAppointment] = useState(false);
+    setConfirmationVisible(!confirmationVisible);
+  };
 
-  const [showAlert, setShowAlert] = useState(false);
+  const toggleEditingFormVisibility = () => {
+    setEditingFormVisible(!editingFormVisible);
+  };
+
+  /* const appointmentForm = connectProps(AppointmentFormContainerBasic, () => {
+    const currentAppointment =
+      appointments.filter(
+        (appointment) =>
+          editingAppointment && appointment.id === editingAppointment.id
+      )[0] || addedAppointment;
+    const cancelAppointment = () => {
+      if (isNewAppointment) {
+        this.setState({
+          editingAppointment: previousAppointment,
+          isNewAppointment: false,
+        });
+      }
+    };
+
+    return {
+      visible: editingFormVisible,
+      appointmentData: currentAppointment,
+      commitChanges: handleCommitChanges,
+      visibleChange: toggleEditingFormVisibility,
+      onEditingAppointmentChange: handleChangeEditingAppointment,
+      cancelAppointment,
+    };
+  }); */
+
+  const BasicLayout = ({ onFieldChange, appointmentData, ...restProps }) => {
+    const onCustomFieldChange = (nextValue) => {
+      onFieldChange({ customField: nextValue });
+    };
+
+    const currentAppointment =
+      appointments.filter(
+        (appointment) =>
+          editingAppointment && appointment.id === editingAppointment.id
+      )[0] || addedAppointment;
+    const cancelAppointment = () => {
+      if (isNewAppointment) {
+        this.setState({
+          editingAppointment: previousAppointment,
+          isNewAppointment: false,
+        });
+      }
+    };
+
+    return (
+      <AppointmentForm.BasicLayout
+        appointmentData={appointmentData}
+        onFieldChange={onFieldChange}
+        {...restProps}
+      >
+        <AppointmentForm.Label text="Correo Electronico" type="title" />
+        <AppointmentForm.TextEditor
+          value={appointmentData.customField}
+          onValueChange={onCustomFieldChange}
+          placeholder="Correo Electronico"
+        />
+        <AppointmentFormActions
+          visible={editingFormVisible}
+          visibleChange={toggleEditingFormVisibility}
+          appointmentData={currentAppointment}
+          cancelAppointment={cancelAppointment}
+          commitChanges={handleCommitChanges}
+          onEditingAppointmentChange={handleChangeEditingAppointment}
+        />
+      </AppointmentForm.BasicLayout>
+    );
+  };
+
+  const appointmentForm = connectProps(AppointmentFormContainerBasic, () => {
+    const currentAppointment =
+      appointments.filter(
+        (appointment) =>
+          editingAppointment && appointment.id === editingAppointment.id
+      )[0] || addedAppointment;
+    const cancelAppointment = () => {
+      if (isNewAppointment) {
+        this.setState({
+          editingAppointment: previousAppointment,
+          isNewAppointment: false,
+        });
+      }
+    };
+
+    return {
+      visible: editingFormVisible,
+      appointmentData: currentAppointment,
+      commitChanges: handleCommitChanges,
+      visibleChange: toggleEditingFormVisibility,
+      onEditingAppointmentChange: handleChangeEditingAppointment,
+      cancelAppointment,
+    };
+  });
 
   const handleChangeAddedAppointment = (addedAppointment) => {
     console.log("handleChangeAddedAppointment");
@@ -773,17 +939,18 @@ const ReservaGridCustom2 = () => {
     const isValidAppointment = Utils.isValidAppointment(
       addedAppointment,
       addedAppointment,
-      workingDays
+      workingDays,
+      busyTimes
     );
     if (addedAppointment && !isValidAppointment) {
       addedAppointment.cancel = true;
       console.log("MOSTRANDO ALERTA 1");
       setShowAlert(true);
-      setAllowAdding(false);
+      //setAllowAdding(false);
+      setAddedAppointment(addedAppointment);
       return;
     }
-    setAllowAdding(true);
-    setIsValidAppointment(true);
+    // setAllowAdding(true);
     setAddedAppointment(addedAppointment);
   };
 
@@ -794,60 +961,82 @@ const ReservaGridCustom2 = () => {
     const isValidAppointment = Utils.isValidAppointment(
       addedAppointment,
       addedAppointment,
-      workingDays
+      workingDays,
+      busyTimes
     );
     if (!isValidAppointment) {
       addedAppointment.cancel = true;
       console.log("MOSTRANDO ALERTA 2");
       setShowAlert(true);
+      //setAllowAdding(false);
+      setAppointmentChanges(appointmentChanges);
       return;
     }
-    setIsValidAppointment(false);
+    // setAllowAdding(true);
     setAppointmentChanges(appointmentChanges);
-  };
-
-  const handleChangeEditingAppointment = (editingAppointment) => {
-    console.log("handleChangeEditingAppointment");
-    console.log(editingAppointment);
-
-    const isValidAppointment = Utils.isValidAppointment(
-      addedAppointment,
-      addedAppointment,
-      workingDays
-    );
-    if (!isValidAppointment) {
-      addedAppointment.cancel = true;
-      console.log("MOSTRANDO ALERTA 3");
-      setShowAlert(true);
-      return;
-    }
-    setIsValidAppointment(true);
-    setEditingAppointment(editingAppointment);
   };
 
   const handleCloseAlert = () => {
     console.log("MOSTRANDO ALERTA 4");
     setShowAlert(false);
-    setIsValidAppointment(false);
   };
 
-  useEffect(() => {
-    //
+  const renderCourtPage = () => {
+    history.push("/dashboard/canchas");
+  };
+
+  const commitDeletedAppointment = () => {
+    let newData = appointments;
+
+    newData = appointments.filter(
+      (appointment) => appointment.id !== deletedAppointmentId
+    );
+
+    setAppointments(newData);
+    /* this.setState((state) => {
+      const { data, deletedAppointmentId } = state;
+      const nextData = data.filter(appointment => appointment.id !== deletedAppointmentId);
+   
+      return { data: nextData, deletedAppointmentId: null };
+    }); */
+    toggleConfirmationVisible();
+  };
+
+  const RecurrenceLayoutEditor = (props) => {
+    // eslint-disable-next-line react/destructuring-assignment
+    console.log("RENDERING RecurrenceLayoutEditor PROPS");
+    console.log(props);
+    return <AppointmentForm.RecurrenceLayout {...props} />;
+  };
+
+  const TextEditor = (props) => {
+    // eslint-disable-next-line react/destructuring-assignment
+    console.log("RENDERING TextEditor PROPS");
+    console.log(props);
+    if (props.type === "multilineTextEditor") {
+      return null;
+    }
+    return <AppointmentForm.TextEditor {...props} />;
+  };
+
+  const updateBookingGrid = () => {
     sportChange(1);
 
-    dispatch(getInstitutionSchedules(institution.id));
+    //OBTENER LOS DIAS LABORALES
 
-    let startDayTime;
+    //OBTENER LOS HORARIOS DE LA INSTITUCION
 
-    let endDayTime;
+    //dispatch(getInstitutionSchedules(institution.id));
 
+    /*  let startDayTime;
 
+    let endDayTime; */
 
     //OBTENER LOS DIAS LABORALES
     if (institution.schedules) {
       institution.schedules.forEach((schedule) => {
-        let horariosLaborales = []
-        let diasLaboralesSegmentados = []
+        let horariosLaborales = [];
+        let diasLaboralesSegmentados = [];
 
         schedule.daysAvailable.forEach((diaLaboral) => {
           switch (diaLaboral) {
@@ -865,7 +1054,7 @@ const ReservaGridCustom2 = () => {
             "dia: " + diaLaboral + " numero: " + moment().day(diaLaboral).day()
           );
 
-          diasLaboralesSegmentados.push(moment().day(diaLaboral).day())
+          diasLaboralesSegmentados.push(moment().day(diaLaboral).day());
 
           setWorkingDays((prevState) => {
             return [...prevState, moment().day(diaLaboral).day()];
@@ -876,7 +1065,7 @@ const ReservaGridCustom2 = () => {
         schedule.details.forEach((horario) => {
           console.log("VALIDANDO EL HORARIO MAS TEMPRANO Y MAS TARDE");
 
-          startDayTime = validateStartDayTime(
+          /* startDayTime = validateStartDayTime(
             startDayTime,
             new Date(horario.timeFrame.from).getHours()
           );
@@ -884,43 +1073,66 @@ const ReservaGridCustom2 = () => {
           endDayTime = validateEndtDayTime(
             endDayTime,
             new Date(horario.timeFrame.to).getHours()
-          );
+          ); */
 
-          console.log(
-            "horario desde: " +
-            new Date(horario.timeFrame.from).getHours() +
-            " hasta: " +
-            new Date(horario.timeFrame.to).getHours()
-          );
-
-          horariosLaborales.push(
-            {
-              from: new Date(horario.timeFrame.from).getHours(),
-              to: new Date(horario.timeFrame.to).getHours()
-            }
-          );
+          horariosLaborales.push({
+            from: new Date(horario.timeFrame.from).getHours(),
+            to: new Date(horario.timeFrame.to).getHours(),
+          });
         });
 
-        console.log("GUARDANDO HORARIOS LABORALES PARA BUSY TIMES")
-        console.log({ ...horariosLaborales, diasLaboralesSegmentados })
+        console.log("GUARDANDO HORARIOS LABORALES PARA BUSY TIMES");
+        console.log({ ...horariosLaborales, diasLaboralesSegmentados });
 
         setBusyTimes((prevState) => {
-          return [...prevState, { horariosLaborales, diasLaboralesSegmentados }];
+          return [
+            ...prevState,
+            { horariosLaborales, diasLaboralesSegmentados },
+          ];
         });
         //  setBusyTimes(horariosLaborales);
       });
 
-      setStartDayHour(startDayTime);
-      setEndDayHour(endDayTime);
+      /* dispatch({
+        type: LOAD_INSTITUTION_TIMES,
+        payload: { startDayTime, endDayTime },
+      }); */
 
+      console.log("SETEANDO HORARIO MINIM Y MAXIMO DE LA INSTITUCION");
+      console.log(moment(institution.scheduleMinTime).hour());
+      console.log(moment(institution.scheduleMaxTime).hour());
 
+      //setStartDayHour(moment(institution.scheduleMinTime).hour());
+      //setEndDayHour(moment(institution.scheduleMaxTime).hour());
+      setStartDayHour(8);
+      setEndDayHour(23);
     }
 
-
     //Obtener todas las reservas hechas para la institucion
+  };
+
+  useEffect(() => {
+    console.log("CARGANDO EL COMPONENTE DE RESERVAS");
+
+    updateBookingGrid();
+
+    //const institution = JSON.parse(localStorage.getItem("institution"));
+    //OBTENER LAS RESERVAS POR INSTITUCION
   }, []);
 
-  return (
+  const firstUpdate = useRef(true);
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
+    console.log("ACTUALIZAR CADA VEZ QUE SE MODIFIQUEN LOS HORARIOS");
+
+    updateBookingGrid();
+    //Obtener todas las reservas hechas para la institucion
+  }, [institution.schedules]);
+
+  return institutionHasCourts ? (
     <>
       <Paper>
         <Scheduler
@@ -929,12 +1141,14 @@ const ReservaGridCustom2 = () => {
         >
           <EditingState
             onCommitChanges={handleCommitChanges}
-            addedAppointment={addedAppointment}
-            onAddedAppointmentChange={handleChangeAddedAppointment}
-            appointmentChanges={appointmentChanges}
-            onAppointmentChangesChange={handleChangeAppointmentChanges}
-            editingAppointment={editingAppointment}
             onEditingAppointmentChange={handleChangeEditingAppointment}
+            //onAddedAppointmentChange={handleChangeAddedAppointment}
+            /* addedAppointment={addedAppointment}0  
+          onAddedAppointmentChange={handleChangeAddedAppointment}
+          appointmentChanges={appointmentChanges}
+          onAppointmentChangesChange={handleChangeAppointmentChanges}
+          editingAppointment={editingAppointment}
+          onEditingAppointmentChange={handleChangeEditingAppointment} */
           />
           <ViewState defaultCurrentDate="2018-07-17" />
           <GroupingState grouping={grouping} />
@@ -964,15 +1178,49 @@ const ReservaGridCustom2 = () => {
           <IntegratedGrouping />
           <IntegratedEditing />
 
-          <ConfirmationDialog messages={ConfirmationDialogMessages} />
+          {/* <ConfirmationDialog messages={ConfirmationDialogMessages} /> */}
 
           <AppointmentTooltip showCloseButton showDeleteButton showOpenButton />
-          <AppointmentForm />
+          <AppointmentForm
+            //overlayComponent={appointmentForm}
+            basicLayoutComponent={BasicLayout}
+            visible={editingFormVisible}
+            onVisibilityChange={toggleEditingFormVisibility}
+            textEditorComponent={TextEditor}
+            recurrenceLayoutComponent={RecurrenceLayoutEditor}
+            messages={AppointmentFormMessages}
+          />
           <GroupingPanel />
           <ViewSwitcher />
           <TodayButton messages={TodayButtonMessages} />
         </Scheduler>
       </Paper>
+
+      <Dialog open={confirmationVisible}>
+        <DialogTitle>Eliminar Reserva</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            ¿Está seguro de que desea eliminar esta reserva?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={toggleConfirmationVisible}
+            color="primary"
+            variant="outlined"
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={commitDeletedAppointment}
+            color="secondary"
+            variant="outlined"
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Snackbar
         open={showAlert}
         autoHideDuration={6000}
@@ -987,6 +1235,43 @@ const ReservaGridCustom2 = () => {
         </Alert>
       </Snackbar>
     </>
+  ) : (
+    <Paper>
+      <Box
+        width="100%"
+        top={0}
+        p={4}
+        zIndex="modal"
+        color="textSecondary"
+        bgcolor="background.header"
+      >
+        <Container maxWidth="md" className={classes.container}>
+          <Typography
+            variant="h5"
+            component="h2"
+            gutterBottom={true}
+            className={classes.header}
+          >
+            La Institucion aun no Posee Canchas Registradas
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            color="textSecondary"
+            paragraph={true}
+          >
+            Haga Click en el siguiente Boton para crear su primer Cancha
+          </Typography>
+          <Button
+            onClick={renderCourtPage}
+            variant="contained"
+            color="primary"
+            className={classes.action}
+          >
+            Ir al Menu de Canchas
+          </Button>
+        </Container>
+      </Box>
+    </Paper>
   );
 };
 export default ReservaGridCustom2;

@@ -33,6 +33,8 @@ import InstitutionRoutes, {
 } from "./../../pages/routes";
 import useStyles from "./menuBarStyles";
 import getMenu from "./sideBarItems";
+import { ConfirmProvider } from "material-ui-confirm";
+import { Avatar } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -70,7 +72,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -88,7 +89,6 @@ const AppBar = styled(MuiAppBar, {
     }),
   }),
 }));
-
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -128,6 +128,8 @@ const getRoleRoutes = (role) => {
 };
 
 const MenuBar = (props) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -185,13 +187,9 @@ const MenuBar = (props) => {
     </div>
   ));
 
-  const user = JSON.parse(JSON.parse(AuthService.getCurrentUser()));
-
   const BASE_URL = getBaseUrl(user.roles[0]);
 
   const handleMenu = () => {
-    const user = JSON.parse(JSON.parse(AuthService.getCurrentUser()));
-
     let menu = getMenu(user);
 
     return menu.map(({ visible, name, url, links, icon }) => {
@@ -347,7 +345,14 @@ const MenuBar = (props) => {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <AccountCircle />
+              {user.photo ? (
+                <Avatar
+                  //src={user.avatar}
+                  src={user.photo}
+                />
+              ) : (
+                <AccountCircle />
+              )}
             </IconButton>
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>

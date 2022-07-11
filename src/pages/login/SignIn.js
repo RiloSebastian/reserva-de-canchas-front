@@ -16,8 +16,21 @@ import AuthService from "../../services/auth.service";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 import InstitucionService from "../../services/instituciones/InstitucionService";
 import { useDispatch } from "react-redux";
-import { getByAdminEmail } from "../../actions/institution";
+import {
+  getByAdminEmail,
+  getInstitutionSchedules,
+  setInstitution,
+} from "../../actions/institution";
 import EmailService from "../../services/email/EmailService";
+
+import IconButton from "@mui/material/IconButton";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import InputAdornment from "@mui/material/InputAdornment";
+import FormControl from "@mui/material/FormControl";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import FormHelperText from "@mui/material/FormHelperText";
 
 function Copyright(props) {
   return (
@@ -50,9 +63,88 @@ const SignIn = (props) => {
 
   const dispatch = useDispatch();
 
+  const [values, setValues] = useState({
+    username: "",
+    password: "",
+  });
+
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+  });
+
+  const validate = (name, value) => {
+    switch (name) {
+      case "username":
+        if (!value) {
+          return "Email es Requerido";
+        } else if (
+          !value.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)
+        ) {
+          return "Introduzca una dirección de correo electrónico válida";
+        } else {
+          return "";
+        }
+      case "password":
+        if (!value) {
+          return "La Contraseña es Requerida";
+        } else if (value.length < 6) {
+          return "Por favor complete con al menos 6 caracteres";
+        } else if (!value.match(/[a-z]/g)) {
+          return "Por favor, Ingrese al menos una minúscula.";
+        } else if (!value.match(/[A-Z]/g)) {
+          return "Por favor, Ingrese al menos una mayúscula.";
+        } else if (!value.match(/[0-9]/g)) {
+          return "Por favor, Ingrese al menos valor numérico.";
+        } else if (!value.match(/[!@#&:;'.,?_/*~$^=<>\(\)–\[\{}\]\+]/g)) {
+          return "Por favor, Ingrese al menos un caracter especial.";
+        } else {
+          return "";
+        }
+      default: {
+        return "";
+      }
+    }
+  };
+
   const [showMessageError, setShowMessageError] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
+
+  const handleUserInput = (e) => {
+    console.log("handleUserInput");
+    console.log(
+      "[e.target.name]: " +
+        [e.target.name] +
+        " [e.target.value]: " +
+        [e.target.value]
+    );
+    console.log("handleUserInput");
+
+    setErrors((prevState) => {
+      return {
+        ...prevState,
+        [e.target.name]: validate(e.target.name, e.target.value),
+      };
+    });
+    setValues((prevState) => {
+      return {
+        ...prevState,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+
+  const handleClickShowPassword = () => {
+    setValues({
+      ...values,
+      showPassword: !values.showPassword,
+    });
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   const handleMessageError = (message) => {
     setErrorMessage(message);
@@ -75,27 +167,51 @@ const SignIn = (props) => {
       console.log("obteniendo info del login");
       console.log(user);
 
-      if (user.roles[0] === "ROLE_CUSTOMER") {
-        history.push("/customer/home");
-      } else {
-        //setear info de la institucion asociada
+      const userRole = user.roles[0];
+      switch (userRole) {
+        case "ROLE_CUSTOMER":
+          console.log("ROLE_CUSTOMER");
+          history.push("/customer/home");
+          break;
+        case "ROLE_ADMIN":
+          console.log("ROLE_ADMIN");
 
-        try {
-          console.log("Abrir dashboard");
+          //setear info de la institucion asociada
 
+          try {
+            console.log("Abrir dashboard");
+
+            const institution = await InstitucionService.getByAdminEmail(
+              user.email
+            ).then((data) => data);
+            console.log(
+              "obteniendo la info de la institucion para dejarlo en el store"
+            );
+
+            console.log(institution);
+
+            dispatch(setInstitution(institution));
+
+            history.push("/dashboard/reservas");
+          } catch (error) {
+            console.log("Catcheando el error de la institucion");
+            console.log(error);
+          }
+
+          break;
+        case "ROLE_EMPLOYEE":
+          console.log("ROLE_EMPLOYEE");
+          break;
+        case "ROLE_COACH":
+          console.log("ROLE_COACH");
+          break;
+        case "ROLE_SUPER_ADMIN":
+          console.log("ROLE_SUPER_ADMIN");
+          break;
+        default:
           console.log(
-            "obteniendo la info de la institucion para dejarlo en el store"
+            `Lo sentimos, no existen permisos para este rol > ${userRole}.`
           );
-
-          const institution = dispatch(getByAdminEmail(data.get("username")));
-
-          console.log(institution);
-
-          history.push("/dashboard/reservas");
-        } catch (error) {
-          console.log("Catcheando el error de la institucion");
-          console.log(error);
-        }
       }
     } catch (err) {
       console.error("error al obtener usuario");
@@ -162,17 +278,44 @@ const SignIn = (props) => {
                 name="username"
                 autoComplete="username"
                 autoFocus
+                value={values.username}
+                onChange={handleUserInput}
+                onBlur={handleUserInput}
+                helperText={errors.username}
+                error={errors.username}
               />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Contraseña"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
+              <FormControl error={errors.password} fullWidth variant="outlined">
+                <InputLabel required htmlFor="outlined-adornment-password">
+                  Contraseña
+                </InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-password"
+                  type={values.showPassword ? "text" : "password"}
+                  value={values.password}
+                  //onChange={handleChange('password')}
+                  onChange={handleUserInput}
+                  onBlur={handleUserInput}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {values.showPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  label="Contraseña"
+                  name="password"
+                />
+                <FormHelperText>{errors.password}</FormHelperText>
+              </FormControl>
               <Button
                 type="submit"
                 fullWidth

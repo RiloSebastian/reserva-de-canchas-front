@@ -19,6 +19,8 @@ import { ConfirmProvider } from "material-ui-confirm";
 import { red } from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
 
+import moment from "moment";
+
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
   props,
   ref
@@ -62,45 +64,22 @@ const SchedulerFromTo = ({
   handleChangeHorarios,
   diaYHorarioId,
   details,
-  setDiasYHorarios,
+  handleDeleteHorarios,
 }) => {
   const confirm = useConfirm();
 
   const { from, to, id } = detail;
 
-  const [valueFrom, setvalueFrom] = useState();
-  const [valueTo, setvalueTo] = useState();
-
   const handleChangeFrom = (e) => {
     console.log("HANDLE CHANGE FROM HORARIO");
     console.log(id);
     handleChangeHorarios(diaYHorarioId, id, e, to);
-
-    /* setDiasYHorarios((prevState) => {
-      console.log("HANDLE CHANGE TO HORARIO");
-      console.log(prevState);
-      handleChangeHorarios(diaYHorarioId, id, from, e);
-
-      return {
-        ...prevState,
-      };
-    }); */
   };
 
   const handleChangeTo = (e) => {
     console.log("HANDLE CHANGE TO HORARIO");
     console.log(detail.id);
     handleChangeHorarios(diaYHorarioId, id, from, e);
-
-    /* setDiasYHorarios((prevState) => {
-      console.log("HANDLE CHANGE TO HORARIO");
-      console.log(prevState);
-      handleChangeHorarios(diaYHorarioId, id, from, e);
-
-      return {
-        ...prevState,
-      };
-    }); */
   };
 
   const removeHorario = (horarioId, diaYHorarioId) => {
@@ -112,19 +91,8 @@ const SchedulerFromTo = ({
     })
       .then(() => {
         console.log("ELIMINANDO HORARIOS");
-        /* const dayUpdated = daysSelected.map((day) => {
-          if (day.daysAndTimesId === item.id) {
-            return {
-              ...day,
-              selected: false,
-              daysAndTimesId: null,
-            };
-          }
-          return day;
-        });
-        setDaysSelected(dayUpdated);
 
-        setDiasYHorarios(diasYHorarios.filter((other) => other.id !== item.id)); */
+        handleDeleteHorarios(horarioId, diaYHorarioId);
       })
       .catch(() => console.log("Deletion cancelled."));
   };
@@ -148,14 +116,14 @@ const SchedulerFromTo = ({
             value={to}
             onChange={handleChangeTo}
             renderInput={(params) => <TextField {...params} />}
-            shouldDisableTime={(timeValue, clockType) => {
+            /* shouldDisableTime={(timeValue, clockType) => {
               if (clockType === "minutes" && timeValue !== from.getMinutes()) {
                 return true;
               }
 
               return false;
-            }}
-            minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
+            }}*/
+            minTime={new Date(new Date(from).setHours(moment(from).hour() + 1))}
           />
         </Grid>
       </LocalizationProvider>

@@ -1,3 +1,5 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
@@ -11,8 +13,9 @@ import IconButton from "@mui/material/IconButton";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import PropTypes from "prop-types";
-import React, { useEffect } from "react";
 import NumberFormat from "react-number-format";
+
+import { useConfirm } from "material-ui-confirm";
 
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(
   props,
@@ -45,12 +48,18 @@ NumberFormatCustom.propTypes = {
 };
 
 const ScheduleAndPrice = ({
+  handleChangeHorarios,
   horario,
   diaYHorarioId,
-  removeHorario,
   setHorarios,
-  setHorariosYPrecios,
+  min,
+  max,
+  fieldsToShow,
+  handleDeleteHorarios,
+  details
 }) => {
+  const confirm = useConfirm();
+
   const { id, precio, enabled, from, to } = horario;
 
   const handleChange = (e) => {
@@ -75,6 +84,31 @@ const ScheduleAndPrice = ({
         return [...horariosUpdated];
       });
     }
+  };
+
+  const handleChangeFrom = (e) => {
+    console.log("HANDLE CHANGE FROM HORARIO");
+    handleChangeHorarios(diaYHorarioId, id, e, to);
+  };
+
+  const handleChangeTo = (e) => {
+    console.log("HANDLE CHANGE TO HORARIO");
+    handleChangeHorarios(diaYHorarioId, id, from, e);
+  };
+
+  const removeHorario = (horarioId, diaYHorarioId) => {
+    console.log("REMOVER HORARIO PARA LOS DIAS SELECCIONADOS");
+
+    confirm({
+      title: "¿Esta Seguro que desea eliminar este horario?",
+      cancellationText: "Cancelar",
+    })
+      .then(() => {
+        console.log("ELIMINANDO HORARIOS");
+
+        handleDeleteHorarios(horarioId, diaYHorarioId);
+      })
+      .catch(() => console.log("Deletion cancelled."));
   };
 
   useEffect(() => {
@@ -103,18 +137,9 @@ const ScheduleAndPrice = ({
             label="Desde"
             name="from"
             value={from}
-            onChange={(newValue) => {
-              setHorarios((horarios) => {
-                let horariosUpdated = horarios.map((horario) =>
-                  horario.id === id
-                    ? { ...horario, ["from"]: newValue }
-                    : horario
-                );
-
-                return [...horariosUpdated];
-              });
-            }}
+            onChange={handleChangeFrom}
             renderInput={(params) => <TextField {...params} />}
+            minTime={min}
           />
         </Grid>
         <Grid item xs>
@@ -122,15 +147,7 @@ const ScheduleAndPrice = ({
             label="Hasta"
             name="to"
             value={to}
-            onChange={(newValue) => {
-              setHorarios((horarios) => {
-                let horariosUpdated = horarios.map((horario) =>
-                  horario.id === id ? { ...horario, ["to"]: newValue } : horario
-                );
-
-                return [...horariosUpdated];
-              });
-            }}
+            onChange={handleChangeTo}
             renderInput={(params) => <TextField {...params} />}
             shouldDisableTime={(timeValue, clockType) => {
               if (clockType === "minutes" && timeValue !== from.getMinutes()) {
@@ -139,7 +156,8 @@ const ScheduleAndPrice = ({
 
               return false;
             }}
-            minTime={new Date(new Date(from).setHours(from.getHours() + 1))}
+            maxTime={max}
+            minTime={min}
           />
         </Grid>
       </LocalizationProvider>
@@ -155,10 +173,11 @@ const ScheduleAndPrice = ({
           sx={{ m: 1, width: "25ch" }}
           InputProps={{
             inputComponent: NumberFormatCustom,
+            readOnly: fieldsToShow.readOnly,
           }}
         />
       </Grid>
-      <Grid item xs>
+      <Grid hidden={fieldsToShow.enabled} item xs>
         <FormControlLabel
           control={
             <Switch
@@ -172,15 +191,18 @@ const ScheduleAndPrice = ({
           labelPlacement="activo"
         />
       </Grid>
-      <Grid item xs>
+      <Grid hidden={fieldsToShow.delete} item xs>
         <IconButton
+          disabled={details.length === 1}
+          fontSize="inherit"
+          sx={{ color: pink[500] }}
           onClick={() => {
             removeHorario(id, diaYHorarioId);
           }}
           aria-label="delete"
           size="large"
         >
-          <DeleteIcon fontSize="inherit" sx={{ color: pink[500] }} />
+          <DeleteIcon />
         </IconButton>
       </Grid>
     </Grid>

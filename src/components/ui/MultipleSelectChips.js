@@ -95,10 +95,17 @@ const MultipleSelectChips = ({
             <Typography variant="body2">{`${label}${
               value.length ? ":" : ": No ha seleccionado ningun dia."
             } ${
-              value.length === 7
+              value.length === 7 &&
+              daysSelected
+                .map((option) => option.daysAndTimesId)
+                .every((id) => id === daysAndTimesId)
                 ? "Todos los Dias"
                 : daysSelected
-                    .filter((option) => value.indexOf(option.value) !== -1)
+                    .filter(
+                      (option) =>
+                        value.indexOf(option.value) !== -1 &&
+                        option.daysAndTimesId === daysAndTimesId
+                    )
                     .map((option) => option.label)
                     .join(", ")
             }`}</Typography>

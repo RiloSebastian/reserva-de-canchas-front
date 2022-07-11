@@ -1,3 +1,5 @@
+import React, { forwardRef, useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { MenuItem, Select } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Delete } from "@material-ui/icons";
@@ -26,7 +28,6 @@ import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import MaterialTable from "material-table";
 import moment from "moment";
-import React, { forwardRef, useEffect, useState, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { courtList } from "../../assets/mocks/courtList";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
@@ -36,6 +37,14 @@ import PhotoService from "../../services/photos/PhotoService";
 import CourtsDetails from "./CourtsDetails";
 import UploadImage from "./../../components/UploadImage";
 import UploadPhotos from "../../components/ui/UploadPhotos";
+import InstitucionService from "../../services/instituciones/InstitucionService";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import { Stack } from "@mui/material";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,12 +61,6 @@ const useStyles = makeStyles((theme) => ({
 const getSurfaces = (sport) => {
   return surfacesArray.filter((s) => sport.id === s.sport_id);
 };
-
-const sportArray = [
-  { id: "61a68dbc107957730042e154", name: "TENIS" },
-  { id: "61a68dbc107957730042e153", name: "FUTBOL" },
-  { id: "61a68dbc107957730042e155", name: "PADEL" },
-];
 
 const surfacesArray = [
   {
@@ -154,11 +157,23 @@ const ListaCanchas = ({ institutionId }) => {
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
   };
 
+  const institution = useSelector((state) => state.institution);
+
   const history = useHistory();
 
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
+
+  const [openSnackbar, setOpenSnackbar] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severity: "",
+  });
+
+  const [sportArray, setSportArray] = useState([]);
 
   const [openUploadPhotos, setOpenUploadPhotos] = useState(false);
 
@@ -178,11 +193,9 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [fileObjects, setFileObjects] = useState([]);
 
-  const [horariosYPrecios, setHorariosYPrecios] = useState({
-    excluirDiasNoLaborales: true,
-  });
+  const [schedules, setSchedules] = useState([]);
 
-  const [sport, setSport] = useState({});
+  const [sports, setSports] = useState({});
 
   const [surfaces, setSurfaces] = useState([]);
 
@@ -214,7 +227,7 @@ const ListaCanchas = ({ institutionId }) => {
             helperText: "Debe seleccionar un deporte para la cancha",
           }
           : true,
-      lookup: sport,
+      lookup: sports,
       render: (rowData) => rowData.sport.name,
       editComponent: (rowData) => {
         return (
@@ -245,9 +258,9 @@ const ListaCanchas = ({ institutionId }) => {
     },
     {
       title: "Superficie",
-      field: "surface",
+      field: "courtType",
       validate: (rowData) =>
-        rowData.sport === undefined
+        rowData.courtType === undefined
           ? {
             isValid: false,
             helperText: "Debe seleccionar la Superficie de la Cancha",
@@ -262,6 +275,14 @@ const ListaCanchas = ({ institutionId }) => {
       title: "Seña",
       field: "signPercentage",
       type: "numeric",
+      validate: (rowData) =>
+        rowData.signPercentage < 0 ||
+          rowData.signPercentage > 100 ||
+          rowData.signPercentage === undefined
+          ? {
+            isValid: false,
+          }
+          : true,
       render: (rowData) =>
         rowData.signPercentage === undefined || rowData.signPercentage === 0
           ? "no requiere seña"
@@ -277,8 +298,12 @@ const ListaCanchas = ({ institutionId }) => {
               ? "La Seña debe ser entre 0 y 100"
               : ""
           }
+          error={
+            props.value < 0 || props.value > 100 || props.value === undefined
+          }
           onChange={(e) => props.onChange(e.target.value)}
           InputProps={{
+            inputProps: { min: 0, max: 100 },
             startAdornment: <InputAdornment position="start">%</InputAdornment>,
           }}
           variant="standard"
@@ -319,7 +344,7 @@ const ListaCanchas = ({ institutionId }) => {
     },
     {
       title: "Iluminacion",
-      field: "iluminacion",
+      field: "courtIllumination",
       render: (rowData) => (rowData.enabled ? "Si" : "No"),
       editComponent: (props) => (
         <FormControlLabel
@@ -334,7 +359,7 @@ const ListaCanchas = ({ institutionId }) => {
       ),
     },
     {
-      field: "schedule",
+      field: "schedules",
       filtering: false,
       editComponent: (props) => (
         <Button color="info" variant="contained" onClick={desplegarModal}>
@@ -360,71 +385,137 @@ const ListaCanchas = ({ institutionId }) => {
     },
   ];
 
-  useEffect(() => {
-    //retrieveCourts("61a6d2b35df5ed18eec54355");
-    //retrieveSportsList();
-
-    const dynamicLookupObject = sportArray.reduce(function (acc, cur, i) {
-      acc[cur.id] = cur.name;
-
-      return acc;
-    }, {});
-
-    console.log(dynamicLookupObject);
-
-    setSport(dynamicLookupObject);
-    setData(courtList);
-  }, []);
-
-  const firstUpdate = useRef(true);
-  useEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-      return;
-    }
-
-    console.log("surfacesArray");
-    console.log(surfacesArray);
-    console.log("sportSelected");
-    console.log(sportSelected);
-
-    const surfacesArrayFiltered = surfacesArray.filter(
-      (s) => s.sport_id == sportSelected
-    );
-
-    const dynamicLookupSurfaces = surfacesArrayFiltered[0].surface.reduce(
-      function (acc, cur, i) {
-        acc[cur.id] = cur.name;
-
-        return acc;
-      },
-      {}
-    );
-
-    setSurfaces(dynamicLookupSurfaces);
-  }, [sportSelected]);
-
   const handleUploadImage = (e) => {
-    /* let images = [];
-
-    for (let i = 0; i < event.target.files.length; i++) {
-      images.push(URL.createObjectURL(event.target.files[i]));
-    }
-
-    setImages({
-      progressInfos: [],
-      message: [],
-      selectedFiles: event.target.files,
-      previewImages: images,
-    }); 
-    setOpenUploadPhotos(true);*/
-
     let ImagesArray = Object.entries(e.target.files).map((e) =>
       URL.createObjectURL(e[1])
     );
     console.log(ImagesArray);
     setImages([...images, ...ImagesArray]);
     console.log("images", images);
+  };
+
+  const retrieveSportsList = async () => {
+    try {
+      const listadoDeportes = await DeporteService.getAll();
+
+      console.log("listadoDeportes");
+      console.log(listadoDeportes);
+
+      const data = listadoDeportes.data;
+
+      if (data) {
+        const sports = {};
+        data.map((s) => (sports[s.id] = s.name));
+
+        console.log(sports);
+
+        setSports(sports);
+        setSportArray(data);
+      }
+    } catch (err) {
+      //history.push("/login");
+      console.log("ERROR AL OBTENER LA LISTA DE DEPORTES");
+    }
+  };
+
+  const desplegarModal = (props) => {
+    setIsMultipleEdit(false);
+    setOpen(true);
+  };
+
+  const desplegarModalForMultipleEdit = (props) => {
+    setIsMultipleEdit(true);
+    setOpen(true);
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    setOpenSnackbar((prevState) => {
+      return { ...prevState, open: false };
+    });
+  };
+
+  const createCancha = async (newCancha) => {
+    console.log("newCancha");
+    console.log(newCancha);
+
+    let cancha = { newCancha };
+
+    if (schedules) {
+      const horarios = schedules.map((s) =>
+        s
+          ? {
+            ...s,
+            ["from"]: moment(s.from).format("HH:mm"),
+            ["to"]: moment(s.to).format("HH:mm"),
+          }
+          : s
+      );
+      schedules = horarios;
+
+      cancha = { ...newCancha, ["schedules"]: schedules };
+    } else {
+      console.log("no hay horarios cargados");
+    }
+    console.log(cancha);
+
+    try {
+      const canchaCreated = await CanchaService.create(institution.id, cancha);
+
+      const data = canchaCreated.data;
+
+      for (let i = 0; i < images.selectedFiles.length; i++) {
+        const photoAdded = await PhotoService.upload(
+          data.id,
+          images.selectedFiles[i]
+        );
+
+        console.log("photoAdded");
+        console.log(photoAdded);
+
+        setPhotoData((photos) => [
+          ...photos,
+          {
+            img: photoAdded.data,
+            title: "Breakfast",
+            author: "@bkristastucchio",
+            featured: true,
+          },
+        ]);
+      }
+
+      console.log("cancha creada");
+      console.log(canchaCreated);
+      console.log(data);
+      return data;
+    } catch (error) {
+      return Promise.reject(error.data);
+    }
+  };
+
+  const updateCancha = async (canchaToUpdated) => {
+    console.log("canchaToUpdated");
+
+    const cancha = { ...canchaToUpdated, ["schedules"]: schedules };
+
+    console.log(cancha);
+
+    try {
+      const canchaUpdated = await CanchaService.update(institution.id, cancha);
+      const data = canchaUpdated.data;
+
+      console.log("cancha actualizada");
+      console.log(canchaUpdated);
+      console.log(data);
+      return data;
+    } catch (error) {
+      return Promise.reject(error.data);
+    }
+  };
+
+  const deleteCancha = async (id) => {
+    const canchaCreated = await CanchaService.remove(institution.id, id);
+    const data = canchaCreated.data;
+    return data;
   };
 
   const retrieveCourts = async (institutionId) => {
@@ -467,119 +558,74 @@ const ListaCanchas = ({ institutionId }) => {
         setData(data);
       }
     } catch (err) {
-      history.push("/login");
+      //history.push("/login");
+      setData(courtList);
     }
   };
 
-  const retrieveSportsList = async () => {
-    try {
-      const listadoDeportes = await DeporteService.getAll();
-
-      console.log("listadoDeportes");
-      console.log(listadoDeportes);
-
-      const data = listadoDeportes.data;
-
-      if (data) {
-        const sport = {};
-        data.map((s) => (sport[s.id] = s.name));
-
-        console.log(sport);
-
-        setSport(sport);
-      }
-    } catch (err) {
-      history.push("/login");
-    }
-  };
-
-  const desplegarModal = (props) => {
-    setIsMultipleEdit(false);
-    setOpen(true);
-  };
-
-  const desplegarModalForMultipleEdit = (props) => {
-    setIsMultipleEdit(true);
-    setOpen(true);
-  };
-
-  const createCancha = async (newCancha) => {
-    console.log("newCancha");
-
-    const horarios = horariosYPrecios.schedules.map((s) =>
-      s
-        ? {
-          ...s,
-          ["from"]: moment(s.from).format("HH:mm"),
-          ["to"]: moment(s.to).format("HH:mm"),
-        }
-        : s
-    );
-    horariosYPrecios.schedules = horarios;
-
-    const cancha = { ...newCancha, ["schedule"]: horariosYPrecios };
-
-    console.log(cancha);
-
-    const canchaCreated = await CanchaService.create(
-      "61a6d2b35df5ed18eec54355",
-      cancha
-    );
-    const data = canchaCreated.data;
-
-    for (let i = 0; i < images.selectedFiles.length; i++) {
-      const photoAdded = await PhotoService.upload(
-        data.id,
-        images.selectedFiles[i]
-      );
-
-      console.log("photoAdded");
-      console.log(photoAdded);
-
-      setPhotoData((photos) => [
-        ...photos,
-        {
-          img: photoAdded.data,
-          title: "Breakfast",
-          author: "@bkristastucchio",
-          featured: true,
-        },
-      ]);
+  const firstUpdate = useRef(true);
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
     }
 
-    console.log("cancha creada");
-    console.log(canchaCreated);
-    console.log(data);
-    return data;
-  };
+    console.log("sportArray");
+    console.log(sportArray);
+    console.log("sportSelected");
+    console.log(sportSelected);
 
-  const updateCancha = async (canchaToUpdated) => {
-    console.log("canchaToUpdated");
-
-    const cancha = { ...canchaToUpdated, ["schedule"]: horariosYPrecios };
-
-    console.log(cancha);
-
-    const canchaUpdated = await CanchaService.update(
-      "61a6d2b35df5ed18eec54355",
-      cancha
+    const surfacesArrayFiltered = sportArray.filter(
+      (s) => s.id == sportSelected
     );
-    const data = canchaUpdated.data;
 
-    console.log("cancha actualizada");
-    console.log(canchaUpdated);
-    console.log(data);
-    return data;
-  };
+    if (surfacesArrayFiltered.length > 0) {
+      /* const dynamicLookupSurfaces = sportArray.surfaces.reduce(function (
+        acc,
+        cur,
+        i
+      ) {
+        acc[cur.id] = cur.name;
 
-  const deleteCancha = async (id) => {
-    const canchaCreated = await CanchaService.remove(
-      "61a6d2b35df5ed18eec54355",
-      id
-    );
-    const data = canchaCreated.data;
-    return data;
-  };
+        return acc;
+      },
+      {}); */
+
+      const dynamicLookupSurfaces = surfacesArray[0].surface.reduce(function (
+        acc,
+        cur,
+        i
+      ) {
+        acc[cur.id] = cur.name;
+
+        return acc;
+      },
+        {});
+
+      setSurfaces(dynamicLookupSurfaces);
+    } else {
+      console.log("no hay superficies cargadas");
+    }
+  }, [sportSelected]);
+
+  useEffect(() => {
+    //DEVOLVER LAS CANCHAS DE LA INSTITUCION
+    retrieveCourts(institution.id);
+
+    //SETEAR LOS DEPORTES DISPONIBLES
+    retrieveSportsList();
+
+    const dynamicLookupObject = sportArray.reduce(function (acc, cur, i) {
+      acc[cur.id] = cur.name;
+
+      return acc;
+    }, {});
+
+    console.log(dynamicLookupObject);
+
+    //setSport(dynamicLookupObject);
+    //setData(courtList);
+  }, []);
 
   return (
     <>
@@ -631,7 +677,7 @@ const ListaCanchas = ({ institutionId }) => {
         }}
         detailPanel={[
           {
-            tooltip: "Mostrar Imagenes",
+            tooltip: "Mostrar Detalle de Cancha",
             render: (rowData) => <CourtsDetails rowData={rowData} />,
           },
         ]}
@@ -651,14 +697,31 @@ const ListaCanchas = ({ institutionId }) => {
         editable={{
           onRowAdd: (newData) =>
             new Promise(async (resolve, reject) => {
-              const cancha = await createCancha(newData);
+              const cancha = await createCancha(newData)
+                .then((cancha) => {
+                  console.log("agregar cancha a la lista");
+                  console.log(cancha);
 
-              console.log("agregar cancha a la lista");
-              console.log(cancha);
+                  setData([...data, cancha]);
 
-              setData([...data, cancha]);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "success",
+                    message: "Cancha creada Exitosamente!",
+                  });
 
-              resolve();
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log("error al agregar cancha a la lista");
+                  console.log(err);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: err.message,
+                  });
+                  reject();
+                });
             }),
           onRowUpdate: (newData, oldData) =>
             new Promise(async (resolve, reject) => {
@@ -708,11 +771,32 @@ const ListaCanchas = ({ institutionId }) => {
         <FormularioHorarioPrecioCancha
           open={open}
           setOpen={setOpen}
-          horariosYPrecios={horariosYPrecios}
-          setHorariosYPrecios={setHorariosYPrecios}
+          schedules={schedules}
+          setSchedules={setSchedules}
           isMultipleEdit={isMultipleEdit}
         />
       )}
+      <div>
+        <Stack spacing={2} sx={{ width: "100%" }}>
+          <Snackbar
+            autoHideDuration={4000}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+            open={openSnackbar.open}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert
+              severity={openSnackbar.severity}
+              onClose={handleCloseSnackbar}
+              sx={{ width: "100%" }}
+            >
+              {openSnackbar.message}
+            </Alert>
+          </Snackbar>
+        </Stack>
+      </div>
     </>
   );
 };

@@ -17,21 +17,22 @@ const getUserRole = () => {
   const userRole = JSON.parse(
     JSON.parse(authService.getCurrentUser())
   ).roles[0].replace(/ROLE_/g, "");
-  console.log(userRole);
 
   return USER_ROLE[userRole].name;
 };
 
 const AccountProfile = (props) => {
+  const { user } = props;
+
   const [fileObjects, setFileObjects] = useState([]);
 
   const [openUploadPhotos, setOpenUploadPhotos] = useState(false);
 
-  const user = {
+  /* const user = {
     avatar: "/static/images/avatars/avatar_6.png",
     jobTitle: getUserRole(),
     name: "Carlos Perez",
-  };
+  }; */
 
   return (
     <>
@@ -45,7 +46,8 @@ const AccountProfile = (props) => {
             }}
           >
             <Avatar
-              src={user.avatar}
+              //src={user.avatar}
+              src={user.photo}
               sx={{
                 height: 64,
                 mb: 2,
@@ -53,10 +55,10 @@ const AccountProfile = (props) => {
               }}
             />
             <Typography color="textPrimary" gutterBottom variant="h5">
-              {user.name}
+              {user.email}
             </Typography>
             <Typography color="textSecondary" variant="body2">
-              {`${user.jobTitle}`}
+              {getUserRole(user.roles[0])}
             </Typography>
           </Box>
         </CardContent>
@@ -68,7 +70,7 @@ const AccountProfile = (props) => {
             variant="text"
             onClick={() => setOpenUploadPhotos(true)}
           >
-            Subir Imagen de Perfil
+            Cambiar Imagen de Perfil
           </Button>
         </CardActions>
       </Card>
@@ -78,7 +80,8 @@ const AccountProfile = (props) => {
           setOpenUploadPhotos={setOpenUploadPhotos}
           fileObjects={fileObjects}
           setFileObjects={setFileObjects}
-          filesLimit={0}
+          filesLimit={1}
+          isModal={true}
         />
       )}
     </>

@@ -1,7 +1,8 @@
 import {
-  GET_INSTITUTION,
+  SET_INSTITUTION,
   UPDATE_INSTITUTION,
   LOAD_INSTITUTION_SCHEDULES,
+  LOAD_INSTITUTION_TIMES,
 } from "../actions/types";
 
 const initialState = {
@@ -18,6 +19,8 @@ const initialState = {
   email: "",
   institutionTel: "",
   manager: "",
+  schedules: [],
+  times: {},
 };
 
 export default function (state = initialState, action) {
@@ -27,7 +30,7 @@ export default function (state = initialState, action) {
   console.log(payload);
 
   switch (type) {
-    case GET_INSTITUTION:
+    case SET_INSTITUTION:
       return {
         ...state,
         id: payload.id,
@@ -35,6 +38,9 @@ export default function (state = initialState, action) {
         description: payload.description,
         institutionTel: payload.institutionTel,
         address: payload.address,
+        schedules: payload.schedules,
+        scheduleMinTime: payload.scheduleMinTime,
+        scheduleMaxTime: payload.scheduleMaxTime,
       };
     case UPDATE_INSTITUTION:
       return {
@@ -45,6 +51,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         schedules: payload,
+      };
+    case LOAD_INSTITUTION_TIMES:
+      return {
+        ...state,
+        times: payload,
       };
     default:
       return state;

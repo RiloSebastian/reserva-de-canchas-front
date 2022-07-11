@@ -71,7 +71,11 @@ const Home = () => {
         }}
       >
         <Container maxWidth={false}>
-          <FormularioFiltroCanchas state={state} dispatch={dispatch} />
+          <FormularioFiltroCanchas
+            state={state}
+            dispatch={dispatch}
+            setInstitutions={setInstitutions}
+          />
           <Box sx={{ m: 3 }} />
           <Box>
             <Card>
@@ -81,26 +85,28 @@ const Home = () => {
                 </Typography>
 
                 <Box sx={{ pt: 1 }}>
-                  <Stack
-                    direction="row"
-                    flexWrap="wrap-reverse"
-                    alignItems="center"
-                    justifyContent="flex-end"
-                  >
+                  {institutions.length > 0 && (
                     <Stack
                       direction="row"
-                      spacing={1}
-                      flexShrink={0}
-                      sx={{ my: 1 }}
+                      flexWrap="wrap-reverse"
+                      alignItems="center"
+                      justifyContent="flex-end"
                     >
-                      <CourtFilterSideBar
-                        isOpenFilter={openFilter}
-                        onOpenFilter={handleOpenFilter}
-                        onCloseFilter={handleCloseFilter}
-                      />
-                      <CourtSort />
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        flexShrink={0}
+                        sx={{ my: 1 }}
+                      >
+                        <CourtFilterSideBar
+                          isOpenFilter={openFilter}
+                          onOpenFilter={handleOpenFilter}
+                          onCloseFilter={handleCloseFilter}
+                        />
+                        <CourtSort />
+                      </Stack>
                     </Stack>
-                  </Stack>
+                  )}
                   <Box
                     component="main"
                     sx={{

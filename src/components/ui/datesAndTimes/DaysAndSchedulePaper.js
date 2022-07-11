@@ -18,7 +18,6 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import moment from "moment";
-import ScheduleAndPrice from "../../ScheduleAndPrice";
 import { makeStyles } from "@material-ui/core/styles";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Button from "@mui/material/Button";
@@ -39,7 +38,6 @@ const DaysAndSchedulePaper = ({
   diasYHorarios,
   setDiasYHorarios,
   diaYHorario,
-  diaYHorarioId,
   setHorario,
   daysSelected,
   setDaysSelected,
@@ -93,6 +91,32 @@ const DaysAndSchedulePaper = ({
     setDiasYHorarios(diasYHorariosUpdated);
   };
 
+  const handleDeleteHorarios = (horarioId, diaYHorarioId) => {
+    console.log("HANDLE DELETE HORARIOS");
+    console.log("HORARIO " + horarioId);
+
+    console.log(diasYHorarios);
+    console.log(diaYHorarioId);
+
+    const diasYHorariosUpdated = diasYHorarios.map((day) => {
+      if (day.id === diaYHorarioId) {
+        const horariosUpdated = day.details.filter(
+          (horario) => horario.id !== horarioId
+        );
+
+        return {
+          ...day,
+          details: horariosUpdated,
+        };
+      }
+      return day;
+    });
+
+    console.log(" HORARIOS ACTUALIZADOS");
+    console.log(diasYHorariosUpdated);
+    setDiasYHorarios(diasYHorariosUpdated);
+  };
+
   useEffect(() => {
     console.log("LOADING DIAS Y HORARIOS");
 
@@ -113,10 +137,8 @@ const DaysAndSchedulePaper = ({
             <Grid item xs>
               <SelectWeekDays
                 setDaysSelected={setDaysSelected}
-                setHorarios={setHorario}
                 daysSelected={daysSelected}
-                daysAndTimesId={diaYHorarioId}
-                diaYHorario={diaYHorario}
+                daysAndTimesId={diaYHorario.id}
               />
             </Grid>
             <Grid item>
@@ -130,6 +152,7 @@ const DaysAndSchedulePaper = ({
                       details={diaYHorario.details}
                       detail={detail}
                       setDiasYHorarios={setDiasYHorarios}
+                      handleDeleteHorarios={handleDeleteHorarios}
                     />
                   );
                 })}

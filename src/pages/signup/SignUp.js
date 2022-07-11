@@ -20,15 +20,20 @@ import AuthService from "../../services/auth.service";
 import AppAppBar from "../home/modules/views/AppAppBar";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 
-import IconButton from '@mui/material/IconButton';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormControl from '@mui/material/FormControl';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import FormHelperText from '@mui/material/FormHelperText';
+import IconButton from "@mui/material/IconButton";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import InputAdornment from "@mui/material/InputAdornment";
+import FormControl from "@mui/material/FormControl";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import FormHelperText from "@mui/material/FormHelperText";
 import EmailService from "../../services/email/EmailService";
+
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import es from "react-phone-input-2/lang/es.json";
+import ar from "react-phone-input-2/lang/ar.json";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -59,25 +64,27 @@ const SignUp = () => {
   const theme = useTheme();
 
   const [values, setValues] = useState({
-    firstName: '',
-    lastName: '',
-    userRole: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: "",
+    lastName: "",
+    userRole: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     showPassword: false,
     showConfirmPassword: false,
+    telephone: "",
   });
 
   const [errors, setErrors] = useState({
-    firstName: '',
-    lastName: '',
-    userRole: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: "",
+    lastName: "",
+    userRole: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     showPassword: false,
     showConfirmPassword: false,
+    telephone: "",
   });
 
   const [showMessageError, setShowMessageError] = useState(false);
@@ -142,6 +149,16 @@ const SignUp = () => {
         } else {
           return "";
         } */
+      case "telephone":
+        if (!value) {
+          return "Número de Telefono es Requerido";
+        } else if (
+          !value.match(/^[+]?[(]?[0-9]{1,4}[)]?[\s]?[0-9]{4}[-]?[0-9]{4}$/)
+        ) {
+          return "Introduce un número de Teléfono válido.";
+        } else {
+          return "";
+        }
       case "password":
         if (!value) {
           return "La Contraseña es Requerida";
@@ -172,22 +189,45 @@ const SignUp = () => {
     }
   };
 
-  const handleUserInput = e => {
+  const handleUserInput = (e) => {
+    console.log("handleUserInput");
+    console.log(
+      "[e.target.name]: " +
+        [e.target.name] +
+        " [e.target.value]: " +
+        [e.target.value]
+    );
+    console.log("handleUserInput");
 
-    console.log("handleUserInput")
-    console.log("[e.target.name]: " + [e.target.name] + " [e.target.value]: " + [e.target.value])
-    console.log("handleUserInput")
-
-    setErrors(prevState => {
+    setErrors((prevState) => {
       return {
         ...prevState,
-        [e.target.name]: validate(e.target.name, e.target.value)
+        [e.target.name]: validate(e.target.name, e.target.value),
       };
     });
-    setValues(prevState => {
+    setValues((prevState) => {
       return {
         ...prevState,
-        [e.target.name]: e.target.value
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+
+  const handleOnChange = (value) => {
+    console.log("Actualizando numero de telefono");
+    console.log("[telephone]: ");
+    console.log(value.toString());
+
+    setErrors((prevState) => {
+      return {
+        ...prevState,
+        telephone: validate("telephone", value.toString()),
+      };
+    });
+    setValues((prevState) => {
+      return {
+        ...prevState,
+        telephone: value,
       };
     });
   };
@@ -195,13 +235,11 @@ const SignUp = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-
     //Validar la DATA
-
 
     let validationErrors = {};
 
-    Object.keys(values).forEach(name => {
+    Object.keys(values).forEach((name) => {
       const error = validate(name, values[name]);
       if (error && error.length > 0) {
         validationErrors[name] = error;
@@ -218,10 +256,10 @@ const SignUp = () => {
         email: values.email,
         password: values.password,
         userRole: "ROLE_CUSTOMER",
+        telephone: "(11)4252-6997",
       };
 
       console.log("----data----", data);
-
 
       try {
         const registerUser = await AuthService.register(
@@ -229,16 +267,18 @@ const SignUp = () => {
           data.lastName,
           data.userRole,
           data.email,
-          data.password
+          data.password,
+          data.telephone
         ).then((data) => data);
 
         console.log("usuario Creado");
         console.log(registerUser);
 
-        //pegarle al endpo email
+        //pegarle al endpoint email async
 
-        const emailSended = await EmailService.sendVerificationEmail(registerUser.email)
-          .then(data => data);
+        const emailSended = await EmailService.sendVerificationEmail(
+          registerUser.email
+        ).then((data) => data);
 
         history.push({
           pathname: "/account-confirmation",
@@ -259,18 +299,11 @@ const SignUp = () => {
         );
         setShowMessageError(true);
       }
-
     }
 
-
-    return
-
+    return;
 
     const data = new FormData(event.currentTarget);
-
-
-
-
 
     // eslint-disable-next-line no-console
     console.log({
@@ -293,8 +326,9 @@ const SignUp = () => {
 
       //pegarle al endpo email
 
-      const emailSended = await AuthService.sendVerificationEmail(registerUser.email)
-        .then(data => data);
+      const emailSended = await AuthService.sendVerificationEmail(
+        registerUser.email
+      ).then((data) => data);
 
       history.push({
         pathname: "/account-confirmation",
@@ -374,6 +408,37 @@ const SignUp = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
+                  <PhoneInput
+                    inputStyle={{
+                      width: "100%",
+                      height: "54px",
+                      fontSize: "18px",
+                      paddingLeft: "48px",
+                      borderRadius: "5px",
+                    }}
+                    placeholder="+54 (11) 1234-1234"
+                    value={values.telephone}
+                    localization={ar}
+                    country="ar"
+                    enableAreaCodes={["ar"]}
+                    enableAreaCodeStretch={true}
+                    onlyCountries={["ar"]}
+                    preferredCountries={["ar"]}
+                    preserveOrder={["onlyCountries", "preferredCountries"]}
+                    masks={{ ar: "(..) ....-...." }}
+                    onChange={handleOnChange}
+                    isValid={(value, country) => {
+                      if (errors.telephone !== "") {
+                        return (
+                          "Numero Invalido: " + value + ", " + country.name
+                        );
+                      } else {
+                        return true;
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
                   <TextField
                     required
                     fullWidth
@@ -388,11 +453,17 @@ const SignUp = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControl error={errors.password} fullWidth variant="outlined">
-                    <InputLabel required htmlFor="outlined-adornment-password">Contraseña</InputLabel>
+                  <FormControl
+                    error={errors.password}
+                    fullWidth
+                    variant="outlined"
+                  >
+                    <InputLabel required htmlFor="outlined-adornment-password">
+                      Contraseña
+                    </InputLabel>
                     <OutlinedInput
                       id="outlined-adornment-password"
-                      type={values.showPassword ? 'text' : 'password'}
+                      type={values.showPassword ? "text" : "password"}
                       value={values.password}
                       //onChange={handleChange('password')}
                       onChange={handleUserInput}
@@ -405,22 +476,32 @@ const SignUp = () => {
                             onMouseDown={handleMouseDownPassword}
                             edge="end"
                           >
-                            {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                            {values.showPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       }
                       label="Contraseña"
                       name="password"
                     />
-                    <FormHelperText >{errors.password}</FormHelperText>
+                    <FormHelperText>{errors.password}</FormHelperText>
                   </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControl error={errors.confirmPassword} fullWidth variant="outlined">
-                    <InputLabel required htmlFor="outlined-adornment-password">Confirmar Contraseña</InputLabel>
+                  <FormControl
+                    error={errors.confirmPassword}
+                    fullWidth
+                    variant="outlined"
+                  >
+                    <InputLabel required htmlFor="outlined-adornment-password">
+                      Confirmar Contraseña
+                    </InputLabel>
                     <OutlinedInput
                       id="outlined-adornment-password"
-                      type={values.showConfirmPassword ? 'text' : 'password'}
+                      type={values.showConfirmPassword ? "text" : "password"}
                       value={values.confirmPassword}
                       onChange={handleUserInput}
                       onBlur={handleUserInput}
@@ -432,7 +513,11 @@ const SignUp = () => {
                             onMouseDown={handleMouseDownPassword}
                             edge="end"
                           >
-                            {values.showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                            {values.showConfirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       }

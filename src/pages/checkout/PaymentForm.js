@@ -60,7 +60,7 @@ const findDebitCardType = (cardNumber) => {
   return "";
 };
 
-const PaymentForm = ({setValidatedPaymentMethod, setReservation }) => {
+const PaymentForm = ({ setValidatedPaymentMethod, setReservation }) => {
   const [state, dispatch] = useReducer(reducer, {
     cardOwner: "",
     cardNumber: "",
@@ -71,10 +71,6 @@ const PaymentForm = ({setValidatedPaymentMethod, setReservation }) => {
   const [cardType, setCardType] = useState();
 
   const [error, setError] = useState({});
-
-  const handleChange = (e) => {
-    dispatch({ type: e.target.name, data: e.target.value });
-  };
 
   const isFormValid = () => {
     const { cardOwner, cardNumber, expDate, securityCode } = state;
@@ -112,6 +108,10 @@ const PaymentForm = ({setValidatedPaymentMethod, setReservation }) => {
     }
   };
 
+  const handleChange = (e) => {
+    dispatch({ type: e.target.name, data: e.target.value });
+  };
+
   const handleBlur = (e) => {
     handleValidations(e.target.name, e.target.value);
   };
@@ -138,8 +138,8 @@ const PaymentForm = ({setValidatedPaymentMethod, setReservation }) => {
       isFormValid()
     ) {
       setValidatedPaymentMethod(false);
-      setReservation(prevState => {
-        return {...prevState, checkout: state};
+      setReservation((prevState) => {
+        return { ...prevState, checkout: state };
       });
     } else {
       setValidatedPaymentMethod(true);
