@@ -25,38 +25,46 @@ const get = async (institution_id, court_id) => {
 };
 
 const create = async (institution_id, data) => {
-  try {
-    const canchaCreada = await http.post(
-      `/institutions/${institution_id}/courts`,
-      data,
-      {
-        headers: AuthHeader(),
-      }
-    );
-    console.log("cancha creada");
-    console.log(canchaCreada);
-    return canchaCreada;
-  } catch (err) {
-    console.log(err.response);
-    return Promise.reject(err.response);
-  }
+  return await http
+    .post(`/institutions/${institution_id}/courts`, data)
+    .then((response) => {
+      console.log("cancha creada");
+      console.log(response);
+      return response.data;
+    })
+    .catch((err) => {
+      console.log("error al crear cancha ");
+      console.log(err.response);
+      return Promise.reject(err.response);
+    });
 };
 
 const update = async (institution_id, data) => {
+  return await http
+    .put(`/courts/${data.id}`, data)
+    .then((response) => {
+      console.log("cancha editada");
+      console.log(response);
+      return response.data;
+    })
+    .catch((err) => {
+      console.log("error al crear cancha ");
+      console.log(err.response);
+      return Promise.reject(err.response);
+    });
+};
+
+const remove = async (institution_id, court_id) => {
   try {
-    return await http.patch(
-      `/institutions/${institution_id}/courts/${data.id}`,
-      data,
-      {
-        headers: AuthHeader(),
-      }
-    );
+    return await http.delete(`/courts/${court_id}`, {
+      headers: AuthHeader(),
+    });
   } catch (err) {
     console.log(err);
   }
 };
 
-const remove = async (institution_id, court_id) => {
+/* const remove = async (institution_id, court_id) => {
   try {
     return await http.delete(
       `/institutions/${institution_id}/courts/${court_id}`,
@@ -67,7 +75,7 @@ const remove = async (institution_id, court_id) => {
   } catch (err) {
     console.log(err);
   }
-};
+}; */
 
 const removeAll = async (institution_id) => {
   try {

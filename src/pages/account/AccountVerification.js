@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Box from "@material-ui/core/Box";
@@ -6,6 +6,8 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import { useHistory } from "react-router-dom";
 import EmailService from "../../services/email/EmailService";
+import { useParams } from "react-router-dom";
+import AuthService from "../../services/auth.service";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -24,21 +26,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AccountConfirmation(props) {
+export default function AccountVerification(props) {
+  const { userToken } = useParams();
   const classes = useStyles();
 
   let history = useHistory();
 
-  const [user, setUser] = useState(history.location.state);
+  const [loading, setLoading] = useState(true);
 
-  console.log("CREANDO NUEVO USUARIO");
-  console.log(user);
+  const user = JSON.parse(localStorage.getItem("userPending"));
 
   const content = {
-    header: `${user ? user.name : "Usuario"}, Ya casi terminamos...`,
+    header: `${
+      user ? user.name : "Usuario"
+    }, Lo sentimos, ha ocurrido un error al intentar validar su cuenta...`,
     description:
-      "Para completar el alta de tu cuenta, por favor, dirigite a la casilla de correo que agregaste previamente y hace click en el link que te enviamos para Activar tu cuenta.",
-    "primary-action": "Volver al LogIn",
+      "Haga Click en el siguiente Botón para enviarle un nuevo correo y volver a intentarlo.",
     "secondary-action": "Reenviar Correo de Confirmacion",
     ...props.content,
   };
@@ -58,9 +61,30 @@ export default function AccountConfirmation(props) {
       console.log("Error al reenviar el correo de confirmacion");
       console.log(error);
     }
-
-    history.push("/login");
   };
+
+  useEffect(async () => {
+    console.log("ENVIANDO TOKEN PARA VALIDAR LA CUENTA DEL USUARIO");
+    console.log(userToken);
+    try {
+      const userEnabled = await AuthService.enable(userToken).then(
+        (data) => data
+      );
+
+      setLoading(false);
+      localStorage.removeItem("userPending");
+      history.push({
+        pathname: "/login",
+        state: {
+          accountEnable: true,
+        },
+      });
+    } catch (error) {
+      console.log("ERROR AL HABILITAR EL USUARIO");
+      console.log(error);
+      setLoading(false);
+    }
+  }, []);
 
   return (
     <Box
@@ -84,14 +108,6 @@ export default function AccountConfirmation(props) {
         <Typography variant="subtitle1" color="textSecondary" paragraph={true}>
           {content["description"]}
         </Typography>
-        <Button
-          onClick={renderLogin}
-          variant="contained"
-          color="primary"
-          className={classes.action}
-        >
-          {content["primary-action"]}
-        </Button>
         <Button
           onClick={resendConfirmationEmail}
           variant="contained"

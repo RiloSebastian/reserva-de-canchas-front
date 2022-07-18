@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -31,6 +31,13 @@ import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import FormHelperText from "@mui/material/FormHelperText";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import { Stack } from "@mui/material";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 function Copyright(props) {
   return (
@@ -61,7 +68,18 @@ const rightLink = {
 const SignIn = (props) => {
   let history = useHistory();
 
+  const [accountState, setAccountState] = useState(history.location.state);
+
   const dispatch = useDispatch();
+
+  const [openSnackbar, setOpenSnackbar] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severity: "",
+    autoHideDuration: 4000,
+  });
 
   const [values, setValues] = useState({
     username: "",
@@ -110,6 +128,12 @@ const SignIn = (props) => {
   const [showMessageError, setShowMessageError] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
+
+  const handleCloseSnackbar = (event, reason) => {
+    setOpenSnackbar((prevState) => {
+      return { ...prevState, open: false };
+    });
+  };
 
   const handleUserInput = (e) => {
     console.log("handleUserInput");
@@ -177,26 +201,22 @@ const SignIn = (props) => {
           console.log("ROLE_ADMIN");
 
           //setear info de la institucion asociada
+          console.log("Abrir dashboard");
 
-          try {
-            console.log("Abrir dashboard");
+          const institution = await InstitucionService.getByAdminEmail(
+            user.email
+          )
+            .then((data) => data)
+            .catch((err) => Promise.reject(err.response));
+          console.log(
+            "obteniendo la info de la institucion para dejarlo en el store"
+          );
 
-            const institution = await InstitucionService.getByAdminEmail(
-              user.email
-            ).then((data) => data);
-            console.log(
-              "obteniendo la info de la institucion para dejarlo en el store"
-            );
+          console.log(institution);
 
-            console.log(institution);
+          dispatch(setInstitution(institution));
 
-            dispatch(setInstitution(institution));
-
-            history.push("/dashboard/reservas");
-          } catch (error) {
-            console.log("Catcheando el error de la institucion");
-            console.log(error);
-          }
+          history.push("/dashboard/reservas");
 
           break;
         case "ROLE_EMPLOYEE":
@@ -217,7 +237,10 @@ const SignIn = (props) => {
       console.error("error al obtener usuario");
       console.log(err);
 
-      if (err.data.error === "Esta cuenta no esta habilitada") {
+      if (err.status === 404) {
+        handleMessageError(err.data.message);
+        setShowMessageError(true);
+      } else if (err.data.error === "Esta cuenta no esta habilitada") {
         //Renviar link de confirmacion
         console.error("La cuenta no esta habilidata - reenviar correo");
 
@@ -242,6 +265,20 @@ const SignIn = (props) => {
       }
     }
   };
+
+  useEffect(() => {
+    console.log("ACTUALIZAR EL ESTADO DE LA CUENTA");
+    if (accountState) {
+      setOpenSnackbar({
+        open: true,
+        autoHideDuration: 6000,
+        severity: "success",
+        message:
+          "Tu cuenta se encuentra habilidata. Ya podes ingresar con tu usuario y contraseña",
+      });
+    } else {
+    }
+  }, [accountState]);
 
   return (
     <React.Fragment>
@@ -341,6 +378,27 @@ const SignIn = (props) => {
         handleClose={handleClose}
         errorMessage={errorMessage}
       />
+      <div>
+        <Stack spacing={2} sx={{ width: "100%" }}>
+          <Snackbar
+            autoHideDuration={openSnackbar.autoHideDuration}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+            open={openSnackbar.open}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert
+              severity={openSnackbar.severity}
+              onClose={handleCloseSnackbar}
+              sx={{ width: "100%" }}
+            >
+              {openSnackbar.message}
+            </Alert>
+          </Snackbar>
+        </Stack>
+      </div>
     </React.Fragment>
   );
 };

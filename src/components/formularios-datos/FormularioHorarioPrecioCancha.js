@@ -57,7 +57,6 @@ const FormularioHorarioPrecioCancha = ({
 
   const [noSchedulesLoadedOpen, setNoSchedulesLoadedOpen] = useState(false);
 
-
   const [min, setMin] = useState(new Date());
 
   const [max, setMax] = useState(new Date());
@@ -124,9 +123,46 @@ const FormularioHorarioPrecioCancha = ({
     } */
   };
 
+  const handleAddDaysAvailable = () => {
+    const diasYhorariosToUpload = [];
+
+    diasYHorarios.forEach((diaYHorario) => {
+      //Setear horarios para los dias seleccionados
+      const details = [];
+
+      const daysOfTheWeek = daysSelected
+        .filter((daySelected) => daySelected.daysAndTimesId === diaYHorario.id)
+        .map((day) => day.value);
+
+      console.log("SETEANDO DIAS DE LA SEMANA");
+      console.log(daysOfTheWeek);
+
+      console.log("SETEANDO LOS HORARIOS");
+      diaYHorario.details.forEach(({ from, to }) => {
+        const timeFrame = {
+          from,
+          to,
+        };
+        details.push({ timeFrame });
+      });
+
+      diasYhorariosToUpload.push({
+        daysAvailable: daysOfTheWeek,
+        details,
+        //state: "DISABLED",
+      });
+    });
+
+    return diasYhorariosToUpload;
+  };
+
   const handleGuardarHorariosYPrecios = () => {
-    console.log("GUARDANDO PRECIOS Y HORARIOS DE LA CANCHA")
-    console.log(horarios)
+    console.log("GUARDANDO PRECIOS Y HORARIOS DE LA CANCHA");
+
+    const data = handleAddDaysAvailable();
+    console.log(data);
+
+    setSchedules(data);
     /* setLoading(true);
 
     setHorariosYPrecios((body) => {
@@ -179,7 +215,9 @@ const FormularioHorarioPrecioCancha = ({
   const handleAddNewSchedule = (id) => {
     console.log("agregando nuevo horario para la card -> " + id);
 
-    const diaYHorario = diasYHorarios.filter((diaYHorario) => diaYHorario.id === id)
+    const diaYHorario = diasYHorarios.filter(
+      (diaYHorario) => diaYHorario.id === id
+    );
     const from = getNextFromTime(diaYHorario[0].details);
 
     const nuevoHorario = {
@@ -300,6 +338,8 @@ const FormularioHorarioPrecioCancha = ({
           }
           return day;
         });
+        console.log("HABILITAMOS NUEVAMENTE LOS DIAS QUE FUERON ELIMINADOS");
+        console.log(dayUpdated);
         setDaysSelected(dayUpdated);
 
         if (
@@ -344,7 +384,6 @@ const FormularioHorarioPrecioCancha = ({
             from: minTime,
             to: maxTime,
             price: "",
-            enabled: true,
           },
         ],
       },
@@ -450,13 +489,48 @@ const FormularioHorarioPrecioCancha = ({
       setDaysSelected(arraySorted);
     } else {
       setDaysSelected([
-        { label: "Lunes", value: 1, daysAndTimesId: null, selected: false },
-        { label: "Martes", value: 2, daysAndTimesId: null, selected: false },
-        { label: "Miercoles", value: 3, daysAndTimesId: null, selected: false },
-        { label: "Jueves", value: 4, daysAndTimesId: null, selected: false },
-        { label: "Viernes", value: 5, daysAndTimesId: null, selected: false },
-        { label: "Sabado", value: 6, daysAndTimesId: null, selected: false },
-        { label: "Domingo", value: 7, daysAndTimesId: null, selected: false },
+        {
+          label: "Lunes",
+          value: "LUNES",
+          daysAndTimesId: null,
+          selected: false,
+        },
+        {
+          label: "Martes",
+          value: "MARTES",
+          daysAndTimesId: null,
+          selected: false,
+        },
+        {
+          label: "Miercoles",
+          value: "MIERCOLES",
+          daysAndTimesId: null,
+          selected: false,
+        },
+        {
+          label: "Jueves",
+          value: "JUEVES",
+          daysAndTimesId: null,
+          selected: false,
+        },
+        {
+          label: "Viernes",
+          value: "VIERNES",
+          daysAndTimesId: null,
+          selected: false,
+        },
+        {
+          label: "Sabado",
+          value: "SABADO",
+          daysAndTimesId: null,
+          selected: false,
+        },
+        {
+          label: "Domingo",
+          value: "DOMINGO",
+          daysAndTimesId: null,
+          selected: false,
+        },
       ]);
     }
   }, [institution.schedules]);
@@ -497,7 +571,11 @@ const FormularioHorarioPrecioCancha = ({
                   {diasYHorarios.map((diaYHorario) => (
                     <ListItem key={diaYHorario.id}>
                       <Paper className={classes}>
-                        <Box key={diaYHorario.id} textAlign="center" sx={{ m: 4 }}>
+                        <Box
+                          key={diaYHorario.id}
+                          textAlign="center"
+                          sx={{ m: 4 }}
+                        >
                           <Box textAlign="left" sx={{ mt: 4 }}>
                             <p>Dias de la Semana</p>
                             <SelectWeekDays
@@ -532,7 +610,9 @@ const FormularioHorarioPrecioCancha = ({
                               <Button
                                 variant="outlined"
                                 startIcon={<AddCircleOutlineIcon />}
-                                onClick={() => handleAddNewSchedule(diaYHorario.id)}
+                                onClick={() =>
+                                  handleAddNewSchedule(diaYHorario.id)
+                                }
                               >
                                 Agregar Mas Horarios
                               </Button>

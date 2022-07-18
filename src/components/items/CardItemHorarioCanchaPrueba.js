@@ -106,6 +106,7 @@ const CardItemHorarioCanchaPrueba = ({
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const [courts, setCourts] = useState(schedule.courts);

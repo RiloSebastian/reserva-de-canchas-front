@@ -56,7 +56,7 @@ const ScheduleAndPrice = ({
   max,
   fieldsToShow,
   handleDeleteHorarios,
-  details
+  details,
 }) => {
   const confirm = useConfirm();
 
@@ -139,7 +139,7 @@ const ScheduleAndPrice = ({
             value={from}
             onChange={handleChangeFrom}
             renderInput={(params) => <TextField {...params} />}
-            minTime={min}
+            //minTime={min}
           />
         </Grid>
         <Grid item xs>
@@ -156,8 +156,8 @@ const ScheduleAndPrice = ({
 
               return false;
             }}
-            maxTime={max}
-            minTime={min}
+            //maxTime={max}
+            //minTime={min}
           />
         </Grid>
       </LocalizationProvider>

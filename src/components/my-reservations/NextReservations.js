@@ -62,6 +62,7 @@ const NextReservations = () => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const [columns, setColumns] = useState([

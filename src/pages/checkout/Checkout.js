@@ -61,6 +61,7 @@ const Checkout = () => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const handleCloseSnackbar = (event, reason) => {

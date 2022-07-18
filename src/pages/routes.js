@@ -28,6 +28,7 @@ export const PATHS = {
   login: "/login",
   signup: "/signup",
   accountconfirmation: "/account-confirmation",
+  accountverification: "/account-validation/:userToken",
   signupinstitution: "/signup/institution",
   forgotpass: "/forgot-pass",
   homepage: "/homepage",
