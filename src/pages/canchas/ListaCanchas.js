@@ -448,9 +448,11 @@ const ListaCanchas = ({ institutionId }) => {
   const createCancha = async (newCancha) => {
     console.log("DATA DE LA NUEVA CANCHA");
     console.log(newCancha);
+    console.log(schedules);
     const cancha = [
       {
         ...newCancha,
+        schedules,
         cancelationTimeInHours: 1,
         //courtCover: true,
         //courtIllumination: true,
@@ -460,7 +462,7 @@ const ListaCanchas = ({ institutionId }) => {
         //name: "Cancha 1",
         //scheduleMaxTime: "2022-07-16T17:46:43.985Z",
         //scheduleMinTime: "2022-07-16T17:46:43.985Z",
-        schedules: [
+        /* schedules: [
           {
             daysAvailable: ["DOMINGO"],
             details: [
@@ -475,7 +477,7 @@ const ListaCanchas = ({ institutionId }) => {
             ],
             state: "ACTIVE",
           },
-        ],
+        ], */
         //signPorcentage: 50,
         sport: "TENIS",
         state: "DISABLED",

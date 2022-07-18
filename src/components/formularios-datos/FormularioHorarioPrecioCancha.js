@@ -163,6 +163,7 @@ const FormularioHorarioPrecioCancha = ({
     console.log(data);
 
     setSchedules(data);
+    setOpen(false);
     /* setLoading(true);
 
     setHorariosYPrecios((body) => {
