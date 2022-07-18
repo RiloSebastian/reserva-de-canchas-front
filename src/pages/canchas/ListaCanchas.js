@@ -41,6 +41,7 @@ import InstitucionService from "../../services/instituciones/InstitucionService"
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { Stack } from "@mui/material";
+import ChipState from "../../components/employees/ChipState";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -171,6 +172,7 @@ const ListaCanchas = ({ institutionId }) => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const [sportArray, setSportArray] = useState([]);
@@ -193,9 +195,7 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [fileObjects, setFileObjects] = useState([]);
 
-  const [horariosYPrecios, setHorariosYPrecios] = useState({
-    excluirDiasNoLaborales: true,
-  });
+  const [schedules, setSchedules] = useState([]);
 
   const [sports, setSports] = useState({});
 
@@ -220,6 +220,17 @@ const ListaCanchas = ({ institutionId }) => {
 
   const columns = [
     {
+      title: "Nombre Cancha",
+      field: "name",
+      validate: (rowData) =>
+        rowData.name === undefined || rowData.name === ""
+          ? {
+              isValid: false,
+              helperText: "El nombre de la cancha no puede estar vacio",
+            }
+          : true,
+    },
+    {
       title: "Deporte",
       field: "sport",
       validate: (rowData) =>
@@ -230,7 +241,7 @@ const ListaCanchas = ({ institutionId }) => {
             }
           : true,
       lookup: sports,
-      render: (rowData) => rowData.sport.name,
+      render: (rowData) => rowData.sport,
       editComponent: (rowData) => {
         return (
           <Select
@@ -248,17 +259,6 @@ const ListaCanchas = ({ institutionId }) => {
       },
     },
     {
-      title: "Nombre Cancha",
-      field: "name",
-      validate: (rowData) =>
-        rowData.name === undefined || rowData.name === ""
-          ? {
-              isValid: false,
-              helperText: "El nombre de la cancha no puede estar vacio",
-            }
-          : true,
-    },
-    {
       title: "Superficie",
       field: "courtType",
       validate: (rowData) =>
@@ -270,25 +270,25 @@ const ListaCanchas = ({ institutionId }) => {
           : true,
       //lookup: (rowData) => getSurfaces(rowData.sport),
       lookup: surfaces,
-      render: (rowData) => rowData.surface,
+      render: (rowData) => rowData.courtType,
     },
     { title: "Descripcion", field: "description" },
     {
       title: "Seña",
-      field: "signPercentage",
+      field: "signPorcentage",
       type: "numeric",
       validate: (rowData) =>
-        rowData.signPercentage < 0 ||
-        rowData.signPercentage > 100 ||
-        rowData.signPercentage === undefined
+        rowData.signPorcentage < 0 ||
+        rowData.signPorcentage > 100 ||
+        rowData.signPorcentage === undefined
           ? {
               isValid: false,
             }
           : true,
       render: (rowData) =>
-        rowData.signPercentage === undefined || rowData.signPercentage === 0
+        rowData.signPorcentage === undefined || rowData.signPorcentage === 0
           ? "no requiere seña"
-          : "% " + rowData.signPercentage,
+          : "% " + rowData.signPorcentage,
       editComponent: (props) => (
         <TextField
           id="standard-start-adornment"
@@ -313,25 +313,9 @@ const ListaCanchas = ({ institutionId }) => {
       ),
     },
     {
-      title: "Estado",
-      field: "enabled",
-      render: (rowData) => (rowData.enabled ? "Habilidata" : "Deshabilitada"),
-      editComponent: (props) => (
-        <FormControlLabel
-          control={
-            <Switch
-              onChange={(e) => props.onChange(e.target.checked)}
-              checked={props.value}
-            />
-          }
-          label={props.value ? "Habilitada" : "Deshabilitada"}
-        />
-      ),
-    },
-    {
       title: "Techada",
-      field: "techada",
-      render: (rowData) => (rowData.enabled ? "Techada" : "Descubierta"),
+      field: "courtCover",
+      render: (rowData) => (rowData.courtCover ? "Si" : "No"),
       editComponent: (props) => (
         <FormControlLabel
           control={
@@ -347,7 +331,7 @@ const ListaCanchas = ({ institutionId }) => {
     {
       title: "Iluminacion",
       field: "courtIllumination",
-      render: (rowData) => (rowData.enabled ? "Si" : "No"),
+      render: (rowData) => (rowData.courtIllumination ? "Si" : "No"),
       editComponent: (props) => (
         <FormControlLabel
           control={
@@ -361,9 +345,34 @@ const ListaCanchas = ({ institutionId }) => {
       ),
     },
     {
+      title: "Estado",
+      field: "enabled",
+      editable: "onUpdate",
+      render: (rowData, renderType) => (
+        <ChipState
+          rowData={rowData}
+          renderType={renderType}
+          states={{ enable: "Habilitada", disable: "Deshabilitada" }}
+        />
+      ),
+      //render: (rowData) => (rowData.enabled ? "Habilidata" : "Deshabilitada"),
+      editComponent: (props) => (
+        <FormControlLabel
+          control={
+            <Switch
+              onChange={(e) => props.onChange(e.target.checked)}
+              checked={props.value}
+            />
+          }
+          label={props.value ? "Habilitada" : "Deshabilitada"}
+        />
+      ),
+    },
+    {
       field: "schedules",
       filtering: false,
-      editComponent: (props) => (
+      lookup: schedules,
+      editComponent: (props, tableRef) => (
         <Button color="info" variant="contained" onClick={desplegarModal}>
           Agregar Horarios y Precios
         </Button>
@@ -437,13 +446,91 @@ const ListaCanchas = ({ institutionId }) => {
   };
 
   const createCancha = async (newCancha) => {
-    console.log("newCancha");
+    console.log("DATA DE LA NUEVA CANCHA");
+    console.log(newCancha);
+    const cancha = [
+      {
+        ...newCancha,
+        cancelationTimeInHours: 1,
+        //courtCover: true,
+        //courtIllumination: true,
+        courtType: "CEMENTO",
+        //description: "excelente cancha de cemento",
+        institutionId: institution.id,
+        //name: "Cancha 1",
+        //scheduleMaxTime: "2022-07-16T17:46:43.985Z",
+        //scheduleMinTime: "2022-07-16T17:46:43.985Z",
+        schedules: [
+          {
+            daysAvailable: ["DOMINGO"],
+            details: [
+              {
+                costPerSlot: 0,
+                state: "ACTIVE",
+                timeFrame: {
+                  from: "2022-07-16T17:46:43.985Z",
+                  to: "2022-07-16T17:46:43.985Z",
+                },
+              },
+            ],
+            state: "ACTIVE",
+          },
+        ],
+        //signPorcentage: 50,
+        sport: "TENIS",
+        state: "DISABLED",
+      },
+      /* {
+        cancelationTimeInHours: 1,
+        courtCover: true,
+        courtIllumination: true,
+        courtType: "CEMENTO",
+        description: "excelente cancha de cemento",
+        institutionId: institution.id,
+        name: "Cancha 1",
+        scheduleMaxTime: "2022-07-16T17:46:43.985Z",
+        scheduleMinTime: "2022-07-16T17:46:43.985Z",
+        schedules: [
+          {
+            daysAvailable: ["DOMINGO"],
+            details: [
+              {
+                costPerSlot: 0,
+                state: "ACTIVE",
+                timeFrame: {
+                  from: "2022-07-16T17:46:43.985Z",
+                  to: "2022-07-16T17:46:43.985Z",
+                },
+              },
+            ],
+            state: "ACTIVE",
+          },
+        ],
+        signPorcentage: 50,
+        sport: "TENIS",
+        state: "DISABLED",
+      }, */
+    ];
+
+    try {
+      const canchaCreated = await CanchaService.create(
+        institution.id,
+        cancha
+      ).then((data) => data);
+
+      console.log("cancha creada");
+      console.log(canchaCreated);
+      return canchaCreated[0];
+    } catch (error) {
+      return Promise.reject(error.data);
+    }
+    /* console.log("newCancha");
     console.log(newCancha);
 
     let cancha = { newCancha };
 
-    if (horariosYPrecios.schedules) {
-      const horarios = horariosYPrecios.schedules.map((s) =>
+    if (schedules) {
+      const horarios = schedules.map((s) =>
         s
           ? {
               ...s,
@@ -452,9 +539,9 @@ const ListaCanchas = ({ institutionId }) => {
             }
           : s
       );
-      horariosYPrecios.schedules = horarios;
+      schedules = horarios;
 
-      cancha = { ...newCancha, ["schedule"]: horariosYPrecios };
+      cancha = { ...newCancha, ["schedules"]: schedules };
     } else {
       console.log("no hay horarios cargados");
     }
@@ -491,30 +578,38 @@ const ListaCanchas = ({ institutionId }) => {
       return data;
     } catch (error) {
       return Promise.reject(error.data);
-    }
+    } */
   };
 
   const updateCancha = async (canchaToUpdated) => {
     console.log("canchaToUpdated");
 
-    const cancha = { ...canchaToUpdated, ["schedule"]: horariosYPrecios };
+    const cancha = {
+      ...canchaToUpdated,
+      cancelationTimeInHours: 1,
+      institutionId: institution.id,
+      ["schedules"]: schedules,
+    };
 
     console.log(cancha);
 
     try {
-      const canchaUpdated = await CanchaService.update(institution.id, cancha);
+      const canchaUpdated = await CanchaService.update(
+        institution.id,
+        cancha
+      ).then((data) => data);
       const data = canchaUpdated.data;
 
       console.log("cancha actualizada");
       console.log(canchaUpdated);
-      console.log(data);
-      return data;
+      return canchaUpdated;
     } catch (error) {
       return Promise.reject(error.data);
     }
   };
 
   const deleteCancha = async (id) => {
+    console.log("ELIMINANDO CANCHA " + id);
     const canchaCreated = await CanchaService.remove(institution.id, id);
     const data = canchaCreated.data;
     return data;
@@ -527,9 +622,49 @@ const ListaCanchas = ({ institutionId }) => {
       console.log("listadoCanchas");
       console.log(listadoCanchas);
 
-      const data = listadoCanchas.data;
+      const data = listadoCanchas.data.map(
+        ({
+          id,
+          name,
+          sport,
+          courtType,
+          courtCover,
+          courtIllumination,
+          signPorcentage,
+          state,
+          description,
+          schedules,
+        }) => {
+          console.log("REARMANDO CANCHA PARA LISTARLAS");
+          console.log({
+            id,
+            name,
+            sport,
+            courtType,
+            courtCover,
+            courtIllumination,
+            signPorcentage,
+            state,
+            description,
+            schedules,
+          });
+          return {
+            id,
+            name,
+            sport,
+            courtType,
+            courtCover,
+            courtIllumination,
+            signPorcentage,
+            state,
+            description,
+          };
+        }
+      );
 
-      if (data) {
+      setData(data);
+
+      /* if (data) {
         data.forEach((court) => {
           console.log("obteniendo imagenes");
           console.log(court);
@@ -558,10 +693,10 @@ const ListaCanchas = ({ institutionId }) => {
         console.log(data);
 
         setData(data);
-      }
+      } */
     } catch (err) {
       //history.push("/login");
-      setData(courtList);
+      setData([]);
     }
   };
 
@@ -727,31 +862,53 @@ const ListaCanchas = ({ institutionId }) => {
             }),
           onRowUpdate: (newData, oldData) =>
             new Promise(async (resolve, reject) => {
-              const cancha = await updateCancha(newData);
+              const cancha = await updateCancha(newData)
+                .then((cancha) => {
+                  console.log("actualizar cancha");
+                  console.log(cancha);
 
-              console.log("actualizar cancha");
-              console.log(cancha);
+                  const dataUpdate = [...data];
+                  const index = oldData.tableData.id;
+                  dataUpdate[index] = cancha;
+                  setData([...dataUpdate]);
 
-              const dataUpdate = [...data];
-              const index = oldData.tableData.id;
-              dataUpdate[index] = cancha;
-              setData([...dataUpdate]);
-
-              resolve();
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log("error al editar la cancha seleccionada");
+                  console.log(err);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: err.message,
+                  });
+                  reject();
+                });
             }),
           onRowDelete: (oldData) =>
             new Promise(async (resolve, reject) => {
               console.log("eliminando cancha");
               console.log(oldData);
 
-              const cancha = await deleteCancha(oldData.id);
+              const cancha = await deleteCancha(oldData.id)
+                .then((canchaDeleted) => {
+                  const dataDelete = [...data];
+                  const index = oldData.tableData.id;
+                  dataDelete.splice(index, 1);
+                  setData([...dataDelete]);
 
-              const dataDelete = [...data];
-              const index = oldData.tableData.id;
-              dataDelete.splice(index, 1);
-              setData([...dataDelete]);
-
-              resolve();
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log("error al eliminar la cancha de la institucion");
+                  console.log(err);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: err.message,
+                  });
+                  reject();
+                });
             }),
         }}
       />
@@ -773,8 +930,8 @@ const ListaCanchas = ({ institutionId }) => {
         <FormularioHorarioPrecioCancha
           open={open}
           setOpen={setOpen}
-          horariosYPrecios={horariosYPrecios}
-          setHorariosYPrecios={setHorariosYPrecios}
+          schedules={schedules}
+          setSchedules={setSchedules}
           isMultipleEdit={isMultipleEdit}
         />
       )}

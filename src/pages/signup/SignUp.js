@@ -302,53 +302,6 @@ const SignUp = () => {
     }
 
     return;
-
-    const data = new FormData(event.currentTarget);
-
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-      role: data.get("userRole"),
-    });
-
-    try {
-      const registerUser = await AuthService.register(
-        data.get("firstName"),
-        data.get("lastName"),
-        data.get("userRole"),
-        data.get("email"),
-        data.get("password")
-      ).then((data) => data);
-
-      console.log("usuario Creado");
-      console.log(registerUser);
-
-      //pegarle al endpo email
-
-      const emailSended = await AuthService.sendVerificationEmail(
-        registerUser.email
-      ).then((data) => data);
-
-      history.push({
-        pathname: "/account-confirmation",
-        state: data.get("firstName"),
-      });
-    } catch (err) {
-      console.error("error al registrar usuario");
-      console.log(err);
-
-      handleMessageError(
-        Object.values(err.data).map((error, idx) => (
-          <Fragment key={error}>
-            {<br />}
-            {error}
-            {<br />}
-          </Fragment>
-        ))
-      );
-      setShowMessageError(true);
-    }
   };
 
   return (

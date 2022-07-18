@@ -17,7 +17,6 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import { Delete } from "@material-ui/icons";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import FormularioHorarioPrecioCancha from "../../../components/formularios-datos/FormularioHorarioPrecioCancha";
 import Switch from "@mui/material/Switch";
 import Chip from "@mui/material/Chip";
 import DoneIcon from "@mui/icons-material/Done";
@@ -76,6 +75,7 @@ const ListaEmpleado = () => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const [activo, setActivo] = useState(false);
@@ -170,7 +170,11 @@ const ListaEmpleado = () => {
         );
       },
       render: (rowData, renderType) => (
-        <ChipState rowData={rowData} renderType={renderType} />
+        <ChipState
+          rowData={rowData}
+          renderType={renderType}
+          states={{ enable: "Activo", disable: "Inactivo" }}
+        />
       ),
       editable: "onUpdate",
     },
@@ -365,7 +369,6 @@ const ListaEmpleado = () => {
             }),
         }}
       />
-      {open && <FormularioHorarioPrecioCancha open={open} setOpen={setOpen} />}
     </>
   );
 };

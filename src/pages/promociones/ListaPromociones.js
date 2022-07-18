@@ -17,8 +17,6 @@ import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import MaterialTable from "material-table";
-import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
-import OutlinedInput from "@mui/material/OutlinedInput";
 //import InputLabel from "@mui/material/InputLabel";
 //import MenuItem from "@mui/material/MenuItem";
 //import FormControl from "@mui/material/FormControl";
@@ -127,6 +125,7 @@ const ListaPromociones = () => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const [personName, setPersonName] = useState([]);

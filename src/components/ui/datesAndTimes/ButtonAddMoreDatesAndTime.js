@@ -14,14 +14,6 @@ const ButtonAddMoreDatesAndTime = ({
         color="secondary"
         aria-label="delete"
         size="large"
-        /* disabled={
-          !daysSelected
-            .map((daySelected) => daySelected.selected)
-            .includes(false) ||
-
-          daysSelected.map((daySelected) => daySelected.selected).every(s => s === false)
-
-        } */
         disabled={disabled}
       >
         <AddCircleIcon

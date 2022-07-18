@@ -10,6 +10,7 @@ import { history } from "./helpers/history";
 import CustomerLayout from "./layout/CustomerLayout";
 import InstitutionLayout from "./layout/InstitutionLayout";
 import AccountConfirmation from "./pages/account/AccountConfirmation";
+import AccountVerification from "./pages/account/AccountVerification";
 import ForgotPassword from "./pages/home/ForgotPassword";
 import HomePage from "./pages/home/HomePage";
 import SignIn from "./pages/login/SignIn";
@@ -87,6 +88,10 @@ const App = () => {
             exact
             path={PATHS.accountconfirmation}
             component={AccountConfirmation}
+          />
+          <Route
+            path={PATHS.accountverification}
+            component={AccountVerification}
           />
           <Route exact path={PATHS.forgotpass} component={ForgotPassword} />
           <Route exact path="/">

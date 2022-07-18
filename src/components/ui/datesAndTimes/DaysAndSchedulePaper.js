@@ -18,7 +18,6 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import moment from "moment";
-import ScheduleAndPrice from "../../ScheduleAndPrice";
 import { makeStyles } from "@material-ui/core/styles";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Button from "@mui/material/Button";
@@ -138,10 +137,8 @@ const DaysAndSchedulePaper = ({
             <Grid item xs>
               <SelectWeekDays
                 setDaysSelected={setDaysSelected}
-                setHorarios={setHorario}
                 daysSelected={daysSelected}
                 daysAndTimesId={diaYHorario.id}
-                diaYHorario={diaYHorario}
               />
             </Grid>
             <Grid item>

@@ -77,6 +77,7 @@ const FormularioFiltroCanchas = ({ state, dispatch, setInstitutions }) => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const handleCloseSnackbar = (event, reason) => {
