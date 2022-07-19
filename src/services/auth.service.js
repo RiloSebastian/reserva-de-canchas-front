@@ -78,9 +78,10 @@ const register = async (
 
 const enable = async (userToken) => {
   console.log("ENVIANDO TOKEN CONVERTIDO A STRINGS");
+  console.log(typeof userToken);
 
   return await axios
-    .get(API_URL + "enable-user", { userToken })
+    .post(API_URL + "enable-user", { userToken })
     .then((response) => {
       console.log("habilitando usuario");
       console.log(response);

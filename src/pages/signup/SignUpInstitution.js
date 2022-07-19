@@ -328,7 +328,7 @@ const SignUpInstitution = () => {
 
       history.push({
         pathname: "/account-confirmation",
-        state: values,
+        state: adminUser,
       });
     } catch (err) {
       console.error("error al crear admin e institucion");
