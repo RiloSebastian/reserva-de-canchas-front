@@ -3,9 +3,12 @@ import {
   UPDATE_INSTITUTION,
   LOAD_INSTITUTION_SCHEDULES,
   LOAD_INSTITUTION_TIMES,
+  RETRIEVE_INSTITUTION,
+  DELETE_INSTITUTION_SCHEDULES,
+  LOAD_INSTITUTION_DAYSOFF,
 } from "../actions/types";
 
-const initialState = {
+/* const initialState = {
   id: "",
   name: "",
   address: {
@@ -18,18 +21,48 @@ const initialState = {
   description: "",
   email: "",
   institutionTel: "",
-  manager: "",
+  managers: [],
   schedules: [],
   times: {},
-};
+}; */
+const initialState = {};
 
-export default function (state = initialState, action) {
+export default function (institution = initialState, action) {
   const { type, payload } = action;
 
-  console.log("actualizando intitucion");
-  console.log(payload);
-
   switch (type) {
+    case RETRIEVE_INSTITUTION:
+      return payload;
+    case UPDATE_INSTITUTION:
+      return {
+        ...institution,
+        payload,
+      };
+    case LOAD_INSTITUTION_DAYSOFF:
+      return {
+        ...institution,
+        freeDays: payload,
+      };
+    case LOAD_INSTITUTION_SCHEDULES:
+      return {
+        ...institution,
+        schedules: payload,
+      };
+    case DELETE_INSTITUTION_SCHEDULES:
+      return {
+        ...institution,
+        schedules: [],
+      };
+    case LOAD_INSTITUTION_TIMES:
+      return {
+        ...institution,
+        times: payload,
+      };
+    default:
+      return institution;
+  }
+
+  /* switch (type) {
     case SET_INSTITUTION:
       return {
         ...state,
@@ -41,6 +74,7 @@ export default function (state = initialState, action) {
         schedules: payload.schedules,
         scheduleMinTime: payload.scheduleMinTime,
         scheduleMaxTime: payload.scheduleMaxTime,
+        managers: payload.managers,
       };
     case UPDATE_INSTITUTION:
       return {
@@ -59,5 +93,5 @@ export default function (state = initialState, action) {
       };
     default:
       return state;
-  }
+  } */
 }

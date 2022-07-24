@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useReducer } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -47,6 +47,23 @@ NumberFormatCustom.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
+const reducer = (state, action) => {
+  console.log("action", action.data);
+  console.log("state", state);
+  switch (action.type) {
+    case "from":
+      return { ...state, timeFrame: { ...state.timeFrame, from: action.data } };
+    case "to":
+      return { ...state, timeFrame: { ...state.timeFrame, to: action.data } };
+    case "state":
+      return { ...state, state: action.data };
+    case "costPerSlot":
+      return { ...state, costPerSlot: action.data };
+    default:
+      return state;
+  }
+};
+
 const ScheduleAndPrice = ({
   handleChangeHorarios,
   horario,
@@ -60,10 +77,25 @@ const ScheduleAndPrice = ({
 }) => {
   const confirm = useConfirm();
 
-  const { id, precio, enabled, from, to } = horario;
+  const [state, dispatch] = useReducer(reducer, horario);
+
+  /* const { id, precio, enabled, from, to } = horario;
+
+  const [state, dispatch] = useReducer(reducer, {
+    timeFrame: { from, to },
+    state: true,
+    costPerSlot: 0.0,
+  }); */
 
   const handleChange = (e) => {
-    if (e.target.type === "checkbox") {
+    if (e.target) {
+      dispatch({ type: e.target.name, data: e.target.value });
+    } else {
+      dispatch({ type: "from", data: e });
+    }
+
+    handleChangeHorarios(diaYHorarioId, state);
+    /* if (e.target.type === "checkbox") {
       setHorarios((horarios) => {
         let horariosUpdated = horarios.map((horario) =>
           horario.id === id
@@ -81,12 +113,14 @@ const ScheduleAndPrice = ({
             : horario
         );
 
+        console.log("HORARIO ACTUALIZADO...");
+        console.log(horariosUpdated);
         return [...horariosUpdated];
       });
-    }
+    } */
   };
 
-  const handleChangeFrom = (e) => {
+  /* const handleChangeFrom = (e) => {
     console.log("HANDLE CHANGE FROM HORARIO");
     handleChangeHorarios(diaYHorarioId, id, e, to);
   };
@@ -94,7 +128,7 @@ const ScheduleAndPrice = ({
   const handleChangeTo = (e) => {
     console.log("HANDLE CHANGE TO HORARIO");
     handleChangeHorarios(diaYHorarioId, id, from, e);
-  };
+  }; */
 
   const removeHorario = (horarioId, diaYHorarioId) => {
     console.log("REMOVER HORARIO PARA LOS DIAS SELECCIONADOS");
@@ -112,9 +146,11 @@ const ScheduleAndPrice = ({
   };
 
   useEffect(() => {
-    setHorarios((horarios) => {
+    console.log("RENDERIZANDO HORARIOS Y PRECIOS");
+    console.log(horario);
+    /* setHorarios((horarios) => {
       let horariosUpdated = horarios.map((horario) =>
-        horario.id === id ? { ...horario, ["from"]: from } : horario
+        horario.id === state.id ? { ...horario, ["from"]: state.from } : horario
       );
 
       return [...horariosUpdated];
@@ -122,11 +158,11 @@ const ScheduleAndPrice = ({
 
     setHorarios((horarios) => {
       let horariosUpdated = horarios.map((horario) =>
-        horario.id === id ? { ...horario, ["to"]: to } : horario
+        horario.id === state.id ? { ...horario, ["to"]: state.to } : horario
       );
 
       return [...horariosUpdated];
-    });
+    }); */
   }, []);
 
   return (
@@ -136,8 +172,9 @@ const ScheduleAndPrice = ({
           <MobileTimePicker
             label="Desde"
             name="from"
-            value={from}
-            onChange={handleChangeFrom}
+            value={state.timeFrame.from}
+            onChange={handleChange}
+            //onChange={handleChangeFrom}
             renderInput={(params) => <TextField {...params} />}
             //minTime={min}
           />
@@ -146,16 +183,17 @@ const ScheduleAndPrice = ({
           <MobileTimePicker
             label="Hasta"
             name="to"
-            value={to}
-            onChange={handleChangeTo}
+            value={state.timeFrame.to}
+            onChange={handleChange}
+            //onChange={handleChangeTo}
             renderInput={(params) => <TextField {...params} />}
-            shouldDisableTime={(timeValue, clockType) => {
-              if (clockType === "minutes" && timeValue !== from.getMinutes()) {
+            /* shouldDisableTime={(timeValue, clockType) => {
+              if (clockType === "minutes" && timeValue !== from) {
                 return true;
               }
 
               return false;
-            }}
+            }} */
             //maxTime={max}
             //minTime={min}
           />
@@ -164,8 +202,8 @@ const ScheduleAndPrice = ({
 
       <Grid item xs>
         <TextField
-          name="price"
-          value={precio}
+          name="costPerSlot"
+          value={state.costPerSlot}
           inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
           label="Precio /hr"
           onChange={handleChange}
@@ -183,11 +221,11 @@ const ScheduleAndPrice = ({
             <Switch
               name="enabled"
               onChange={handleChange}
-              checked={enabled}
+              checked={state.enabled}
               color="primary"
             />
           }
-          label={enabled ? "Activo" : "Inactivo"}
+          label={state.enabled ? "Activo" : "Inactivo"}
           labelPlacement="activo"
         />
       </Grid>
@@ -197,7 +235,7 @@ const ScheduleAndPrice = ({
           fontSize="inherit"
           sx={{ color: pink[500] }}
           onClick={() => {
-            removeHorario(id, diaYHorarioId);
+            removeHorario(state.id, diaYHorarioId);
           }}
           aria-label="delete"
           size="large"

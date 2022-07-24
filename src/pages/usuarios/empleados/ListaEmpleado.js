@@ -24,6 +24,7 @@ import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
 import ChipState from "../../../components/employees/ChipState";
 import { TextField } from "@material-ui/core";
 import authService from "../../../services/auth.service";
+import userService from "../../../services/user.service";
 import EmailService from "../../../services/email/EmailService";
 import { USER_ROLE } from "../../../constants/userRole";
 
@@ -240,11 +241,11 @@ const ListaEmpleado = () => {
     try {
       const registerUser = await authService
         .register(
-          data.firstName,
-          data.lastName,
-          data.userRole,
-          data.email,
-          data.password
+          newUser.firstName,
+          newUser.lastName,
+          newUser.userRole,
+          newUser.email,
+          newUser.password
         )
         .then((data) => data);
 
@@ -264,6 +265,45 @@ const ListaEmpleado = () => {
       console.log(emailSended);
 
       return registerUser;
+    } catch (error) {
+      return Promise.reject(error.data);
+    }
+  };
+
+  const updateUser = async (userUpdated) => {
+    console.log("userUpdated");
+    console.log(userUpdated);
+    try {
+      const userUpdated = await userService
+        .update(
+          userUpdated.firstName,
+          userUpdated.lastName,
+          userUpdated.userRole,
+          userUpdated.email,
+          userUpdated.password
+        )
+        .then((data) => data);
+
+      console.log("usuario updated");
+      console.log(userUpdated);
+
+      return userUpdated;
+    } catch (error) {
+      return Promise.reject(error.data);
+    }
+  };
+
+  const deleteUser = async (userId) => {
+    console.log("userId");
+    console.log(userId);
+
+    try {
+      const userDeleted = await userService.remove(userId).then((data) => data);
+
+      console.log("usuario eliminado correctamente");
+      console.log(userDeleted);
+
+      return userDeleted;
     } catch (error) {
       return Promise.reject(error.data);
     }
@@ -346,26 +386,54 @@ const ListaEmpleado = () => {
                 });
             }),
           onRowUpdate: (newData, oldData) =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                const dataUpdate = [...data];
-                const index = oldData.tableData.id;
-                dataUpdate[index] = newData;
-                setData([...dataUpdate]);
+            new Promise(async (resolve, reject) => {
+              const user = await updateUser(newData)
+                .then((user) => {
+                  console.log("actualizar user");
+                  console.log(user);
 
-                resolve();
-              }, 1000);
+                  const dataUpdate = [...data];
+                  const index = oldData.tableData.id;
+                  dataUpdate[index] = user;
+                  setData([...dataUpdate]);
+
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log("error al editar el user seleccionado");
+                  console.log(err);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: err.message,
+                  });
+                  reject();
+                });
             }),
           onRowDelete: (oldData) =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                const dataDelete = [...data];
-                const index = oldData.tableData.id;
-                dataDelete.splice(index, 1);
-                setData([...dataDelete]);
+            new Promise(async (resolve, reject) => {
+              console.log("eliminando usuario");
+              console.log(oldData);
 
-                resolve();
-              }, 1000);
+              const user = await deleteUser(oldData.id)
+                .then((userDeleted) => {
+                  const dataDelete = [...data];
+                  const index = oldData.tableData.id;
+                  dataDelete.splice(index, 1);
+                  setData([...dataDelete]);
+
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log("error al eliminar el user de la institucion");
+                  console.log(err);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: err.message,
+                  });
+                  reject();
+                });
             }),
         }}
       />

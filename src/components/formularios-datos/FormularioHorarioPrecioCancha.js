@@ -1,29 +1,25 @@
-import React, { createContext, useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { makeStyles } from "@material-ui/core/styles";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SaveIcon from "@mui/icons-material/Save";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
-import Checkbox from "@mui/material/Checkbox";
+import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
+import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import moment from "moment";
+import React, { useEffect, useRef, useState, useReducer } from "react";
+import { useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
+import { days } from "../../utils/days/days";
 import ScheduleAndPrice from "./../ScheduleAndPrice";
 import SelectWeekDays from "./SelectWeekDays";
-import Paper from "@mui/material/Paper";
-import { makeStyles } from "@material-ui/core/styles";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import Button from "@mui/material/Button";
-import { days } from "../../utils/days/days";
-import { v4 as uuidv4 } from "uuid";
 
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -31,11 +27,16 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ButtonAddMoreDatesAndTime from "../ui/datesAndTimes/ButtonAddMoreDatesAndTime";
 
-import FormControl from "@mui/material/FormControl";
-import DaysAndSchedulePaper from "../ui/datesAndTimes/DaysAndSchedulePaper";
-import { useConfirm } from "material-ui-confirm";
 import { pink } from "@mui/material/colors";
+import FormControl from "@mui/material/FormControl";
+import { useConfirm } from "material-ui-confirm";
 import { getNextFromTime } from "../../validations/validationTime";
+
+import { CardContent } from "@mui/material";
+import CardActions from "@mui/material/CardActions";
+import Typography from "@mui/material/Typography";
+import { BASE_URL_INSTITUTIONS } from "../../pages/routes";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   ...theme.typography.body2,
@@ -45,15 +46,40 @@ const useStyles = makeStyles((theme) => ({
   lineHeight: "30px",
 }));
 
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "daysAvailable":
+      return { ...state, daysAvailable: action.data };
+    case "details":
+      return { ...state, details: action.data };
+    case "state": {
+      return { ...state, state: action.data };
+    }
+    default:
+      return state;
+  }
+};
+
 const FormularioHorarioPrecioCancha = ({
   open,
   setOpen,
   schedules,
   setSchedules,
   isMultipleEdit,
+  onChange,
 }) => {
+  let history = useHistory();
+
   const confirm = useConfirm();
   const institution = useSelector((state) => state.institution);
+
+  const [state, dispatch] = useReducer(reducer, {
+    daysAvailable: [],
+    details: [],
+    state: true,
+  });
+
+  const [diasYHorarios, setDiasYHorarios] = useState([]);
 
   const [noSchedulesLoadedOpen, setNoSchedulesLoadedOpen] = useState(false);
 
@@ -93,15 +119,12 @@ const FormularioHorarioPrecioCancha = ({
 
   const [horarios, setHorarios] = useState([]);
 
-  const [diasYHorarios, setDiasYHorarios] = useState([]);
-
   const [dates, setDates] = useState([]);
 
   const nuevoHorario = {
     id: "",
-    from: min,
-    to: max,
-    price: "",
+    timeFrame: { from: min, to: max },
+    costPerSlot: 0,
     enabled: true,
   };
 
@@ -128,7 +151,7 @@ const FormularioHorarioPrecioCancha = ({
 
     diasYHorarios.forEach((diaYHorario) => {
       //Setear horarios para los dias seleccionados
-      const details = [];
+      //const details = [];
 
       const daysOfTheWeek = daysSelected
         .filter((daySelected) => daySelected.daysAndTimesId === diaYHorario.id)
@@ -138,17 +161,18 @@ const FormularioHorarioPrecioCancha = ({
       console.log(daysOfTheWeek);
 
       console.log("SETEANDO LOS HORARIOS");
-      diaYHorario.details.forEach(({ from, to }) => {
+      console.log(diaYHorario.details);
+      /* diaYHorario.details.forEach(({ from, to }) => {
         const timeFrame = {
           from,
           to,
         };
         details.push({ timeFrame });
-      });
+      }); */
 
       diasYhorariosToUpload.push({
         daysAvailable: daysOfTheWeek,
-        details,
+        details: diaYHorario.details,
         //state: "DISABLED",
       });
     });
@@ -162,7 +186,8 @@ const FormularioHorarioPrecioCancha = ({
     const data = handleAddDaysAvailable();
     console.log(data);
 
-    setSchedules(data);
+    //setSchedules(data);
+    onChange(data);
     setOpen(false);
     /* setLoading(true);
 
@@ -176,6 +201,13 @@ const FormularioHorarioPrecioCancha = ({
   const handleClose = () => {
     setLoading(true);
     setOpen(false);
+  };
+
+  const handleRedirectToConfig = () => {
+    history.push({
+      pathname: BASE_URL_INSTITUTIONS.base + "/configuracion",
+      state: "data sended",
+    });
   };
 
   const handleAddNewDatesSchedules = () => {
@@ -291,7 +323,33 @@ const FormularioHorarioPrecioCancha = ({
     setDisableAddMoreDays(addNewDaysAndSchedulesAvailable);
   };
 
-  const handleChangeHorarios = (diaYHorarioId, horarioId, from, to) => {
+  const handleChangeHorarios = (diaYHorarioId, horarioUpdated) => {
+    console.log("HANDLE CHANGE HORARIOS");
+
+    console.log("DIA Y HORARIO " + diaYHorarioId);
+    console.log("HORARIO ");
+    console.log(horarioUpdated);
+
+    const diasYHorariosUpdated = diasYHorarios.map((day) => {
+      if (day.id === diaYHorarioId) {
+        const horariosUpdated = day.details.map((horario) => {
+          if (horario.id === horarioUpdated.id) {
+            return horarioUpdated;
+          }
+          return horario;
+        });
+
+        return {
+          ...day,
+          details: horariosUpdated,
+        };
+      }
+      return day;
+    });
+    setDiasYHorarios(diasYHorariosUpdated);
+  };
+
+  /* const handleChangeHorarios = (diaYHorarioId, horarioId, from, to) => {
     console.log("HANDLE CHANGE HORARIOS");
 
     console.log("DIA Y HORARIO " + diaYHorarioId);
@@ -321,7 +379,7 @@ const FormularioHorarioPrecioCancha = ({
       return day;
     });
     setDiasYHorarios(diasYHorariosUpdated);
-  };
+  }; */
 
   const handleDelete = (item) => {
     confirm({
@@ -382,9 +440,12 @@ const FormularioHorarioPrecioCancha = ({
         details: [
           {
             id: uuidv4(),
-            from: minTime,
-            to: maxTime,
-            price: "",
+            timeFrame: {
+              from: minTime,
+              to: maxTime,
+            },
+            costPerSlot: "",
+            state: true,
           },
         ],
       },
@@ -536,7 +597,7 @@ const FormularioHorarioPrecioCancha = ({
     }
   }, [institution.schedules]);
 
-  return (
+  return institution.schedules && institution.schedules.length > 0 ? (
     <div>
       <Dialog open={open} onClose={handleClose} maxWidth="xl">
         <DialogTitle>Precios Y Horarios</DialogTitle>
@@ -683,6 +744,31 @@ const FormularioHorarioPrecioCancha = ({
         </Box>
       </Dialog>
     </div>
+  ) : (
+    <Dialog open={open} onClose={handleClose} maxWidth="xl">
+      <DialogTitle>Precios Y Horarios</DialogTitle>
+      <DialogContent>
+        <React.Fragment>
+          <CardContent>
+            <Typography variant="h5" component="div">
+              La institucion aun no posee horarios de apertura y cierre cargados
+            </Typography>
+            <Typography sx={{ mb: 1.5 }} color="text.secondary">
+              Por favor agregue los horarios en el panel de configuraciones
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button
+              onClick={handleRedirectToConfig}
+              variant="contained"
+              size="small"
+            >
+              Ir a panel de Configuracion
+            </Button>
+          </CardActions>
+        </React.Fragment>
+      </DialogContent>
+    </Dialog>
   );
 };
 

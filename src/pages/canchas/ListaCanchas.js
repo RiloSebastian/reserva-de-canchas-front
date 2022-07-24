@@ -1,5 +1,3 @@
-import React, { forwardRef, useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { MenuItem, Select } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Delete } from "@material-ui/icons";
@@ -19,29 +17,33 @@ import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import { Stack } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
+import Snackbar from "@mui/material/Snackbar";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import MaterialTable from "material-table";
-import moment from "moment";
+import React, {
+  forwardRef,
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { courtList } from "../../assets/mocks/courtList";
+import { createCourt, deleteCourt, updateCourt } from "../../actions/court";
+import ChipState from "../../components/employees/ChipState";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
+import UploadPhotos from "../../components/ui/UploadPhotos";
 import CanchaService from "../../services/canchas/CanchaService";
 import DeporteService from "../../services/deportes/DeporteService";
-import PhotoService from "../../services/photos/PhotoService";
 import CourtsDetails from "./CourtsDetails";
-import UploadImage from "./../../components/UploadImage";
-import UploadPhotos from "../../components/ui/UploadPhotos";
-import InstitucionService from "../../services/instituciones/InstitucionService";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
-import { Stack } from "@mui/material";
-import ChipState from "../../components/employees/ChipState";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -157,6 +159,8 @@ const ListaCanchas = ({ institutionId }) => {
     )),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
   };
+
+  const dispatch = useDispatch();
 
   const institution = useSelector((state) => state.institution);
 
@@ -372,26 +376,52 @@ const ListaCanchas = ({ institutionId }) => {
       field: "schedules",
       filtering: false,
       lookup: schedules,
-      editComponent: (props, tableRef) => (
-        <Button color="info" variant="contained" onClick={desplegarModal}>
-          Agregar Horarios y Precios
-        </Button>
-      ),
+      editComponent: (props) => {
+        return (
+          <>
+            <Button color="info" variant="contained" onClick={desplegarModal}>
+              Agregar Horarios y Precios
+            </Button>
+            <FormularioHorarioPrecioCancha
+              open={open}
+              setOpen={setOpen}
+              schedules={schedules}
+              setSchedules={setSchedules}
+              isMultipleEdit={isMultipleEdit}
+              onChange={props.onChange}
+            />
+          </>
+        );
+      },
     },
     {
       field: "images",
       filtering: false,
       editComponent: (props) => (
-        <IconButton
-          color="primary"
-          aria-label="upload picture"
-          component="span"
-          onClick={() => {
-            setOpenUploadPhotos(true);
-          }}
-        >
-          <PhotoCamera />
-        </IconButton>
+        <>
+          <IconButton
+            color="primary"
+            aria-label="upload picture"
+            component="span"
+            onClick={() => {
+              setOpenUploadPhotos(true);
+            }}
+          >
+            <PhotoCamera />
+          </IconButton>
+          <UploadPhotos
+            openUploadPhotos={openUploadPhotos}
+            setOpenUploadPhotos={setOpenUploadPhotos}
+            setImages={setImages}
+            images={images}
+            isMultipleEdit={isMultipleEdit}
+            handleUploadImage={handleUploadImage}
+            fileObjects={fileObjects}
+            setFileObjects={setFileObjects}
+            filesLimit={6}
+            isModal={true}
+          />
+        </>
       ),
     },
   ];
@@ -445,142 +475,22 @@ const ListaCanchas = ({ institutionId }) => {
     });
   };
 
-  const createCancha = async (newCancha) => {
+  const createCancha = (newCancha) => {
     console.log("DATA DE LA NUEVA CANCHA");
     console.log(newCancha);
-    console.log(schedules);
+
     const cancha = [
       {
         ...newCancha,
-        schedules,
         cancelationTimeInHours: 1,
-        //courtCover: true,
-        //courtIllumination: true,
         courtType: "CEMENTO",
-        //description: "excelente cancha de cemento",
         institutionId: institution.id,
-        //name: "Cancha 1",
-        //scheduleMaxTime: "2022-07-16T17:46:43.985Z",
-        //scheduleMinTime: "2022-07-16T17:46:43.985Z",
-        /* schedules: [
-          {
-            daysAvailable: ["DOMINGO"],
-            details: [
-              {
-                costPerSlot: 0,
-                state: "ACTIVE",
-                timeFrame: {
-                  from: "2022-07-16T17:46:43.985Z",
-                  to: "2022-07-16T17:46:43.985Z",
-                },
-              },
-            ],
-            state: "ACTIVE",
-          },
-        ], */
-        //signPorcentage: 50,
         sport: "TENIS",
         state: "DISABLED",
       },
-      /* {
-        cancelationTimeInHours: 1,
-        courtCover: true,
-        courtIllumination: true,
-        courtType: "CEMENTO",
-        description: "excelente cancha de cemento",
-        institutionId: institution.id,
-        name: "Cancha 1",
-        scheduleMaxTime: "2022-07-16T17:46:43.985Z",
-        scheduleMinTime: "2022-07-16T17:46:43.985Z",
-        schedules: [
-          {
-            daysAvailable: ["DOMINGO"],
-            details: [
-              {
-                costPerSlot: 0,
-                state: "ACTIVE",
-                timeFrame: {
-                  from: "2022-07-16T17:46:43.985Z",
-                  to: "2022-07-16T17:46:43.985Z",
-                },
-              },
-            ],
-            state: "ACTIVE",
-          },
-        ],
-        signPorcentage: 50,
-        sport: "TENIS",
-        state: "DISABLED",
-      }, */
     ];
 
-    try {
-      const canchaCreated = await CanchaService.create(
-        institution.id,
-        cancha
-      ).then((data) => data);
-
-      console.log("cancha creada");
-      console.log(canchaCreated);
-      return canchaCreated[0];
-    } catch (error) {
-      return Promise.reject(error.data);
-    }
-    /* console.log("newCancha");
-    console.log(newCancha);
-
-    let cancha = { newCancha };
-
-    if (schedules) {
-      const horarios = schedules.map((s) =>
-        s
-          ? {
-              ...s,
-              ["from"]: moment(s.from).format("HH:mm"),
-              ["to"]: moment(s.to).format("HH:mm"),
-            }
-          : s
-      );
-      schedules = horarios;
-
-      cancha = { ...newCancha, ["schedules"]: schedules };
-    } else {
-      console.log("no hay horarios cargados");
-    }
-    console.log(cancha);
-
-    try {
-      const canchaCreated = await CanchaService.create(institution.id, cancha);
-
-      const data = canchaCreated.data;
-
-      for (let i = 0; i < images.selectedFiles.length; i++) {
-        const photoAdded = await PhotoService.upload(
-          data.id,
-          images.selectedFiles[i]
-        );
-
-        console.log("photoAdded");
-        console.log(photoAdded);
-
-        setPhotoData((photos) => [
-          ...photos,
-          {
-            img: photoAdded.data,
-            title: "Breakfast",
-            author: "@bkristastucchio",
-            featured: true,
-          },
-        ]);
-      }
-
-      console.log("cancha creada");
-      console.log(canchaCreated);
-      console.log(data);
-      return data;
-    } catch (error) {
-      return Promise.reject(error.data);
-    } */
+    return dispatch(createCourt(institution.id, cancha));
   };
 
   const updateCancha = async (canchaToUpdated) => {
@@ -595,26 +505,13 @@ const ListaCanchas = ({ institutionId }) => {
 
     console.log(cancha);
 
-    try {
-      const canchaUpdated = await CanchaService.update(
-        institution.id,
-        cancha
-      ).then((data) => data);
-      const data = canchaUpdated.data;
-
-      console.log("cancha actualizada");
-      console.log(canchaUpdated);
-      return canchaUpdated;
-    } catch (error) {
-      return Promise.reject(error.data);
-    }
+    return dispatch(updateCourt(cancha));
   };
 
   const deleteCancha = async (id) => {
     console.log("ELIMINANDO CANCHA " + id);
-    const canchaCreated = await CanchaService.remove(institution.id, id);
-    const data = canchaCreated.data;
-    return data;
+
+    return dispatch(deleteCourt(id));
   };
 
   const retrieveCourts = async (institutionId) => {
@@ -841,7 +738,7 @@ const ListaCanchas = ({ institutionId }) => {
                   console.log("agregar cancha a la lista");
                   console.log(cancha);
 
-                  setData([...data, cancha]);
+                  setData([...data, cancha[0]]);
 
                   setOpenSnackbar({
                     open: true,
@@ -879,10 +776,27 @@ const ListaCanchas = ({ institutionId }) => {
                 .catch((err) => {
                   console.log("error al editar la cancha seleccionada");
                   console.log(err);
+
+                  let errorMessage =
+                    "No se ha identificado el error, vuelva a intentar";
+
+                  switch (err.status) {
+                    case 409:
+                      errorMessage = err.data.name;
+                      break;
+
+                    default:
+                      break;
+                  }
                   setOpenSnackbar({
                     open: true,
                     severity: "error",
-                    message: err.message,
+                    message: Object.values(err.data).map((err, idx) => (
+                      <Fragment key={err}>
+                        {err}
+                        {<br />}
+                      </Fragment>
+                    )),
                   });
                   reject();
                 });
@@ -914,29 +828,6 @@ const ListaCanchas = ({ institutionId }) => {
             }),
         }}
       />
-      {openUploadPhotos && (
-        <UploadPhotos
-          openUploadPhotos={openUploadPhotos}
-          setOpenUploadPhotos={setOpenUploadPhotos}
-          setImages={setImages}
-          images={images}
-          isMultipleEdit={isMultipleEdit}
-          handleUploadImage={handleUploadImage}
-          fileObjects={fileObjects}
-          setFileObjects={setFileObjects}
-          filesLimit={6}
-          isModal={true}
-        />
-      )}
-      {open && (
-        <FormularioHorarioPrecioCancha
-          open={open}
-          setOpen={setOpen}
-          schedules={schedules}
-          setSchedules={setSchedules}
-          isMultipleEdit={isMultipleEdit}
-        />
-      )}
       <div>
         <Stack spacing={2} sx={{ width: "100%" }}>
           <Snackbar

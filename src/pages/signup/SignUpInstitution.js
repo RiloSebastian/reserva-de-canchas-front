@@ -1,55 +1,38 @@
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useReducer,
-  useRef,
-  useState,
-  Fragment,
-} from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import LoadingButton from "@mui/lab/LoadingButton";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
 import Grid from "@mui/material/Grid";
-import Stack from "@mui/material/Stack";
 import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
+import React, { Fragment, useState } from "react";
 //import { TextField } from "@material-ui/core";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import AuthService from "../../services/auth.service";
-import AppAppBar from "../home/modules/views/AppAppBar";
 import { Link, useHistory } from "react-router-dom";
-import InstitucionService from "../../services/instituciones/InstitucionService";
-import GeoLocalizacionService from "../../services/geolocalizacion/GeoLocalizacionService";
-import ComboBox from "../../components/ui/ComboBox";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
+import ComboBox from "../../components/ui/ComboBox";
+import AuthService from "../../services/auth.service";
+import InstitucionService from "../../services/instituciones/InstitucionService";
+import AppAppBar from "../home/modules/views/AppAppBar";
 
-import IconButton from "@mui/material/IconButton";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputLabel from "@mui/material/InputLabel";
+import OutlinedInput from "@mui/material/OutlinedInput";
 import EmailService from "../../services/email/EmailService";
 
 import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import es from "react-phone-input-2/lang/es.json";
 import ar from "react-phone-input-2/lang/ar.json";
+import es from "react-phone-input-2/lang/es.json";
+import "react-phone-input-2/lib/style.css";
 
 const themeTextArea = createTheme({
   components: {
@@ -328,7 +311,7 @@ const SignUpInstitution = () => {
 
       history.push({
         pathname: "/account-confirmation",
-        state: values,
+        state: adminUser,
       });
     } catch (err) {
       console.error("error al crear admin e institucion");
