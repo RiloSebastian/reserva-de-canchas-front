@@ -24,6 +24,7 @@ import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
 import ChipState from "../../../components/employees/ChipState";
 import { TextField } from "@material-ui/core";
 import authService from "../../../services/auth.service";
+import userService from "../../../services/user.service";
 import EmailService from "../../../services/email/EmailService";
 import { USER_ROLE } from "../../../constants/userRole";
 
@@ -273,19 +274,18 @@ const ListaEmpleado = () => {
     console.log("userUpdated");
     console.log(userUpdated);
     try {
-      const userUpdated = await authService
-        .register(
-          newUser.firstName,
-          newUser.lastName,
-          newUser.userRole,
-          newUser.email,
-          newUser.password
+      const userUpdated = await userService
+        .update(
+          userUpdated.firstName,
+          userUpdated.lastName,
+          userUpdated.userRole,
+          userUpdated.email,
+          userUpdated.password
         )
         .then((data) => data);
 
       console.log("usuario updated");
       console.log(userUpdated);
-      console.log(emailSended);
 
       return userUpdated;
     } catch (error) {
@@ -293,39 +293,17 @@ const ListaEmpleado = () => {
     }
   };
 
-  const deleteUser = async (newUser) => {
-    console.log("newUser");
-    console.log(newUser);
-
-    let user = { newUser };
+  const deleteUser = async (userId) => {
+    console.log("userId");
+    console.log(userId);
 
     try {
-      const registerUser = await authService
-        .register(
-          newUser.firstName,
-          newUser.lastName,
-          newUser.userRole,
-          newUser.email,
-          newUser.password
-        )
-        .then((data) => data);
+      const userDeleted = await userService.remove(userId).then((data) => data);
 
-      console.log("usuario Creado");
-      console.log(registerUser);
+      console.log("usuario eliminado correctamente");
+      console.log(userDeleted);
 
-      //pegarle al endpo email
-
-      const emailSended = await EmailService.sendVerificationEmail(
-        registerUser.email
-      ).then((data) => data);
-
-      console.log("usuario creado");
-      console.log(registerUser);
-
-      console.log("email de confirmacion enviado");
-      console.log(emailSended);
-
-      return registerUser;
+      return userDeleted;
     } catch (error) {
       return Promise.reject(error.data);
     }

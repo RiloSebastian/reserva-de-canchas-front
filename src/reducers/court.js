@@ -1,50 +1,34 @@
 import {
-  REGISTER_SUCCESS,
-  REGISTER_FAIL,
-  LOGIN_SUCCESS,
-  LOGIN_FAIL,
-  LOGOUT,
+  RETRIEVE_COURTS,
+  CREATE_COURT,
+  UPDATE_COURT,
+  DELETE_COURT,
 } from "../actions/types";
 
-const courts = JSON.parse(localStorage.getItem("user"));
+const initialState = [];
 
-const initialState = user
-  ? { isLoggedIn: true, user }
-  : { isLoggedIn: false, user: null };
-
-export default function (state = initialState, action) {
+export default function (courts = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {
-    case REGISTER_SUCCESS:
-      return {
-        ...state,
-        isLoggedIn: false,
-      };
-    case REGISTER_FAIL:
-      return {
-        ...state,
-        isLoggedIn: false,
-      };
-    case LOGIN_SUCCESS:
-      return {
-        ...state,
-        isLoggedIn: true,
-        user: payload.user,
-      };
-    case LOGIN_FAIL:
-      return {
-        ...state,
-        isLoggedIn: false,
-        user: null,
-      };
-    case LOGOUT:
-      return {
-        ...state,
-        isLoggedIn: false,
-        user: null,
-      };
+    case CREATE_COURT:
+      return [...courts, payload];
+    case RETRIEVE_COURTS:
+      return payload;
+    case UPDATE_COURT:
+      return courts.map((court) => {
+        if (court.id === payload.id) {
+          return {
+            ...court,
+            ...payload,
+          };
+        } else {
+          return court;
+        }
+      });
+    case DELETE_COURT:
+      return courts.filter(({ id }) => id !== payload.id);
     default:
-      return state;
+      return courts;
   }
 }

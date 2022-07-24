@@ -70,6 +70,9 @@ import AppointmentFormContainerBasic from "../../components/ui/devexpress/Appoin
 import { set } from "date-fns";
 import { AppointmentFormMessages } from "./localization-messages/AppointmentFormMessages";
 import AppointmentFormActions from "../../components/ui/devexpress/AppointmentFormActions";
+import { retrieveCourts } from "../../actions/court";
+import CircularProgress from "@mui/material/CircularProgress";
+import Backdrop from "@mui/material/Backdrop";
 
 const PREFIX = "Demo";
 
@@ -474,18 +477,19 @@ const sports = gettingSports();
 
 const ReservaGridCustom2 = () => {
   const dispatch = useDispatch();
-
   let history = useHistory();
 
   const institution = useSelector((state) => state.institution);
+  const courtList = useSelector((state) => state.court);
 
+  const [loading, setLoading] = useState(true);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
   const [previousAppointment, setPreviousAppointment] = useState(undefined);
   const [deletedAppointmentId, setDeletedAppointmentId] = useState(undefined);
   const [editingFormVisible, setEditingFormVisible] = useState(false);
   const [isNewAppointment, setIsNewAppointment] = useState(false);
 
-  const [institutionHasCourts, setInstitutionHasCourts] = useState(true);
+  const [institutionHasCourts, setInstitutionHasCourts] = useState(false);
 
   const [startDayHour, setStartDayHour] = useState(7);
   const [endDayHour, setEndDayHour] = useState(23);
@@ -1111,15 +1115,6 @@ const ReservaGridCustom2 = () => {
     //Obtener todas las reservas hechas para la institucion
   };
 
-  useEffect(() => {
-    console.log("CARGANDO EL COMPONENTE DE RESERVAS");
-
-    updateBookingGrid();
-
-    //const institution = JSON.parse(localStorage.getItem("institution"));
-    //OBTENER LAS RESERVAS POR INSTITUCION
-  }, []);
-
   const firstUpdate = useRef(true);
   useEffect(() => {
     if (firstUpdate.current) {
@@ -1132,7 +1127,55 @@ const ReservaGridCustom2 = () => {
     //Obtener todas las reservas hechas para la institucion
   }, [institution.schedules]);
 
-  return institutionHasCourts ? (
+  const firstUpdateCourts = useRef(true);
+  useEffect(() => {
+    if (firstUpdateCourts.current) {
+      firstUpdateCourts.current = false;
+      return;
+    }
+    console.log("ACTUALIZAR CADA VEZ QUE SE MODIFIQUEN LAS CANCHAS");
+
+    if (courtList.length > 0) {
+      updateBookingGrid();
+    } else {
+      setInstitutionHasCourts(false);
+    }
+
+    //Obtener todas las reservas hechas para la institucion
+  }, [courtList]);
+
+  useEffect(() => {
+    console.log("CARGANDO EL COMPONENTE DE RESERVAS");
+
+    dispatch(retrieveCourts(institution.id))
+      .then((data) => {
+        console.log("canchas obtenidas para la grilla de reservas");
+        console.log(data);
+        updateBookingGrid();
+        setInstitutionHasCourts(true);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log("error al obtener las canchas para la grilla de reservas");
+        console.log(err.response);
+        setInstitutionHasCourts(false);
+        setLoading(false);
+      });
+
+    //const institution = JSON.parse(localStorage.getItem("institution"));
+    //OBTENER LAS RESERVAS POR INSTITUCION
+  }, []);
+
+  return loading ? (
+    <Box sx={{ display: "flex" }}>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" disableShrink />
+      </Backdrop>
+    </Box>
+  ) : institutionHasCourts ? (
     <>
       <Paper>
         <Scheduler

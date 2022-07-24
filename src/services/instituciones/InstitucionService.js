@@ -1,4 +1,3 @@
-import React from "react";
 import http from "../../http-common";
 
 const getAll = () => {
@@ -13,11 +12,15 @@ const get = async (institution_id) => {
 };
 
 const getByAdminEmail = async (admin_email) => {
+  return await http.get(`/institutions/admin/${admin_email}`);
+};
+
+/* const getByAdminEmail = async (admin_email) => {
   return await http
     .get(`/institutions/admin/${admin_email}`)
     .then((response) => response.data)
     .catch((err) => Promise.reject(err));
-};
+}; */
 
 /* const getByAdminEmail = async (admin_email) => {
   return await http
@@ -62,9 +65,30 @@ const getInstitutionSchedules = async (institution_id) => {
     .catch((err) => Promise.reject(err));
 };
 
-const createInstitutionSchedules = async (institution_id, data) => {
+const updateInstitutionSchedules = async (institution_id, data, force) => {
+  return await http.put(
+    `/institutions/${institution_id}/schedules?force=${force}`,
+    data
+  );
+};
+
+const uploadNonWorkingDays = async (institution_id, data, force) => {
+  return await http.put(
+    `/institutions/${institution_id}/daysoff?force=${force}`,
+    data
+  );
+};
+
+const uploadAdvancePayment = async (institution_id, data) => {
+  return await http.post(
+    `/institutions/${institution_id}/advance-payment`,
+    data
+  );
+};
+
+/* const updateInstitutionSchedules = async (institution_id, data, force) => {
   return await http
-    .post(`/institutions/${institution_id}/schedules`, data)
+    .put(`/institutions/${institution_id}/schedules?force=${force}`, data)
     .then((response) => {
       console.log("CREANDO HORARIO PARA INSTITUCION");
       console.log(response.data);
@@ -76,7 +100,7 @@ const createInstitutionSchedules = async (institution_id, data) => {
 
       return Promise.reject(err.response);
     });
-};
+}; */
 
 const uploadImages = async (institution_id, data) => {
   /* return await http
@@ -110,38 +134,6 @@ const uploadFeriados = async (institution_id, data) => {
     }); */
 };
 
-const uploadNonWorkingDays = async (institution_id, data) => {
-  /* return await http
-    .post(`/institutions/${institution_id}/images`, data)
-    .then((response) => {
-      console.log("CREANDO HORARIO PARA INSTITUCION");
-      console.log(response.data);
-      return response.data;
-    })
-    .catch((err) => {
-      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
-      console.log(err.response);
-
-      return Promise.reject(err.response);
-    }); */
-};
-
-const uploadAdvancePayment = async (institution_id, data) => {
-  /* return await http
-    .post(`/institutions/${institution_id}/images`, data)
-    .then((response) => {
-      console.log("CREANDO HORARIO PARA INSTITUCION");
-      console.log(response.data);
-      return response.data;
-    })
-    .catch((err) => {
-      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
-      console.log(err.response);
-
-      return Promise.reject(err.response);
-    }); */
-};
-
 const create = (data) => {
   return http.post(`/institutions`, data);
 };
@@ -158,6 +150,10 @@ const removeAll = () => {
   return http.delete(`/institutions`);
 };
 
+const deleteAllInstitutionSchedules = (institution_id) => {
+  return http.delete(`/institutions/${institution_id}/schedules`);
+};
+
 export default {
   getAll,
   get,
@@ -167,9 +163,10 @@ export default {
   remove,
   removeAll,
   getInstitutionSchedules,
-  createInstitutionSchedules,
+  updateInstitutionSchedules,
   uploadImages,
   uploadFeriados,
   uploadNonWorkingDays,
   uploadAdvancePayment,
+  deleteAllInstitutionSchedules,
 };

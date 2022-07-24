@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-import { DatePicker, TimePicker } from "@material-ui/pickers";
 import {
   Box,
   Button,
@@ -10,13 +8,18 @@ import {
   FormControl,
   FormHelperText,
   Grid,
+  InputAdornment,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Select,
+  TextField,
 } from "@mui/material";
-import InstitucionService from "../../services/instituciones/InstitucionService";
-import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 import { useConfirm } from "material-ui-confirm";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { uploadAdvancePayment } from "../../actions/institution";
+import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 
 const validate = (values) => {
   const errors = {};
@@ -35,9 +38,10 @@ const validate = (values) => {
 const BEFORE_RESERVATION = "anterior a la reserva";
 
 const AdvancePaymentConfig = ({ props, institution }) => {
+  const dispatch = useDispatch();
   const confirm = useConfirm();
   const [advancePaymentPeriod, setAdvancePaymentPeriod] = useState(1);
-  const [value, setValue] = useState({});
+  const [value, setValue] = useState(0);
 
   const [open, setOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({});
@@ -45,7 +49,7 @@ const AdvancePaymentConfig = ({ props, institution }) => {
   const handleChange = (event) => {
     console.log("MODIFICANDO DETALLES DE LA SEñA");
     console.log(event.target.value);
-    setAdvancePaymentPeriod(event.target.value || "");
+    setValue(event.target.value);
   };
 
   const handleMessageLoaded = (isSuccess) => {
@@ -79,7 +83,9 @@ const AdvancePaymentConfig = ({ props, institution }) => {
   };
 
   const handleUploadChanges = async (data) => {
-    try {
+    dispatch(uploadAdvancePayment(institution.id, data)).then().catch();
+
+    /* try {
       const schedulesCreated = await InstitucionService.uploadAdvancePayment(
         institution.id,
         data
@@ -87,7 +93,7 @@ const AdvancePaymentConfig = ({ props, institution }) => {
       handleMessageLoaded(true);
     } catch (error) {
       handleMessageLoaded(false);
-    }
+    } */
   };
 
   return (
@@ -102,7 +108,25 @@ const AdvancePaymentConfig = ({ props, institution }) => {
           <CardContent>
             <Grid container spacing={3}>
               <Grid item md={6} xs={12}>
-                <FormControl sx={{ m: 1, minWidth: 120 }}>
+                <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+                  <OutlinedInput
+                    id="outlined-adornment-weight"
+                    type="number"
+                    value={value}
+                    onChange={handleChange}
+                    endAdornment={
+                      <InputAdornment position="end">Dias</InputAdornment>
+                    }
+                    aria-describedby="outlined-weight-helper-text"
+                    inputProps={{
+                      "aria-label": "weight",
+                      min: 0,
+                      max: 7,
+                    }}
+                  />
+                  <FormHelperText id="outlined-weight-helper-text"></FormHelperText>
+                </FormControl>
+                {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
                   <InputLabel id="demo-simple-select-helper-label">
                     Hasta
                   </InputLabel>
@@ -122,7 +146,7 @@ const AdvancePaymentConfig = ({ props, institution }) => {
                   <FormHelperText>
                     Tiempo limite para Cancelar una Reserva
                   </FormHelperText>
-                </FormControl>
+                </FormControl> */}
               </Grid>
             </Grid>
           </CardContent>

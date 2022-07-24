@@ -1,85 +1,59 @@
 import CanchaService from "../services/canchas/CanchaService";
 import {
-  REGISTER_SUCCESS,
-  REGISTER_FAIL,
-  LOGIN_SUCCESS,
-  LOGIN_FAIL,
-  LOGOUT,
-  SET_MESSAGE,
+  RETRIEVE_COURTS,
+  CREATE_COURT,
+  UPDATE_COURT,
+  DELETE_COURT,
 } from "./types";
 
-export const getCourtsByInstitution = (institution_id) => (dispatch) => {
-  return CanchaService.getCourtsByInstitution(institution_id).then(
-    (response) => {
-      dispatch({
-        type: REGISTER_SUCCESS,
-      });
-
-      dispatch({
-        type: SET_MESSAGE,
-        payload: response.data.message,
-      });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-
-      dispatch({
-        type: REGISTER_FAIL,
-      });
-
-      dispatch({
-        type: SET_MESSAGE,
-        payload: message,
-      });
-
-      return Promise.reject();
-    }
-  );
+export const retrieveCourts = (institution_id) => async (dispatch) => {
+  try {
+    const res = await CanchaService.getAll(institution_id);
+    dispatch({
+      type: RETRIEVE_COURTS,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err);
+  }
 };
 
-export const login = (username, password) => (dispatch) => {
-  return AuthService.login(username, password).then(
-    (data) => {
-      dispatch({
-        type: LOGIN_SUCCESS,
-        payload: { user: data },
-      });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-
-      dispatch({
-        type: LOGIN_FAIL,
-      });
-
-      dispatch({
-        type: SET_MESSAGE,
-        payload: message,
-      });
-
-      return Promise.reject();
-    }
-  );
+export const createCourt = (institution_id, data) => async (dispatch) => {
+  try {
+    const res = await CanchaService.create(institution_id, data);
+    dispatch({
+      type: CREATE_COURT,
+      payload: res.data[0],
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err);
+  }
 };
 
-export const logout = () => (dispatch) => {
-  AuthService.logout();
+export const updateCourt = (data) => async (dispatch) => {
+  try {
+    const res = await CanchaService.update(data);
+    dispatch({
+      type: UPDATE_COURT,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err.response);
+  }
+};
 
-  dispatch({
-    type: LOGOUT,
-  });
+export const deleteCourt = (id) => async (dispatch) => {
+  try {
+    const res = await CanchaService.remove(id);
+    dispatch({
+      type: DELETE_COURT,
+      payload: { id },
+    });
+    return Promise.resolve(id);
+  } catch (err) {
+    return Promise.reject(err);
+  }
 };

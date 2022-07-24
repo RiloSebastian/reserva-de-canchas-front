@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import {
   getByAdminEmail,
   getInstitutionSchedules,
+  retrieveCretrieveInstitutionByAdmainEmailourts,
   setInstitution,
 } from "../../actions/institution";
 import EmailService from "../../services/email/EmailService";
@@ -200,10 +201,10 @@ const SignIn = (props) => {
         case "ROLE_ADMIN":
           console.log("ROLE_ADMIN");
 
-          //setear info de la institucion asociada
-          console.log("Abrir dashboard");
+          dispatch(retrieveCretrieveInstitutionByAdmainEmailourts(user.email));
 
-          const institution = await InstitucionService.getByAdminEmail(
+          //setear info de la institucion asociada
+          /* const institution = await InstitucionService.getByAdminEmail(
             user.email
           )
             .then((data) => data)
@@ -214,8 +215,9 @@ const SignIn = (props) => {
 
           console.log(institution);
 
-          dispatch(setInstitution(institution));
+          dispatch(setInstitution(institution)); */
 
+          console.log("Abrir dashboard");
           history.push("/dashboard/reservas");
 
           break;

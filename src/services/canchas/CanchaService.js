@@ -1,7 +1,7 @@
 import http from "../../http-common";
 import AuthHeader from "../auth-header";
 
-const getAll = async (institution_id) => {
+/* const getAll = async (institution_id) => {
   try {
     const listadoCanchas = await http.get(
       `/institutions/${institution_id}/courts`
@@ -14,6 +14,10 @@ const getAll = async (institution_id) => {
     console.log(err);
     return Promise.reject(err);
   }
+}; */
+
+const getAll = (institution_id) => {
+  return http.get(`/institutions/${institution_id}/courts`);
 };
 
 const get = async (institution_id, court_id) => {
@@ -25,6 +29,10 @@ const get = async (institution_id, court_id) => {
 };
 
 const create = async (institution_id, data) => {
+  return await http.post(`/institutions/${institution_id}/courts`, data);
+};
+
+/* const create = async (institution_id, data) => {
   return await http
     .post(`/institutions/${institution_id}/courts`, data)
     .then((response) => {
@@ -37,9 +45,11 @@ const create = async (institution_id, data) => {
       console.log(err.response);
       return Promise.reject(err.response);
     });
+}; */
+const update = async (data) => {
+  return await http.put(`/courts/${data.id}`, data);
 };
-
-const update = async (institution_id, data) => {
+/* const update = async (institution_id, data) => {
   return await http
     .put(`/courts/${data.id}`, data)
     .then((response) => {
@@ -52,16 +62,10 @@ const update = async (institution_id, data) => {
       console.log(err.response);
       return Promise.reject(err.response);
     });
-};
+}; */
 
-const remove = async (institution_id, court_id) => {
-  try {
-    return await http.delete(`/courts/${court_id}`, {
-      headers: AuthHeader(),
-    });
-  } catch (err) {
-    console.log(err);
-  }
+const remove = async (court_id) => {
+  return await http.delete(`/courts/${court_id}`);
 };
 
 /* const remove = async (institution_id, court_id) => {

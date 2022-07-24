@@ -2,9 +2,6 @@ import EventIcon from "@mui/icons-material/Event";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import "moment/locale/es";
 import React, {
   useEffect,
@@ -14,13 +11,13 @@ import React, {
   useState,
 } from "react";
 import {
+  formatCreditCardNumber,
+  formatCVC,
+  formatExpirationDate,
   minLength,
   stripeCardExpirValidation,
   stripeCardNumberValidation,
   textWithSpacesOnly,
-  formatCreditCardNumber,
-  formatExpirationDate,
-  formatCVC,
 } from "../../validations";
 
 function clearNumber(value = "") {
