@@ -6,25 +6,11 @@ import {
   RETRIEVE_INSTITUTION,
   DELETE_INSTITUTION_SCHEDULES,
   LOAD_INSTITUTION_DAYSOFF,
+  CREATE_MANAGER,
+  UPDATE_MANAGER,
+  DELETE_MANAGER,
 } from "../actions/types";
 
-/* const initialState = {
-  id: "",
-  name: "",
-  address: {
-    langAddress: "",
-    geometry: {
-      coordinates: [0, 0],
-      type: "Point",
-    },
-  },
-  description: "",
-  email: "",
-  institutionTel: "",
-  managers: [],
-  schedules: [],
-  times: {},
-}; */
 const initialState = {};
 
 export default function (institution = initialState, action) {
@@ -58,40 +44,31 @@ export default function (institution = initialState, action) {
         ...institution,
         times: payload,
       };
+    case CREATE_MANAGER:
+      return {
+        ...institution,
+        managers: [...institution.managers, payload],
+      };
+    case UPDATE_MANAGER:
+      return {
+        ...institution,
+        managers: institution.managers.map((manager) => {
+          if (manager.id === payload.id) {
+            return {
+              ...manager,
+              ...payload,
+            };
+          } else {
+            return manager;
+          }
+        }),
+      };
+    case DELETE_MANAGER:
+      return {
+        ...institution,
+        managers: institution.managers.filter(({ id }) => id !== payload.id),
+      };
     default:
       return institution;
   }
-
-  /* switch (type) {
-    case SET_INSTITUTION:
-      return {
-        ...state,
-        id: payload.id,
-        name: payload.name,
-        description: payload.description,
-        institutionTel: payload.institutionTel,
-        address: payload.address,
-        schedules: payload.schedules,
-        scheduleMinTime: payload.scheduleMinTime,
-        scheduleMaxTime: payload.scheduleMaxTime,
-        managers: payload.managers,
-      };
-    case UPDATE_INSTITUTION:
-      return {
-        ...state,
-        [payload.type]: payload.data,
-      };
-    case LOAD_INSTITUTION_SCHEDULES:
-      return {
-        ...state,
-        schedules: payload,
-      };
-    case LOAD_INSTITUTION_TIMES:
-      return {
-        ...state,
-        times: payload,
-      };
-    default:
-      return state;
-  } */
 }

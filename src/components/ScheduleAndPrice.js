@@ -90,8 +90,6 @@ const ScheduleAndPrice = ({
   const handleChange = (e) => {
     if (e.target) {
       dispatch({ type: e.target.name, data: e.target.value });
-    } else {
-      dispatch({ type: "from", data: e });
     }
 
     handleChangeHorarios(diaYHorarioId, state);
@@ -120,15 +118,17 @@ const ScheduleAndPrice = ({
     } */
   };
 
-  /* const handleChangeFrom = (e) => {
+  const handleChangeFrom = (e) => {
     console.log("HANDLE CHANGE FROM HORARIO");
-    handleChangeHorarios(diaYHorarioId, id, e, to);
+    dispatch({ type: "from", data: e });
+    handleChangeHorarios(diaYHorarioId, state);
   };
 
   const handleChangeTo = (e) => {
     console.log("HANDLE CHANGE TO HORARIO");
-    handleChangeHorarios(diaYHorarioId, id, from, e);
-  }; */
+    dispatch({ type: "to", data: e });
+    handleChangeHorarios(diaYHorarioId, state);
+  };
 
   const removeHorario = (horarioId, diaYHorarioId) => {
     console.log("REMOVER HORARIO PARA LOS DIAS SELECCIONADOS");
@@ -173,8 +173,8 @@ const ScheduleAndPrice = ({
             label="Desde"
             name="from"
             value={state.timeFrame.from}
-            onChange={handleChange}
-            //onChange={handleChangeFrom}
+            //onChange={handleChange}
+            onChange={handleChangeFrom}
             renderInput={(params) => <TextField {...params} />}
             //minTime={min}
           />
@@ -184,8 +184,8 @@ const ScheduleAndPrice = ({
             label="Hasta"
             name="to"
             value={state.timeFrame.to}
-            onChange={handleChange}
-            //onChange={handleChangeTo}
+            //onChange={handleChange}
+            onChange={handleChangeTo}
             renderInput={(params) => <TextField {...params} />}
             /* shouldDisableTime={(timeValue, clockType) => {
               if (clockType === "minutes" && timeValue !== from) {

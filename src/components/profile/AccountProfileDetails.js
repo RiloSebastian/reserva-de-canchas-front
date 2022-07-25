@@ -176,6 +176,10 @@ export const AccountProfileDetails = (props) => {
     validateErrors();
   }, [errors]);
 
+  useEffect(() => {
+    setValues(user);
+  }, [user]);
+
   return (
     <>
       <form autoComplete="off" noValidate {...props}>
@@ -239,7 +243,7 @@ export const AccountProfileDetails = (props) => {
                     borderRadius: "5px",
                   }}
                   placeholder="+54 (11) 1234-1234"
-                  value={user.phone}
+                  value={user.telephone}
                   localization={ar}
                   country="ar"
                   enableAreaCodes={["ar"]}

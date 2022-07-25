@@ -10,10 +10,14 @@ import UserService from "../../../services/user.service";
 
 import { useConfirm } from "material-ui-confirm";
 import CustomizedSnackbars from "../../../components/ui/CustomizedSnackbars";
+import { useSelector, useDispatch } from "react-redux";
+import { retrieveUser } from "../../../actions/auth";
 
 const AdminProfile = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  //const user = JSON.parse(localStorage.getItem("user"));
+  const { user } = useSelector((state) => state.auth);
   const confirm = useConfirm();
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({});
 
@@ -37,6 +41,12 @@ const AdminProfile = () => {
       const deletedUser = await UserService.remove(user.id);
     } catch (error) {}
   };
+
+  useEffect(() => {
+    //CARGAR INFO DEL USUARIO
+    console.log("TRAYENDO PERFIL DEL USER");
+    dispatch(retrieveUser(user.id));
+  }, []);
 
   return (
     <>

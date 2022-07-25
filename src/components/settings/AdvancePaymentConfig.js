@@ -9,14 +9,10 @@ import {
   FormHelperText,
   Grid,
   InputAdornment,
-  InputLabel,
-  MenuItem,
   OutlinedInput,
-  Select,
-  TextField,
 } from "@mui/material";
 import { useConfirm } from "material-ui-confirm";
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { useDispatch } from "react-redux";
 import { uploadAdvancePayment } from "../../actions/institution";
 import CustomizedSnackbars from "../ui/CustomizedSnackbars";
@@ -83,17 +79,32 @@ const AdvancePaymentConfig = ({ props, institution }) => {
   };
 
   const handleUploadChanges = async (data) => {
-    dispatch(uploadAdvancePayment(institution.id, data)).then().catch();
-
-    /* try {
-      const schedulesCreated = await InstitucionService.uploadAdvancePayment(
-        institution.id,
-        data
-      ).then((data) => data);
-      handleMessageLoaded(true);
-    } catch (error) {
-      handleMessageLoaded(false);
-    } */
+    dispatch(uploadAdvancePayment(institution.id, data))
+      .then((data) => {
+        console.log(
+          "TIEMPO DE CANCELACION DE RESERVAS ACTUALIZADO CORRECTAMENTE"
+        );
+        console.log(data);
+        setSnackbar({
+          message: "Los Horarios se han Guardado Exitosamente!",
+          severity: "success",
+        });
+        setOpen(true);
+      })
+      .catch((error) => {
+        console.log("ERROR AL ACTUALIZAR TIEMPO DE CANCELACION DE RESERVAS");
+        console.log(error);
+        setSnackbar({
+          message: Object.values(error.data).map((error, idx) => (
+            <Fragment key={error}>
+              {error}
+              {<br />}
+            </Fragment>
+          )),
+          severity: "error",
+        });
+        setOpen(true);
+      });
   };
 
   return (
@@ -126,27 +137,6 @@ const AdvancePaymentConfig = ({ props, institution }) => {
                   />
                   <FormHelperText id="outlined-weight-helper-text"></FormHelperText>
                 </FormControl>
-                {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
-                  <InputLabel id="demo-simple-select-helper-label">
-                    Hasta
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-helper-label"
-                    id="demo-simple-select-helper"
-                    value={advancePaymentPeriod}
-                    label="Hasta"
-                    onChange={handleChange}
-                  >
-                    <MenuItem value={1}>INDEFINIDO</MenuItem>
-                    <MenuItem value={12}>12 hs {BEFORE_RESERVATION}</MenuItem>
-                    <MenuItem value={24}>1 dia {BEFORE_RESERVATION}</MenuItem>
-                    <MenuItem value={48}>2 dias {BEFORE_RESERVATION}</MenuItem>
-                    <MenuItem value={72}>3 dias {BEFORE_RESERVATION}</MenuItem>
-                  </Select>
-                  <FormHelperText>
-                    Tiempo limite para Cancelar una Reserva
-                  </FormHelperText>
-                </FormControl> */}
               </Grid>
             </Grid>
           </CardContent>
