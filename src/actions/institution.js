@@ -7,9 +7,57 @@ import {
   LOAD_INSTITUTION_SCHEDULES,
   RETRIEVE_INSTITUTION,
   UPDATE_INSTITUTION,
+  CREATE_MANAGER,
+  UPDATE_MANAGER,
+  DELETE_MANAGER,
 } from "./types";
 
 import InstitucionService from "../services/instituciones/InstitucionService";
+import userService from "../services/user.service";
+
+export const createUserForInstitution =
+  (institution_id, role_type, data) => async (dispatch) => {
+    try {
+      const res = await InstitucionService.createUserForInstitution(
+        institution_id,
+        role_type,
+        data
+      );
+      dispatch({
+        type: CREATE_MANAGER,
+        payload: res.data[0],
+      });
+      return Promise.resolve(res.data);
+    } catch (err) {
+      return Promise.reject(err.response);
+    }
+  };
+
+export const updateAppUser = (data) => async (dispatch) => {
+  try {
+    const res = await userService.update(data.id, data);
+    dispatch({
+      type: UPDATE_MANAGER,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err.response);
+  }
+};
+
+export const deleteAppUser = (user_id) => async (dispatch) => {
+  try {
+    const res = await userService.remove(user_id);
+    dispatch({
+      type: DELETE_MANAGER,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err.response);
+  }
+};
 
 export const getByAdminEmail = (admin_email) => (dispatch) => {
   return InstitucionService.getByAdminEmail(admin_email).then(

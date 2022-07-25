@@ -28,12 +28,6 @@ const AccountProfile = (props) => {
 
   const [openUploadPhotos, setOpenUploadPhotos] = useState(false);
 
-  /* const user = {
-    avatar: "/static/images/avatars/avatar_6.png",
-    jobTitle: getUserRole(),
-    name: "Carlos Perez",
-  }; */
-
   return (
     <>
       <Card {...props}>

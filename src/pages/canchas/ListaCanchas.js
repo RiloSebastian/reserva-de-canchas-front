@@ -557,6 +557,7 @@ const ListaCanchas = ({ institutionId }) => {
             signPorcentage,
             state,
             description,
+            schedules,
           };
         }
       );

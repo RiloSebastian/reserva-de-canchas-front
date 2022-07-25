@@ -1,12 +1,11 @@
-import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 
 import {
-  makeStyles,
-  FormLabel,
   Chip,
-  Typography,
   FormHelperText,
+  FormLabel,
+  makeStyles,
+  Typography,
 } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -37,6 +36,7 @@ const MultipleSelectChips = ({
   setDaysSelected,
   daysSelected,
   daysAndTimesId,
+  readOnly,
 }) => {
   const classes = useStyles();
 
@@ -78,19 +78,10 @@ const MultipleSelectChips = ({
     }
   };
 
-  useEffect(() => {
-    console.log("DIAS SELECCIONADOS PROVENIENTES DEL BACK");
-    console.log(daysSelected);
-
-    /* daysSelected.map((option, i) => {
-      handleClick(option.value, daysAndTimesId);
-    }); */
-  }, []);
-
   return (
     <>
       <div className={classes.container}>
-        {label && (
+        {label && readOnly === undefined && (
           <FormLabel error={Boolean(error)}>
             <Typography variant="body2">{`${label}${
               value.length ? ":" : ": No ha seleccionado ningun dia."
@@ -146,14 +137,16 @@ const MultipleSelectChips = ({
                         <Typography variant="body2">{`${option.label}`}</Typography>
                       }
                       clickable={
-                        !option.selected ||
-                        option.daysAndTimesId === daysAndTimesId
+                        readOnly === undefined &&
+                        (!option.selected ||
+                          option.daysAndTimesId === daysAndTimesId)
                       }
                       onClick={
-                        !option.selected ||
+                        readOnly === undefined &&
+                        (!option.selected ||
                         option.daysAndTimesId === daysAndTimesId
                           ? () => handleClick(option.value, daysAndTimesId)
-                          : undefined
+                          : undefined)
                       }
                     />
                   );

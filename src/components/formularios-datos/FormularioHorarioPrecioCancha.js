@@ -255,8 +255,10 @@ const FormularioHorarioPrecioCancha = ({
 
     const nuevoHorario = {
       id: uuidv4(),
-      from,
-      to: new Date(new Date(from).setHours(new Date(from).getHours() + 1)),
+      timeFrame: {
+        from,
+        to: new Date(new Date(from).setHours(new Date(from).getHours() + 1)),
+      },
     };
 
     console.log(nuevoHorario);

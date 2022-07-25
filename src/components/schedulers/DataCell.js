@@ -7,22 +7,28 @@ export default function DataCell({
   className,
   itemData,
   isDisableDate,
-  isDinner
+  isDinner,
+  timePrice,
+  courtDetails,
   // workingDays,
   // busyTimes
 }) {
-  /* const { startDate } = itemData;
-  const isDisableDate =
-    Utils.isHoliday(startDate) || Utils.isWeekend(startDate, workingDays);
-  const isDinner = Utils.isDinner(startDate, busyTimes); */
   let cssClasses = className ? className : "";
 
   if (isDisableDate) {
     cssClasses += " disable-date";
   } else if (isDinner) {
     cssClasses += " dinner";
+  } else if (timePrice === 0) {
+    cssClasses += " no-price";
   } else {
-    return <ReservationDetails />;
+    return (
+      <ReservationDetails
+        itemData={itemData}
+        timePrice={timePrice}
+        courtDetails={courtDetails}
+      />
+    );
   }
   return <div className={cssClasses}>{children}</div>;
 }

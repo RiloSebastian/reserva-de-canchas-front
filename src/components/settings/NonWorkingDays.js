@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import startOfDay from "date-fns/startOfDay";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { useDispatch } from "react-redux";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -131,7 +131,30 @@ export const NonWorkingDays = ({ props, institution }) => {
   };
 
   const handleUploadChanges = async (data) => {
-    dispatch(uploadNonWorkingDays(institution.id, data, true));
+    dispatch(uploadNonWorkingDays(institution.id, data, true))
+      .then((data) => {
+        console.log("DIAS NO LABORLALES ACTUALIZADOS CORRECTAMENTE");
+        console.log(data);
+        setSnackbar({
+          message: "Los Dias No Laborales se han Guardado Exitosamente!",
+          severity: "success",
+        });
+        setOpen(true);
+      })
+      .catch((error) => {
+        console.log("ERROR AL ACTUALIZAR DIAS NO LABORLALES DE INSTITUCUIN");
+        console.log(error);
+        setSnackbar({
+          message: Object.values(error.data).map((error, idx) => (
+            <Fragment key={error}>
+              {error}
+              {<br />}
+            </Fragment>
+          )),
+          severity: "error",
+        });
+        setOpen(true);
+      });
     /* try {
       const images = await InstitucionService.uploadNonWorkingDays(
         institution.id,

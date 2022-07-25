@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -9,32 +8,28 @@ import Grid from "@mui/material/Grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
-import AppAppBar from "./../home/modules/views/AppAppBar";
 import AuthService from "../../services/auth.service";
+import AppAppBar from "./../home/modules/views/AppAppBar";
 
-import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
-import InstitucionService from "../../services/instituciones/InstitucionService";
 import { useDispatch } from "react-redux";
-import {
-  getByAdminEmail,
-  getInstitutionSchedules,
-  retrieveCretrieveInstitutionByAdmainEmailourts,
-  setInstitution,
-} from "../../actions/institution";
+import { retrieveCretrieveInstitutionByAdmainEmailourts } from "../../actions/institution";
+import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 import EmailService from "../../services/email/EmailService";
 
-import IconButton from "@mui/material/IconButton";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import FormHelperText from "@mui/material/FormHelperText";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 import { Stack } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputLabel from "@mui/material/InputLabel";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Snackbar from "@mui/material/Snackbar";
+import { login } from "../../actions/auth";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -126,6 +121,7 @@ const SignIn = (props) => {
     }
   };
 
+  const [loading, setLoading] = useState(false);
   const [showMessageError, setShowMessageError] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -137,15 +133,6 @@ const SignIn = (props) => {
   };
 
   const handleUserInput = (e) => {
-    console.log("handleUserInput");
-    console.log(
-      "[e.target.name]: " +
-        [e.target.name] +
-        " [e.target.value]: " +
-        [e.target.value]
-    );
-    console.log("handleUserInput");
-
     setErrors((prevState) => {
       return {
         ...prevState,
@@ -183,7 +170,77 @@ const SignIn = (props) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    try {
+    dispatch(login(data.get("username"), data.get("password")))
+      .then((user) => {
+        const userRole = user.roles[0];
+        switch (userRole) {
+          case "ROLE_CUSTOMER":
+            console.log("ROLE_CUSTOMER");
+            history.push("/customer/home");
+            break;
+          case "ROLE_ADMIN":
+            console.log("ROLE_ADMIN");
+
+            dispatch(
+              retrieveCretrieveInstitutionByAdmainEmailourts(user.email)
+            );
+
+            console.log("Abrir dashboard");
+            history.push("/dashboard/reservas");
+
+            break;
+          case "ROLE_EMPLOYEE":
+            console.log("ROLE_EMPLOYEE");
+            break;
+          case "ROLE_COACH":
+            console.log("ROLE_COACH");
+            break;
+          case "ROLE_SUPER_ADMIN":
+            console.log("ROLE_SUPER_ADMIN");
+            break;
+          default:
+            console.log(
+              `Lo sentimos, no existen permisos para este rol > ${userRole}.`
+            );
+        }
+
+        // props.history.push("/profile");
+        //window.location.reload();
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.error("error al obtener usuario");
+        console.log(err);
+
+        if (err.status === 404) {
+          handleMessageError(err.data.message);
+          setShowMessageError(true);
+        } else if (err.data.error === "Esta cuenta no esta habilitada") {
+          //Renviar link de confirmacion
+          console.error("La cuenta no esta habilidata - reenviar correo");
+
+          try {
+            const emailReSended = EmailService.sendVerificationEmail(
+              data.get("username")
+            ).then((data) => data);
+
+            handleMessageError(
+              `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
+            );
+            setShowMessageError(true);
+          } catch (error) {
+            handleMessageError(
+              `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
+            );
+            setShowMessageError(true);
+          }
+        } else {
+          handleMessageError(err.data.error);
+          setShowMessageError(true);
+        }
+      });
+
+    /* try {
       const user = await AuthService.login(
         data.get("username"),
         data.get("password")
@@ -202,20 +259,6 @@ const SignIn = (props) => {
           console.log("ROLE_ADMIN");
 
           dispatch(retrieveCretrieveInstitutionByAdmainEmailourts(user.email));
-
-          //setear info de la institucion asociada
-          /* const institution = await InstitucionService.getByAdminEmail(
-            user.email
-          )
-            .then((data) => data)
-            .catch((err) => Promise.reject(err.response));
-          console.log(
-            "obteniendo la info de la institucion para dejarlo en el store"
-          );
-
-          console.log(institution);
-
-          dispatch(setInstitution(institution)); */
 
           console.log("Abrir dashboard");
           history.push("/dashboard/reservas");
@@ -265,7 +308,7 @@ const SignIn = (props) => {
         handleMessageError(err.data.error);
         setShowMessageError(true);
       }
-    }
+    } */
   };
 
   useEffect(() => {
@@ -331,7 +374,6 @@ const SignIn = (props) => {
                   id="outlined-adornment-password"
                   type={values.showPassword ? "text" : "password"}
                   value={values.password}
-                  //onChange={handleChange('password')}
                   onChange={handleUserInput}
                   onBlur={handleUserInput}
                   endAdornment={

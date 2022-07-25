@@ -7,6 +7,7 @@ const SelectWeekDays = ({
   daysSelected,
   daysAndTimesId,
   diaYHorario,
+  readOnly,
 }) => {
   const [value, setValue] = useState([]);
   const [error, setError] = useState("");
@@ -44,6 +45,7 @@ const SelectWeekDays = ({
         daysSelected={daysSelected}
         daysAndTimesId={daysAndTimesId}
         diaYHorario={diaYHorario}
+        readOnly={readOnly}
       />
     </Paper>
   );

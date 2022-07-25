@@ -32,38 +32,14 @@ import {
 import { days } from "../../utils/days/days";
 import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 
-const bull = (
-  <Box
-    component="span"
-    sx={{ display: "inline-block", mx: "2px", transform: "scale(0.8)" }}
-  >
-    •
-  </Box>
-);
-
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-function getStyles(day1, day, theme) {
-  return {
-    fontWeight:
-      day.indexOf(day1) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
 
 export const OpenAndCloseTimes = ({ props, institution }) => {
-  const confirm = useConfirm();
+  const classes = useStyles();
+  const theme = useTheme();
 
+  const confirm = useConfirm();
   const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
@@ -78,10 +54,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
     height: 30,
     lineHeight: "30px",
   }));
-
-  const classes = useStyles();
-
-  const theme = useTheme();
 
   const [disabled, setDisabled] = useState(true);
 

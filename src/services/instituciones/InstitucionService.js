@@ -138,6 +138,10 @@ const create = (data) => {
   return http.post(`/institutions`, data);
 };
 
+const createUserForInstitution = async (institution_id, role_type, data) => {
+  return await http.post(`/institutions/${institution_id}/${role_type}`, data);
+};
+
 const update = (institution_id, data) => {
   return http.put(`/institutions/${institution_id}`, data);
 };
@@ -169,4 +173,5 @@ export default {
   uploadNonWorkingDays,
   uploadAdvancePayment,
   deleteAllInstitutionSchedules,
+  createUserForInstitution,
 };

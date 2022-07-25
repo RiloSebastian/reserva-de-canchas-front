@@ -10,6 +10,7 @@
   }
 }
 
+.no-price,
 .disable-date,
 .dinner {
   height: 100%;
@@ -36,6 +37,10 @@
 
 .dinner {
   background: rgba(255, 193, 7, 0.2);
+}
+
+.no-price {
+  background: rgb(255, 94, 0);
 }
 
 .dx-scheduler-time-panel-cell .dinner {

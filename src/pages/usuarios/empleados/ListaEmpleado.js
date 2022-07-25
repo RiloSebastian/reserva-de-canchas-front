@@ -1,5 +1,4 @@
-import MaterialTable from "material-table";
-import React, { useState, forwardRef } from "react";
+import { Delete } from "@material-ui/icons";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -15,18 +14,27 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import { Delete } from "@material-ui/icons";
+import { Stack } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Snackbar from "@mui/material/Snackbar";
+import { createTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
-import Chip from "@mui/material/Chip";
-import DoneIcon from "@mui/icons-material/Done";
-import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
+import MaterialTable from "material-table";
+import React, { forwardRef, useState, Fragment } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createUserForInstitution,
+  deleteAppUser,
+  updateAppUser,
+} from "../../../actions/institution";
 import ChipState from "../../../components/employees/ChipState";
-import { TextField } from "@material-ui/core";
-import authService from "../../../services/auth.service";
-import userService from "../../../services/user.service";
-import EmailService from "../../../services/email/EmailService";
 import { USER_ROLE } from "../../../constants/userRole";
+import userService from "../../../services/user.service";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const theme = createTheme({
   components: {
@@ -68,6 +76,8 @@ const tableIcons = {
 };
 
 const ListaEmpleado = () => {
+  const institution = useSelector((state) => state.institution);
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
 
   const [openSnackbar, setOpenSnackbar] = useState({
@@ -84,11 +94,11 @@ const ListaEmpleado = () => {
   const [columns, setColumns] = useState([
     {
       title: "Nombre",
-      field: "firstName",
+      field: "name",
       validate: (rowData) =>
-        rowData.firstName === undefined ||
-        rowData.firstName === "" ||
-        rowData.firstName.trim() === ""
+        rowData.name === undefined ||
+        rowData.name === "" ||
+        rowData.name.trim() === ""
           ? {
               isValid: false,
               helperText: "El nombre del usuario no puede estar vacio",
@@ -183,7 +193,7 @@ const ListaEmpleado = () => {
 
   const [data, setData] = useState([
     {
-      firstName: "Marcos",
+      name: "Marcos",
       lastName: "Gonzalez",
       email: "marcos@email.com",
       description: "Cancha de Polvo de Ladrillos",
@@ -191,7 +201,7 @@ const ListaEmpleado = () => {
       estado: true,
     },
     {
-      firstName: "Claudia",
+      name: "Claudia",
       lastName: "Solis",
       email: "claudia@email.com",
       description: "Cancha de Cemento",
@@ -199,7 +209,7 @@ const ListaEmpleado = () => {
       estado: true,
     },
     {
-      firstName: "Raul",
+      name: "Raul",
       lastName: "Perez",
       email: "raul@email.com",
       description: "Cancha de 5 Sintetica",
@@ -207,7 +217,7 @@ const ListaEmpleado = () => {
       estado: false,
     },
     {
-      firstName: "Susana",
+      name: "Susana",
       lastName: "Carbone",
       email: "susana@email.com",
       description: "Cancha de 9 de pasto natural",
@@ -215,7 +225,7 @@ const ListaEmpleado = () => {
       estado: true,
     },
     {
-      firstName: "Vanina",
+      name: "Vanina",
       lastName: "Sanchez",
       email: "vaninca@email.com",
       description: "Cancha de Cemento",
@@ -224,89 +234,58 @@ const ListaEmpleado = () => {
     },
   ]);
 
-  const desplegarModal = () => {
-    setOpen(true);
+  const handleCloseSnackbar = (event, reason) => {
+    setOpenSnackbar((prevState) => {
+      return { ...prevState, open: false };
+    });
   };
 
-  const handleChange = () => {
-    setActivo(true);
-  };
-
-  const createNewUser = async (newUser) => {
+  const createNewUser = (newUser) => {
     console.log("newUser");
-    console.log(newUser);
 
-    let user = { newUser };
+    let newUserAdapted = {
+      ...newUser,
+      telephone: "(11)3231-1234",
+      password: "Pass1!",
+      roles: [newUser.userRole],
+    };
 
-    try {
-      const registerUser = await authService
-        .register(
-          newUser.firstName,
-          newUser.lastName,
-          newUser.userRole,
-          newUser.email,
-          newUser.password
-        )
-        .then((data) => data);
+    let role_type = "";
 
-      console.log("usuario Creado");
-      console.log(registerUser);
-
-      //pegarle al endpo email
-
-      const emailSended = await EmailService.sendVerificationEmail(
-        registerUser.email
-      ).then((data) => data);
-
-      console.log("usuario creado");
-      console.log(registerUser);
-
-      console.log("email de confirmacion enviado");
-      console.log(emailSended);
-
-      return registerUser;
-    } catch (error) {
-      return Promise.reject(error.data);
+    switch (newUser.userRole) {
+      case USER_ROLE.COACH.role:
+        role_type = "coaches";
+        break;
+      case USER_ROLE.EMPLOYEE.role:
+        role_type = "employees";
+        break;
+      case USER_ROLE.ADMIN.role:
+        role_type = "managers";
+        break;
+      default:
+        break;
     }
+    console.log(newUserAdapted);
+    return dispatch(
+      createUserForInstitution(institution.id, role_type, [newUserAdapted])
+    );
   };
 
   const updateUser = async (userUpdated) => {
     console.log("userUpdated");
-    console.log(userUpdated);
-    try {
-      const userUpdated = await userService
-        .update(
-          userUpdated.firstName,
-          userUpdated.lastName,
-          userUpdated.userRole,
-          userUpdated.email,
-          userUpdated.password
-        )
-        .then((data) => data);
-
-      console.log("usuario updated");
-      console.log(userUpdated);
-
-      return userUpdated;
-    } catch (error) {
-      return Promise.reject(error.data);
-    }
+    let newUserAdapted = {
+      ...userUpdated,
+      roles: [userUpdated.userRole],
+    };
+    console.log(newUserAdapted);
+    return dispatch(updateAppUser(newUserAdapted));
   };
 
   const deleteUser = async (userId) => {
     console.log("userId");
     console.log(userId);
 
-    try {
-      const userDeleted = await userService.remove(userId).then((data) => data);
-
-      console.log("usuario eliminado correctamente");
-      console.log(userDeleted);
-
-      return userDeleted;
-    } catch (error) {
-      return Promise.reject(error.data);
-    }
+    return dispatch(deleteAppUser(userId));
   };
 
   return (
@@ -372,15 +351,20 @@ const ListaEmpleado = () => {
 
                   resolve();
                 })
-                .catch((err) => {
+                .catch((error) => {
                   console.log(
                     "error al agregar un nuevo usuario a la institucion"
                   );
-                  console.log(err);
+                  console.log(error);
                   setOpenSnackbar({
                     open: true,
                     severity: "error",
-                    message: err.message,
+                    message: Object.values(error.data).map((error, idx) => (
+                      <Fragment key={error}>
+                        {error}
+                        {<br />}
+                      </Fragment>
+                    )),
                   });
                   reject();
                 });
@@ -399,13 +383,18 @@ const ListaEmpleado = () => {
 
                   resolve();
                 })
-                .catch((err) => {
+                .catch((error) => {
                   console.log("error al editar el user seleccionado");
-                  console.log(err);
+                  console.log(error);
                   setOpenSnackbar({
                     open: true,
                     severity: "error",
-                    message: err.message,
+                    message: Object.values(error.data).map((error, idx) => (
+                      <Fragment key={error}>
+                        {error}
+                        {<br />}
+                      </Fragment>
+                    )),
                   });
                   reject();
                 });
@@ -424,19 +413,45 @@ const ListaEmpleado = () => {
 
                   resolve();
                 })
-                .catch((err) => {
+                .catch((error) => {
                   console.log("error al eliminar el user de la institucion");
-                  console.log(err);
+                  console.log(error);
                   setOpenSnackbar({
                     open: true,
                     severity: "error",
-                    message: err.message,
+                    message: Object.values(error.data).map((error, idx) => (
+                      <Fragment key={error}>
+                        {error}
+                        {<br />}
+                      </Fragment>
+                    )),
                   });
                   reject();
                 });
             }),
         }}
       />
+      <div>
+        <Stack spacing={2} sx={{ width: "100%" }}>
+          <Snackbar
+            autoHideDuration={4000}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+            open={openSnackbar.open}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert
+              severity={openSnackbar.severity}
+              onClose={handleCloseSnackbar}
+              sx={{ width: "100%" }}
+            >
+              {openSnackbar.message}
+            </Alert>
+          </Snackbar>
+        </Stack>
+      </div>
     </>
   );
 };
