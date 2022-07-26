@@ -693,7 +693,7 @@ const ListaCanchas = ({ institutionId }) => {
             emptyDataSourceMessage:
               "Aun no existen canchas asociadas a la institucion",
             filterRow: {
-              filterTooltip: "Filter",
+              filterTooltip: "Filtro",
             },
             editRow: {
               saveTooltip: "Confirmar",

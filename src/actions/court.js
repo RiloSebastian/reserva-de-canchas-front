@@ -4,6 +4,7 @@ import {
   CREATE_COURT,
   UPDATE_COURT,
   DELETE_COURT,
+  CLEAN_COURTS,
 } from "./types";
 
 export const retrieveCourts = (institution_id) => async (dispatch) => {
@@ -15,6 +16,10 @@ export const retrieveCourts = (institution_id) => async (dispatch) => {
     });
     return Promise.resolve(res.data);
   } catch (err) {
+    dispatch({
+      type: CLEAN_COURTS,
+      payload: [],
+    });
     return Promise.reject(err);
   }
 };

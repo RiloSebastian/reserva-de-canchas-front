@@ -114,6 +114,10 @@ const getBaseUrl = (role) => {
 
     case USER_ROLE.ADMIN.role:
       return BASE_URL_INSTITUTIONS;
+    case USER_ROLE.COACH.role:
+      return BASE_URL_INSTITUTIONS;
+    case USER_ROLE.EMPLOYEE.role:
+      return BASE_URL_INSTITUTIONS;
   }
 };
 
@@ -123,6 +127,10 @@ const getRoleRoutes = (role) => {
       return CustomerRoutes;
 
     case USER_ROLE.ADMIN.role:
+      return InstitutionRoutes;
+    case USER_ROLE.COACH.role:
+      return InstitutionRoutes;
+    case USER_ROLE.EMPLOYEE.role:
       return InstitutionRoutes;
   }
 };

@@ -9,6 +9,9 @@ import {
   CREATE_MANAGER,
   UPDATE_MANAGER,
   DELETE_MANAGER,
+  RETRIEVE_MANAGERS,
+  RETRIEVE_EMPLOYEES,
+  RETRIEVE_COACHES,
 } from "../actions/types";
 
 const initialState = {};
@@ -43,30 +46,6 @@ export default function (institution = initialState, action) {
       return {
         ...institution,
         times: payload,
-      };
-    case CREATE_MANAGER:
-      return {
-        ...institution,
-        managers: [...institution.managers, payload],
-      };
-    case UPDATE_MANAGER:
-      return {
-        ...institution,
-        managers: institution.managers.map((manager) => {
-          if (manager.id === payload.id) {
-            return {
-              ...manager,
-              ...payload,
-            };
-          } else {
-            return manager;
-          }
-        }),
-      };
-    case DELETE_MANAGER:
-      return {
-        ...institution,
-        managers: institution.managers.filter(({ id }) => id !== payload.id),
       };
     default:
       return institution;

@@ -5,6 +5,27 @@ const formatTime = "hh:mm a";
 const es = moment().locale("es");
 
 export default class Utils {
+  static genPassword() {
+    const number = "0123456789";
+    const lowChars = "abcdefghijklmnopqrstuvwxyz";
+    const upChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const specialChars = "!@#$%^&*()";
+
+    const passwordLength = 3;
+    let password = "";
+    for (let i = 0; i <= passwordLength; i++) {
+      let randomNumber1 = Math.floor(Math.random() * number.length);
+      let randomNumber2 = Math.floor(Math.random() * lowChars.length);
+      let randomNumber3 = Math.floor(Math.random() * upChars.length);
+      let randomNumber4 = Math.floor(Math.random() * specialChars.length);
+      password += number.substring(randomNumber1, randomNumber1 + 1);
+      password += lowChars.substring(randomNumber2, randomNumber2 + 1);
+      password += upChars.substring(randomNumber3, randomNumber3 + 1);
+      password += specialChars.substring(randomNumber4, randomNumber4 + 1);
+    }
+    return password;
+  }
+
   static isHoliday(date, holidays) {
     const localeDate = date.toLocaleDateString();
     return (

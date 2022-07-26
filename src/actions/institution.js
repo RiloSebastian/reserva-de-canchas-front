@@ -10,6 +10,9 @@ import {
   CREATE_MANAGER,
   UPDATE_MANAGER,
   DELETE_MANAGER,
+  RETRIEVE_MANAGERS,
+  RETRIEVE_EMPLOYEES,
+  RETRIEVE_COACHES,
 } from "./types";
 
 import InstitucionService from "../services/instituciones/InstitucionService";
@@ -220,7 +223,7 @@ export const setInstitution = (payload) => (dispatch) => {
   dispatch({ type: "SET_INSTITUTION", payload });
 };
 
-export const retrieveCretrieveInstitutionByAdmainEmailourts =
+export const retrieveInstitutionByAdmainEmail =
   (user_email) => async (dispatch) => {
     try {
       const res = await InstitucionService.getByAdminEmail(user_email);
@@ -233,3 +236,42 @@ export const retrieveCretrieveInstitutionByAdmainEmailourts =
       return Promise.reject(err);
     }
   };
+
+export const retrieveManagers = (institution_id) => async (dispatch) => {
+  try {
+    const res = await InstitucionService.getAllManagers(institution_id);
+    dispatch({
+      type: RETRIEVE_MANAGERS,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
+export const retrieveEmployees = (institution_id) => async (dispatch) => {
+  try {
+    const res = await InstitucionService.getAllEmployees(institution_id);
+    dispatch({
+      type: RETRIEVE_EMPLOYEES,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
+export const retrieveCoches = (institution_id) => async (dispatch) => {
+  try {
+    const res = await InstitucionService.getAllCoaches(institution_id);
+    dispatch({
+      type: RETRIEVE_COACHES,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};

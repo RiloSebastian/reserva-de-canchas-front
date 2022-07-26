@@ -3,6 +3,7 @@ import {
   CREATE_COURT,
   UPDATE_COURT,
   DELETE_COURT,
+  CLEAN_COURTS,
 } from "../actions/types";
 
 const initialState = [];
@@ -28,6 +29,8 @@ export default function (courts = initialState, action) {
       });
     case DELETE_COURT:
       return courts.filter(({ id }) => id !== payload.id);
+    case CLEAN_COURTS:
+      return payload;
     default:
       return courts;
   }
