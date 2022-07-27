@@ -1,7 +1,6 @@
-import http from '../../http-common'
-import AuthHeader from '../auth-header';
+import http from "../../http-common";
 
-const getAll = async () => {
+/* const getAll = async () => {
     try {
         const listadoDeportes = await http.get(`/sports`, { headers: AuthHeader() });
         console.log('listado de deportes');
@@ -12,7 +11,11 @@ const getAll = async () => {
         return Promise.reject(err);
     }
 };
+ */
+const getAll = () => {
+  return http.get(`/sports`);
+};
 
 export default {
-    getAll,
+  getAll,
 };

@@ -38,6 +38,7 @@ import React, {
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createCourt, deleteCourt, updateCourt } from "../../actions/court";
+import { retrieveSports } from "../../actions/sports";
 import ChipState from "../../components/employees/ChipState";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
 import UploadPhotos from "../../components/ui/UploadPhotos";
@@ -164,6 +165,8 @@ const ListaCanchas = ({ institutionId }) => {
 
   const institution = useSelector((state) => state.institution);
 
+  const sportsData = useSelector((state) => state.sports);
+
   const history = useHistory();
 
   const classes = useStyles();
@@ -237,6 +240,7 @@ const ListaCanchas = ({ institutionId }) => {
     {
       title: "Deporte",
       field: "sport",
+
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
@@ -249,13 +253,13 @@ const ListaCanchas = ({ institutionId }) => {
       editComponent: (rowData) => {
         return (
           <Select
-            value={rowData.value || "string"}
+            value={rowData.value || undefined}
             onChange={(e) => {
               rowData.onChange(String(e.target.value));
               setSportSelected(e.target.value);
             }}
           >
-            {sportArray.map((type) => (
+            {sportsData.map((type) => (
               <MenuItem value={type.id}>{type.name}</MenuItem>
             ))}
           </Select>
@@ -272,7 +276,6 @@ const ListaCanchas = ({ institutionId }) => {
               helperText: "Debe seleccionar la Superficie de la Cancha",
             }
           : true,
-      //lookup: (rowData) => getSurfaces(rowData.sport),
       lookup: surfaces,
       render: (rowData) => rowData.courtType,
     },
@@ -435,28 +438,20 @@ const ListaCanchas = ({ institutionId }) => {
     console.log("images", images);
   };
 
-  const retrieveSportsList = async () => {
-    try {
-      const listadoDeportes = await DeporteService.getAll();
+  const retrieveSportsList = () => {
+    dispatch(retrieveSports())
+      .then((data) => {
+        const dynamicLookupObject = data.reduce(function (acc, cur, i) {
+          acc[cur.id] = cur.name;
 
-      console.log("listadoDeportes");
-      console.log(listadoDeportes);
+          return acc;
+        }, {});
 
-      const data = listadoDeportes.data;
-
-      if (data) {
-        const sports = {};
-        data.map((s) => (sports[s.id] = s.name));
-
-        console.log(sports);
-
-        setSports(sports);
-        setSportArray(data);
-      }
-    } catch (err) {
-      //history.push("/login");
-      console.log("ERROR AL OBTENER LA LISTA DE DEPORTES");
-    }
+        setSports(dynamicLookupObject);
+      })
+      .catch((error) => {
+        setSports([]);
+      });
   };
 
   const desplegarModal = (props) => {
@@ -483,9 +478,9 @@ const ListaCanchas = ({ institutionId }) => {
       {
         ...newCancha,
         cancelationTimeInHours: 1,
-        courtType: "CEMENTO",
+        // courtType: "CEMENTO",
         institutionId: institution.id,
-        sport: "TENIS",
+        //sport: "TENIS",
         state: "DISABLED",
       },
     ];
@@ -607,38 +602,15 @@ const ListaCanchas = ({ institutionId }) => {
       return;
     }
 
-    console.log("sportArray");
-    console.log(sportArray);
-    console.log("sportSelected");
-    console.log(sportSelected);
+    const surfacesArrayFilteredBySport = sportsData.filter(
+      (s) => s.id === sportSelected
+    )[0].surfaces;
 
-    const surfacesArrayFiltered = sportArray.filter(
-      (s) => s.id == sportSelected
-    );
-
-    if (surfacesArrayFiltered.length > 0) {
-      /* const dynamicLookupSurfaces = sportArray.surfaces.reduce(function (
-        acc,
-        cur,
-        i
-      ) {
-        acc[cur.id] = cur.name;
-
-        return acc;
-      },
-      {}); */
-
-      const dynamicLookupSurfaces = surfacesArray[0].surface.reduce(function (
-        acc,
-        cur,
-        i
-      ) {
-        acc[cur.id] = cur.name;
-
-        return acc;
-      },
-      {});
-
+    if (surfacesArrayFilteredBySport.length > 0) {
+      const dynamicLookupSurfaces = surfacesArrayFilteredBySport.reduce(
+        (a, v) => ({ ...a, [v]: v }),
+        {}
+      );
       setSurfaces(dynamicLookupSurfaces);
     } else {
       console.log("no hay superficies cargadas");
@@ -651,14 +623,6 @@ const ListaCanchas = ({ institutionId }) => {
 
     //SETEAR LOS DEPORTES DISPONIBLES
     retrieveSportsList();
-
-    const dynamicLookupObject = sportArray.reduce(function (acc, cur, i) {
-      acc[cur.id] = cur.name;
-
-      return acc;
-    }, {});
-
-    console.log(dynamicLookupObject);
 
     //setSport(dynamicLookupObject);
     //setData(courtList);

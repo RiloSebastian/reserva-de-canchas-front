@@ -1,18 +1,19 @@
 import {
+  CREATE_MANAGER,
   DELETE_INSTITUTION_SCHEDULES,
+  DELETE_MANAGER,
   GET_INSTITUTION,
   GET_INSTITUTION_FAILED,
+  GET_INSTITUTION_SCHEDULES_FAILED,
   LOAD_INSTITUTION_ADVANCE_PAYMENT,
   LOAD_INSTITUTION_DAYSOFF,
   LOAD_INSTITUTION_SCHEDULES,
-  RETRIEVE_INSTITUTION,
-  UPDATE_INSTITUTION,
-  CREATE_MANAGER,
-  UPDATE_MANAGER,
-  DELETE_MANAGER,
-  RETRIEVE_MANAGERS,
-  RETRIEVE_EMPLOYEES,
   RETRIEVE_COACHES,
+  RETRIEVE_EMPLOYEES,
+  RETRIEVE_INSTITUTION,
+  RETRIEVE_MANAGERS,
+  UPDATE_INSTITUTION,
+  UPDATE_MANAGER,
 } from "./types";
 
 import InstitucionService from "../services/instituciones/InstitucionService";
@@ -62,6 +63,24 @@ export const deleteAppUser = (user_id) => async (dispatch) => {
   }
 };
 
+export const getInstitutionSchedules = (institution_id) => async (dispatch) => {
+  try {
+    const res = await InstitucionService.getInstitutionSchedules(
+      institution_id
+    );
+    dispatch({
+      type: LOAD_INSTITUTION_SCHEDULES,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    dispatch({
+      type: GET_INSTITUTION_SCHEDULES_FAILED,
+    });
+    return Promise.reject(err.response);
+  }
+};
+
 export const getByAdminEmail = (admin_email) => (dispatch) => {
   return InstitucionService.getByAdminEmail(admin_email).then(
     (response) => {
@@ -76,42 +95,6 @@ export const getByAdminEmail = (admin_email) => (dispatch) => {
       return response;
     },
     (error) => {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-
-      dispatch({
-        type: GET_INSTITUTION_FAILED,
-      });
-
-      return Promise.reject();
-    }
-  );
-};
-
-export const getInstitutionSchedules = (institution_id) => (dispatch) => {
-  return InstitucionService.getInstitutionSchedules(institution_id).then(
-    (response) => {
-      console.log("ejecutando action para obtener horarios de la institucion");
-      console.log(response);
-
-      //TRAIGO LOS HORARIOS DE LA INSTITUCION
-
-      dispatch({
-        type: LOAD_INSTITUTION_SCHEDULES,
-        payload: response,
-      });
-
-      return Promise.resolve();
-    },
-    (error) => {
-      console.log(
-        "ERROR -> ejecutando action para obtener horarios de la institucion"
-      );
-      console.log(error);
       const message =
         (error.response &&
           error.response.data &&

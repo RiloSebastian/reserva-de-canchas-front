@@ -6,6 +6,7 @@ import court from "./court";
 import managers from "./managers";
 import reservations from "./reservations";
 import promotions from "./promotions";
+import sports from "./sports";
 
 export default combineReducers({
   auth,
@@ -15,4 +16,5 @@ export default combineReducers({
   managers,
   reservations,
   promotions,
+  sports,
 });

@@ -1,17 +1,11 @@
 import {
-  SET_INSTITUTION,
-  UPDATE_INSTITUTION,
+  DELETE_INSTITUTION_SCHEDULES,
+  GET_INSTITUTION_SCHEDULES_FAILED,
+  LOAD_INSTITUTION_DAYSOFF,
   LOAD_INSTITUTION_SCHEDULES,
   LOAD_INSTITUTION_TIMES,
   RETRIEVE_INSTITUTION,
-  DELETE_INSTITUTION_SCHEDULES,
-  LOAD_INSTITUTION_DAYSOFF,
-  CREATE_MANAGER,
-  UPDATE_MANAGER,
-  DELETE_MANAGER,
-  RETRIEVE_MANAGERS,
-  RETRIEVE_EMPLOYEES,
-  RETRIEVE_COACHES,
+  UPDATE_INSTITUTION,
 } from "../actions/types";
 
 const initialState = {};
@@ -38,6 +32,11 @@ export default function (institution = initialState, action) {
         schedules: payload,
       };
     case DELETE_INSTITUTION_SCHEDULES:
+      return {
+        ...institution,
+        schedules: [],
+      };
+    case GET_INSTITUTION_SCHEDULES_FAILED:
       return {
         ...institution,
         schedules: [],
