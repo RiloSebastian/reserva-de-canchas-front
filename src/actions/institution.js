@@ -216,7 +216,7 @@ export const retrieveInstitutionByAdmainEmail =
       });
       return Promise.resolve(res.data);
     } catch (err) {
-      return Promise.reject(err);
+      return Promise.reject(err.response);
     }
   };
 

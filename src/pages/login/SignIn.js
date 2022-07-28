@@ -181,10 +181,17 @@ const SignIn = (props) => {
           case "ROLE_ADMIN":
             console.log("ROLE_ADMIN");
 
-            dispatch(retrieveInstitutionByAdmainEmail(user.email));
-
-            console.log("Abrir dashboard");
-            history.push("/dashboard/reservas");
+            dispatch(retrieveInstitutionByAdmainEmail(user.email))
+              .then((data) => {
+                console.log("Abrir dashboard");
+                history.push("/dashboard/reservas");
+              })
+              .catch((err) => {
+                if (err.status === 404) {
+                  handleMessageError(err.data.message);
+                  setShowMessageError(true);
+                }
+              });
 
             break;
           case "ROLE_EMPLOYEE":
