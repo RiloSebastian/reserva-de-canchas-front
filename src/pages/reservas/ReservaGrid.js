@@ -32,19 +32,13 @@ function ReservaGrid() {
 
   const [currentDate, setCurrentDate] = useState(new Date(2021, 3, 27));
   const [currentView, setCurrentView] = useState(views[0]);
-  const [sportSelected, setSportSelected] = useState(sportsList[0]);
+  const [sportSelected, setSportSelected] = useState("");
+  const [sports, setSports] = useState([]);
   const [courts, setCourts] = useState(priorityData);
 
-  /* const onAppointmentFormOpening = (e) => {
-    const startDate = new Date(e.appointmentData.startDate);
-    if (!Utils.isValidAppointmentDate(startDate)) {
-      e.cancel = true;
-      notifyDisableDate();
-    }
-    applyDisableDatesToDateEditors(e.form);
-  }; */
-
   const onAppointmentFormOpening = (e) => {
+    console.log("ABRIENDO FORM");
+    console.log(e);
     const startDate = new Date(e.appointmentData.startDate);
     if (!Utils.isValidAppointmentDate(startDate)) {
       e.cancel = true;
@@ -68,7 +62,19 @@ function ReservaGrid() {
       );
     console.log("CAMPOS DEL FORM");
     console.log(mainGroupItems);
-    if (
+    mainGroupItems = mainGroupItems.map((mainGroupItem) => {
+      if (mainGroupItem.dataField == "text") {
+        return {
+          ...mainGroupItem,
+          label: { text: "Nombre y Apellido" },
+          validationRules: [{ type: "required" }],
+        };
+      } else {
+        return mainGroupItem;
+      }
+    });
+
+    /* if (
       !mainGroupItems.find(function (i) {
         return i.dataField === "phone";
       })
@@ -78,9 +84,10 @@ function ReservaGrid() {
         label: { text: "Numero de Telefono" },
         editorType: "dxTextBox",
         dataField: "phone",
+        validationRules: [{ type: "required" }],
       });
       form.itemOption("mainGroup", "items", mainGroupItems);
-    }
+    } */
 
     if (
       !mainGroupItems.find(function (i) {
@@ -92,6 +99,7 @@ function ReservaGrid() {
         label: { text: "Correo Electronico" },
         editorType: "dxTextBox",
         dataField: "email",
+        validationRules: [{ type: "required" }],
       });
       form.itemOption("mainGroup", "items", mainGroupItems);
     }
@@ -154,7 +162,9 @@ function ReservaGrid() {
       firstUpdate.current = false;
       return;
     }
-    console.log("1 DEVUELVO LAS CANCHAS PARA EL DEPORTE " + sportSelected);
+    console.log(
+      "[SPORT-SELECTED] DEVUELVO LAS CANCHAS PARA EL DEPORTE " + sportSelected
+    );
     console.log(courtList);
     const courtFilteredBySport = courtList
       .filter((court) => court.sport === sportSelected)
@@ -167,7 +177,19 @@ function ReservaGrid() {
   }, [sportSelected]);
 
   useEffect(() => {
-    console.log("2 DEVUELVO LAS CANCHAS PARA EL DEPORTE " + sportSelected);
+    console.log(
+      "[CONSTRUCTOR] DEVUELVO LAS CANCHAS PARA EL DEPORTE " + sportSelected
+    );
+
+    console.log(courtList);
+
+    const sportsByInstitutions = courtList
+      .map((item) => item.sport)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    setSportSelected(sportsByInstitutions[0]);
+
+    setSports(sportsByInstitutions);
 
     const courtFilteredBySport = courtList
       .filter((court) => court.sport === sportSelected)
@@ -187,7 +209,7 @@ function ReservaGrid() {
             <div className="caption">Grilla de Reservas</div>
             <div className="option">
               <RadioGroup
-                items={sportsList}
+                items={sports}
                 value={sportSelected}
                 layout="horizontal"
                 onValueChanged={onRadioGroupValueChanged}
