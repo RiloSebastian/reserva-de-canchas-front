@@ -30,6 +30,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import Snackbar from "@mui/material/Snackbar";
 import { login } from "../../actions/auth";
 import { retrieveInstitutionByAdmainEmail } from "../../actions/institution";
+import { retrieveCourts } from "../../actions/court";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -183,6 +184,10 @@ const SignIn = (props) => {
 
             dispatch(retrieveInstitutionByAdmainEmail(user.email))
               .then((data) => {
+                dispatch(retrieveCourts(data.id))
+                  .then((data) => data)
+                  .catch((err) => {});
+
                 console.log("Abrir dashboard");
                 history.push("/dashboard/reservas");
               })

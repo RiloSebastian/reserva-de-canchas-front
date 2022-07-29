@@ -1,6 +1,6 @@
 import React from "react";
-import Utils from "../../utils/utils";
 import ReservationDetails from "../ui/devexpress/ReservationDetails";
+import ReservationNoPriceDetails from "../ui/devexpress/ReservationNoPriceDetails";
 
 export default function DataCell({
   children,
@@ -20,7 +20,13 @@ export default function DataCell({
   } else if (isDinner) {
     cssClasses += " dinner";
   } else if (timePrice === 0) {
-    cssClasses += " no-price";
+    return (
+      <ReservationNoPriceDetails
+        itemData={itemData}
+        timePrice={timePrice}
+        courtDetails={courtDetails}
+      />
+    );
   } else {
     return (
       <ReservationDetails

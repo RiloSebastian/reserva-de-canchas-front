@@ -186,16 +186,8 @@ const FormularioHorarioPrecioCancha = ({
     const data = handleAddDaysAvailable();
     console.log(data);
 
-    //setSchedules(data);
     onChange(data);
     setOpen(false);
-    /* setLoading(true);
-
-    setHorariosYPrecios((body) => {
-      return { ...body, ["schedules"]: horarios };
-    });
-
-    setOpen(false); */
   };
 
   const handleClose = () => {

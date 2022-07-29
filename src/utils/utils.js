@@ -1,4 +1,4 @@
-import { dinnerTime } from "./data/data";
+import { dinnerTime } from "../pages/reservas/data";
 import moment from "moment";
 
 const formatTime = "hh:mm a";
@@ -45,9 +45,6 @@ export default class Utils {
 
     let isDinner = true;
 
-    /*   console.log("PRINTEANDO BUSY TIMES EN UTILS");
-    console.log(busyTime); */
-
     for (const range of busyTime) {
       for (const horario of range.horariosLaborales) {
         for (var i = horario.from; i <= horario.to - 1; i++) {
@@ -57,12 +54,8 @@ export default class Utils {
         }
       }
     }
-    /* for (const range of dinnerTime) {
-      return hours >= range.from && hours < range.to;
-    } */
 
     return isDinner;
-    //return hours >= dinnerTime.from && hours < dinnerTime.to;
   }
 
   static getTimePrice(courtDetails, itemData) {
@@ -137,10 +130,6 @@ export default class Utils {
     busyTime,
     holidays
   ) {
-    console.log("VALIDANDO SI ES UN APPOINTMENT VALIDO");
-    console.log(component);
-    console.log(appointmentData);
-    console.log(workingDays);
     const startDate = new Date(appointmentData.startDate);
     const endDate = new Date(appointmentData.endDate);
     const cellDuration = 60;

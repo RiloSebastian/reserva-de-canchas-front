@@ -165,6 +165,8 @@ const ListaCanchas = ({ institutionId }) => {
 
   const institution = useSelector((state) => state.institution);
 
+  const courts = useSelector((state) => state.court);
+
   const sportsData = useSelector((state) => state.sports);
 
   const history = useHistory();
@@ -204,7 +206,7 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [schedules, setSchedules] = useState([]);
 
-  const [sports, setSports] = useState({});
+  const [sport, setSports] = useState({});
 
   const [surfaces, setSurfaces] = useState([]);
 
@@ -240,7 +242,6 @@ const ListaCanchas = ({ institutionId }) => {
     {
       title: "Deporte",
       field: "sport",
-
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
@@ -248,7 +249,7 @@ const ListaCanchas = ({ institutionId }) => {
               helperText: "Debe seleccionar un deporte para la cancha",
             }
           : true,
-      lookup: sports,
+      lookup: sport,
       render: (rowData) => rowData.sport,
       editComponent: (rowData) => {
         return (
@@ -260,7 +261,7 @@ const ListaCanchas = ({ institutionId }) => {
             }}
           >
             {sportsData.map((type) => (
-              <MenuItem value={type.id}>{type.name}</MenuItem>
+              <MenuItem value={type.name}>{type.name}</MenuItem>
             ))}
           </Select>
         );
@@ -279,7 +280,17 @@ const ListaCanchas = ({ institutionId }) => {
       lookup: surfaces,
       render: (rowData) => rowData.courtType,
     },
-    { title: "Descripcion", field: "description" },
+    {
+      title: "Descripcion",
+      field: "description",
+      validate: (rowData) =>
+        rowData.description === undefined || rowData.description === ""
+          ? {
+              isValid: false,
+              helperText: "La descripcion de la cancha no puede estar vacio",
+            }
+          : true,
+    },
     {
       title: "Seña",
       field: "signPorcentage",
@@ -442,10 +453,13 @@ const ListaCanchas = ({ institutionId }) => {
     dispatch(retrieveSports())
       .then((data) => {
         const dynamicLookupObject = data.reduce(function (acc, cur, i) {
-          acc[cur.id] = cur.name;
+          acc[cur.name] = cur.name;
 
           return acc;
         }, {});
+
+        console.log("CARGANDO LISTA DE DEPORTES");
+        console.log(dynamicLookupObject);
 
         setSports(dynamicLookupObject);
       })
@@ -478,24 +492,28 @@ const ListaCanchas = ({ institutionId }) => {
       {
         ...newCancha,
         cancelationTimeInHours: 1,
-        // courtType: "CEMENTO",
         institutionId: institution.id,
-        //sport: "TENIS",
+        courtCover: newCancha.courtCover ? newCancha.courtCover : false,
+        courtIllumination: newCancha.courtIllumination
+          ? newCancha.courtIllumination
+          : false,
         state: "DISABLED",
+        schedules: newCancha.schedules,
       },
     ];
 
     return dispatch(createCourt(institution.id, cancha));
   };
 
-  const updateCancha = async (canchaToUpdated) => {
+  const updateCancha = (canchaToUpdated) => {
     console.log("canchaToUpdated");
 
     const cancha = {
       ...canchaToUpdated,
       cancelationTimeInHours: 1,
       institutionId: institution.id,
-      ["schedules"]: schedules,
+      state: "DISABLED",
+      //  schedules: canchaToUpdated.schedules,
     };
 
     console.log(cancha);
@@ -503,96 +521,33 @@ const ListaCanchas = ({ institutionId }) => {
     return dispatch(updateCourt(cancha));
   };
 
-  const deleteCancha = async (id) => {
+  const deleteCancha = (id) => {
     console.log("ELIMINANDO CANCHA " + id);
 
     return dispatch(deleteCourt(id));
   };
 
-  const retrieveCourts = async (institutionId) => {
-    try {
-      const listadoCanchas = await CanchaService.getAll(institutionId);
-
+  const retrieveCourts = () => {
+    setData(courts);
+    /* dispatch(retrieveCourts(institutionId)).then(data => {
       console.log("listadoCanchas");
       console.log(listadoCanchas);
 
-      const data = listadoCanchas.data.map(
-        ({
-          id,
-          name,
-          sport,
-          courtType,
-          courtCover,
-          courtIllumination,
-          signPorcentage,
-          state,
-          description,
-          schedules,
-        }) => {
-          console.log("REARMANDO CANCHA PARA LISTARLAS");
-          console.log({
-            id,
-            name,
-            sport,
-            courtType,
-            courtCover,
-            courtIllumination,
-            signPorcentage,
-            state,
-            description,
-            schedules,
-          });
-          return {
-            id,
-            name,
-            sport,
-            courtType,
-            courtCover,
-            courtIllumination,
-            signPorcentage,
-            state,
-            description,
-            schedules,
-          };
-        }
-      );
+      const data = listadoCanchas.data.map((data) => data);
 
       setData(data);
+    }).catch(err => {
+      setData([]);
+    });
 
-      /* if (data) {
-        data.forEach((court) => {
-          console.log("obteniendo imagenes");
-          console.log(court);
+    try {
+      const listadoCanchas = await CanchaService.getAll(institutionId);
 
-          if (court.images_id !== null) {
-            let photos = [];
-
-            court.images_id.forEach((image_id) => {
-              photos.push({
-                img: "http://localhost:8080/api/photos/" + image_id,
-                title: "Breakfast",
-                author: "@bkristastucchio",
-                featured: true,
-              });
-            });
-
-            console.log("array de photos");
-            console.log(photos);
-
-            court.photos = photos;
-          } else {
-          }
-        });
-
-        console.log("final data");
-        console.log(data);
-
-        setData(data);
-      } */
+      
     } catch (err) {
       //history.push("/login");
-      setData([]);
-    }
+     
+    } */
   };
 
   const firstUpdate = useRef(true);
@@ -603,7 +558,7 @@ const ListaCanchas = ({ institutionId }) => {
     }
 
     const surfacesArrayFilteredBySport = sportsData.filter(
-      (s) => s.id === sportSelected
+      (s) => s.name === sportSelected
     )[0].surfaces;
 
     if (surfacesArrayFilteredBySport.length > 0) {
@@ -611,6 +566,8 @@ const ListaCanchas = ({ institutionId }) => {
         (a, v) => ({ ...a, [v]: v }),
         {}
       );
+      console.log("CARGANDO SURFACES");
+      console.log(dynamicLookupSurfaces);
       setSurfaces(dynamicLookupSurfaces);
     } else {
       console.log("no hay superficies cargadas");
@@ -713,13 +670,19 @@ const ListaCanchas = ({ institutionId }) => {
 
                   resolve();
                 })
-                .catch((err) => {
+                .catch((error) => {
                   console.log("error al agregar cancha a la lista");
-                  console.log(err);
+                  console.log(error);
                   setOpenSnackbar({
                     open: true,
                     severity: "error",
-                    message: err.message,
+                    message: Object.values(error.data).map((error, idx) => (
+                      <Fragment key={error}>
+                        {<br />}
+                        {error}
+                        {<br />}
+                      </Fragment>
+                    )),
                   });
                   reject();
                 });
