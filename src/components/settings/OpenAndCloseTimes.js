@@ -35,6 +35,14 @@ import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
+const useStyles = makeStyles((theme) => ({
+  ...theme.typography.body2,
+  textAlign: "center",
+  color: theme.palette.text.secondary,
+  height: 30,
+  lineHeight: "30px",
+}));
+
 export const OpenAndCloseTimes = ({ props, institution }) => {
   const classes = useStyles();
   const theme = useTheme();
@@ -46,14 +54,6 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
   const [snackbar, setSnackbar] = useState({});
 
   const [noSchedulesLoadedOpen, setNoSchedulesLoadedOpen] = useState(false);
-
-  const useStyles = makeStyles((theme) => ({
-    ...theme.typography.body2,
-    textAlign: "center",
-    color: theme.palette.text.secondary,
-    height: 30,
-    lineHeight: "30px",
-  }));
 
   const [disabled, setDisabled] = useState(true);
 

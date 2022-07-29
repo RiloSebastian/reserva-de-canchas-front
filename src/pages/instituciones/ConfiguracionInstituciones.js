@@ -44,7 +44,11 @@ const ConfiguracionInstituciones = () => {
   useEffect(() => {
     //Obtener Datos de la Institucions
 
-    dispatch(getInstitutionSchedules(institution.id));
+    dispatch(getInstitutionSchedules(institution.id))
+      .then((data) => {})
+      .catch((error) =>
+        console.log("ERROR AL OBTENER LOS HORARIOS DE LA INSTITUCION")
+      );
   }, []);
 
   return (

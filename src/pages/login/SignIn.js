@@ -14,7 +14,6 @@ import AuthService from "../../services/auth.service";
 import AppAppBar from "./../home/modules/views/AppAppBar";
 
 import { useDispatch } from "react-redux";
-import { retrieveCretrieveInstitutionByAdmainEmailourts } from "../../actions/institution";
 import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 import EmailService from "../../services/email/EmailService";
 
@@ -30,6 +29,8 @@ import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Snackbar from "@mui/material/Snackbar";
 import { login } from "../../actions/auth";
+import { retrieveInstitutionByAdmainEmail } from "../../actions/institution";
+import { retrieveCourts } from "../../actions/court";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -181,19 +182,36 @@ const SignIn = (props) => {
           case "ROLE_ADMIN":
             console.log("ROLE_ADMIN");
 
-            dispatch(
-              retrieveCretrieveInstitutionByAdmainEmailourts(user.email)
-            );
+            dispatch(retrieveInstitutionByAdmainEmail(user.email))
+              .then((data) => {
+                dispatch(retrieveCourts(data.id))
+                  .then((data) => data)
+                  .catch((err) => {});
 
-            console.log("Abrir dashboard");
-            history.push("/dashboard/reservas");
+                console.log("Abrir dashboard");
+                history.push("/dashboard/reservas");
+              })
+              .catch((err) => {
+                if (err.status === 404) {
+                  handleMessageError(err.data.message);
+                  setShowMessageError(true);
+                }
+              });
 
             break;
           case "ROLE_EMPLOYEE":
             console.log("ROLE_EMPLOYEE");
+            dispatch(retrieveInstitutionByAdmainEmail(user.email));
+
+            console.log("Abrir dashboard");
+            history.push("/dashboard/reservas");
             break;
           case "ROLE_COACH":
             console.log("ROLE_COACH");
+            dispatch(retrieveInstitutionByAdmainEmail(user.email));
+
+            console.log("Abrir dashboard");
+            history.push("/dashboard/reservas");
             break;
           case "ROLE_SUPER_ADMIN":
             console.log("ROLE_SUPER_ADMIN");

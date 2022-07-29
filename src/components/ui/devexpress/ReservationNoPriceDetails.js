@@ -1,8 +1,9 @@
 import React from "react";
 
-const ReservationDetails = ({ itemData, timePrice, courtDetails }) => {
+const ReservationNoPriceDetails = ({ itemData, timePrice, courtDetails }) => {
   return (
     <div
+      className={" no-price"}
       style={{
         display: "flex",
         alignItems: "center",
@@ -11,9 +12,9 @@ const ReservationDetails = ({ itemData, timePrice, courtDetails }) => {
         fontWeight: "bold",
       }}
     >
-      $ {timePrice}
+      Sin Precio
     </div>
   );
 };
 
-export default ReservationDetails;
+export default ReservationNoPriceDetails;

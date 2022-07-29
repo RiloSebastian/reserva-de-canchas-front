@@ -182,89 +182,91 @@ const AppointmentFormContainerBasic = ({
   });
 
   return (
-    <AppointmentForm.Overlay
-      visible={visible}
-      target={target}
-      fullSize
-      onHide={onHide}
-    >
-      <StyledDiv>
-        <div style={{ marginTop: 75 }} className={classes.header}>
-          <IconButton
-            className={classes.closeButton}
-            onClick={cancelChanges}
-            size="large"
-          >
-            <Close color="action" />
-          </IconButton>
-        </div>
-        <div className={classes.content}>
-          <div className={classes.wrapper}>
-            <Create className={classes.icon} color="action" />
-            <TextField {...textEditorProps("title")} />
+    <>
+      <AppointmentForm.Overlay
+        visible={visible}
+        target={target}
+        fullSize
+        onHide={onHide}
+      >
+        <StyledDiv>
+          <div style={{ marginTop: 75 }} className={classes.header}>
+            <IconButton
+              className={classes.closeButton}
+              onClick={cancelChanges}
+              size="large"
+            >
+              <Close color="action" />
+            </IconButton>
           </div>
-          <div className={classes.wrapper}>
-            <CalendarToday className={classes.icon} color="action" />
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <DateTimePicker
-                label="Start Date"
-                renderInput={(props) => (
-                  <TextField className={classes.picker} {...props} />
-                )}
-                {...startDatePickerProps}
+          <div className={classes.content}>
+            <div className={classes.wrapper}>
+              <Create className={classes.icon} color="action" />
+              <TextField {...textEditorProps("title")} />
+            </div>
+            <div className={classes.wrapper}>
+              <CalendarToday className={classes.icon} color="action" />
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                <DateTimePicker
+                  label="Start Date"
+                  renderInput={(props) => (
+                    <TextField className={classes.picker} {...props} />
+                  )}
+                  {...startDatePickerProps}
+                />
+                <DateTimePicker
+                  label="End Date"
+                  renderInput={(props) => (
+                    <TextField className={classes.picker} {...props} />
+                  )}
+                  {...endDatePickerProps}
+                />
+              </LocalizationProvider>
+            </div>
+            <div className={classes.wrapper}>
+              <FormControlLabel
+                control={<Checkbox defaultChecked />}
+                label="repeat"
               />
-              <DateTimePicker
-                label="End Date"
-                renderInput={(props) => (
-                  <TextField className={classes.picker} {...props} />
-                )}
-                {...endDatePickerProps}
-              />
-            </LocalizationProvider>
+            </div>
+            <div className={classes.wrapper}>
+              <MailIcon className={classes.icon} color="action" />
+              <TextField {...textEditorProps("Email")} />
+            </div>
+            <div className={classes.wrapper}>
+              <LocationOn className={classes.icon} color="action" />
+              <TextField {...textEditorProps("Email")} />
+            </div>
           </div>
-          <div className={classes.wrapper}>
-            <FormControlLabel
-              control={<Checkbox defaultChecked />}
-              label="repeat"
-            />
-          </div>
-          <div className={classes.wrapper}>
-            <MailIcon className={classes.icon} color="action" />
-            <TextField {...textEditorProps("Email")} />
-          </div>
-          <div className={classes.wrapper}>
-            <LocationOn className={classes.icon} color="action" />
-            <TextField {...textEditorProps("Email")} />
-          </div>
-        </div>
-        <div className={classes.buttonGroup}>
-          {!isNewAppointment && (
+          <div className={classes.buttonGroup}>
+            {!isNewAppointment && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                className={classes.button}
+                onClick={() => {
+                  visibleChange();
+                  commitAppointment("deleted");
+                }}
+              >
+                Delete
+              </Button>
+            )}
             <Button
               variant="outlined"
-              color="secondary"
+              color="primary"
               className={classes.button}
               onClick={() => {
                 visibleChange();
-                commitAppointment("deleted");
+                applyChanges();
               }}
             >
-              Delete
+              {isNewAppointment ? "Create" : "Save"}
             </Button>
-          )}
-          <Button
-            variant="outlined"
-            color="primary"
-            className={classes.button}
-            onClick={() => {
-              visibleChange();
-              applyChanges();
-            }}
-          >
-            {isNewAppointment ? "Create" : "Save"}
-          </Button>
-        </div>
-      </StyledDiv>
-    </AppointmentForm.Overlay>
+          </div>
+        </StyledDiv>
+      </AppointmentForm.Overlay>
+    </>
   );
 };
 
