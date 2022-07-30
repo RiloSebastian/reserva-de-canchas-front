@@ -54,6 +54,14 @@ function ReservaGrid() {
         : "Crear una Nueva Reserva"
     );
 
+    /*   const courtDetails = courts.filter(
+      (court) => court.id === groupingInfo[0].id
+    )[0];
+
+    const timePrice = Utils.getTimePrice(courtDetails, e.appointmentData); */
+
+    const timePrice = 150;
+
     const form = e.form;
     let mainGroupItems = form
       .itemOption("mainGroup")
@@ -88,6 +96,22 @@ function ReservaGrid() {
       });
       form.itemOption("mainGroup", "items", mainGroupItems);
     } */
+
+    if (
+      !mainGroupItems.find(function (i) {
+        return i.dataField === "price";
+      })
+    ) {
+      mainGroupItems.push({
+        colSpan: 2,
+        label: { text: "Precio" },
+        editorType: "dxNumberBox",
+        dataField: "price",
+        editorOptions: { value: timePrice, disabled: true },
+        validationRules: [{ type: "required" }],
+      });
+      form.itemOption("mainGroup", "items", mainGroupItems);
+    }
 
     if (
       !mainGroupItems.find(function (i) {
