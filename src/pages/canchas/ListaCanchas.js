@@ -509,7 +509,7 @@ const ListaCanchas = ({ institutionId }) => {
 
   useEffect(() => {
     //DEVOLVER LAS CANCHAS DE LA INSTITUCION
-    //retrieveCourts(institution.id);
+    retrieveCourts();
 
     //SETEAR LOS DEPORTES DISPONIBLES
     retrieveSportsList();
