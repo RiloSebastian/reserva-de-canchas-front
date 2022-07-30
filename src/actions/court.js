@@ -20,7 +20,7 @@ export const retrieveCourts = (institution_id) => async (dispatch) => {
       type: CLEAN_COURTS,
       payload: [],
     });
-    return Promise.reject(err);
+    return Promise.reject(err.response);
   }
 };
 

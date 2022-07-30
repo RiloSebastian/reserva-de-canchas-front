@@ -28,7 +28,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Snackbar from "@mui/material/Snackbar";
-import { login } from "../../actions/auth";
+import { login, logout } from "../../actions/auth";
 import { retrieveInstitutionByAdmainEmail } from "../../actions/institution";
 import { retrieveCourts } from "../../actions/court";
 
@@ -182,20 +182,25 @@ const SignIn = (props) => {
           case "ROLE_ADMIN":
             console.log("ROLE_ADMIN");
 
-            dispatch(retrieveInstitutionByAdmainEmail(user.email))
+            return dispatch(retrieveInstitutionByAdmainEmail(user.email))
               .then((data) => {
-                dispatch(retrieveCourts(data.id))
-                  .then((data) => data)
-                  .catch((err) => {});
-
-                console.log("Abrir dashboard");
-                history.push("/dashboard/reservas");
+                return dispatch(retrieveCourts(data.id))
+                  .then((data) => {
+                    console.log("Abrir dashboard");
+                    history.push("/dashboard/reservas");
+                  })
+                  .catch((err) => {
+                    dispatch(logout());
+                    return Promise.reject(err);
+                  });
               })
               .catch((err) => {
                 if (err.status === 404) {
                   handleMessageError(err.data.message);
                   setShowMessageError(true);
                 }
+                dispatch(logout());
+                return Promise.reject(err);
               });
 
             break;
@@ -221,9 +226,6 @@ const SignIn = (props) => {
               `Lo sentimos, no existen permisos para este rol > ${userRole}.`
             );
         }
-
-        // props.history.push("/profile");
-        //window.location.reload();
       })
       .catch((err) => {
         setLoading(false);
@@ -257,76 +259,6 @@ const SignIn = (props) => {
           setShowMessageError(true);
         }
       });
-
-    /* try {
-      const user = await AuthService.login(
-        data.get("username"),
-        data.get("password")
-      ).then((data) => data);
-
-      console.log("obteniendo info del login");
-      console.log(user);
-
-      const userRole = user.roles[0];
-      switch (userRole) {
-        case "ROLE_CUSTOMER":
-          console.log("ROLE_CUSTOMER");
-          history.push("/customer/home");
-          break;
-        case "ROLE_ADMIN":
-          console.log("ROLE_ADMIN");
-
-          dispatch(retrieveCretrieveInstitutionByAdmainEmailourts(user.email));
-
-          console.log("Abrir dashboard");
-          history.push("/dashboard/reservas");
-
-          break;
-        case "ROLE_EMPLOYEE":
-          console.log("ROLE_EMPLOYEE");
-          break;
-        case "ROLE_COACH":
-          console.log("ROLE_COACH");
-          break;
-        case "ROLE_SUPER_ADMIN":
-          console.log("ROLE_SUPER_ADMIN");
-          break;
-        default:
-          console.log(
-            `Lo sentimos, no existen permisos para este rol > ${userRole}.`
-          );
-      }
-    } catch (err) {
-      console.error("error al obtener usuario");
-      console.log(err);
-
-      if (err.status === 404) {
-        handleMessageError(err.data.message);
-        setShowMessageError(true);
-      } else if (err.data.error === "Esta cuenta no esta habilitada") {
-        //Renviar link de confirmacion
-        console.error("La cuenta no esta habilidata - reenviar correo");
-
-        try {
-          const emailReSended = await EmailService.sendVerificationEmail(
-            data.get("username")
-          ).then((data) => data);
-
-          handleMessageError(
-            `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
-          );
-          setShowMessageError(true);
-        } catch (error) {
-          handleMessageError(
-            `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
-          );
-          setShowMessageError(true);
-        }
-      } else {
-        handleMessageError(err.data.error);
-        setShowMessageError(true);
-      }
-    } */
   };
 
   useEffect(() => {

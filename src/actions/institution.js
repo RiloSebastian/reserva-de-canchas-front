@@ -206,6 +206,19 @@ export const setInstitution = (payload) => (dispatch) => {
   dispatch({ type: "SET_INSTITUTION", payload });
 };
 
+export const retrieveInstitutionById = (institution_id) => async (dispatch) => {
+  try {
+    const res = await InstitucionService.get(institution_id);
+    dispatch({
+      type: RETRIEVE_INSTITUTION,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err.response);
+  }
+};
+
 export const retrieveInstitutionByAdmainEmail =
   (user_email) => async (dispatch) => {
     try {
