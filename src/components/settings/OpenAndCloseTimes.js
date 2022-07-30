@@ -27,6 +27,7 @@ import CardActions from "@mui/material/CardActions";
 import Typography from "@mui/material/Typography";
 import {
   deleteAllInstitutionSchedules,
+  retrieveInstitutionById,
   updateInstitutionSchedules,
 } from "../../actions/institution";
 import { days } from "../../utils/days/days";
@@ -284,11 +285,16 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       .then((data) => {
         console.log("HORARIOS DE LA INSTITUCION ACTUALIZADOS CORRECTAMENTE");
         console.log(data);
-        setSnackbar({
-          message: "Los Horarios se han Guardado Exitosamente!",
-          severity: "success",
-        });
-        setOpen(true);
+
+        dispatch(retrieveInstitutionById(institution.id))
+          .then((data) => {
+            setSnackbar({
+              message: "Los Horarios se han Guardado Exitosamente!",
+              severity: "success",
+            });
+            setOpen(true);
+          })
+          .catch((err) => err);
       })
       .catch((error) => {
         console.log("ERROR AL ACTUALIZAR HORARIOS DE INSTITUCUIN");

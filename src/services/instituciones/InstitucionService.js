@@ -5,10 +5,7 @@ const getAll = () => {
 };
 
 const get = async (institution_id) => {
-  return await http
-    .get(`/institutions/${institution_id}`)
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err));
+  return await http.get(`/institutions/${institution_id}`);
 };
 
 const getByAdminEmail = async (admin_email) => {

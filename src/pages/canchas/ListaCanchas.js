@@ -307,7 +307,6 @@ const ListaCanchas = ({ institutionId }) => {
           states={{ enable: "Habilitada", disable: "Deshabilitada" }}
         />
       ),
-      //render: (rowData) => (rowData.enabled ? "Habilidata" : "Deshabilitada"),
       editComponent: (props) => (
         <FormControlLabel
           control={

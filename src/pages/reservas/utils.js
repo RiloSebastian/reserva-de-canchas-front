@@ -1,10 +1,10 @@
-import { dinnerTime, holidays } from "./data.js";
+import { dinnerTime } from "./data.js";
 import moment from "moment";
 
 const formatTime = "hh:mm a";
 
 export default class Utils {
-  static isHoliday(date) {
+  static isHoliday(date, holidays) {
     const localeDate = date.toLocaleDateString();
     return (
       holidays.filter((holiday) => holiday.toLocaleDateString() === localeDate)
@@ -12,9 +12,9 @@ export default class Utils {
     );
   }
 
-  static isWeekend(date) {
+  static isWeekend(date, workingDays) {
     const day = date.getDay();
-    return day === 0 || day === 6;
+    return !workingDays.includes(day);
   }
 
   static isDinner(date) {
@@ -29,24 +29,36 @@ export default class Utils {
     return hours === dinnerTime.from && minutes === 0;
   }
 
-  static isValidAppointment(component, appointmentData) {
+  static isValidAppointment(component, appointmentData, workingDays, holidays) {
     const startDate = new Date(appointmentData.startDate);
     const endDate = new Date(appointmentData.endDate);
     const cellDuration = component.option("cellDuration");
-    return Utils.isValidAppointmentInterval(startDate, endDate, cellDuration);
+    return Utils.isValidAppointmentInterval(
+      startDate,
+      endDate,
+      cellDuration,
+      workingDays,
+      holidays
+    );
   }
 
-  static isValidAppointmentInterval(startDate, endDate, cellDuration) {
+  static isValidAppointmentInterval(
+    startDate,
+    endDate,
+    cellDuration,
+    workingDays,
+    holidays
+  ) {
     const edgeEndDate = new Date(endDate.getTime() - 1);
 
-    if (!Utils.isValidAppointmentDate(edgeEndDate)) {
+    if (!Utils.isValidAppointmentDate(edgeEndDate, workingDays, holidays)) {
       return false;
     }
 
     const durationInMs = cellDuration * 60 * 1000;
     const date = startDate;
     while (date <= endDate) {
-      if (!Utils.isValidAppointmentDate(date)) {
+      if (!Utils.isValidAppointmentDate(date, workingDays, holidays)) {
         return false;
       }
       const newDateTime = date.getTime() + durationInMs - 1;
@@ -56,9 +68,11 @@ export default class Utils {
     return true;
   }
 
-  static isValidAppointmentDate(date) {
+  static isValidAppointmentDate(date, workingDays, holidays) {
     return (
-      !Utils.isHoliday(date) && !Utils.isDinner(date) && !Utils.isWeekend(date)
+      !Utils.isHoliday(date, holidays) &&
+      !Utils.isDinner(date) &&
+      !Utils.isWeekend(date, workingDays)
     );
   }
 
