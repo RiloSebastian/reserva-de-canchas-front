@@ -167,7 +167,7 @@ function ReservaGrid() {
         label: { text: "Precio" },
         editorType: "dxNumberBox",
         dataField: "price",
-        editorOptions: { value: 2000, disabled: true },
+        editorOptions: { value: timePrice, disabled: true },
         validationRules: [{ type: "required" }],
       });
       form.itemOption("mainGroup", "items", mainGroupItems);

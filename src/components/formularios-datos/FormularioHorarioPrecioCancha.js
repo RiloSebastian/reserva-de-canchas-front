@@ -406,46 +406,6 @@ const FormularioHorarioPrecioCancha = ({
       .catch(() => console.log("Deletion cancelled."));
   };
 
-  useEffect(() => {
-    const minTime = new Date(
-      new Date(
-        new Date().setHours(moment(institution.scheduleMinTime).hour())
-      ).setMinutes(0)
-    );
-
-    const maxTime = new Date(
-      new Date(
-        new Date().setHours(moment(institution.scheduleMaxTime).hour())
-      ).setMinutes(0)
-    );
-
-    console.log("SETEANDO HORARIOS MINIMOS Y MAXIMOS PARA LAS CANCHAS");
-    console.log(minTime);
-    console.log(maxTime);
-
-    setMin(minTime);
-
-    setMax(maxTime);
-
-    setDiasYHorarios([
-      {
-        id: uuidv4(),
-        dias: daysSelected,
-        details: [
-          {
-            id: uuidv4(),
-            timeFrame: {
-              from: minTime,
-              to: maxTime,
-            },
-            costPerSlot: "",
-            state: true,
-          },
-        ],
-      },
-    ]);
-  }, []);
-
   const firstUpdate = useRef(true);
   useEffect(() => {
     if (firstUpdate.current) {
@@ -590,6 +550,46 @@ const FormularioHorarioPrecioCancha = ({
       ]);
     }
   }, [institution.schedules]);
+
+  useEffect(() => {
+    console.log("SETEANDO HORARIOS MINIMOS Y MAXIMOS PARA LAS CANCHAS");
+    const minTime = new Date(
+      new Date(
+        new Date().setHours(moment(institution.scheduleMinTime).hour())
+      ).setMinutes(0)
+    );
+
+    const maxTime = new Date(
+      new Date(
+        new Date().setHours(moment(institution.scheduleMaxTime).hour())
+      ).setMinutes(0)
+    );
+
+    console.log(minTime);
+    console.log(maxTime);
+
+    setMin(minTime);
+
+    setMax(maxTime);
+
+    setDiasYHorarios([
+      {
+        id: uuidv4(),
+        dias: daysSelected,
+        details: [
+          {
+            id: uuidv4(),
+            timeFrame: {
+              from: minTime,
+              to: maxTime,
+            },
+            costPerSlot: "",
+            state: true,
+          },
+        ],
+      },
+    ]);
+  }, []);
 
   return institution.schedules && institution.schedules.length > 0 ? (
     <div>

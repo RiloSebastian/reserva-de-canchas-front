@@ -39,6 +39,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createCourt, deleteCourt, updateCourt } from "../../actions/court";
 import { retrieveSports } from "../../actions/sports";
+import ChipCourtState from "../../components/employees/ChipCourtState";
 import ChipState from "../../components/employees/ChipState";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
 import UploadPhotos from "../../components/ui/UploadPhotos";
@@ -185,21 +186,19 @@ const ListaCanchas = ({ institutionId }) => {
           : true,
       lookup: sport,
       render: (rowData) => rowData.sport,
-      editComponent: (rowData) => {
-        return (
-          <Select
-            value={rowData.value || undefined}
-            onChange={(e) => {
-              rowData.onChange(String(e.target.value));
-              setSportSelected(e.target.value);
-            }}
-          >
-            {sportsData.map((type) => (
-              <MenuItem value={type.name}>{type.name}</MenuItem>
-            ))}
-          </Select>
-        );
-      },
+      editComponent: (rowData) => (
+        <Select
+          value={rowData.value || undefined}
+          onChange={(e) => {
+            setSportSelected(e.target.value);
+            rowData.onChange(String(e.target.value));
+          }}
+        >
+          {sportsData.map((type) => (
+            <MenuItem value={type.name}>{type.name}</MenuItem>
+          ))}
+        </Select>
+      ),
     },
     {
       title: "Superficie",
@@ -213,6 +212,35 @@ const ListaCanchas = ({ institutionId }) => {
           : true,
       lookup: surfaces,
       render: (rowData) => rowData.courtType,
+      editComponent: (rowData) => {
+        console.log("RENDERIZANDO EDIT COMPONENT DE TIPO DE SUPERFICIE");
+        console.log(surfaces);
+        console.log(rowData);
+        console.log(sportsData);
+
+        let surfacesArrayFilteredBySport = sportsData.filter(
+          (s) => s.name === rowData.rowData.sport
+        );
+
+        let surfacesFounded = [];
+        if (surfacesArrayFilteredBySport.length > 0) {
+          surfacesFounded = surfacesArrayFilteredBySport[0].courtTypes;
+        }
+
+        return (
+          <Select
+            defaultValue={rowData.value}
+            value={rowData.value || undefined}
+            onChange={(e) => {
+              rowData.onChange(String(e.target.value));
+            }}
+          >
+            {surfacesFounded.map((sup) => (
+              <MenuItem value={sup}>{sup}</MenuItem>
+            ))}
+          </Select>
+        );
+      },
     },
     {
       title: "Descripcion",
@@ -298,10 +326,10 @@ const ListaCanchas = ({ institutionId }) => {
     },
     {
       title: "Estado",
-      field: "enabled",
+      field: "state",
       editable: "onUpdate",
       render: (rowData, renderType) => (
-        <ChipState
+        <ChipCourtState
           rowData={rowData}
           renderType={renderType}
           states={{ enable: "Habilitada", disable: "Deshabilitada" }}
@@ -327,7 +355,7 @@ const ListaCanchas = ({ institutionId }) => {
         return (
           <>
             <Button color="info" variant="contained" onClick={desplegarModal}>
-              Agregar Horarios y Precios
+              Horarios y Precios
             </Button>
             <FormularioHorarioPrecioCancha
               open={open}
@@ -402,6 +430,7 @@ const ListaCanchas = ({ institutionId }) => {
   };
 
   const desplegarModal = (props) => {
+    console.log("DESPLEGAR FORM DE HORARIOS Y PRECIOS");
     setIsMultipleEdit(false);
     setOpen(true);
   };
@@ -430,7 +459,7 @@ const ListaCanchas = ({ institutionId }) => {
         courtIllumination: newCancha.courtIllumination
           ? newCancha.courtIllumination
           : false,
-        state: "DISABLED",
+        state: "ENABLED",
         schedules: newCancha.schedules,
       },
     ];
@@ -445,7 +474,7 @@ const ListaCanchas = ({ institutionId }) => {
       ...canchaToUpdated,
       cancelationTimeInHours: 1,
       institutionId: institution.id,
-      state: "DISABLED",
+      state: canchaToUpdated.state ? "ENABLED" : "DISABLED",
       //  schedules: canchaToUpdated.schedules,
     };
 
@@ -462,25 +491,6 @@ const ListaCanchas = ({ institutionId }) => {
 
   const retrieveCourts = () => {
     setData(courts);
-    /* dispatch(retrieveCourts(institutionId)).then(data => {
-      console.log("listadoCanchas");
-      console.log(listadoCanchas);
-
-      const data = listadoCanchas.data.map((data) => data);
-
-      setData(data);
-    }).catch(err => {
-      setData([]);
-    });
-
-    try {
-      const listadoCanchas = await CanchaService.getAll(institutionId);
-
-      
-    } catch (err) {
-      //history.push("/login");
-     
-    } */
   };
 
   const firstUpdate = useRef(true);
@@ -505,6 +515,7 @@ const ListaCanchas = ({ institutionId }) => {
     } else {
       console.log("no hay superficies cargadas");
     }
+    //getSportSurfaces(sportSelected);
   }, [sportSelected]);
 
   useEffect(() => {
