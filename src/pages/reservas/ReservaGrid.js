@@ -58,7 +58,7 @@ function ReservaGrid() {
       (court) => court.id === groupingInfo[0].id
     )[0];
 
-    const timePrice = Utils.getTimePrice(courtDetails, { ...restProps }); */
+    const timePrice = Utils.getTimePrice(courtDetails, e.appointmentData); */
 
     const timePrice = 150;
 
