@@ -28,7 +28,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Snackbar from "@mui/material/Snackbar";
-import { login } from "../../actions/auth";
+import { login, logout } from "../../actions/auth";
 import { retrieveInstitutionByAdmainEmail } from "../../actions/institution";
 import { retrieveCourts } from "../../actions/court";
 
@@ -182,20 +182,25 @@ const SignIn = (props) => {
           case "ROLE_ADMIN":
             console.log("ROLE_ADMIN");
 
-            dispatch(retrieveInstitutionByAdmainEmail(user.email))
+            return dispatch(retrieveInstitutionByAdmainEmail(user.email))
               .then((data) => {
-                dispatch(retrieveCourts(data.id))
+                return dispatch(retrieveCourts(data.id))
                   .then((data) => {
                     console.log("Abrir dashboard");
                     history.push("/dashboard/reservas");
                   })
-                  .catch((err) => {});
+                  .catch((err) => {
+                    dispatch(logout());
+                    return Promise.reject(err);
+                  });
               })
               .catch((err) => {
                 if (err.status === 404) {
                   handleMessageError(err.data.message);
                   setShowMessageError(true);
                 }
+                dispatch(logout());
+                return Promise.reject(err);
               });
 
             break;

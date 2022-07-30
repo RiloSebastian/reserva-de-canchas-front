@@ -492,7 +492,7 @@ const ListaCanchas = ({ institutionId }) => {
 
     const surfacesArrayFilteredBySport = sportsData.filter(
       (s) => s.name === sportSelected
-    )[0].surfaces;
+    )[0].courtTypes;
 
     if (surfacesArrayFilteredBySport.length > 0) {
       const dynamicLookupSurfaces = surfacesArrayFilteredBySport.reduce(
@@ -509,7 +509,7 @@ const ListaCanchas = ({ institutionId }) => {
 
   useEffect(() => {
     //DEVOLVER LAS CANCHAS DE LA INSTITUCION
-    retrieveCourts(institution.id);
+    //retrieveCourts(institution.id);
 
     //SETEAR LOS DEPORTES DISPONIBLES
     retrieveSportsList();
