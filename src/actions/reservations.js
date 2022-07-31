@@ -25,9 +25,9 @@ export const retrieveCustomerReservations =
     }
   };
 
-export const createReservation = (institution_id, data) => async (dispatch) => {
+export const createReservation = (data) => async (dispatch) => {
   try {
-    const res = await ReservationService.create(institution_id, data);
+    const res = await ReservationService.create(data);
     dispatch({
       type: CREATE_RESERVATION,
       payload: res.data[0],

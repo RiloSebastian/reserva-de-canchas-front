@@ -13,7 +13,6 @@ import "devextreme/dist/css/dx.light.css";
 import Utils from "./utils.js";
 import SpeedDialAction from "devextreme-react/speed-dial-action";
 import RadioGroup from "devextreme-react/radio-group";
-import { useSelector } from "react-redux";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -23,12 +22,14 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useHistory } from "react-router-dom";
 import { BASE_URL_INSTITUTIONS } from "../routes";
+import { useDispatch, useSelector } from "react-redux";
 
 // Dictionaries for German language
 import esMessages from "devextreme/localization/messages/es.json";
 
 import { locale, loadMessages } from "devextreme/localization";
 import moment from "moment";
+import { createReservation } from "../../actions/reservations.js";
 
 const PREFIX = "Demo";
 
@@ -63,7 +64,7 @@ const classes = {
   nonWorkingCell: `${PREFIX}-nonWorkingCell`,
 };
 
-const views = [{ type: "week", maxAppointmentsPerCell: 1 }, "month"];
+const views = [{ type: "week", maxAppointmentsPerCell: 1 }];
 
 const notifyDisableDate = () => {
   notify(
@@ -81,9 +82,10 @@ const notifyNoCourtsAvailable = () => {
   );
 };
 
-const groups = ["sportId"];
+const groups = ["sportId", "courtId"];
 
 function ReservaGrid() {
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [isAdminRole, setIsAdminRole] = useState(false);
   const { user } = useSelector((state) => state.auth);
@@ -94,7 +96,7 @@ function ReservaGrid() {
   const [currentView, setCurrentView] = useState(views[0]);
   const [sportSelected, setSportSelected] = useState("");
   const [sports, setSports] = useState([]);
-  const [courts, setCourts] = useState(priorityData);
+  const [courts, setCourts] = useState([]);
   const [workingDays, setWorkingDays] = useState([]);
   const [holidays, setHolidays] = useState([]);
   const [startDayHour, setStartDayHour] = useState(
@@ -106,13 +108,24 @@ function ReservaGrid() {
   const [busyTime, setBusyTime] = useState([]);
 
   const onAppointmentFormOpening = (e) => {
-    console.log("ABRIENDO FORM");
+    /* console.log("ABRIENDO FORM");
     console.log(e);
-    console.log(courts);
+    console.log(
+      e.form
+        .itemOption("mainGroup")
+        .items.filter(
+          (mainGroupItem) => mainGroupItem.dataField === "courtId"
+        )[0]
+        .editorOptions.dataSource.filter(
+          (court) => court.id === e.appointmentData.courtId
+        )[0]
+    ); */
     const courtDetails = e.form
       .itemOption("mainGroup")
-      .items.filter((mainGroupItem) => mainGroupItem.dataField === "sportId")[0]
-      .editorOptions.dataSource[0];
+      .items.filter((mainGroupItem) => mainGroupItem.dataField === "courtId")[0]
+      .editorOptions.dataSource.filter(
+        (court) => court.id === e.appointmentData.courtId
+      )[0];
 
     const startDate = new Date(e.appointmentData.startDate);
     if (
@@ -146,8 +159,8 @@ function ReservaGrid() {
       .items.filter(
         (mainGroupItem) => mainGroupItem.dataField !== "description"
       );
-    console.log("CAMPOS DEL FORM");
-    console.log(mainGroupItems);
+    /*  console.log("CAMPOS DEL FORM");
+    console.log(mainGroupItems); */
 
     if (
       !mainGroupItems.find(function (i) {
@@ -230,6 +243,11 @@ function ReservaGrid() {
   };
 
   const onAppointmentAdding = (e) => {
+    let { appointmentData } = e;
+
+    dispatch(createReservation(appointmentData));
+    console.log("onAppointmentAdding ");
+    console.log(appointmentData);
     const isValidAppointment = Utils.isValidAppointment(
       e.component,
       e.appointmentData,
@@ -244,6 +262,7 @@ function ReservaGrid() {
   };
 
   const onAppointmentUpdating = (e) => {
+    console.log("onAppointmentUpdating ");
     const isValidAppointment = Utils.isValidAppointment(
       e.component,
       e.newData,
@@ -257,6 +276,19 @@ function ReservaGrid() {
     }
   };
 
+  const onAppointmentDeleting = (e) => {
+    console.log("onAppointmentDeleting ");
+    console.log(e);
+  };
+
+  const onAppointmentAdded = (e) => {
+    console.log("onAppointmentAdded ");
+    console.log(e);
+    if (e.error) {
+      alert(e.error.message);
+    }
+  };
+
   const onCurrentViewChange = (value) => setCurrentView(value);
 
   const onRadioGroupValueChanged = (args) => {
@@ -266,6 +298,8 @@ function ReservaGrid() {
   };
 
   const onOptionChanged = (e) => {
+    console.log("onOptionChanged ");
+    console.log(e);
     if (e.name === "currentDate") {
       setCurrentDate(e.value);
     }
@@ -280,14 +314,19 @@ function ReservaGrid() {
   };
 
   const renderDataCell = (itemData) => {
+    const courtFounded = { ...itemData.groups };
     const CellTemplate = currentView === "month" ? DataCellMonth : DataCell;
 
+    let courtDetails = courtList.filter(
+      (court) => court.id === String(courtFounded.courtId)
+    )[0];
     return (
       <CellTemplate
         itemData={itemData}
         workingDays={workingDays}
         holidays={holidays}
         busyTime={busyTime}
+        courtDetails={courtDetails}
       />
     );
   };
@@ -409,9 +448,10 @@ function ReservaGrid() {
     const courtFilteredBySport = courtList
       .filter((court) => court.sport === sportSelected)
       .map((c) => {
-        return { ...c, text: c.name };
+        return { ...c, text: c.name, courtId: c.id };
       });
 
+    console.log("SETEANDO CANCHAS POR DEPORTE");
     console.log(courtFilteredBySport);
     setCourts(courtFilteredBySport);
     setLoading(false);
@@ -517,9 +557,11 @@ function ReservaGrid() {
                 onAppointmentFormOpening={onAppointmentFormOpening}
                 onAppointmentAdding={onAppointmentAdding}
                 onAppointmentUpdating={onAppointmentUpdating}
+                onAppointmentDeleting={onAppointmentDeleting}
+                onAppointmentAdded={onAppointmentAdded}
               >
                 <Resource
-                  fieldExpr="sportId"
+                  fieldExpr="courtId"
                   allowMultiple={false}
                   dataSource={courts}
                   label="Cancha"

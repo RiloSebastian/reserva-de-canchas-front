@@ -126,57 +126,64 @@ export default class Utils {
 
   static getTimePrice(courtDetails, itemData) {
     let timePrice = 0;
-    if (courtDetails.schedules && courtDetails.schedules.length > 0) {
-      courtDetails.schedules.forEach((shedule) => {
-        if (shedule.details && shedule.details.length > 0) {
-          const daysNumberAvailable = shedule.daysAvailable.map((day) => {
-            switch (day) {
-              case "DOMINGO":
-                return 0;
-              case "LUNES":
-                return 1;
-              case "MARTES":
-                return 2;
-              case "MIERCOLES":
-                return 3;
-              case "JUEVES":
-                return 4;
-              case "VIERNES":
-                return 5;
-              case "SABADO":
-                return 6;
-              default:
-                break;
-            }
-          });
-
-          if (daysNumberAvailable.includes(moment(itemData.startDate).day())) {
-            shedule.details.forEach((detail) => {
-              const time = moment(
-                moment(itemData.startDate).format("hh:mm a"),
-                formatTime
-              );
-              const beforeTime = moment(
-                moment(detail.timeFrame.from).format("hh:mm a"),
-                formatTime
-              );
-              const afterTime = moment(
-                moment(detail.timeFrame.to).format("hh:mm a"),
-                formatTime
-              );
-
-              if (time.isBetween(beforeTime, afterTime, undefined, "[)")) {
-                timePrice = detail.costPerSlot;
+    if (courtDetails !== undefined && courtDetails.schedules !== undefined) {
+      if (courtDetails.schedules && courtDetails.schedules.length > 0) {
+        courtDetails.schedules.forEach((shedule) => {
+          if (shedule.details && shedule.details.length > 0) {
+            const daysNumberAvailable = shedule.daysAvailable.map((day) => {
+              switch (day) {
+                case "DOMINGO":
+                  return 0;
+                case "LUNES":
+                  return 1;
+                case "MARTES":
+                  return 2;
+                case "MIERCOLES":
+                  return 3;
+                case "JUEVES":
+                  return 4;
+                case "VIERNES":
+                  return 5;
+                case "SABADO":
+                  return 6;
+                default:
+                  break;
               }
             });
+
+            if (
+              daysNumberAvailable.includes(moment(itemData.startDate).day())
+            ) {
+              shedule.details.forEach((detail) => {
+                const time = moment(
+                  moment(itemData.startDate).format("hh:mm a"),
+                  formatTime
+                );
+                const beforeTime = moment(
+                  moment(detail.timeFrame.from).format("hh:mm a"),
+                  formatTime
+                );
+                const afterTime = moment(
+                  moment(detail.timeFrame.to).format("hh:mm a"),
+                  formatTime
+                );
+
+                if (time.isBetween(beforeTime, afterTime, undefined, "[)")) {
+                  timePrice = detail.costPerSlot;
+                }
+              });
+            }
+          } else {
+            return 0;
           }
-        } else {
-          return 0;
-        }
-      });
+        });
+      } else {
+        return 0;
+      }
     } else {
       return 0;
     }
+
     return timePrice;
   }
 }
