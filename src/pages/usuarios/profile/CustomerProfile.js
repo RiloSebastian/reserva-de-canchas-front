@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Box, Container, Grid, Typography } from "@mui/material";
 import AccountProfile from "../../../components/profile/AccountProfile";
 import { AccountProfileDetails } from "../../../components/profile/AccountProfileDetails";
@@ -6,9 +7,20 @@ import CustomerLayout from "./../../../layout/CustomerLayout";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UserService from "../../../services/user.service";
+import { useSelector, useDispatch } from "react-redux";
+
+import { useConfirm } from "material-ui-confirm";
+import CustomizedSnackbars from "../../../components/ui/CustomizedSnackbars";
+
+import { retrieveUser } from "../../../actions/auth";
 
 const CustomerProfile = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  //const user = JSON.parse(localStorage.getItem("user"));
+  const { user } = useSelector((state) => state.auth);
+  const confirm = useConfirm();
+  const [open, setOpen] = useState(false);
+
+  const [snackbar, setSnackbar] = useState({});
 
   const handleDeleteAccount = async () => {
     console.log("ELIMINANDO CUENTA");
@@ -59,6 +71,13 @@ const CustomerProfile = () => {
           </Grid>
         </Container>
       </Box>
+
+      <CustomizedSnackbars
+        message={snackbar.message}
+        severity={snackbar.severity}
+        setOpen={setOpen}
+        open={open}
+      />
     </>
   );
 };

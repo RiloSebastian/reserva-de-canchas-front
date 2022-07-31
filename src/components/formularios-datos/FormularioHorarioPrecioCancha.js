@@ -413,9 +413,6 @@ const FormularioHorarioPrecioCancha = ({
       return;
     }
 
-    console.log("VALIDANDO CADA VEZ QUE SE SELECCIONA UN DIA");
-    console.log(daysSelected);
-
     //Validar si es necesario desabilitar el boton de agregar mas horarios
 
     if (diasYHorarios.length === 1) {
@@ -499,9 +496,6 @@ const FormularioHorarioPrecioCancha = ({
         return days[a.label] - days[b.label];
       });
 
-      console.log("setear los dias habiles de la institucion");
-      console.log(arraySorted);
-
       setDaysSelected(arraySorted);
     } else {
       setDaysSelected([
@@ -552,7 +546,6 @@ const FormularioHorarioPrecioCancha = ({
   }, [institution.schedules]);
 
   useEffect(() => {
-    console.log("SETEANDO HORARIOS MINIMOS Y MAXIMOS PARA LAS CANCHAS");
     const minTime = new Date(
       new Date(
         new Date().setHours(moment(institution.scheduleMinTime).hour())
@@ -564,9 +557,6 @@ const FormularioHorarioPrecioCancha = ({
         new Date().setHours(moment(institution.scheduleMaxTime).hour())
       ).setMinutes(0)
     );
-
-    console.log(minTime);
-    console.log(maxTime);
 
     setMin(minTime);
 
@@ -584,7 +574,7 @@ const FormularioHorarioPrecioCancha = ({
               to: maxTime,
             },
             costPerSlot: "",
-            state: true,
+            state: "",
           },
         ],
       },

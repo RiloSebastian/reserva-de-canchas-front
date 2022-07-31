@@ -1,4 +1,5 @@
 import CanchaService from "../services/canchas/CanchaService";
+import { uploadPhotos } from "./photos";
 import {
   RETRIEVE_COURTS,
   CREATE_COURT,
@@ -27,11 +28,28 @@ export const retrieveCourts = (institution_id) => async (dispatch) => {
 export const createCourt = (institution_id, data) => async (dispatch) => {
   try {
     const res = await CanchaService.create(institution_id, data);
-    dispatch({
-      type: CREATE_COURT,
-      payload: res.data[0],
-    });
-    return Promise.resolve(res.data);
+    if (data[0].images && data[0].images.length > 0) {
+      let pictures = [];
+      try {
+        dispatch(uploadPhotos("court", res.data[0].id, data[0].images))
+          .then((data) => {
+            pictures.push(...data);
+            dispatch({
+              type: CREATE_COURT,
+              payload: { ...res.data[0], pictures },
+            });
+          })
+          .catch();
+      } catch (error) {}
+    } else {
+      console.log("DIRECTO AL ELSE");
+      dispatch({
+        type: CREATE_COURT,
+        payload: res.data[0],
+      });
+    }
+
+    return Promise.resolve(res.data[0]);
   } catch (err) {
     return Promise.reject(err.response);
   }

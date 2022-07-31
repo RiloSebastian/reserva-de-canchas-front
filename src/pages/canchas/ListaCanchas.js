@@ -38,6 +38,7 @@ import React, {
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { createCourt, deleteCourt, updateCourt } from "../../actions/court";
+import { uploadPhotos } from "../../actions/photos";
 import { retrieveSports } from "../../actions/sports";
 import ChipCourtState from "../../components/employees/ChipCourtState";
 import ChipState from "../../components/employees/ChipState";
@@ -213,11 +214,6 @@ const ListaCanchas = ({ institutionId }) => {
       lookup: surfaces,
       render: (rowData) => rowData.courtType,
       editComponent: (rowData) => {
-        console.log("RENDERIZANDO EDIT COMPONENT DE TIPO DE SUPERFICIE");
-        console.log(surfaces);
-        console.log(rowData);
-        console.log(sportsData);
-
         let surfacesArrayFilteredBySport = sportsData.filter(
           (s) => s.name === rowData.rowData.sport
         );
@@ -351,6 +347,7 @@ const ListaCanchas = ({ institutionId }) => {
       field: "schedules",
       filtering: false,
       lookup: schedules,
+      render: () => {},
       editComponent: (props) => {
         return (
           <>
@@ -370,45 +367,42 @@ const ListaCanchas = ({ institutionId }) => {
       },
     },
     {
-      field: "images",
+      field: "pictures",
       filtering: false,
-      editComponent: (props) => (
-        <>
-          <IconButton
-            color="primary"
-            aria-label="upload picture"
-            component="span"
-            onClick={() => {
-              setOpenUploadPhotos(true);
-            }}
-          >
-            <PhotoCamera />
-          </IconButton>
-          <UploadPhotos
-            openUploadPhotos={openUploadPhotos}
-            setOpenUploadPhotos={setOpenUploadPhotos}
-            setImages={setImages}
-            images={images}
-            isMultipleEdit={isMultipleEdit}
-            handleUploadImage={handleUploadImage}
-            fileObjects={fileObjects}
-            setFileObjects={setFileObjects}
-            filesLimit={6}
-            isModal={true}
-          />
-        </>
-      ),
+      render: () => {},
+      editComponent: (props) => {
+        const handleUploadImage = (e) => {
+          props.onChange(e);
+        };
+        return (
+          <>
+            <IconButton
+              color="primary"
+              aria-label="upload picture"
+              component="span"
+              onClick={() => {
+                setOpenUploadPhotos(true);
+              }}
+            >
+              <PhotoCamera />
+            </IconButton>
+            <UploadPhotos
+              openUploadPhotos={openUploadPhotos}
+              setOpenUploadPhotos={setOpenUploadPhotos}
+              setImages={setImages}
+              setFileObjects={setFileObjects}
+              images={images}
+              isMultipleEdit={isMultipleEdit}
+              handleUploadImage={handleUploadImage}
+              fileObjects={fileObjects}
+              filesLimit={6}
+              isModal={true}
+            />
+          </>
+        );
+      },
     },
   ];
-
-  const handleUploadImage = (e) => {
-    let ImagesArray = Object.entries(e.target.files).map((e) =>
-      URL.createObjectURL(e[1])
-    );
-    console.log(ImagesArray);
-    setImages([...images, ...ImagesArray]);
-    console.log("images", images);
-  };
 
   const retrieveSportsList = () => {
     dispatch(retrieveSports())
@@ -418,10 +412,6 @@ const ListaCanchas = ({ institutionId }) => {
 
           return acc;
         }, {});
-
-        console.log("CARGANDO LISTA DE DEPORTES");
-        console.log(dynamicLookupObject);
-
         setSports(dynamicLookupObject);
       })
       .catch((error) => {
@@ -509,8 +499,6 @@ const ListaCanchas = ({ institutionId }) => {
         (a, v) => ({ ...a, [v]: v }),
         {}
       );
-      console.log("CARGANDO SURFACES");
-      console.log(dynamicLookupSurfaces);
       setSurfaces(dynamicLookupSurfaces);
     } else {
       console.log("no hay superficies cargadas");
@@ -604,7 +592,7 @@ const ListaCanchas = ({ institutionId }) => {
                   console.log("agregar cancha a la lista");
                   console.log(cancha);
 
-                  setData([...data, cancha[0]]);
+                  setData([...data, cancha]);
 
                   setOpenSnackbar({
                     open: true,

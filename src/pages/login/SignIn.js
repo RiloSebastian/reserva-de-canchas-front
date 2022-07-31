@@ -28,7 +28,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Snackbar from "@mui/material/Snackbar";
-import { login, logout } from "../../actions/auth";
+import { login, logout, retrieveUser } from "../../actions/auth";
 import { retrieveInstitutionByAdmainEmail } from "../../actions/institution";
 import { retrieveCourts } from "../../actions/court";
 
@@ -173,6 +173,7 @@ const SignIn = (props) => {
 
     dispatch(login(data.get("username"), data.get("password")))
       .then((user) => {
+        dispatch(retrieveUser(user.id));
         const userRole = user.roles[0];
         switch (userRole) {
           case "ROLE_CUSTOMER":
@@ -190,8 +191,10 @@ const SignIn = (props) => {
                     history.push("/dashboard/reservas");
                   })
                   .catch((err) => {
-                    dispatch(logout());
-                    return Promise.reject(err);
+                    console.log("Abrir dashboard");
+                    history.push("/dashboard/reservas");
+                    //dispatch(logout());
+                    //return Promise.reject(err);
                   });
               })
               .catch((err) => {

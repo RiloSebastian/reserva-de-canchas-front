@@ -6,6 +6,7 @@ import {
   LOAD_INSTITUTION_TIMES,
   RETRIEVE_INSTITUTION,
   UPDATE_INSTITUTION,
+  UPLOAD_INSTITUTION_PHOTOS,
 } from "../actions/types";
 
 const initialState = {};
@@ -45,6 +46,11 @@ export default function (institution = initialState, action) {
       return {
         ...institution,
         times: payload,
+      };
+    case UPLOAD_INSTITUTION_PHOTOS:
+      return {
+        ...institution,
+        pictures: payload,
       };
     default:
       return institution;
