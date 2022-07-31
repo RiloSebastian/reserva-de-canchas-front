@@ -1,14 +1,11 @@
-import React, { forwardRef, useState } from "react";
 import { List, ListItem } from "@material-ui/core";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import MoreIcon from "@mui/icons-material/MoreVert";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import { Avatar } from "@mui/material";
 import MuiAppBar from "@mui/material/AppBar";
-import Badge from "@mui/material/Badge";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
@@ -22,6 +19,8 @@ import { styled, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import React, { forwardRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { Route, Switch } from "react-router";
 import { Link, NavLink as RouterLink } from "react-router-dom";
 import { USER_ROLE } from "../../constants/userRole";
@@ -33,8 +32,6 @@ import InstitutionRoutes, {
 } from "./../../pages/routes";
 import useStyles from "./menuBarStyles";
 import getMenu from "./sideBarItems";
-import { ConfirmProvider } from "material-ui-confirm";
-import { Avatar } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -136,7 +133,9 @@ const getRoleRoutes = (role) => {
 };
 
 const MenuBar = (props) => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  //const user = JSON.parse(localStorage.getItem("user"));
+
+  const { user } = useSelector((state) => state.auth);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -353,14 +352,7 @@ const MenuBar = (props) => {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              {user.photo ? (
-                <Avatar
-                  //src={user.avatar}
-                  src={user.photo}
-                />
-              ) : (
-                <AccountCircle />
-              )}
+              <Avatar src={user.profilePicture ? user.profilePicture : ""} />
             </IconButton>
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>

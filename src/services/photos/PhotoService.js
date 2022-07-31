@@ -1,28 +1,35 @@
 import http from "../../http-common";
 
-const upload = async (owner_id, image) => {
-  let formData = new FormData();
+/* const upload = async (entity_type, owner_id, images) => {
+  const formData = new FormData();
+  formData.append("files", images[0].file);
 
-  formData.append("file", image);
-  formData.append("owner_id", owner_id);
-
-  console.log("agregando imagenes");
+  console.log("enviando form data con imagenes");
+  console.log(images);
   console.log(formData);
 
-  try {
-    const imageAdded = await http.post(`/photos/add`, formData, {
-      headers: {
-        Authorization:
-          "Bearer " + JSON.parse(localStorage.getItem("user")).token,
-        "Content-type": "multipart/form-data",
-      },
-    });
-    console.log("imageAdded");
-    console.log(imageAdded);
-    return imageAdded;
-  } catch (err) {
-    console.log(err);
+  return await http.post(`/files/set/${entity_type}/${owner_id}`, formData, {
+    headers: {
+      Authorization: "Bearer " + JSON.parse(localStorage.getItem("user")).token,
+      "Content-type": "multipart/form-data",
+    },
+  });
+}; */
+
+const upload = async (entity_type, owner_id, images) => {
+  const formData = new FormData();
+  //formData.append("files", image.file);
+
+  for (let i = 0; i < images.length; i++) {
+    formData.append("files", images[i].file);
   }
+
+  return await http.post(`/files/set/${entity_type}/${owner_id}`, formData, {
+    headers: {
+      Authorization: "Bearer " + JSON.parse(localStorage.getItem("user")).token,
+      "Content-type": "multipart/form-data",
+    },
+  });
 };
 
 const getById = async (id) => {

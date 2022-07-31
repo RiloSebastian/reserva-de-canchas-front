@@ -5,6 +5,7 @@ import {
   LOGOUT,
   REGISTER_FAIL,
   REGISTER_SUCCESS,
+  UPLOAD_USER_PHOTOS,
 } from "../actions/types";
 
 const user = JSON.parse(localStorage.getItem("user"));
@@ -49,6 +50,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         user: { ...state.user, ...payload.user },
+      };
+    case UPLOAD_USER_PHOTOS:
+      return {
+        ...state,
+        user: { ...state.user, profilePicture: payload },
       };
     default:
       return state;

@@ -17,15 +17,11 @@ const login = async (username, password) => {
           "user",
           JSON.stringify({
             ...response.data,
-            photo:
-              "https://upload.wikimedia.org/wikipedia/commons/e/e4/Roger_Federer_%2818566686046%29.jpg",
           })
         );
       }
       return {
         ...response.data,
-        photo:
-          "https://upload.wikimedia.org/wikipedia/commons/e/e4/Roger_Federer_%2818566686046%29.jpg",
       };
     })
     .catch((err) => {
