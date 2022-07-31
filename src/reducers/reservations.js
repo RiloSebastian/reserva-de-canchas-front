@@ -1,8 +1,9 @@
 import {
-  RETRIEVE_RERVATIONS,
+  RETRIEVE_RESERVATIONS,
   CREATE_RESERVATION,
   UPDATE_RESERVATION,
   DELETE_RESERVATION,
+  CLEAN_RESERVATIONS,
 } from "../actions/types";
 
 const initialState = [];
@@ -13,7 +14,7 @@ export default function (reservations = initialState, action) {
   switch (type) {
     case CREATE_RESERVATION:
       return [...reservations, payload];
-    case RETRIEVE_RERVATIONS:
+    case RETRIEVE_RESERVATIONS:
       return payload;
     case UPDATE_RESERVATION:
       return reservations.map((reservation) => {
@@ -28,6 +29,8 @@ export default function (reservations = initialState, action) {
       });
     case DELETE_RESERVATION:
       return reservations.filter(({ id }) => id !== payload.id);
+    case CLEAN_RESERVATIONS:
+      return [];
     default:
       return reservations;
   }

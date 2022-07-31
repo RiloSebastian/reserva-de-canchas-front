@@ -18,10 +18,7 @@ export default function (institution = initialState, action) {
     case RETRIEVE_INSTITUTION:
       return payload;
     case UPDATE_INSTITUTION:
-      return {
-        ...institution,
-        payload,
-      };
+      return payload;
     case LOAD_INSTITUTION_DAYSOFF:
       return {
         ...institution,

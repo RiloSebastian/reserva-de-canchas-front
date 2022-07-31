@@ -20,6 +20,8 @@ import HistoryReservations from "../../../components/my-reservations/HistoryRese
 import NextReservations from "../../../components/my-reservations/NextReservations";
 import ReservationService from "../../../services/reservations/ReservationService";
 import { useHistory } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { retrieveCustomerReservations } from "../../../actions/reservations";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -46,6 +48,8 @@ const tableIcons = {
 };
 
 const MisReservas = () => {
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const history = useHistory();
 
   const [columns, setColumns] = useState([
@@ -82,41 +86,21 @@ const MisReservas = () => {
   const [historyReservations, setHistoryReservations] = useState([]);
 
   const getCustomerReservations = async (customerId) => {
-    try {
-      const reservationList = await ReservationService.getAllByCustomerId(customerId);
+    dispatch(retrieveCustomerReservations(customerId))
+      .then((reservas) => {
+        //SEPARAR RESERVAS EN PENDIENTES Y FINALIZADAS
+        console.info("SEPARAR RESERVAS EN PENDIENTES Y FINALIZADAS");
 
-      console.log("reservationList");
-      console.log(reservationList);
-
-      const data = reservationList.data;
-
-      if (data) {
-        
-        //TODO: separar reservas finalizadas de las pendientes
-
-        data.forEach((reservation) => {
-          console.log("reservation");
-          console.log(reservation);
-
-          if(reservation.status === "PENDING"){
-
-          }else {
-
-          }
-
-        });
-      }
-    } catch (err) {
-      //TODO: manejar el error si no se pueden obtener las reservas del cliente! 
-      console.log("error al cargar las reservas del cliente")
-    }
-  }
+        setNextReservations(reservas);
+        setHistoryReservations(reservas);
+        return reservas;
+      })
+      .catch((err) => err);
+  };
 
   useEffect(() => {
-
-    getCustomerReservations();
-
-  }, [])
+    getCustomerReservations(user.id);
+  }, []);
 
   return (
     <>
@@ -133,7 +117,10 @@ const MisReservas = () => {
           }}
           maxWidth="100%"
         >
-          <NextReservations />
+          <NextReservations
+            nextReservations={nextReservations}
+            setNextReservations={setNextReservations}
+          />
         </Container>
       </Box>
 
@@ -150,7 +137,10 @@ const MisReservas = () => {
           }}
           maxWidth="100%"
         >
-          <HistoryReservations />
+          <HistoryReservations
+            historyReservations={historyReservations}
+            setHistoryReservations={setHistoryReservations}
+          />
         </Container>
       </Box>
     </>

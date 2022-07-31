@@ -77,6 +77,7 @@ const tableIcons = {
 };
 
 const ListaEmpleado = () => {
+  const { user } = useSelector((state) => state.auth);
   const institution = useSelector((state) => state.institution);
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
@@ -386,6 +387,11 @@ const ListaEmpleado = () => {
           },
         ]}
         editable={{
+          isEditable: (rowData) => rowData.id !== user.id,
+          isEditHidden: (rowData) => rowData.id !== user.id,
+          isDeletable: (rowData) => rowData.id !== user.id,
+          isDeleteHidden: (rowData) => rowData.id !== user.id,
+
           onRowAdd: (newData) =>
             new Promise(async (resolve, reject) => {
               const user = await createNewUser(newData)

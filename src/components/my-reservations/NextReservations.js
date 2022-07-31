@@ -207,25 +207,27 @@ const NextReservations = () => {
           },
         }}
         components={{
-          Action: (props) => (
-            <Box sx={{ "& > button": { m: 1 } }}>
-              <LoadingButton
-                color={props.data.status !== "CANCELED" ? "error" : "error"}
-                onClick={(event) => props.action.onClick(event, props.data)}
-                loading={
-                  loading &&
-                  selectedReservation.reservation_id ===
-                    props.data.reservation_id &&
-                  selectedReservation.status !== "CANCELED"
-                }
-                loadingPosition="start"
-                startIcon={<DeleteIcon />}
-                variant="contained"
-              >
-                Cancelar Reserva
-              </LoadingButton>
-            </Box>
-          ),
+          Action: (props) => {
+            return (
+              <Box sx={{ "& > button": { m: 1 } }}>
+                <LoadingButton
+                  color={props.data.status !== "CANCELED" ? "error" : "error"}
+                  onClick={(event) => props.action.onClick(event, props.data)}
+                  loading={
+                    loading &&
+                    selectedReservation.reservation_id ===
+                      props.data.reservation_id &&
+                    selectedReservation.status !== "CANCELED"
+                  }
+                  loadingPosition="start"
+                  startIcon={<DeleteIcon />}
+                  variant="contained"
+                >
+                  Cancelar Reserva
+                </LoadingButton>
+              </Box>
+            );
+          },
         }}
         onRowClick={(evt, selectedRow) => setSelectedReservation(selectedRow)}
         options={{

@@ -91,7 +91,7 @@ const SignUp = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("false");
+  const [statusMessage, setStatusMessage] = useState("");
   const [showMessageError, setShowMessageError] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -299,6 +299,12 @@ const SignUp = () => {
             handleMessageError(
               "Error al Enviar Mail de Confirmacion, por favor intente nuevamente mas tarde"
             );
+            history.push({
+              pathname: "/login",
+              state: {
+                accountEnable: false,
+              },
+            });
           });
       } catch (err) {
         console.error("error al registrar usuario");

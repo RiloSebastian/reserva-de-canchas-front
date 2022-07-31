@@ -115,6 +115,8 @@ export const updateInstitutionDetails =
   (institution_id, data) => async (dispatch) => {
     try {
       const res = await InstitucionService.update(institution_id, data);
+      console.log("DEVOLVIENDO INFO DE LA INSTITUCION");
+      console.log(res.data);
       dispatch({
         type: UPDATE_INSTITUTION,
         payload: res.data,
@@ -193,12 +195,6 @@ export const deleteAllInstitutionSchedules =
       return Promise.reject(err.response);
     }
   };
-
-export const change = (payload) => (dispatch) => {
-  console.log("En la action de change state");
-  console.log(payload);
-  dispatch({ type: "UPDATE_INSTITUTION", payload });
-};
 
 export const setInstitution = (payload) => (dispatch) => {
   console.log("En la action de setInstitution state");

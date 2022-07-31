@@ -18,11 +18,7 @@ const getAll = async (institution_id) => {
 };
 
 const getAllByCustomerId = async (customer_id) => {
-  try {
-    return await http.get(`/reservations/customers/${customer_id}`);
-  } catch (err) {
-    console.log(err);
-  }
+  return await http.get(`/reservations/customers/${customer_id}`);
 };
 
 const get = async (institution_id, court_id) => {
