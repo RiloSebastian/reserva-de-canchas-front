@@ -34,6 +34,9 @@ import ar from "react-phone-input-2/lang/ar.json";
 import es from "react-phone-input-2/lang/es.json";
 import "react-phone-input-2/lib/style.css";
 
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+
 const themeTextArea = createTheme({
   components: {
     MuiTextField: {
@@ -82,6 +85,8 @@ const theme = createTheme();
 
 const SignUpInstitution = () => {
   let history = useHistory();
+  const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
 
   const theme = useTheme();
 
@@ -122,7 +127,7 @@ const SignUpInstitution = () => {
     telephone: "",
   });
 
-  const [open, setOpen] = useState(false);
+  const [emailSended, setEmailSended] = useState(false);
 
   const handleClose = () => {
     setShowMessageError(false);
@@ -268,6 +273,9 @@ const SignUpInstitution = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    setLoading(true);
+    setStatusMessage("Creando Usuario");
+
     console.log("creando admin e institucion");
     console.log(values);
 
@@ -279,15 +287,25 @@ const SignUpInstitution = () => {
         values.email,
         values.password,
         values.institutionTel
-      ).then((data) => data);
+      ).then(async (data) => {
+        //pegarle al endpoint email
+        setStatusMessage("Enviando Email de Confirmacion");
+        const emailSendedToAdmin = await EmailService.sendVerificationEmail(
+          data.email
+        )
+          .then((data) => {
+            setEmailSended(true);
+          })
+          .catch((err) => {
+            handleMessageError(
+              "Error al Enviar Mail de Confirmacion, por favor intente nuevamente mas tarde"
+            );
+          });
+        return data;
+      });
 
-      //pegarle al endpoint email
-
-      const emailSended = await EmailService.sendVerificationEmail(
-        adminUser.email
-      ).then((data) => data);
-
-      const managers = [adminUser.email];
+      setStatusMessage("Creando Institucion");
+      const managers = [adminUser.id];
 
       const { name, description, institutionTel, address } = values;
 
@@ -301,20 +319,35 @@ const SignUpInstitution = () => {
 
       console.log("enviando datos de la institucion");
       console.log(data);
+      const institution = await InstitucionService.create(data)
+        .then((institution) => {
+          setLoading(false);
+          console.log("INSTITUCION CREADA");
+          console.log(institution);
 
-      const institution = await InstitucionService.create(data).then(
-        (data) => data
-      );
-
-      console.log("INSTITUCION CREADA");
-      console.log(institution);
-
-      history.push({
-        pathname: "/account-confirmation",
-        state: adminUser,
-      });
+          if (emailSended) {
+            history.push({
+              pathname: "/account-confirmation",
+              state: adminUser,
+            });
+          } else {
+            history.push({
+              pathname: "/login",
+              state: {
+                accountEnable: false,
+              },
+            });
+          }
+        })
+        .catch((error) => {
+          setLoading(false);
+          handleMessageError(
+            "Error al Crear la Institucion, por favor intente nuevamente mas tarde"
+          );
+        });
     } catch (err) {
-      console.error("error al crear admin e institucion");
+      setLoading(false);
+      console.error("error al registrar institucion");
       console.error(err);
 
       if (err.data === undefined || err.data === null) {
@@ -342,8 +375,6 @@ const SignUpInstitution = () => {
       setShowMessageError(true);
     }
   };
-
-  const [loading, setLoading] = useState(false);
 
   function handleClick() {
     setLoading(true);
@@ -701,6 +732,32 @@ const SignUpInstitution = () => {
         handleClose={handleClose}
         errorMessage={errorMessage}
       />
+
+      {loading && (
+        <Box sx={{ display: "flex" }}>
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loading}
+          >
+            <Grid
+              container
+              spacing={0}
+              direction="column"
+              alignItems="center"
+              justify="center"
+            >
+              <Grid item>
+                <Typography variant="h6" textAlign="center">
+                  {statusMessage}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <CircularProgress color="inherit" disableShrink />
+              </Grid>
+            </Grid>
+          </Backdrop>
+        </Box>
+      )}
     </React.Fragment>
   );
 };

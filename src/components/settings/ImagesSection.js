@@ -140,7 +140,7 @@ export const ImagesSection = ({ props, institution }) => {
             ) : (
               <Grid container justifyContent="center">
                 <Alert severity="warning">
-                  no hay imagenes cargadas para esta cancha
+                  no hay imagenes cargadas para esta institucion
                 </Alert>
               </Grid>
             )}

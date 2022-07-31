@@ -100,7 +100,6 @@ export const InstitutionDetails = (props) => {
 
   const handleChange = (e) => {
     setValues({ type: e.target.name, data: e.target.value });
-    //dispatch(change({ type: e.target.name, data: e.target.value }));
   };
 
   const handleOnChange = (value) => {
@@ -193,8 +192,8 @@ export const InstitutionDetails = (props) => {
       cancellationText: "Cancelar",
     })
       .then(() => {
-        console.log("subiendo camios en los detalles de la institucion");
-
+        console.log("subiendo cambios en los detalles de la institucion");
+        console.log(values);
         handleUploadChanges(values);
       })
       .catch(() => console.log("Deletion cancelled."));

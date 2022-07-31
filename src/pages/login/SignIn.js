@@ -183,7 +183,7 @@ const SignIn = (props) => {
           case "ROLE_ADMIN":
             console.log("ROLE_ADMIN");
 
-            return dispatch(retrieveInstitutionByAdmainEmail(user.email))
+            return dispatch(retrieveInstitutionByAdmainEmail(user.id))
               .then((data) => {
                 return dispatch(retrieveCourts(data.id))
                   .then((data) => {
@@ -230,7 +230,7 @@ const SignIn = (props) => {
             );
         }
       })
-      .catch((err) => {
+      .catch(async (err) => {
         setLoading(false);
         console.error("error al obtener usuario");
         console.log(err);
@@ -243,7 +243,7 @@ const SignIn = (props) => {
           console.error("La cuenta no esta habilidata - reenviar correo");
 
           try {
-            const emailReSended = EmailService.sendVerificationEmail(
+            const emailReSended = await EmailService.sendVerificationEmail(
               data.get("username")
             ).then((data) => data);
 
@@ -253,7 +253,7 @@ const SignIn = (props) => {
             setShowMessageError(true);
           } catch (error) {
             handleMessageError(
-              `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
+              `${err.data.error}. Hubo un error al enviar tu correo de confirmacion, por favor intenta mas tarde`
             );
             setShowMessageError(true);
           }
@@ -266,15 +266,24 @@ const SignIn = (props) => {
 
   useEffect(() => {
     console.log("ACTUALIZAR EL ESTADO DE LA CUENTA");
-    if (accountState) {
-      setOpenSnackbar({
-        open: true,
-        autoHideDuration: 6000,
-        severity: "success",
-        message:
-          "Tu cuenta se encuentra habilidata. Ya podes ingresar con tu usuario y contraseña",
-      });
-    } else {
+    if (accountState !== undefined) {
+      if (accountState.accountEnable) {
+        setOpenSnackbar({
+          open: true,
+          autoHideDuration: 10000,
+          severity: "success",
+          message:
+            "Tu cuenta se encuentra habilidata. Ya podes ingresar con tu usuario y contraseña",
+        });
+      } else if (!accountState.accountEnable) {
+        setOpenSnackbar({
+          open: true,
+          autoHideDuration: 10000,
+          severity: "error",
+          message:
+            "Tu cuenta aun no ha sido habilidata. Hubo un error al enviar tu correo de confirmacion, por favor intenta mas tarde",
+        });
+      }
     }
   }, [accountState]);
 
