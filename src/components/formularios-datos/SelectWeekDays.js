@@ -15,7 +15,6 @@ const SelectWeekDays = ({
   useEffect(() => {
     daysSelected.forEach((daySelected) => {
       if (daySelected.selected === true) {
-        console.log("SETEANDO CADA DIA SELECCIONADO");
         setValue((prevState) => {
           return [...prevState, daySelected.value];
         });

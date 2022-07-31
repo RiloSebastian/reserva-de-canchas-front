@@ -3,13 +3,13 @@ import Utils from "./utils.js";
 
 export default function DataCell(props) {
   const { startDate } = props.itemData;
-  const { workingDays } = props;
-  const { holidays } = props;
+  const { workingDays, holidays, busyTime } = props;
 
   const isDisableDate =
     Utils.isHoliday(startDate, holidays) ||
     Utils.isWeekend(startDate, workingDays);
-  const isDinner = Utils.isDinner(startDate);
+  const isDinner = Utils.isDinner(startDate, busyTime);
+
   let cssClasses = props.className ? props.className : "";
 
   if (isDisableDate) {

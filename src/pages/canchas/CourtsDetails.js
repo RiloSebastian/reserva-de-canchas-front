@@ -85,20 +85,15 @@ const CourtsDetails = ({ rowData }) => {
 
   const [daysSelected, setDaysSelected] = useState([]);
 
-  const [daysSelectedId, setDaysSelectedId] = useState(uuidv4());
-
   useEffect(() => {
-    console.log("MOSTRANDE DETALLE DE CANCHA");
-
     let daysAlreadySelected = [];
-
     if (schedules !== undefined) {
-      schedules.forEach((horario) => {
+      schedules.map((horario, index) => {
         horario.daysAvailable.forEach((dia) => {
           daysAlreadySelected.push({
             label: dia.charAt(0).toUpperCase() + dia.slice(1).toLowerCase(),
             value: dia,
-            daysAndTimesId: daysSelectedId,
+            daysAndTimesId: index,
             selected: true,
           });
         });
@@ -136,19 +131,15 @@ const CourtsDetails = ({ rowData }) => {
                   <List>
                     {schedules && schedules.length > 0 ? (
                       <>
-                        {schedules.map((diaYHorario) => (
-                          <ListItem key={diaYHorario.id}>
+                        {schedules.map((diaYHorario, index) => (
+                          <ListItem key={index}>
                             <Paper className={classes}>
-                              <Box
-                                key={diaYHorario.id}
-                                textAlign="center"
-                                sx={{ m: 4 }}
-                              >
+                              <Box key={index} textAlign="center" sx={{ m: 4 }}>
                                 <Box textAlign="left" sx={{ mt: 4 }}>
                                   <p>Dias de la Semana</p>
                                   <SelectWeekDays
                                     daysSelected={daysSelected}
-                                    daysAndTimesId={daysSelectedId}
+                                    daysAndTimesId={index}
                                     fieldsToShow={fieldsToShow}
                                     readOnly={true}
                                   />
@@ -157,76 +148,78 @@ const CourtsDetails = ({ rowData }) => {
                                   <p>Horarios</p>
 
                                   <List>
-                                    {diaYHorario.details.map((horario) => (
-                                      <ListItem key={horario.id}>
-                                        <Grid
-                                          container
-                                          spacing={3}
-                                          alignItems="center"
-                                        >
-                                          <LocalizationProvider
-                                            dateAdapter={AdapterDateFns}
-                                          >
-                                            <Grid item xs>
-                                              <MobileTimePicker
-                                                open={false}
-                                                label="Desde"
-                                                name="from"
-                                                value={horario.timeFrame.from}
-                                                renderInput={(params) => (
-                                                  <TextField {...params} />
-                                                )}
-                                              />
-                                            </Grid>
-                                            <Grid item xs>
-                                              <MobileTimePicker
-                                                open={false}
-                                                label="Hasta"
-                                                name="to"
-                                                value={horario.timeFrame.to}
-                                                renderInput={(params) => (
-                                                  <TextField {...params} />
-                                                )}
-                                              />
-                                            </Grid>
-                                          </LocalizationProvider>
-
-                                          <Grid item xs>
-                                            <TextField
-                                              id="standard-read-only-input"
-                                              label="/hr"
-                                              value={`$ ${horario.costPerSlot}`}
-                                              defaultValue="Precio por Hora"
-                                              InputProps={{
-                                                readOnly: true,
-                                              }}
-                                              variant="standard"
-                                            />
-                                          </Grid>
+                                    {diaYHorario.details.map(
+                                      (horario, index) => (
+                                        <ListItem key={index}>
                                           <Grid
-                                            hidden={fieldsToShow.enabled}
-                                            item
-                                            xs
+                                            container
+                                            spacing={3}
+                                            alignItems="center"
                                           >
-                                            <FormControlLabel
-                                              control={
-                                                <Switch
-                                                  name="enabled"
-                                                  checked={horario.enabled}
-                                                  color="primary"
+                                            <LocalizationProvider
+                                              dateAdapter={AdapterDateFns}
+                                            >
+                                              <Grid item xs>
+                                                <MobileTimePicker
+                                                  open={false}
+                                                  label="Desde"
+                                                  name="from"
+                                                  value={horario.timeFrame.from}
+                                                  renderInput={(params) => (
+                                                    <TextField {...params} />
+                                                  )}
                                                 />
-                                              }
-                                              label={
-                                                horario.enabled
-                                                  ? "Activo"
-                                                  : "Inactivo"
-                                              }
-                                              labelPlacement="activo"
-                                            />
+                                              </Grid>
+                                              <Grid item xs>
+                                                <MobileTimePicker
+                                                  open={false}
+                                                  label="Hasta"
+                                                  name="to"
+                                                  value={horario.timeFrame.to}
+                                                  renderInput={(params) => (
+                                                    <TextField {...params} />
+                                                  )}
+                                                />
+                                              </Grid>
+                                            </LocalizationProvider>
+
+                                            <Grid item xs>
+                                              <TextField
+                                                id="standard-read-only-input"
+                                                label="/hr"
+                                                value={`$ ${horario.costPerSlot}`}
+                                                defaultValue="Precio por Hora"
+                                                InputProps={{
+                                                  readOnly: true,
+                                                }}
+                                                variant="standard"
+                                              />
+                                            </Grid>
+                                            <Grid
+                                              hidden={fieldsToShow.enabled}
+                                              item
+                                              xs
+                                            >
+                                              <FormControlLabel
+                                                control={
+                                                  <Switch
+                                                    name="enabled"
+                                                    checked={horario.enabled}
+                                                    color="primary"
+                                                  />
+                                                }
+                                                label={
+                                                  horario.enabled
+                                                    ? "Activo"
+                                                    : "Inactivo"
+                                                }
+                                                labelPlacement="activo"
+                                              />
+                                            </Grid>
                                           </Grid>
-                                        </Grid>
-                                      </ListItem>
-                                    ))}
+                                        </ListItem>
+                                      )
+                                    )}
                                   </List>
                                 </Box>
                               </Box>

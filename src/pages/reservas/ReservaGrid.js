@@ -103,12 +103,27 @@ function ReservaGrid() {
   const [endDayHour, setEndDayHour] = useState(
     moment(institution.scheduleMaxTime).hour()
   );
+  const [busyTime, setBusyTime] = useState([]);
 
   const onAppointmentFormOpening = (e) => {
     console.log("ABRIENDO FORM");
     console.log(e);
+    console.log(courts);
+    const courtDetails = e.form
+      .itemOption("mainGroup")
+      .items.filter((mainGroupItem) => mainGroupItem.dataField === "sportId")[0]
+      .editorOptions.dataSource[0];
+
     const startDate = new Date(e.appointmentData.startDate);
-    if (!Utils.isValidAppointmentDate(startDate, workingDays, holidays)) {
+    if (
+      !Utils.isValidAppointmentDate(
+        startDate,
+        workingDays,
+        holidays,
+        busyTime
+      ) ||
+      Utils.getTimePrice(courtDetails, e.appointmentData) === 0
+    ) {
       e.cancel = true;
       notifyDisableDate();
     } else if (!courtList || courtList.length === 0) {
@@ -125,14 +140,6 @@ function ReservaGrid() {
         : "Crear una Nueva Reserva"
     );
 
-    /*   const courtDetails = courts.filter(
-      (court) => court.id === groupingInfo[0].id
-    )[0];
-
-    const timePrice = Utils.getTimePrice(courtDetails, e.appointmentData); */
-
-    const timePrice = 150;
-
     const form = e.form;
     let mainGroupItems = form
       .itemOption("mainGroup")
@@ -141,21 +148,6 @@ function ReservaGrid() {
       );
     console.log("CAMPOS DEL FORM");
     console.log(mainGroupItems);
-
-    /* if (
-      !mainGroupItems.find(function (i) {
-        return i.dataField === "phone";
-      })
-    ) {
-      mainGroupItems.push({
-        colSpan: 2,
-        label: { text: "Numero de Telefono" },
-        editorType: "dxTextBox",
-        dataField: "phone",
-        validationRules: [{ type: "required" }],
-      });
-      form.itemOption("mainGroup", "items", mainGroupItems);
-    } */
 
     if (
       !mainGroupItems.find(function (i) {
@@ -167,10 +159,42 @@ function ReservaGrid() {
         label: { text: "Precio" },
         editorType: "dxNumberBox",
         dataField: "price",
-        editorOptions: { value: timePrice, disabled: true },
+        editorOptions: {
+          value: Utils.getTimePrice(courtDetails, e.appointmentData),
+          disabled: true,
+        },
         validationRules: [{ type: "required" }],
       });
       form.itemOption("mainGroup", "items", mainGroupItems);
+    }
+
+    if (
+      mainGroupItems.find(function (i) {
+        return i.dataField === "price";
+      })
+    ) {
+      const arr = mainGroupItems;
+
+      const index = arr.indexOf(
+        mainGroupItems.filter((i) => i.dataField === "price")[0]
+      );
+
+      if (index !== -1) {
+        arr[index] = {
+          colSpan: 2,
+          label: { text: "Precio" },
+          editorType: "dxNumberBox",
+          dataField: "price",
+          editorOptions: {
+            value: Utils.getTimePrice(courtDetails, e.appointmentData),
+            disabled: true,
+          },
+          validationRules: [{ type: "required" }],
+        };
+      }
+
+      console.log(arr);
+      form.itemOption("mainGroup", "items", arr);
     }
 
     if (
@@ -210,7 +234,8 @@ function ReservaGrid() {
       e.component,
       e.appointmentData,
       workingDays,
-      holidays
+      holidays,
+      busyTime
     );
     if (!isValidAppointment) {
       e.cancel = true;
@@ -223,7 +248,8 @@ function ReservaGrid() {
       e.component,
       e.newData,
       workingDays,
-      holidays
+      holidays,
+      busyTime
     );
     if (!isValidAppointment) {
       e.cancel = true;
@@ -261,6 +287,7 @@ function ReservaGrid() {
         itemData={itemData}
         workingDays={workingDays}
         holidays={holidays}
+        busyTime={busyTime}
       />
     );
   };
@@ -269,7 +296,9 @@ function ReservaGrid() {
     <DateCell itemData={itemData} workingDays={workingDays} />
   );
 
-  const renderTimeCell = (itemData) => <TimeCell itemData={itemData} />;
+  const renderTimeCell = (itemData) => (
+    <TimeCell itemData={itemData} busyTime={busyTime} />
+  );
 
   let history = useHistory();
   const handleRedirectToConfig = () => {
@@ -318,6 +347,9 @@ function ReservaGrid() {
 
     if (institution.schedules) {
       institution.schedules.forEach((schedule) => {
+        let horariosLaborales = [];
+        let diasLaboralesSegmentados = [];
+
         schedule.daysAvailable.forEach((diaLaboral) => {
           switch (diaLaboral) {
             case "MIERCOLES":
@@ -329,9 +361,25 @@ function ReservaGrid() {
             default:
               diaLaboral = diaLaboral.toLowerCase();
           }
+          diasLaboralesSegmentados.push(moment().day(diaLaboral).day());
 
           setWorkingDays((prevState) => {
             return [...prevState, moment().day(diaLaboral).day()];
+          });
+
+          //OBTENER LOS HORARIOS HORARIOS PARA CADA DIA LABORAL
+          schedule.details.forEach((horario) => {
+            horariosLaborales.push({
+              from: new Date(horario.timeFrame.from).getHours(),
+              to: new Date(horario.timeFrame.to).getHours(),
+            });
+          });
+
+          setBusyTime((prevState) => {
+            return [
+              ...prevState,
+              { horariosLaborales, diasLaboralesSegmentados },
+            ];
           });
         });
       });
@@ -341,9 +389,10 @@ function ReservaGrid() {
       let newDateArray = [];
 
       institution.freeDays.forEach((day) => {
-        newDateArray.push(new Date(moment(day).format("YYYY-MM-DD")));
+        newDateArray.push(
+          new Date(moment(day).add(1, "d").format("YYYY-MM-DD"))
+        );
       });
-
       setHolidays(newDateArray);
     }
 
