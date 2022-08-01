@@ -17,6 +17,10 @@ const getAll = async (institution_id) => {
   }
 };
 
+const getAllByInstitutionId = async (institution_id) => {
+  return await http.get(`/reservations/customers/${institution_id}`);
+};
+
 const getAllByCustomerId = async (customer_id) => {
   return await http.get(`/reservations/customers/${customer_id}`);
 };
@@ -105,6 +109,7 @@ export default {
   getAll,
   get,
   getAllByCustomerId,
+  getAllByInstitutionId,
   create,
   update,
   remove,

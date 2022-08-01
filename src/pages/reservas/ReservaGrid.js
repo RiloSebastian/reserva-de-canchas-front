@@ -34,6 +34,7 @@ import {
   updateReservation,
 } from "../../actions/reservations.js";
 import { useConfirm } from "material-ui-confirm";
+import { retrieveInstitutionReservations } from "../../actions/reservations";
 
 const PREFIX = "Demo";
 
@@ -474,6 +475,16 @@ function ReservaGrid() {
       setIsAdminRole(false);
     }
 
+    //OBTENER TODAS LAS RESERVAS DE LA INSTITUCION
+    dispatch(retrieveInstitutionReservations(institution.id))
+      .then((data) => {
+        //ARMO LAS RESERVAS CON EL FORMATO ESPERADO
+      })
+      .catch((error) => {
+        console.log("ERROR AL OBTENER LAS RESERVAS DE LA INSTITUCION");
+        console.error(error);
+      });
+
     if (institution.schedules) {
       institution.schedules.forEach((schedule) => {
         let horariosLaborales = [];
@@ -525,21 +536,24 @@ function ReservaGrid() {
       setHolidays(newDateArray);
     }
 
-    const sportsByInstitutions = courtList
-      .map((item) => item.sport)
-      .filter((value, index, self) => self.indexOf(value) === index);
+    if (courtList && courtList.length > 0) {
+      const sportsByInstitutions = courtList
+        .map((item) => item.sport)
+        .filter((value, index, self) => self.indexOf(value) === index);
 
-    setSportSelected(sportsByInstitutions[0]);
+      setSportSelected(sportsByInstitutions[0]);
 
-    setSports(sportsByInstitutions);
+      setSports(sportsByInstitutions);
 
-    const courtFilteredBySport = courtList
-      .filter((court) => court.sport === sportSelected)
-      .map((c) => {
-        return { ...c, text: c.name, courtId: c.id };
-      });
+      const courtFilteredBySport = courtList
+        .filter((court) => court.sport === sportSelected)
+        .map((c) => {
+          return { ...c, text: c.name, courtId: c.id };
+        });
 
-    setCourts(courtFilteredBySport);
+      setCourts(courtFilteredBySport);
+    }
+
     setLoading(false);
   }, []);
 
@@ -707,58 +721,6 @@ function ReservaGrid() {
                 >
                   Por favor, pongase en Contacto con un Administrador para
                   agregar los horarios a la institucion
-                </Typography>
-              )}
-            </Container>
-          </Box>
-        </Paper>
-      )}
-      <br />
-      {(!courtList || courtList.length === 0) && (
-        <Paper>
-          <Box
-            width="100%"
-            top={0}
-            p={4}
-            zIndex="modal"
-            color="textSecondary"
-            bgcolor="background.header"
-          >
-            <Container maxWidth="md" className={classes.container}>
-              <Typography
-                variant="h5"
-                component="h2"
-                gutterBottom={true}
-                className={classes.header}
-              >
-                La Institucion aun no Posee Canchas Registradas
-              </Typography>
-              {isAdminRole ? (
-                <>
-                  <Typography
-                    variant="subtitle1"
-                    color="textSecondary"
-                    paragraph={true}
-                  >
-                    Haga Click en el siguiente Boton para crear su primer Cancha
-                  </Typography>
-                  <Button
-                    onClick={renderCourtPage}
-                    variant="contained"
-                    color="primary"
-                    className={classes.action}
-                  >
-                    Ir al Menu de Canchas
-                  </Button>
-                </>
-              ) : (
-                <Typography
-                  variant="subtitle1"
-                  color="textSecondary"
-                  paragraph={true}
-                >
-                  Por favor, pongase en Contacto con un Administrador para
-                  agregar canchas a la institucion
                 </Typography>
               )}
             </Container>
