@@ -30,21 +30,10 @@ const get = async (institution_id, court_id) => {
 };
 
 const create = async (reservationData) => {
-  console.log("crear reserva");
-  console.log(reservationData);
-  return await http
-    .post(`/reservations`, reservationData)
-    .then((response) => {
-      console.log("reserva creada correctamente");
-      console.log(response);
-      return response.data;
-    })
-    .catch((err) => {
-      console.log("error al crear la reserva");
-      console.log(err.response);
-      return Promise.reject(err.response);
-      //return { message: "Por el momento forzamos la respuesta ok !" };
-    });
+  return await http.post(
+    `courts/${reservationData.courtId}/reservation`,
+    reservationData
+  );
 };
 
 const update = async (institution_id, data) => {

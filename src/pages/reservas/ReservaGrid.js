@@ -30,6 +30,7 @@ import esMessages from "devextreme/localization/messages/es.json";
 import { locale, loadMessages } from "devextreme/localization";
 import moment from "moment";
 import { createReservation } from "../../actions/reservations.js";
+import { useConfirm } from "material-ui-confirm";
 
 const PREFIX = "Demo";
 
@@ -66,6 +67,10 @@ const classes = {
 
 const views = [{ type: "week", maxAppointmentsPerCell: 1 }];
 
+const notifyErrorCreate = (message) => {
+  notify({ message }, "error", 3000);
+};
+
 const notifyDisableDate = () => {
   notify(
     "No se puede crear o mover una reserva a regiones de hora/fecha deshabilitadas.",
@@ -85,6 +90,7 @@ const notifyNoCourtsAvailable = () => {
 const groups = ["sportId", "courtId"];
 
 function ReservaGrid() {
+  const confirm = useConfirm();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [isAdminRole, setIsAdminRole] = useState(false);
@@ -106,6 +112,14 @@ function ReservaGrid() {
     moment(institution.scheduleMaxTime).hour()
   );
   const [busyTime, setBusyTime] = useState([]);
+
+  const [editingState, setEditingState] = useState({
+    allowAdding: true,
+    allowDeleting: true,
+    allowResizing: false,
+    allowDragging: false,
+    allowUpdating: true,
+  });
 
   const onAppointmentFormOpening = (e) => {
     /* console.log("ABRIENDO FORM");
@@ -243,11 +257,23 @@ function ReservaGrid() {
   };
 
   const onAppointmentAdding = (e) => {
+    console.log("onAppointmentAdding ");
     let { appointmentData } = e;
 
-    dispatch(createReservation(appointmentData));
-    console.log("onAppointmentAdding ");
-    console.log(appointmentData);
+    const reservationData = {
+      reservedFor: {
+        name: appointmentData.text,
+        email: appointmentData.email,
+      },
+      institutionId: institution.id,
+      courtId: appointmentData.courtId,
+      durationRange: {
+        from: appointmentData.startDate,
+        to: appointmentData.endDate,
+      },
+      paymentMethod: "CREDITO",
+    };
+
     const isValidAppointment = Utils.isValidAppointment(
       e.component,
       e.appointmentData,
@@ -258,6 +284,28 @@ function ReservaGrid() {
     if (!isValidAppointment) {
       e.cancel = true;
       notifyDisableDate();
+    }
+
+    let errorMessage = "";
+    const cancel = new Promise(async (resolve, reject) => {
+      console.log("creando reserva");
+
+      const created = await dispatch(createReservation(reservationData))
+        .then((data) => {
+          console.log("RESERVA CREADA CORRECTAMENTE");
+          resolve(false);
+        })
+        .catch((error) => {
+          console.log("ERROR AL CREAR RESERVA");
+          console.log(error);
+
+          errorMessage = "error al crear la reserva";
+          notifyErrorCreate(errorMessage);
+          reject(true);
+        });
+    });
+    if (cancel) {
+      e.cancel = cancel;
     }
   };
 
@@ -277,8 +325,27 @@ function ReservaGrid() {
   };
 
   const onAppointmentDeleting = (e) => {
-    console.log("onAppointmentDeleting ");
-    console.log(e);
+    const cancel = new Promise(async (resolve, reject) => {
+      console.log("eliminando cancha");
+
+      e.cancel = false;
+      await confirm({
+        title: "¿Esta Seguro que desea eliminar este horario?",
+        cancellationText: "Cancelar",
+      })
+        .then(() => {
+          console.log("ELIMINANDO RESERVA");
+
+          resolve(false);
+        })
+        .catch(() => {
+          console.log("ERROR AL ELIMINAR RESERVA");
+
+          reject(true);
+        });
+    });
+
+    e.cancel = cancel;
   };
 
   const onAppointmentAdded = (e) => {
@@ -559,6 +626,7 @@ function ReservaGrid() {
                 onAppointmentUpdating={onAppointmentUpdating}
                 onAppointmentDeleting={onAppointmentDeleting}
                 onAppointmentAdded={onAppointmentAdded}
+                editing={editingState}
               >
                 <Resource
                   fieldExpr="courtId"
