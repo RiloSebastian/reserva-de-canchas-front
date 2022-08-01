@@ -4,6 +4,7 @@ import {
   UPDATE_RESERVATION,
   DELETE_RESERVATION,
   CLEAN_RESERVATIONS,
+  CANCEL_RESERVATION,
 } from "../actions/types";
 
 const initialState = [];
@@ -27,6 +28,8 @@ export default function (reservations = initialState, action) {
           return reservation;
         }
       });
+    case CANCEL_RESERVATION:
+      return reservations.filter(({ id }) => id !== payload.id);
     case DELETE_RESERVATION:
       return reservations.filter(({ id }) => id !== payload.id);
     case CLEAN_RESERVATIONS:

@@ -35,6 +35,7 @@ import {
 } from "../../actions/reservations.js";
 import { useConfirm } from "material-ui-confirm";
 import { retrieveInstitutionReservations } from "../../actions/reservations";
+import { reservations } from "./appointments/appointments";
 
 const PREFIX = "Demo";
 
@@ -103,6 +104,7 @@ function ReservaGrid() {
   const [loading, setLoading] = useState(true);
   const [isAdminRole, setIsAdminRole] = useState(false);
   const { user } = useSelector((state) => state.auth);
+  const reservations = useSelector((state) => state.reservations);
   const institution = useSelector((state) => state.institution);
   const courtList = useSelector((state) => state.court);
 
@@ -130,7 +132,7 @@ function ReservaGrid() {
   });
 
   const onAppointmentFormOpening = (e) => {
-    /* console.log("ABRIENDO FORM");
+    console.log("ABRIENDO FORM");
     console.log(e);
     console.log(
       e.form
@@ -141,7 +143,7 @@ function ReservaGrid() {
         .editorOptions.dataSource.filter(
           (court) => court.id === e.appointmentData.courtId
         )[0]
-    ); */
+    );
     const courtDetails = e.form
       .itemOption("mainGroup")
       .items.filter((mainGroupItem) => mainGroupItem.dataField === "courtId")[0]
@@ -283,24 +285,12 @@ function ReservaGrid() {
       return;
     }
 
-    const reservationData = {
-      reservedFor: {
-        name: appointmentData.text,
-        email: appointmentData.email,
-      },
-      institutionId: institution.id,
-      courtId: appointmentData.courtId,
-      durationRange: {
-        from: appointmentData.startDate,
-        to: appointmentData.endDate,
-      },
-      paymentMethod: "CREDITO",
-    };
-
     const cancel = new Promise(async (resolve, reject) => {
       console.log("creando reserva");
 
-      const created = await dispatch(createReservation(reservationData))
+      const created = await dispatch(
+        createReservation(institution.id, appointmentData)
+      )
         .then((data) => {
           console.log("RESERVA CREADA CORRECTAMENTE");
           notifySuccessMessage("Reserva creada correctamente");
@@ -333,24 +323,11 @@ function ReservaGrid() {
         .then(() => {
           console.log("CANCELANDO RESERVA");
           let { appointmentData } = e;
+          console.log(appointmentData);
 
-          const reservationData = {
-            //id: appointmentData.id,
-            id: "appointmentData.id",
-            reservedFor: {
-              name: appointmentData.text,
-              email: appointmentData.email,
-            },
-            institutionId: institution.id,
-            courtId: appointmentData.courtId,
-            durationRange: {
-              from: appointmentData.startDate,
-              to: appointmentData.endDate,
-            },
-            paymentMethod: "CREDITO",
-          };
-
-          const isCanceled = dispatch(updateReservation(reservationData))
+          const isCanceled = dispatch(
+            updateReservation(institution.id, appointmentData)
+          )
             .then((data) => {
               console.log("RESERVA CANCELADA");
               notifySuccessMessage("Reserva Cancelada correctamente");
@@ -637,7 +614,7 @@ function ReservaGrid() {
                 )}
               </div>
               <Scheduler
-                dataSource={data}
+                dataSource={reservations}
                 groups={groups}
                 views={views}
                 defaultCurrentDate={currentDate}
