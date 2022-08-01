@@ -151,12 +151,10 @@ export default class Utils {
               }
             });
 
-            if (
-              daysNumberAvailable.includes(moment(itemData.startDate).day())
-            ) {
+            if (daysNumberAvailable.includes(moment(itemData).day())) {
               shedule.details.forEach((detail) => {
                 const time = moment(
-                  moment(itemData.startDate).format("hh:mm a"),
+                  moment(itemData).format("hh:mm a"),
                   formatTime
                 );
                 const beforeTime = moment(

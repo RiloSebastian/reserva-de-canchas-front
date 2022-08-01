@@ -36,18 +36,8 @@ const create = async (reservationData) => {
   );
 };
 
-const update = async (institution_id, data) => {
-  try {
-    return await http.patch(
-      `/institutions/${institution_id}/courts/${data.id}`,
-      data,
-      {
-        headers: AuthHeader(),
-      }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+const update = async (data) => {
+  return await http.put(`/reservations/${data.id}`, data);
 };
 
 const remove = async (institution_id, court_id) => {
