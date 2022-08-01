@@ -33,6 +33,7 @@ export const PATHS = {
   signupinstitution: "/signup/institution",
   forgotpass: "/forgot-pass",
   homepage: "/homepage",
+  payments: "/customer/checkout/:userToken",
 };
 
 export const CustomerRoutes = [

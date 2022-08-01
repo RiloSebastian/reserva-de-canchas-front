@@ -1,4 +1,6 @@
 import http from "../../http-common";
+import axios from "axios";
+const API_URL = "http://localhost:8080/api";
 
 const validatePaymentMethod = async (paymentData) => {
   console.log("SERVICE PARA VALIDAR MEDIO DE PAGO");
@@ -20,6 +22,11 @@ const validatePaymentMethod = async (paymentData) => {
     });
 };
 
+const getPaymentDetails = (token) => {
+  return http.get(`/reservations/token?token=${token}`);
+};
+
 export default {
   validatePaymentMethod,
+  getPaymentDetails,
 };

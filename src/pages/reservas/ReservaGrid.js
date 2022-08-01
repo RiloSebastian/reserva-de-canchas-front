@@ -13,7 +13,6 @@ import "devextreme/dist/css/dx.light.css";
 import Utils from "./utils.js";
 import SpeedDialAction from "devextreme-react/speed-dial-action";
 import RadioGroup from "devextreme-react/radio-group";
-import { useSelector } from "react-redux";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -23,12 +22,19 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useHistory } from "react-router-dom";
 import { BASE_URL_INSTITUTIONS } from "../routes";
+import { useDispatch, useSelector } from "react-redux";
 
 // Dictionaries for German language
 import esMessages from "devextreme/localization/messages/es.json";
 
 import { locale, loadMessages } from "devextreme/localization";
 import moment from "moment";
+import {
+  createReservation,
+  updateReservation,
+} from "../../actions/reservations.js";
+import { useConfirm } from "material-ui-confirm";
+import { retrieveInstitutionReservations } from "../../actions/reservations";
 
 const PREFIX = "Demo";
 
@@ -63,7 +69,15 @@ const classes = {
   nonWorkingCell: `${PREFIX}-nonWorkingCell`,
 };
 
-const views = [{ type: "week", maxAppointmentsPerCell: 1 }, "month"];
+const views = [{ type: "week", maxAppointmentsPerCell: 1 }];
+
+const notifySuccessMessage = (message) => {
+  notify({ message }, "success", 4000);
+};
+
+const notifyErrorMessage = (message) => {
+  notify({ message }, "error", 4000);
+};
 
 const notifyDisableDate = () => {
   notify(
@@ -81,9 +95,11 @@ const notifyNoCourtsAvailable = () => {
   );
 };
 
-const groups = ["sportId"];
+const groups = ["sportId", "courtId"];
 
 function ReservaGrid() {
+  const confirm = useConfirm();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [isAdminRole, setIsAdminRole] = useState(false);
   const { user } = useSelector((state) => state.auth);
@@ -94,7 +110,7 @@ function ReservaGrid() {
   const [currentView, setCurrentView] = useState(views[0]);
   const [sportSelected, setSportSelected] = useState("");
   const [sports, setSports] = useState([]);
-  const [courts, setCourts] = useState(priorityData);
+  const [courts, setCourts] = useState([]);
   const [workingDays, setWorkingDays] = useState([]);
   const [holidays, setHolidays] = useState([]);
   const [startDayHour, setStartDayHour] = useState(
@@ -103,12 +119,46 @@ function ReservaGrid() {
   const [endDayHour, setEndDayHour] = useState(
     moment(institution.scheduleMaxTime).hour()
   );
+  const [busyTime, setBusyTime] = useState([]);
+
+  const [editingState, setEditingState] = useState({
+    allowAdding: true,
+    allowDeleting: true,
+    allowResizing: false,
+    allowDragging: false,
+    allowUpdating: false,
+  });
 
   const onAppointmentFormOpening = (e) => {
-    console.log("ABRIENDO FORM");
+    /* console.log("ABRIENDO FORM");
     console.log(e);
+    console.log(
+      e.form
+        .itemOption("mainGroup")
+        .items.filter(
+          (mainGroupItem) => mainGroupItem.dataField === "courtId"
+        )[0]
+        .editorOptions.dataSource.filter(
+          (court) => court.id === e.appointmentData.courtId
+        )[0]
+    ); */
+    const courtDetails = e.form
+      .itemOption("mainGroup")
+      .items.filter((mainGroupItem) => mainGroupItem.dataField === "courtId")[0]
+      .editorOptions.dataSource.filter(
+        (court) => court.id === e.appointmentData.courtId
+      )[0];
+
     const startDate = new Date(e.appointmentData.startDate);
-    if (!Utils.isValidAppointmentDate(startDate, workingDays, holidays)) {
+    if (
+      !Utils.isValidAppointmentDate(
+        startDate,
+        workingDays,
+        holidays,
+        busyTime
+      ) ||
+      Utils.getTimePrice(courtDetails, e.appointmentData.startDate) === 0
+    ) {
       e.cancel = true;
       notifyDisableDate();
     } else if (!courtList || courtList.length === 0) {
@@ -125,37 +175,14 @@ function ReservaGrid() {
         : "Crear una Nueva Reserva"
     );
 
-    /*   const courtDetails = courts.filter(
-      (court) => court.id === groupingInfo[0].id
-    )[0];
-
-    const timePrice = Utils.getTimePrice(courtDetails, e.appointmentData); */
-
-    const timePrice = 150;
-
     const form = e.form;
     let mainGroupItems = form
       .itemOption("mainGroup")
       .items.filter(
         (mainGroupItem) => mainGroupItem.dataField !== "description"
       );
-    console.log("CAMPOS DEL FORM");
-    console.log(mainGroupItems);
-
-    /* if (
-      !mainGroupItems.find(function (i) {
-        return i.dataField === "phone";
-      })
-    ) {
-      mainGroupItems.push({
-        colSpan: 2,
-        label: { text: "Numero de Telefono" },
-        editorType: "dxTextBox",
-        dataField: "phone",
-        validationRules: [{ type: "required" }],
-      });
-      form.itemOption("mainGroup", "items", mainGroupItems);
-    } */
+    /*  console.log("CAMPOS DEL FORM");
+    console.log(mainGroupItems); */
 
     if (
       !mainGroupItems.find(function (i) {
@@ -167,10 +194,44 @@ function ReservaGrid() {
         label: { text: "Precio" },
         editorType: "dxNumberBox",
         dataField: "price",
-        editorOptions: { value: timePrice, disabled: true },
+        editorOptions: {
+          value: Utils.getTimePrice(courtDetails, e.appointmentData.startDate),
+          disabled: true,
+        },
         validationRules: [{ type: "required" }],
       });
       form.itemOption("mainGroup", "items", mainGroupItems);
+    }
+
+    if (
+      mainGroupItems.find(function (i) {
+        return i.dataField === "price";
+      })
+    ) {
+      const arr = mainGroupItems;
+
+      const index = arr.indexOf(
+        mainGroupItems.filter((i) => i.dataField === "price")[0]
+      );
+
+      if (index !== -1) {
+        arr[index] = {
+          colSpan: 2,
+          label: { text: "Precio" },
+          editorType: "dxNumberBox",
+          dataField: "price",
+          editorOptions: {
+            value: Utils.getTimePrice(
+              courtDetails,
+              e.appointmentData.startDate
+            ),
+            disabled: true,
+          },
+          validationRules: [{ type: "required" }],
+        };
+      }
+
+      form.itemOption("mainGroup", "items", arr);
     }
 
     if (
@@ -206,28 +267,123 @@ function ReservaGrid() {
   };
 
   const onAppointmentAdding = (e) => {
+    console.log("onAppointmentAdding ");
+    let { appointmentData } = e;
+
     const isValidAppointment = Utils.isValidAppointment(
       e.component,
       e.appointmentData,
       workingDays,
-      holidays
+      holidays,
+      busyTime
     );
     if (!isValidAppointment) {
       e.cancel = true;
       notifyDisableDate();
+      return;
+    }
+
+    const reservationData = {
+      reservedFor: {
+        name: appointmentData.text,
+        email: appointmentData.email,
+      },
+      institutionId: institution.id,
+      courtId: appointmentData.courtId,
+      durationRange: {
+        from: appointmentData.startDate,
+        to: appointmentData.endDate,
+      },
+      paymentMethod: "CREDITO",
+    };
+
+    const cancel = new Promise(async (resolve, reject) => {
+      console.log("creando reserva");
+
+      const created = await dispatch(createReservation(reservationData))
+        .then((data) => {
+          console.log("RESERVA CREADA CORRECTAMENTE");
+          notifySuccessMessage("Reserva creada correctamente");
+          resolve(false);
+        })
+        .catch((error) => {
+          console.log("ERROR AL CREAR RESERVA");
+          console.log(error);
+
+          let errorMessage = Object.entries(error.data)
+            .map((x) => x.join(":"))
+            .join("\n");
+          notifyErrorMessage(errorMessage);
+          reject(true);
+        });
+    });
+    if (cancel) {
+      e.cancel = cancel;
     }
   };
 
-  const onAppointmentUpdating = (e) => {
-    const isValidAppointment = Utils.isValidAppointment(
-      e.component,
-      e.newData,
-      workingDays,
-      holidays
-    );
-    if (!isValidAppointment) {
-      e.cancel = true;
-      notifyDisableDate();
+  const onAppointmentDeleting = (e) => {
+    const cancel = new Promise(async (resolve, reject) => {
+      console.log("cancelando reserva");
+
+      await confirm({
+        title: "¿Esta Seguro que desea Cancelar esta Reserva?",
+        cancellationText: "Cancelar",
+      })
+        .then(() => {
+          console.log("CANCELANDO RESERVA");
+          let { appointmentData } = e;
+
+          const reservationData = {
+            //id: appointmentData.id,
+            id: "appointmentData.id",
+            reservedFor: {
+              name: appointmentData.text,
+              email: appointmentData.email,
+            },
+            institutionId: institution.id,
+            courtId: appointmentData.courtId,
+            durationRange: {
+              from: appointmentData.startDate,
+              to: appointmentData.endDate,
+            },
+            paymentMethod: "CREDITO",
+          };
+
+          const isCanceled = dispatch(updateReservation(reservationData))
+            .then((data) => {
+              console.log("RESERVA CANCELADA");
+              notifySuccessMessage("Reserva Cancelada correctamente");
+              return false;
+            })
+            .catch((error) => {
+              console.log("ERROR AL CANCELAR LA RESERVA");
+              console.log(error);
+
+              let errorMessage = Object.entries(error.data)
+                .map((x) => x.join(":"))
+                .join("\n");
+              notifyErrorMessage(errorMessage);
+              return true;
+            });
+
+          resolve(isCanceled);
+        })
+        .catch(() => {
+          console.log("NO SE QUISO CANCELAR LA RESERVA");
+
+          reject(true);
+        });
+    });
+
+    e.cancel = cancel;
+  };
+
+  const onAppointmentAdded = (e) => {
+    console.log("onAppointmentAdded ");
+    console.log(e);
+    if (e.error) {
+      alert(e.error.message);
     }
   };
 
@@ -254,13 +410,19 @@ function ReservaGrid() {
   };
 
   const renderDataCell = (itemData) => {
+    const courtFounded = { ...itemData.groups };
     const CellTemplate = currentView === "month" ? DataCellMonth : DataCell;
 
+    let courtDetails = courtList.filter(
+      (court) => court.id === String(courtFounded.courtId)
+    )[0];
     return (
       <CellTemplate
         itemData={itemData}
         workingDays={workingDays}
         holidays={holidays}
+        busyTime={busyTime}
+        courtDetails={courtDetails}
       />
     );
   };
@@ -269,7 +431,9 @@ function ReservaGrid() {
     <DateCell itemData={itemData} workingDays={workingDays} />
   );
 
-  const renderTimeCell = (itemData) => <TimeCell itemData={itemData} />;
+  const renderTimeCell = (itemData) => (
+    <TimeCell itemData={itemData} busyTime={busyTime} />
+  );
 
   let history = useHistory();
   const handleRedirectToConfig = () => {
@@ -289,17 +453,12 @@ function ReservaGrid() {
       firstUpdate.current = false;
       return;
     }
-    console.log(
-      "[SPORT-SELECTED] DEVUELVO LAS CANCHAS PARA EL DEPORTE " + sportSelected
-    );
-    console.log(courtList);
     const courtFilteredBySport = courtList
       .filter((court) => court.sport === sportSelected)
       .map((c) => {
         return { ...c, text: c.name };
       });
 
-    console.log(courtFilteredBySport);
     setCourts(courtFilteredBySport);
   }, [sportSelected]);
 
@@ -316,8 +475,21 @@ function ReservaGrid() {
       setIsAdminRole(false);
     }
 
+    //OBTENER TODAS LAS RESERVAS DE LA INSTITUCION
+    dispatch(retrieveInstitutionReservations(institution.id))
+      .then((data) => {
+        //ARMO LAS RESERVAS CON EL FORMATO ESPERADO
+      })
+      .catch((error) => {
+        console.log("ERROR AL OBTENER LAS RESERVAS DE LA INSTITUCION");
+        console.error(error);
+      });
+
     if (institution.schedules) {
       institution.schedules.forEach((schedule) => {
+        let horariosLaborales = [];
+        let diasLaboralesSegmentados = [];
+
         schedule.daysAvailable.forEach((diaLaboral) => {
           switch (diaLaboral) {
             case "MIERCOLES":
@@ -329,9 +501,25 @@ function ReservaGrid() {
             default:
               diaLaboral = diaLaboral.toLowerCase();
           }
+          diasLaboralesSegmentados.push(moment().day(diaLaboral).day());
 
           setWorkingDays((prevState) => {
             return [...prevState, moment().day(diaLaboral).day()];
+          });
+
+          //OBTENER LOS HORARIOS HORARIOS PARA CADA DIA LABORAL
+          schedule.details.forEach((horario) => {
+            horariosLaborales.push({
+              from: new Date(horario.timeFrame.from).getHours(),
+              to: new Date(horario.timeFrame.to).getHours(),
+            });
+          });
+
+          setBusyTime((prevState) => {
+            return [
+              ...prevState,
+              { horariosLaborales, diasLaboralesSegmentados },
+            ];
           });
         });
       });
@@ -341,30 +529,31 @@ function ReservaGrid() {
       let newDateArray = [];
 
       institution.freeDays.forEach((day) => {
-        newDateArray.push(new Date(moment(day).format("YYYY-MM-DD")));
+        newDateArray.push(
+          new Date(moment(day).add(1, "d").format("YYYY-MM-DD"))
+        );
       });
-
       setHolidays(newDateArray);
     }
 
-    console.log(courtList);
+    if (courtList && courtList.length > 0) {
+      const sportsByInstitutions = courtList
+        .map((item) => item.sport)
+        .filter((value, index, self) => self.indexOf(value) === index);
 
-    const sportsByInstitutions = courtList
-      .map((item) => item.sport)
-      .filter((value, index, self) => self.indexOf(value) === index);
+      setSportSelected(sportsByInstitutions[0]);
 
-    setSportSelected(sportsByInstitutions[0]);
+      setSports(sportsByInstitutions);
 
-    setSports(sportsByInstitutions);
+      const courtFilteredBySport = courtList
+        .filter((court) => court.sport === sportSelected)
+        .map((c) => {
+          return { ...c, text: c.name, courtId: c.id };
+        });
 
-    const courtFilteredBySport = courtList
-      .filter((court) => court.sport === sportSelected)
-      .map((c) => {
-        return { ...c, text: c.name };
-      });
+      setCourts(courtFilteredBySport);
+    }
 
-    console.log(courtFilteredBySport);
-    setCourts(courtFilteredBySport);
     setLoading(false);
   }, []);
 
@@ -467,10 +656,12 @@ function ReservaGrid() {
                 timeCellRender={renderTimeCell}
                 onAppointmentFormOpening={onAppointmentFormOpening}
                 onAppointmentAdding={onAppointmentAdding}
-                onAppointmentUpdating={onAppointmentUpdating}
+                onAppointmentDeleting={onAppointmentDeleting}
+                onAppointmentAdded={onAppointmentAdded}
+                editing={editingState}
               >
                 <Resource
-                  fieldExpr="sportId"
+                  fieldExpr="courtId"
                   allowMultiple={false}
                   dataSource={courts}
                   label="Cancha"
@@ -530,58 +721,6 @@ function ReservaGrid() {
                 >
                   Por favor, pongase en Contacto con un Administrador para
                   agregar los horarios a la institucion
-                </Typography>
-              )}
-            </Container>
-          </Box>
-        </Paper>
-      )}
-      <br />
-      {(!courtList || courtList.length === 0) && (
-        <Paper>
-          <Box
-            width="100%"
-            top={0}
-            p={4}
-            zIndex="modal"
-            color="textSecondary"
-            bgcolor="background.header"
-          >
-            <Container maxWidth="md" className={classes.container}>
-              <Typography
-                variant="h5"
-                component="h2"
-                gutterBottom={true}
-                className={classes.header}
-              >
-                La Institucion aun no Posee Canchas Registradas
-              </Typography>
-              {isAdminRole ? (
-                <>
-                  <Typography
-                    variant="subtitle1"
-                    color="textSecondary"
-                    paragraph={true}
-                  >
-                    Haga Click en el siguiente Boton para crear su primer Cancha
-                  </Typography>
-                  <Button
-                    onClick={renderCourtPage}
-                    variant="contained"
-                    color="primary"
-                    className={classes.action}
-                  >
-                    Ir al Menu de Canchas
-                  </Button>
-                </>
-              ) : (
-                <Typography
-                  variant="subtitle1"
-                  color="textSecondary"
-                  paragraph={true}
-                >
-                  Por favor, pongase en Contacto con un Administrador para
-                  agregar canchas a la institucion
                 </Typography>
               )}
             </Container>

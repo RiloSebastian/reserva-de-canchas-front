@@ -7,10 +7,12 @@ import {
   UPDATE_RESERVATION,
 } from "./types";
 
-export const retrieveCustomerReservations =
+export const retrieveInstitutionReservations =
   (institution_id) => async (dispatch) => {
     try {
-      const res = await ReservationService.getAllByCustomerId(institution_id);
+      const res = await ReservationService.getAllByInstitutionId(
+        institution_id
+      );
       dispatch({
         type: RETRIEVE_RESERVATIONS,
         payload: res.data,
@@ -25,14 +27,32 @@ export const retrieveCustomerReservations =
     }
   };
 
-export const createReservation = (institution_id, data) => async (dispatch) => {
+export const retrieveCustomerReservations =
+  (customer_id) => async (dispatch) => {
+    try {
+      const res = await ReservationService.getAllByCustomerId(customer_id);
+      dispatch({
+        type: RETRIEVE_RESERVATIONS,
+        payload: res.data,
+      });
+      return Promise.resolve(res.data);
+    } catch (err) {
+      dispatch({
+        type: CLEAN_RESERVATIONS,
+        payload: [],
+      });
+      return Promise.reject(err.response);
+    }
+  };
+
+export const createReservation = (data) => async (dispatch) => {
   try {
-    const res = await ReservationService.create(institution_id, data);
+    const res = await ReservationService.create(data);
     dispatch({
       type: CREATE_RESERVATION,
       payload: res.data[0],
     });
-    return Promise.resolve(res.data[0]);
+    return Promise.resolve(res.data);
   } catch (err) {
     return Promise.reject(err.response);
   }

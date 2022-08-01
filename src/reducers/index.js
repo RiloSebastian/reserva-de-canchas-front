@@ -7,6 +7,7 @@ import managers from "./managers";
 import reservations from "./reservations";
 import promotions from "./promotions";
 import sports from "./sports";
+import payment from "./payment";
 
 export default combineReducers({
   auth,
@@ -17,4 +18,5 @@ export default combineReducers({
   reservations,
   promotions,
   sports,
+  payment,
 });

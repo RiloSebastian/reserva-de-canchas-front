@@ -92,6 +92,18 @@ td.dx-scheduler-time-panel-cell .dinner .cafe {
 .dinner {
   height: 100%;
   width: 100%;
+}x
+
+.no-price,
+.no-price::after{
+  content: "Sin Precio";
+  text-align: "center";
+  background: rgba(255, 193, 7, 0.2);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  
 }
 
 .disable-date {
@@ -208,3 +220,19 @@ td.dx-scheduler-time-panel-cell .dinner .cafe {
 .dx-scheduler-cell-sizes-horizontal {
   width: 100px;
 }
+
+
+.dx-scheduler-appointment {  
+  box-sizing: content-box;  
+  padding-right: 15px;  
+}  
+.dx-scheduler-timeline .dx-scheduler-appointment,  
+.dx-scheduler-work-space-month .dx-scheduler-appointment,  
+.dx-scheduler-all-day-appointment .dx-scheduler-appointment {  
+  box-sizing: border-box;  
+  padding-right: 0;  
+}  
+
+.dx-scheduler .dx-scheduler-date-table-cell {  
+  min-width: 150px;  
+}  
