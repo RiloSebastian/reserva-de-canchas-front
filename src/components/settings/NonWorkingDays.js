@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import PickersDay from "@mui/lab/PickersDay";
+import StaticDatePicker from "@mui/lab/StaticDatePicker";
 import {
   Box,
   Button,
@@ -10,29 +13,22 @@ import {
   TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import StaticDatePicker from "@mui/lab/StaticDatePicker";
-import PickersDay from "@mui/lab/PickersDay";
 import startOfDay from "date-fns/startOfDay";
+import React, { Fragment, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
+import DeleteIcon from "@mui/icons-material/Delete";
+import EventIcon from "@mui/icons-material/Event";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Avatar from "@mui/material/Avatar";
-import IconButton from "@mui/material/IconButton";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Typography from "@mui/material/Typography";
-import FolderIcon from "@mui/icons-material/Folder";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EventIcon from "@mui/icons-material/Event";
 
 import { useConfirm } from "material-ui-confirm";
-import InstitucionService from "../../services/instituciones/InstitucionService";
+import { uploadNonWorkingDays } from "../../actions/institution";
 import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 
 function generate(element) {
@@ -65,6 +61,8 @@ const CustomPickersDay = styled(PickersDay, {
 
 export const NonWorkingDays = ({ props, institution }) => {
   const confirm = useConfirm();
+  const dispatch = useDispatch();
+
   const [open, setOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({});
 
@@ -102,7 +100,7 @@ export const NonWorkingDays = ({ props, institution }) => {
   const handleMessageLoaded = (isSuccess) => {
     if (isSuccess) {
       setSnackbar({
-        message: "Los Horarios se han Guardado Exitosamente !",
+        message: "Los Dias no Laborales se han Guardado Exitosamente !",
         severity: "success",
       });
     } else {
@@ -127,13 +125,37 @@ export const NonWorkingDays = ({ props, institution }) => {
         values.forEach((element) => {
           diasNoLaborales.push(element.getTime());
         });
-        handleUploadChanges(diasNoLaborales);
+        handleUploadChanges(values);
       })
       .catch(() => console.log("Deletion cancelled."));
   };
 
   const handleUploadChanges = async (data) => {
-    try {
+    dispatch(uploadNonWorkingDays(institution.id, data, true))
+      .then((data) => {
+        console.log("DIAS NO LABORLALES ACTUALIZADOS CORRECTAMENTE");
+        console.log(data);
+        setSnackbar({
+          message: "Los Dias No Laborales se han Guardado Exitosamente!",
+          severity: "success",
+        });
+        setOpen(true);
+      })
+      .catch((error) => {
+        console.log("ERROR AL ACTUALIZAR DIAS NO LABORLALES DE INSTITUCUIN");
+        console.log(error);
+        setSnackbar({
+          message: Object.values(error.data).map((error, idx) => (
+            <Fragment key={error}>
+              {error}
+              {<br />}
+            </Fragment>
+          )),
+          severity: "error",
+        });
+        setOpen(true);
+      });
+    /* try {
       const images = await InstitucionService.uploadNonWorkingDays(
         institution.id,
         data
@@ -142,8 +164,18 @@ export const NonWorkingDays = ({ props, institution }) => {
       handleMessageLoaded(true);
     } catch (error) {
       handleMessageLoaded(false);
-    }
+    } */
   };
+
+  useEffect(() => {
+    if (institution.freeDays) {
+      let daysOff = [];
+      institution.freeDays.map((dayOff) => {
+        daysOff.push(new Date(dayOff));
+      });
+      setValues(daysOff);
+    }
+  }, [institution.freeDays]);
 
   return (
     <>
@@ -169,6 +201,7 @@ export const NonWorkingDays = ({ props, institution }) => {
                           <StaticDatePicker
                             displayStaticWrapperAs="desktop"
                             label="Week picker"
+                            minDate={new Date()}
                             value={values}
                             onChange={(newValue) => {
                               //copying the values array

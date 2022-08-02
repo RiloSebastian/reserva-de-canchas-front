@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Button,
@@ -10,17 +8,24 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import React, { Fragment, useEffect, useReducer, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateInstitutionDetails } from "../../actions/institution";
 import ComboBox from "../ui/ComboBox";
-import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
-import { change } from "../../actions/institution";
 
 import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 import es from "react-phone-input-2/lang/es.json";
+import "react-phone-input-2/lib/style.css";
 
-import InstitucionService from "../../services/instituciones/InstitucionService";
-import CustomizedSnackbars from "../ui/CustomizedSnackbars";
+import { Stack } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import { useConfirm } from "material-ui-confirm";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const themeTextArea = createTheme({
   components: {
@@ -37,15 +42,42 @@ const themeTextArea = createTheme({
   },
 });
 
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "name":
+      return { ...state, name: action.data };
+    case "address":
+      return { ...state, address: action.data };
+    case "email": {
+      return { ...state, email: action.data };
+    }
+    case "institutionTel":
+      return { ...state, institutionTel: action.data };
+    case "description":
+      return { ...state, description: action.data };
+    default:
+      return state;
+  }
+};
+
 export const InstitutionDetails = (props) => {
   const confirm = useConfirm();
   const institution = useSelector((state) => state.institution);
   const dispatch = useDispatch();
 
+  const [openSnackbar, setOpenSnackbar] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severity: "",
+    autoHideDuration: 4000,
+  });
+
   const [open, setOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({});
 
-  const [values, setValues] = useState(institution);
+  const [values, setValues] = useReducer(reducer, institution);
 
   const [errors, setErrors] = useState({
     name: "",
@@ -60,8 +92,14 @@ export const InstitutionDetails = (props) => {
     institutionTel: "",
   });
 
+  const handleCloseSnackbar = (event, reason) => {
+    setOpenSnackbar((prevState) => {
+      return { ...prevState, open: false };
+    });
+  };
+
   const handleChange = (e) => {
-    dispatch(change({ type: e.target.name, data: e.target.value }));
+    setValues({ type: e.target.name, data: e.target.value });
   };
 
   const handleOnChange = (value) => {
@@ -132,16 +170,15 @@ export const InstitutionDetails = (props) => {
     }
   };
 
-  const handleMessageLoaded = (isSuccess) => {
+  const handleMessageLoaded = (isSuccess, response) => {
     if (isSuccess) {
       setSnackbar({
-        message: "Los Horarios se han Guardado Exitosamente !",
+        message: "Los Cambios se guardaron Exitosamente!",
         severity: "success",
       });
     } else {
       setSnackbar({
-        message:
-          "Hubo un error al intentar guardar los Horarios. Vuelva a intentarlo",
+        message: response,
         severity: "error",
       });
     }
@@ -155,15 +192,35 @@ export const InstitutionDetails = (props) => {
       cancellationText: "Cancelar",
     })
       .then(() => {
-        console.log("subiendo horarios de la institucion");
-
+        console.log("subiendo cambios en los detalles de la institucion");
+        console.log(values);
         handleUploadChanges(values);
       })
       .catch(() => console.log("Deletion cancelled."));
   };
 
   const handleUploadChanges = async (data) => {
-    try {
+    dispatch(updateInstitutionDetails(institution.id, data))
+      .then((data) => {
+        setOpenSnackbar({
+          open: true,
+          severity: "success",
+          message: "Cambios Guardados Exitosamente!",
+        });
+      })
+      .catch((error) => {
+        setOpenSnackbar({
+          open: true,
+          severity: "error",
+          message: Object.values(error.data).map((error, idx) => (
+            <Fragment key={error}>
+              {error}
+              {<br />}
+            </Fragment>
+          )),
+        });
+      });
+    /* try {
       const institutionDetails = await InstitucionService.update(
         institution.id,
         data
@@ -172,7 +229,7 @@ export const InstitutionDetails = (props) => {
       handleMessageLoaded(true);
     } catch (error) {
       handleMessageLoaded(false);
-    }
+    } */
   };
 
   useEffect(() => {
@@ -199,7 +256,7 @@ export const InstitutionDetails = (props) => {
                   name="name"
                   onChange={handleChange}
                   required
-                  value={institution.name}
+                  value={values.name}
                   variant="outlined"
                 />
               </Grid>
@@ -211,7 +268,7 @@ export const InstitutionDetails = (props) => {
                   fullWidth
                   id="address"
                   label="Direccion de la Institucion"
-                  address={institution.address}
+                  address={values.address}
                   setValues={setValues}
                   onChange={handleChange}
                 />
@@ -223,7 +280,7 @@ export const InstitutionDetails = (props) => {
                   name="email"
                   onChange={handleChange}
                   required
-                  value={institution.email}
+                  value={values.email}
                   variant="outlined"
                 />
               </Grid>
@@ -236,7 +293,7 @@ export const InstitutionDetails = (props) => {
                     paddingLeft: "48px",
                     borderRadius: "5px",
                   }}
-                  value={institution.institutionTel}
+                  value={values.institutionTel}
                   localization={es}
                   country="ar"
                   enableAreaCodes={["ar"]}
@@ -252,14 +309,6 @@ export const InstitutionDetails = (props) => {
                     }
                   }}
                 />
-                {/* <TextField
-                fullWidth
-                label="Numero de Telefono"
-                name="phone"
-                onChange={handleChange}
-                value={institution.institutionTel}
-                variant="outlined"
-              /> */}
               </Grid>
               <Grid item md={6} xs={12}>
                 <ThemeProvider theme={themeTextArea}>
@@ -268,7 +317,7 @@ export const InstitutionDetails = (props) => {
                     multiline
                     rows={5}
                     name="description"
-                    value={institution.description}
+                    value={values.description}
                     required
                     variant="outlined"
                     fullWidth
@@ -300,12 +349,27 @@ export const InstitutionDetails = (props) => {
         </Card>
       </form>
 
-      <CustomizedSnackbars
-        message={snackbar.message}
-        severity={snackbar.severity}
-        setOpen={setOpen}
-        open={open}
-      />
+      <div>
+        <Stack spacing={2} sx={{ width: "100%" }}>
+          <Snackbar
+            autoHideDuration={4000}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+            open={openSnackbar.open}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert
+              severity={openSnackbar.severity}
+              onClose={handleCloseSnackbar}
+              sx={{ width: "100%" }}
+            >
+              {openSnackbar.message}
+            </Alert>
+          </Snackbar>
+        </Stack>
+      </div>
     </>
   );
 };

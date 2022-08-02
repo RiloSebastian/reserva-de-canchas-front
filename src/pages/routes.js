@@ -6,6 +6,7 @@ import ConfiguracionInstituciones from "./instituciones/ConfiguracionInstitucion
 import Listainstitucions from "./instituciones/ListaInstituciones";
 import ListaPromociones from "./promociones/ListaPromociones";
 import ReservaGridCustom2 from "./reservas/ReservaGridCustom2";
+import ReservaGrid from "./reservas/ReservaGrid";
 import MisReservas from "./usuarios/clientes/MisReservas";
 import ListaEmpleado from "./usuarios/empleados/ListaEmpleado";
 import AdminProfile from "./usuarios/profile/AdminProfile";
@@ -28,9 +29,11 @@ export const PATHS = {
   login: "/login",
   signup: "/signup",
   accountconfirmation: "/account-confirmation",
+  accountverification: "/account-validation/:userToken",
   signupinstitution: "/signup/institution",
   forgotpass: "/forgot-pass",
   homepage: "/homepage",
+  payments: "/customer/checkout/:userToken",
 };
 
 export const CustomerRoutes = [
@@ -71,7 +74,8 @@ const InstitutionRoutes = [
   {
     id: "reservas",
     path: "/reservas",
-    component: ReservaGridCustom2,
+    //component: ReservaGridCustom2,
+    component: ReservaGrid,
     exact: true,
   },
   {

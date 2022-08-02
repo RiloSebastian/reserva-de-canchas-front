@@ -1,5 +1,3 @@
-import React, { forwardRef, useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { MenuItem, Select } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Delete } from "@material-ui/icons";
@@ -19,28 +17,32 @@ import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import { Stack } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
+import Snackbar from "@mui/material/Snackbar";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import MaterialTable from "material-table";
-import moment from "moment";
+import React, { forwardRef, Fragment, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { courtList } from "../../assets/mocks/courtList";
+import {
+  createCourt,
+  deleteCourt,
+  setCourtSchedules,
+  updateCourt,
+} from "../../actions/court";
+import { retrieveSports } from "../../actions/sports";
+import { UPDATE_COURT_SCHEDULES } from "../../actions/types";
+import ChipCourtState from "../../components/employees/ChipCourtState";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
-import CanchaService from "../../services/canchas/CanchaService";
-import DeporteService from "../../services/deportes/DeporteService";
-import PhotoService from "../../services/photos/PhotoService";
-import CourtsDetails from "./CourtsDetails";
-import UploadImage from "./../../components/UploadImage";
 import UploadPhotos from "../../components/ui/UploadPhotos";
-import InstitucionService from "../../services/instituciones/InstitucionService";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
-import { Stack } from "@mui/material";
+import CourtsDetails from "./CourtsDetails";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -57,72 +59,6 @@ const useStyles = makeStyles((theme) => ({
     flexWrap: "nowrap",
   },
 }));
-
-const getSurfaces = (sport) => {
-  return surfacesArray.filter((s) => sport.id === s.sport_id);
-};
-
-const surfacesArray = [
-  {
-    sport_id: "61a68dbc107957730042e154",
-    surface: [
-      {
-        id: 0,
-        name: "Polvo de Ladrillo",
-      },
-      {
-        id: 1,
-        name: "Cemento",
-      },
-      {
-        id: 2,
-        name: "Césped",
-      },
-    ],
-  },
-  {
-    sport_id: "61a68dbc107957730042e153",
-    surface: [
-      {
-        id: 0,
-        name: "Césped Sintetico",
-      },
-      {
-        id: 1,
-        name: "Cesped Natural",
-      },
-      {
-        id: 2,
-        name: "Alfombra",
-      },
-      {
-        id: 3,
-        name: "Cemento",
-      },
-    ],
-  },
-  {
-    sport_id: "61a68dbc107957730042e155",
-    surface: [
-      {
-        id: 0,
-        name: "Césped Artificial",
-      },
-      {
-        id: 1,
-        name: "Cemento",
-      },
-      {
-        id: 2,
-        name: "Hormigón Poroso",
-      },
-      {
-        id: 3,
-        name: "Recubrimiento Sintético",
-      },
-    ],
-  },
-];
 
 const InputImage = styled("input")({
   display: "none",
@@ -156,8 +92,15 @@ const ListaCanchas = ({ institutionId }) => {
     )),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
   };
+  const editActionRef = React.useRef();
+
+  const dispatch = useDispatch();
 
   const institution = useSelector((state) => state.institution);
+
+  const courts = useSelector((state) => state.court);
+
+  const sportsData = useSelector((state) => state.sports);
 
   const history = useHistory();
 
@@ -171,6 +114,7 @@ const ListaCanchas = ({ institutionId }) => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const [sportArray, setSportArray] = useState([]);
@@ -195,7 +139,7 @@ const ListaCanchas = ({ institutionId }) => {
 
   const [schedules, setSchedules] = useState([]);
 
-  const [sports, setSports] = useState({});
+  const [sport, setSports] = useState({});
 
   const [surfaces, setSurfaces] = useState([]);
 
@@ -218,43 +162,44 @@ const ListaCanchas = ({ institutionId }) => {
 
   const columns = [
     {
-      title: "Deporte",
-      field: "sport",
-      validate: (rowData) =>
-        rowData.sport === undefined
-          ? {
-            isValid: false,
-            helperText: "Debe seleccionar un deporte para la cancha",
-          }
-          : true,
-      lookup: sports,
-      render: (rowData) => rowData.sport.name,
-      editComponent: (rowData) => {
-        return (
-          <Select
-            value={rowData.value || "string"}
-            onChange={(e) => {
-              rowData.onChange(String(e.target.value));
-              setSportSelected(e.target.value);
-            }}
-          >
-            {sportArray.map((type) => (
-              <MenuItem value={type.id}>{type.name}</MenuItem>
-            ))}
-          </Select>
-        );
-      },
-    },
-    {
       title: "Nombre Cancha",
       field: "name",
       validate: (rowData) =>
         rowData.name === undefined || rowData.name === ""
           ? {
-            isValid: false,
-            helperText: "El nombre de la cancha no puede estar vacio",
-          }
+              isValid: false,
+              helperText: "El nombre de la cancha no puede estar vacio",
+            }
           : true,
+    },
+    {
+      title: "Deporte",
+      field: "sport",
+      editable: "onAdd",
+      validate: (rowData) =>
+        rowData.sport === undefined
+          ? {
+              isValid: false,
+              helperText: "Debe seleccionar un deporte para la cancha",
+            }
+          : true,
+      lookup: sport,
+      render: (rowData, renderType) =>
+        renderType === "group" ? rowData : rowData["sport"],
+      editComponent: (rowData) => (
+        <Select
+          value={rowData.value || undefined}
+          onChange={(e) => rowData.onChange(String(e.target.value))}
+          /*  onChange={(e) => {
+            setSportSelected(e.target.value);
+            rowData.onChange(String(e.target.value));
+          }} */
+        >
+          {sportsData.map((type) => (
+            <MenuItem value={type.name}>{type.name}</MenuItem>
+          ))}
+        </Select>
+      ),
     },
     {
       title: "Superficie",
@@ -262,31 +207,67 @@ const ListaCanchas = ({ institutionId }) => {
       validate: (rowData) =>
         rowData.courtType === undefined
           ? {
-            isValid: false,
-            helperText: "Debe seleccionar la Superficie de la Cancha",
-          }
+              isValid: false,
+              helperText: "Debe seleccionar la Superficie de la Cancha",
+            }
           : true,
-      //lookup: (rowData) => getSurfaces(rowData.sport),
       lookup: surfaces,
-      render: (rowData) => rowData.surface,
+      render: (rowData, renderType) => rowData.courtType,
+      editComponent: (rowData) => {
+        console.log("CUANDO AGRUPPO");
+        let surfacesArrayFilteredBySport = sportsData.filter(
+          (s) => s.name === rowData.rowData.sport
+        );
+
+        let surfacesFounded = [];
+        if (surfacesArrayFilteredBySport.length > 0) {
+          surfacesFounded = surfacesArrayFilteredBySport[0].courtTypes;
+        }
+
+        return (
+          <Select
+            defaultValue={rowData.value}
+            value={rowData.value || undefined}
+            onChange={(e) => {
+              rowData.onChange(String(e.target.value));
+            }}
+          >
+            {surfacesFounded.map((sup) => (
+              <MenuItem value={sup}>{sup}</MenuItem>
+            ))}
+          </Select>
+        );
+      },
     },
-    { title: "Descripcion", field: "description" },
+    {
+      title: "Descripcion",
+      field: "description",
+      grouping: false,
+      validate: (rowData) =>
+        rowData.description === undefined || rowData.description === ""
+          ? {
+              isValid: false,
+              helperText: "La descripcion de la cancha no puede estar vacio",
+            }
+          : true,
+    },
     {
       title: "Seña",
-      field: "signPercentage",
+      field: "signPorcentage",
       type: "numeric",
+      grouping: false,
       validate: (rowData) =>
-        rowData.signPercentage < 0 ||
-          rowData.signPercentage > 100 ||
-          rowData.signPercentage === undefined
+        rowData.signPorcentage < 0 ||
+        rowData.signPorcentage > 100 ||
+        rowData.signPorcentage === undefined
           ? {
-            isValid: false,
-          }
+              isValid: false,
+            }
           : true,
       render: (rowData) =>
-        rowData.signPercentage === undefined || rowData.signPercentage === 0
+        rowData.signPorcentage === undefined || rowData.signPorcentage === 0
           ? "no requiere seña"
-          : "% " + rowData.signPercentage,
+          : "% " + rowData.signPorcentage,
       editComponent: (props) => (
         <TextField
           id="standard-start-adornment"
@@ -311,25 +292,9 @@ const ListaCanchas = ({ institutionId }) => {
       ),
     },
     {
-      title: "Estado",
-      field: "enabled",
-      render: (rowData) => (rowData.enabled ? "Habilidata" : "Deshabilitada"),
-      editComponent: (props) => (
-        <FormControlLabel
-          control={
-            <Switch
-              onChange={(e) => props.onChange(e.target.checked)}
-              checked={props.value}
-            />
-          }
-          label={props.value ? "Habilitada" : "Deshabilitada"}
-        />
-      ),
-    },
-    {
       title: "Techada",
-      field: "techada",
-      render: (rowData) => (rowData.enabled ? "Techada" : "Descubierta"),
+      field: "courtCover",
+      render: (rowData) => (rowData.courtCover ? "Si" : "No"),
       editComponent: (props) => (
         <FormControlLabel
           control={
@@ -345,7 +310,7 @@ const ListaCanchas = ({ institutionId }) => {
     {
       title: "Iluminacion",
       field: "courtIllumination",
-      render: (rowData) => (rowData.enabled ? "Si" : "No"),
+      render: (rowData) => (rowData.courtIllumination ? "Si" : "No"),
       editComponent: (props) => (
         <FormControlLabel
           control={
@@ -359,71 +324,166 @@ const ListaCanchas = ({ institutionId }) => {
       ),
     },
     {
-      field: "schedules",
-      filtering: false,
+      title: "Estado",
+      field: "state",
+      editable: "onUpdate",
+      render: (rowData, renderType) => (
+        <ChipCourtState
+          rowData={rowData}
+          renderType={renderType}
+          states={{ enable: "Habilitada", disable: "Deshabilitada" }}
+        />
+      ),
       editComponent: (props) => (
-        <Button color="info" variant="contained" onClick={desplegarModal}>
-          Agregar Horarios y Precios
-        </Button>
+        <FormControlLabel
+          control={
+            <Switch
+              onChange={(e) => props.onChange(e.target.checked)}
+              checked={props.value}
+            />
+          }
+          label={props.value ? "Habilitada" : "Deshabilitada"}
+        />
       ),
     },
     {
-      field: "images",
+      field: "schedules",
       filtering: false,
-      editComponent: (props) => (
-        <IconButton
-          color="primary"
-          aria-label="upload picture"
-          component="span"
-          onClick={() => {
-            setOpenUploadPhotos(true);
-          }}
-        >
-          <PhotoCamera />
-        </IconButton>
-      ),
+      grouping: false,
+      //lookup: schedules,
+      render: () => {},
+      editComponent: (props) => {
+        console.log("PROPS");
+        console.log(props);
+        if (props.value === undefined || props.value.length === 0) {
+          return (
+            <>
+              <Button
+                color="info"
+                variant="contained"
+                onClick={() => desplegarModalToEdit(props)}
+              >
+                Agregar Horarios y Precios
+              </Button>
+
+              {/*  <FormularioHorarioPrecioCancha
+                open={open}
+                setOpen={setOpen}
+                schedules={schedules}
+                setSchedules={setSchedules}
+                isMultipleEdit={isMultipleEdit}
+                onChange={props.onChange}
+              /> */}
+            </>
+          );
+        } else {
+          return (
+            <>
+              <Button
+                color="info"
+                variant="contained"
+                onClick={() => desplegarModalToEdit(props)}
+              >
+                Modificar Horarios y Precios
+              </Button>
+              {/* <FormularioHorarioPrecioCancha
+                open={open}
+                setOpen={setOpen}
+                schedules={schedules}
+                setSchedules={setSchedules}
+                isMultipleEdit={isMultipleEdit}
+                onChange={props.onChange}
+              /> */}
+            </>
+          );
+        }
+      },
+    },
+    {
+      field: "pictures",
+      filtering: false,
+      grouping: false,
+      render: () => {},
+      editComponent: (props) => {
+        const handleUploadImage = (e) => {
+          props.onChange(e);
+        };
+        return (
+          <>
+            <IconButton
+              color="primary"
+              aria-label="upload picture"
+              component="span"
+              onClick={() => {
+                setOpenUploadPhotos(true);
+              }}
+            >
+              <PhotoCamera />
+            </IconButton>
+            <UploadPhotos
+              openUploadPhotos={openUploadPhotos}
+              setOpenUploadPhotos={setOpenUploadPhotos}
+              setImages={setImages}
+              setFileObjects={setFileObjects}
+              images={images}
+              isMultipleEdit={isMultipleEdit}
+              handleUploadImage={handleUploadImage}
+              fileObjects={fileObjects}
+              filesLimit={6}
+              isModal={true}
+            />
+          </>
+        );
+      },
     },
   ];
 
-  const handleUploadImage = (e) => {
-    let ImagesArray = Object.entries(e.target.files).map((e) =>
-      URL.createObjectURL(e[1])
-    );
-    console.log(ImagesArray);
-    setImages([...images, ...ImagesArray]);
-    console.log("images", images);
+  const retrieveSportsList = () => {
+    dispatch(retrieveSports())
+      .then((data) => {
+        const dynamicLookupObject = data.reduce(function (acc, cur, i) {
+          acc[cur.name] = cur.name;
+
+          return acc;
+        }, {});
+        setSports(dynamicLookupObject);
+      })
+      .catch((error) => {
+        setSports([]);
+      });
   };
 
-  const retrieveSportsList = async () => {
-    try {
-      const listadoDeportes = await DeporteService.getAll();
+  const handleSechueduleChanges = (props) => {
+    console.log("DESPLEGAR FORM DE HORARIOS Y PRECIOS");
+    setIsMultipleEdit(false);
+    setOpen(true);
+  };
 
-      console.log("listadoDeportes");
-      console.log(listadoDeportes);
+  const [handleChangeSchedules, setHandleChangeSchedules] = useState();
+  const [isEdit, setIsEdit] = useState(true);
+  const [rowData, setRowData] = useState({});
 
-      const data = listadoDeportes.data;
-
-      if (data) {
-        const sports = {};
-        data.map((s) => (sports[s.id] = s.name));
-
-        console.log(sports);
-
-        setSports(sports);
-        setSportArray(data);
-      }
-    } catch (err) {
-      //history.push("/login");
-      console.log("ERROR AL OBTENER LA LISTA DE DEPORTES");
+  const desplegarModalToEdit = (props) => {
+    console.log("DESPLEGAR FORM DE HORARIOS Y PRECIOS TO EDIT");
+    console.log(props);
+    console.log(props.onChange);
+    setHandleChangeSchedules(() => props.onChange);
+    setSchedules(props.value);
+    setIsEdit(props.rowData !== undefined && props.rowData.id);
+    if (props.rowData !== undefined && props.rowData.id) {
+      setRowData(props.rowData);
     }
+    setOpen(true);
   };
 
   const desplegarModal = (props) => {
+    console.log("DESPLEGAR FORM DE HORARIOS Y PRECIOS");
     setIsMultipleEdit(false);
     setOpen(true);
   };
 
   const desplegarModalForMultipleEdit = (props) => {
+    console.log("DESPLEGAR FORM DE HORARIOS Y PRECIOS PARA MULTIPLES CANCHAS");
     setIsMultipleEdit(true);
     setOpen(true);
   };
@@ -434,194 +494,129 @@ const ListaCanchas = ({ institutionId }) => {
     });
   };
 
-  const createCancha = async (newCancha) => {
-    console.log("newCancha");
+  const createCancha = (newCancha) => {
+    console.log("DATA DE LA NUEVA CANCHA");
     console.log(newCancha);
 
-    let cancha = { newCancha };
+    const cancha = [
+      {
+        ...newCancha,
+        cancelationTimeInHours: 1,
+        institutionId: institution.id,
+        courtCover: newCancha.courtCover ? newCancha.courtCover : false,
+        courtIllumination: newCancha.courtIllumination
+          ? newCancha.courtIllumination
+          : false,
+        state: "ENABLED",
+        schedules: newCancha.schedules,
+      },
+    ];
 
-    if (schedules) {
-      const horarios = schedules.map((s) =>
-        s
-          ? {
-            ...s,
-            ["from"]: moment(s.from).format("HH:mm"),
-            ["to"]: moment(s.to).format("HH:mm"),
-          }
-          : s
-      );
-      schedules = horarios;
-
-      cancha = { ...newCancha, ["schedules"]: schedules };
-    } else {
-      console.log("no hay horarios cargados");
-    }
-    console.log(cancha);
-
-    try {
-      const canchaCreated = await CanchaService.create(institution.id, cancha);
-
-      const data = canchaCreated.data;
-
-      for (let i = 0; i < images.selectedFiles.length; i++) {
-        const photoAdded = await PhotoService.upload(
-          data.id,
-          images.selectedFiles[i]
-        );
-
-        console.log("photoAdded");
-        console.log(photoAdded);
-
-        setPhotoData((photos) => [
-          ...photos,
-          {
-            img: photoAdded.data,
-            title: "Breakfast",
-            author: "@bkristastucchio",
-            featured: true,
-          },
-        ]);
-      }
-
-      console.log("cancha creada");
-      console.log(canchaCreated);
-      console.log(data);
-      return data;
-    } catch (error) {
-      return Promise.reject(error.data);
-    }
+    return dispatch(createCourt(institution.id, cancha));
   };
 
-  const updateCancha = async (canchaToUpdated) => {
+  const updateCancha = (canchaToUpdated) => {
     console.log("canchaToUpdated");
 
-    const cancha = { ...canchaToUpdated, ["schedules"]: schedules };
+    const cancha = {
+      ...canchaToUpdated,
+      cancelationTimeInHours: 1,
+      institutionId: institution.id,
+      state: canchaToUpdated.state ? "ENABLED" : "DISABLED",
+      schedules: canchaToUpdated.schedules,
+    };
 
     console.log(cancha);
 
-    try {
-      const canchaUpdated = await CanchaService.update(institution.id, cancha);
-      const data = canchaUpdated.data;
-
-      console.log("cancha actualizada");
-      console.log(canchaUpdated);
-      console.log(data);
-      return data;
-    } catch (error) {
-      return Promise.reject(error.data);
-    }
+    return dispatch(updateCourt(cancha));
   };
 
-  const deleteCancha = async (id) => {
-    const canchaCreated = await CanchaService.remove(institution.id, id);
-    const data = canchaCreated.data;
-    return data;
-  };
-
-  const retrieveCourts = async (institutionId) => {
-    try {
-      const listadoCanchas = await CanchaService.getAll(institutionId);
-
-      console.log("listadoCanchas");
-      console.log(listadoCanchas);
-
-      const data = listadoCanchas.data;
-
-      if (data) {
-        data.forEach((court) => {
-          console.log("obteniendo imagenes");
-          console.log(court);
-
-          if (court.images_id !== null) {
-            let photos = [];
-
-            court.images_id.forEach((image_id) => {
-              photos.push({
-                img: "http://localhost:8080/api/photos/" + image_id,
-                title: "Breakfast",
-                author: "@bkristastucchio",
-                featured: true,
-              });
-            });
-
-            console.log("array de photos");
-            console.log(photos);
-
-            court.photos = photos;
-          } else {
-          }
+  const handleUploadSchedules = (court_id, schedules, force) => {
+    dispatch(setCourtSchedules(court_id, schedules, force))
+      .then((schedules) => {
+        const courtToUpdate = courts.filter(
+          (court) => court.id === court_id
+        )[0];
+        dispatch({
+          type: UPDATE_COURT_SCHEDULES,
+          payload: { ...courtToUpdate, schedules },
         });
 
-        console.log("final data");
-        console.log(data);
-
-        setData(data);
-      }
-    } catch (err) {
-      //history.push("/login");
-      setData(courtList);
-    }
+        setOpenSnackbar({
+          open: true,
+          severity: "success",
+          message: "Horarios Actualizados Exitosamente!",
+        });
+      })
+      .catch((error) => {
+        console.log("CATCHEANDO ERROR");
+        console.log(error);
+        if (error.data.status === 400 && error.data.error === "Bad Request") {
+          setOpenSnackbar({
+            open: true,
+            severity: "error",
+            message:
+              "Error al intentar cargar los datos, por favor revisar que todos los campos esten completos",
+          });
+        } else {
+          setOpenSnackbar({
+            open: true,
+            severity: "error",
+            message: Object.values(error.data).map((error, idx) => (
+              <Fragment key={error}>
+                {<br />}
+                {error}
+                {<br />}
+              </Fragment>
+            )),
+          });
+        }
+      });
   };
 
-  const firstUpdate = useRef(true);
+  const deleteCancha = (id) => {
+    console.log("ELIMINANDO CANCHA " + id);
+
+    return dispatch(deleteCourt(id));
+  };
+
+  const retrieveCourts = () => {
+    setData(courts);
+  };
+
+  useEffect(() => {
+    retrieveCourts();
+  }, [courts]);
+  /* const firstUpdate = useRef(true);
   useEffect(() => {
     if (firstUpdate.current) {
       firstUpdate.current = false;
       return;
     }
 
-    console.log("sportArray");
-    console.log(sportArray);
-    console.log("sportSelected");
-    console.log(sportSelected);
+    console.log("RENDERIZANDO ON SPORT SELECTED");
+    console.log(sportsData);
+    const surfacesArrayFilteredBySport = sportsData.filter(
+      (s) => s.name === sportSelected
+    )[0].courtTypes;
 
-    const surfacesArrayFiltered = sportArray.filter(
-      (s) => s.id == sportSelected
-    );
-
-    if (surfacesArrayFiltered.length > 0) {
-      /* const dynamicLookupSurfaces = sportArray.surfaces.reduce(function (
-        acc,
-        cur,
-        i
-      ) {
-        acc[cur.id] = cur.name;
-
-        return acc;
-      },
-      {}); */
-
-      const dynamicLookupSurfaces = surfacesArray[0].surface.reduce(function (
-        acc,
-        cur,
-        i
-      ) {
-        acc[cur.id] = cur.name;
-
-        return acc;
-      },
-        {});
-
+    if (surfacesArrayFilteredBySport.length > 0) {
+      const dynamicLookupSurfaces = surfacesArrayFilteredBySport.reduce(
+        (a, v) => ({ ...a, [v]: v }),
+        {}
+      );
       setSurfaces(dynamicLookupSurfaces);
     } else {
       console.log("no hay superficies cargadas");
     }
-  }, [sportSelected]);
+  }, [sportSelected]); */
 
   useEffect(() => {
     //DEVOLVER LAS CANCHAS DE LA INSTITUCION
-    retrieveCourts(institution.id);
+    retrieveCourts();
 
     //SETEAR LOS DEPORTES DISPONIBLES
     retrieveSportsList();
-
-    const dynamicLookupObject = sportArray.reduce(function (acc, cur, i) {
-      acc[cur.id] = cur.name;
-
-      return acc;
-    }, {});
-
-    console.log(dynamicLookupObject);
 
     //setSport(dynamicLookupObject);
     //setData(courtList);
@@ -656,7 +651,7 @@ const ListaCanchas = ({ institutionId }) => {
             emptyDataSourceMessage:
               "Aun no existen canchas asociadas a la institucion",
             filterRow: {
-              filterTooltip: "Filter",
+              filterTooltip: "Filtro",
             },
             editRow: {
               saveTooltip: "Confirmar",
@@ -712,8 +707,81 @@ const ListaCanchas = ({ institutionId }) => {
 
                   resolve();
                 })
-                .catch((err) => {
+                .catch((error) => {
                   console.log("error al agregar cancha a la lista");
+                  console.log(error);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: Object.values(error.data).map((error, idx) => (
+                      <Fragment key={error}>
+                        {<br />}
+                        {error}
+                        {<br />}
+                      </Fragment>
+                    )),
+                  });
+                  reject();
+                });
+            }),
+          onRowUpdate: (newData, oldData) =>
+            new Promise(async (resolve, reject) => {
+              const cancha = await updateCancha(newData)
+                .then((cancha) => {
+                  console.log("actualizar cancha");
+                  console.log(cancha);
+
+                  const dataUpdate = [...data];
+                  const index = oldData.tableData.id;
+                  dataUpdate[index] = cancha;
+                  setData([...dataUpdate]);
+
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log("error al editar la cancha seleccionada");
+                  console.log(err);
+
+                  let errorMessage =
+                    "No se ha identificado el error, vuelva a intentar";
+
+                  switch (err.status) {
+                    case 409:
+                      errorMessage = err.data.name;
+                      break;
+
+                    default:
+                      break;
+                  }
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: Object.values(err.data).map((err, idx) => (
+                      <Fragment key={err}>
+                        {err}
+                        {<br />}
+                      </Fragment>
+                    )),
+                  });
+                  reject();
+                });
+            }),
+          onRowDelete: (oldData) =>
+            new Promise(async (resolve, reject) => {
+              console.log("eliminando cancha");
+              console.log(oldData);
+
+              const cancha = await deleteCancha(oldData.id)
+                .then((canchaDeleted) => {
+                  const dataDelete = [...data];
+                  const index = oldData.tableData.id;
+                  dataDelete.splice(index, 1);
+                  setData([...dataDelete]);
+
+                  resolve();
+                })
+                .catch((err) => {
+                  console.log("error al eliminar la cancha de la institucion");
                   console.log(err);
                   setOpenSnackbar({
                     open: true,
@@ -723,59 +791,8 @@ const ListaCanchas = ({ institutionId }) => {
                   reject();
                 });
             }),
-          onRowUpdate: (newData, oldData) =>
-            new Promise(async (resolve, reject) => {
-              const cancha = await updateCancha(newData);
-
-              console.log("actualizar cancha");
-              console.log(cancha);
-
-              const dataUpdate = [...data];
-              const index = oldData.tableData.id;
-              dataUpdate[index] = cancha;
-              setData([...dataUpdate]);
-
-              resolve();
-            }),
-          onRowDelete: (oldData) =>
-            new Promise(async (resolve, reject) => {
-              console.log("eliminando cancha");
-              console.log(oldData);
-
-              const cancha = await deleteCancha(oldData.id);
-
-              const dataDelete = [...data];
-              const index = oldData.tableData.id;
-              dataDelete.splice(index, 1);
-              setData([...dataDelete]);
-
-              resolve();
-            }),
         }}
       />
-      {openUploadPhotos && (
-        <UploadPhotos
-          openUploadPhotos={openUploadPhotos}
-          setOpenUploadPhotos={setOpenUploadPhotos}
-          setImages={setImages}
-          images={images}
-          isMultipleEdit={isMultipleEdit}
-          handleUploadImage={handleUploadImage}
-          fileObjects={fileObjects}
-          setFileObjects={setFileObjects}
-          filesLimit={6}
-          isModal={true}
-        />
-      )}
-      {open && (
-        <FormularioHorarioPrecioCancha
-          open={open}
-          setOpen={setOpen}
-          schedules={schedules}
-          setSchedules={setSchedules}
-          isMultipleEdit={isMultipleEdit}
-        />
-      )}
       <div>
         <Stack spacing={2} sx={{ width: "100%" }}>
           <Snackbar
@@ -797,6 +814,19 @@ const ListaCanchas = ({ institutionId }) => {
           </Snackbar>
         </Stack>
       </div>
+      {open && (
+        <FormularioHorarioPrecioCancha
+          open={open}
+          setOpen={setOpen}
+          schedules={schedules}
+          setSchedules={setSchedules}
+          isMultipleEdit={isMultipleEdit}
+          onChange={handleChangeSchedules}
+          isEdit={isEdit}
+          rowData={rowData}
+          handleUploadSchedules={handleUploadSchedules}
+        />
+      )}
     </>
   );
 };

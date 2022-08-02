@@ -1,12 +1,11 @@
 import http from "../../http-common";
+const API_URL = "http://localhost:8080/api";
 
-const validatePaymentMethod = async (paymentData) => {
+const validatePaymentMethod = async (reservation_id, paymentData) => {
   console.log("SERVICE PARA VALIDAR MEDIO DE PAGO");
   console.log(paymentData);
   return await http
-    .post("/payment/validation", {
-      paymentData,
-    })
+    .post(`/reservations/pay-in-advance/${reservation_id}`, paymentData)
     .then((response) => {
       console.log("medio de pago validado correctamente");
       console.log(response);
@@ -20,6 +19,11 @@ const validatePaymentMethod = async (paymentData) => {
     });
 };
 
+const getPaymentDetails = (token) => {
+  return http.get(`/reservations/token?token=${token}`);
+};
+
 export default {
   validatePaymentMethod,
+  getPaymentDetails,
 };

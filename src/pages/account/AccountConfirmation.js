@@ -31,8 +31,11 @@ export default function AccountConfirmation(props) {
 
   const [user, setUser] = useState(history.location.state);
 
+  console.log("CREANDO NUEVO USUARIO");
+  console.log(user);
+
   const content = {
-    header: `${user ? user.firstName : "Usuario"}, Ya casi terminamos...`,
+    header: `${user ? user.name : "Usuario"}, Ya casi terminamos...`,
     description:
       "Para completar el alta de tu cuenta, por favor, dirigite a la casilla de correo que agregaste previamente y hace click en el link que te enviamos para Activar tu cuenta.",
     "primary-action": "Volver al LogIn",

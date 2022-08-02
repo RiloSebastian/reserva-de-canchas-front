@@ -1,11 +1,9 @@
-import axios from "axios";
 import http from "../http-common";
-//import AuthHeader from "../auth-header";
 const API_URL = "http://localhost:8080/";
 
-const update = async (user_id, data) => {
+const retrieveUser = async (user_id) => {
   return await http
-    .patch(`/users/${user_id}`, data)
+    .get(`/users/${user_id}`)
     .then((response) => {
       console.log("actualizando usuario");
       console.log(response);
@@ -18,39 +16,12 @@ const update = async (user_id, data) => {
     });
 };
 
-const remove = async (user_id) => {
-  return await http
-    .delete(`/users/${user_id}`)
-    .then((response) => {
-      console.log("eliminando usuario");
-      console.log(response);
-      return response.data;
-    })
-    .catch((err) => {
-      console.log("error al eliminar usuario catch");
-      console.log(err.response);
-      return Promise.reject(err.response);
-    });
-};
-
-/* const update = async (user_id, data) => {
-  try {
-    return await http.patch(`/users/${user_id}`, data, {
-      headers: AuthHeader(),
-    });
-  } catch (err) {
-    console.log(err);
-  }
+const update = async (user_id, data) => {
+  return await http.put(`/users/${user_id}`, data);
 };
 
 const remove = async (user_id) => {
-  try {
-    return await http.delete(`/users/${user_id}`, {
-      headers: AuthHeader(),
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}; */
+  return await http.delete(`/users/${user_id}`);
+};
 
-export default { update, remove };
+export default { update, remove, retrieveUser };

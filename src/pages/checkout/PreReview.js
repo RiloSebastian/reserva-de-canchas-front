@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import DoneIcon from "@mui/icons-material/Done";
 import Chip from "@mui/material/Chip";
 import FormControl from "@mui/material/FormControl";
@@ -38,16 +38,6 @@ const theme = createTheme({
   },
 });
 
-/* const reservas = [
-  {
-    cancha: "Cancha 1",
-    institucion: "Institucion",
-    fecha: "21/10/2021",
-    horario: "20:00",
-    precio: 1200.0,
-  },
-]; */
-
 const TAX_RATE_1 = 0.5;
 const TAX_RATE_2 = 0.75;
 const TAX_RATE_3 = 1.0;
@@ -79,25 +69,32 @@ const handleDelete = () => {
   console.log("handleDelete");
 };
 
-const percentages = Array.from({ length: 3 }, (_, i) => {
+/* const percentages = Array.from({ length: 3 }, (_, i) => {
   console.log("cargando porcentaje de señas");
   const percentage = 0.25 * i + TAX_RATE_1;
   console.log(percentage);
   return percentage;
-});
+}); */
 
 const PreReview = ({ reservation, setReservation }) => {
   const [selectedPercentages, setSelectedPercentages] = useState();
   const [chipColor, setChipColor] = useState("info");
+
+  const [percentages, setPercentages] = useState(
+    Array.from({ length: 3 }, (_, i) => {
+      console.log("cargando porcentaje de señas");
+      const percentage = 0.25 * i + TAX_RATE_1;
+      console.log(percentage);
+      return percentage;
+    })
+  );
 
   const subtotal = (price) => {
     //return items.map(({ price }) => price).reduce((sum, i) => sum + i, 0);
     return price;
   };
 
-  const [invoiceSubtotal, setInvoiceSubtotal] = useState(
-    subtotal(reservation.price)
-  );
+  const [invoiceSubtotal, setInvoiceSubtotal] = useState(0);
   const invoiceAdvancePayment = selectedPercentages * invoiceSubtotal;
   const invoiceTotal = invoiceAdvancePayment;
   //const invoiceTotal = invoiceSubtotal - invoiceAdvancePayment;
@@ -114,21 +111,31 @@ const PreReview = ({ reservation, setReservation }) => {
 
   useEffect(() => {
     console.log("updating total to pay");
-    setReservation(prevState => {
-      return { ...prevState, priceToPay: ccyFormat(invoiceTotal), debToPay: ccyFormat(invoiceSubtotal - invoiceTotal) };
+    setReservation((prevState) => {
+      return {
+        ...prevState,
+        priceToPay: ccyFormat(invoiceTotal),
+        debToPay: ccyFormat(invoiceSubtotal - invoiceTotal),
+      };
     });
   }, [selectedPercentages]);
 
   useEffect(() => {
-    console.log("loading preview");
+    console.log("CARGANDO PREVIEW");
     console.log(reservation);
+
+    setInvoiceSubtotal(subtotal(reservation.price));
 
     let selectedPercentages = percentages.filter(
       (percentage) => percentage === 0.5
     );
     setSelectedPercentages(selectedPercentages[0]);
-    setReservation(prevState => {
-      return { ...prevState, priceToPay: ccyFormat(invoiceTotal), debToPay: ccyFormat(invoiceSubtotal - invoiceTotal) };
+    setReservation((prevState) => {
+      return {
+        ...prevState,
+        priceToPay: ccyFormat(invoiceTotal),
+        debToPay: ccyFormat(invoiceSubtotal - invoiceTotal),
+      };
     });
   }, []);
 
@@ -146,6 +153,7 @@ const PreReview = ({ reservation, setReservation }) => {
               </TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>Deporte</TableCell>
               <TableCell>Cancha</TableCell>
               <TableCell>Fecha</TableCell>
               <TableCell>Horario</TableCell>
@@ -162,6 +170,7 @@ const PreReview = ({ reservation, setReservation }) => {
               </TableRow>
             ))*/}
             <TableRow key={reservation.name}>
+              <TableCell>{reservation.sport}</TableCell>
               <TableCell>{reservation.name}</TableCell>
               <TableCell>{reservation.fecha}</TableCell>
               <TableCell>{reservation.horario}</TableCell>
@@ -194,7 +203,7 @@ const PreReview = ({ reservation, setReservation }) => {
                               onClick={() => handleSelectPercentage(percentage)}
                               //onClick={() => setSelected((s) => !s)}
                               onDelete={
-                                selectedPercentages === percentage && (() => { })
+                                selectedPercentages === percentage && (() => {})
                               }
                               color={
                                 selectedPercentages === percentage
@@ -210,7 +219,7 @@ const PreReview = ({ reservation, setReservation }) => {
                               label={`${parseFloat(percentage * 100).toFixed(
                                 0
                               )} %`}
-                            //onClick={() => setSelectedPercentages(percentage)}
+                              //onClick={() => setSelectedPercentages(percentage)}
                             />
                           </ThemeProvider>
                         }

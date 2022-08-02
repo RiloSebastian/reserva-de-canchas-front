@@ -1,5 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import IconButton from "@material-ui/core/IconButton";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import { makeStyles } from "@material-ui/core/styles";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Box,
   Button,
@@ -8,94 +12,49 @@ import {
   CardHeader,
   Divider,
   Grid,
-  Paper,
-  TextField,
 } from "@mui/material";
-import Stack from "@mui/material/Stack";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
-import { Theme, useTheme } from "@mui/material/styles";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import Chip from "@mui/material/Chip";
-import SchedulerFromTo from "../schedulers/SchedulerFromTo";
-import { makeStyles } from "@material-ui/core/styles";
-import SelectWeekDays from "../formularios-datos/SelectWeekDays";
-import DaysAndSchedulePaper from "../ui/datesAndTimes/DaysAndSchedulePaper";
-import ButtonAddMoreDatesAndTime from "../ui/datesAndTimes/ButtonAddMoreDatesAndTime";
-import InstitucionService from "../../services/instituciones/InstitucionService";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import ListItemText from "@material-ui/core/ListItemText";
-import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useConfirm } from "material-ui-confirm";
-import { ConfirmProvider } from "material-ui-confirm";
-import { red } from "@mui/material/colors";
 import { pink } from "@mui/material/colors";
+import FormControl from "@mui/material/FormControl";
+import { useTheme } from "@mui/material/styles";
+import { useConfirm } from "material-ui-confirm";
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
+import ButtonAddMoreDatesAndTime from "../ui/datesAndTimes/ButtonAddMoreDatesAndTime";
+import DaysAndSchedulePaper from "../ui/datesAndTimes/DaysAndSchedulePaper";
 
 import CardActions from "@mui/material/CardActions";
 import Typography from "@mui/material/Typography";
-import CustomizedSnackbars from "../ui/CustomizedSnackbars";
+import {
+  deleteAllInstitutionSchedules,
+  retrieveInstitutionById,
+  updateInstitutionSchedules,
+} from "../../actions/institution";
 import { days } from "../../utils/days/days";
-import { setInstitution } from "../../actions/institution";
-
-const bull = (
-  <Box
-    component="span"
-    sx={{ display: "inline-block", mx: "2px", transform: "scale(0.8)" }}
-  >
-    •
-  </Box>
-);
+import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
-function getStyles(day1, day, theme) {
-  return {
-    fontWeight:
-      day.indexOf(day1) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
+const useStyles = makeStyles((theme) => ({
+  ...theme.typography.body2,
+  textAlign: "center",
+  color: theme.palette.text.secondary,
+  height: 30,
+  lineHeight: "30px",
+}));
 
 export const OpenAndCloseTimes = ({ props, institution }) => {
-  const confirm = useConfirm();
+  const classes = useStyles();
+  const theme = useTheme();
 
+  const confirm = useConfirm();
   const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({});
 
   const [noSchedulesLoadedOpen, setNoSchedulesLoadedOpen] = useState(false);
-
-  const useStyles = makeStyles((theme) => ({
-    ...theme.typography.body2,
-    textAlign: "center",
-    color: theme.palette.text.secondary,
-    height: 30,
-    lineHeight: "30px",
-  }));
-
-  const classes = useStyles();
-
-  const theme = useTheme();
 
   const [disabled, setDisabled] = useState(true);
 
@@ -308,15 +267,13 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
             .every((d) => d === false)
         ) {
           console.log("NO SE HA SELECCIONADO NINGUNA FECHA");
+          handleDeleteAllSchedules();
         } else {
           const data = handleAddDaysAvailable();
 
           console.log("SUBIENDO DIAS Y HORARIOS DE LA INSTITUCION");
           console.log(data);
 
-          /* data.forEach((schedule) => {
-            handleUploadChanges(schedule);
-          }); */
           handleUploadChanges(data);
         }
       })
@@ -324,7 +281,37 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
   };
 
   const handleUploadChanges = async (data) => {
-    try {
+    dispatch(updateInstitutionSchedules(institution.id, data, true))
+      .then((data) => {
+        console.log("HORARIOS DE LA INSTITUCION ACTUALIZADOS CORRECTAMENTE");
+        console.log(data);
+
+        dispatch(retrieveInstitutionById(institution.id))
+          .then((data) => {
+            setSnackbar({
+              message: "Los Horarios se han Guardado Exitosamente!",
+              severity: "success",
+            });
+            setOpen(true);
+          })
+          .catch((err) => err);
+      })
+      .catch((error) => {
+        console.log("ERROR AL ACTUALIZAR HORARIOS DE INSTITUCUIN");
+        console.log(error);
+        setSnackbar({
+          message: Object.values(error.data).map((error, idx) => (
+            <Fragment key={error}>
+              {error}
+              {<br />}
+            </Fragment>
+          )),
+          severity: "error",
+        });
+        setOpen(true);
+      });
+
+    /* try {
       const schedulesCreated =
         await InstitucionService.createInstitutionSchedules(
           institution.id,
@@ -345,7 +332,11 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
       console.log(" ERROR AL CARGAR LOS DIAS Y HORARIOS DE LA INSTITUCION ");
       console.log(error);
       handleMessageLoaded(false);
-    }
+    } */
+  };
+
+  const handleDeleteAllSchedules = async () => {
+    dispatch(deleteAllInstitutionSchedules(institution.id));
   };
 
   const firstUpdate = useRef(true);
@@ -599,12 +590,12 @@ export const OpenAndCloseTimes = ({ props, institution }) => {
             }}
           >
             <Button
-              disabled={
+              /* disabled={
                 noSchedulesLoadedOpen ||
                 daysSelected
                   .map((daySelected) => daySelected.selected)
                   .every((d) => d === false)
-              }
+              } */
               onClick={handleSubmitChanges}
               color="primary"
               variant="contained"

@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -9,28 +8,33 @@ import Grid from "@mui/material/Grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
-import AppAppBar from "./../home/modules/views/AppAppBar";
 import AuthService from "../../services/auth.service";
+import AppAppBar from "./../home/modules/views/AppAppBar";
 
-import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
-import InstitucionService from "../../services/instituciones/InstitucionService";
 import { useDispatch } from "react-redux";
-import {
-  getByAdminEmail,
-  getInstitutionSchedules,
-  setInstitution,
-} from "../../actions/institution";
+import AlertMessageComponent from "../../components/ui/AlertMessageComponent";
 import EmailService from "../../services/email/EmailService";
 
-import IconButton from "@mui/material/IconButton";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Stack } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
+import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputLabel from "@mui/material/InputLabel";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Snackbar from "@mui/material/Snackbar";
+import { login, logout, retrieveUser } from "../../actions/auth";
+import { retrieveInstitutionByAdmainEmail } from "../../actions/institution";
+import { retrieveCourts } from "../../actions/court";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 function Copyright(props) {
   return (
@@ -61,7 +65,18 @@ const rightLink = {
 const SignIn = (props) => {
   let history = useHistory();
 
+  const [accountState, setAccountState] = useState(history.location.state);
+
   const dispatch = useDispatch();
+
+  const [openSnackbar, setOpenSnackbar] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severity: "",
+    autoHideDuration: 4000,
+  });
 
   const [values, setValues] = useState({
     username: "",
@@ -107,20 +122,18 @@ const SignIn = (props) => {
     }
   };
 
+  const [loading, setLoading] = useState(false);
   const [showMessageError, setShowMessageError] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleUserInput = (e) => {
-    console.log("handleUserInput");
-    console.log(
-      "[e.target.name]: " +
-        [e.target.name] +
-        " [e.target.value]: " +
-        [e.target.value]
-    );
-    console.log("handleUserInput");
+  const handleCloseSnackbar = (event, reason) => {
+    setOpenSnackbar((prevState) => {
+      return { ...prevState, open: false };
+    });
+  };
 
+  const handleUserInput = (e) => {
     setErrors((prevState) => {
       return {
         ...prevState,
@@ -158,90 +171,121 @@ const SignIn = (props) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    try {
-      const user = await AuthService.login(
-        data.get("username"),
-        data.get("password")
-      ).then((data) => data);
+    dispatch(login(data.get("username"), data.get("password")))
+      .then((user) => {
+        dispatch(retrieveUser(user.id));
+        const userRole = user.roles[0];
+        switch (userRole) {
+          case "ROLE_CUSTOMER":
+            console.log("ROLE_CUSTOMER");
+            history.push("/customer/home");
+            break;
+          case "ROLE_ADMIN":
+            console.log("ROLE_ADMIN");
 
-      console.log("obteniendo info del login");
-      console.log(user);
+            return dispatch(retrieveInstitutionByAdmainEmail(user.id))
+              .then((data) => {
+                return dispatch(retrieveCourts(data.id))
+                  .then((data) => {
+                    console.log("Abrir dashboard");
+                    history.push("/dashboard/reservas");
+                  })
+                  .catch((err) => {
+                    console.log("Abrir dashboard");
+                    history.push("/dashboard/reservas");
+                    //dispatch(logout());
+                    //return Promise.reject(err);
+                  });
+              })
+              .catch((err) => {
+                if (err.status === 404) {
+                  handleMessageError(err.data.message);
+                  setShowMessageError(true);
+                }
+                dispatch(logout());
+                return Promise.reject(err);
+              });
 
-      const userRole = user.roles[0];
-      switch (userRole) {
-        case "ROLE_CUSTOMER":
-          console.log("ROLE_CUSTOMER");
-          history.push("/customer/home");
-          break;
-        case "ROLE_ADMIN":
-          console.log("ROLE_ADMIN");
+            break;
+          case "ROLE_EMPLOYEE":
+            console.log("ROLE_EMPLOYEE");
+            dispatch(retrieveInstitutionByAdmainEmail(user.email));
 
-          //setear info de la institucion asociada
+            console.log("Abrir dashboard");
+            history.push("/dashboard/reservas");
+            break;
+          case "ROLE_COACH":
+            console.log("ROLE_COACH");
+            dispatch(retrieveInstitutionByAdmainEmail(user.email));
+
+            console.log("Abrir dashboard");
+            history.push("/dashboard/reservas");
+            break;
+          case "ROLE_SUPER_ADMIN":
+            console.log("ROLE_SUPER_ADMIN");
+            break;
+          default:
+            console.log(
+              `Lo sentimos, no existen permisos para este rol > ${userRole}.`
+            );
+        }
+      })
+      .catch(async (err) => {
+        setLoading(false);
+        console.error("error al obtener usuario");
+        console.log(err);
+
+        if (err.status === 404) {
+          handleMessageError(err.data.message);
+          setShowMessageError(true);
+        } else if (err.data.error === "Esta cuenta no esta habilitada") {
+          //Renviar link de confirmacion
+          console.error("La cuenta no esta habilidata - reenviar correo");
 
           try {
-            console.log("Abrir dashboard");
-
-            const institution = await InstitucionService.getByAdminEmail(
-              user.email
+            const emailReSended = await EmailService.sendVerificationEmail(
+              data.get("username")
             ).then((data) => data);
-            console.log(
-              "obteniendo la info de la institucion para dejarlo en el store"
+
+            handleMessageError(
+              `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
             );
-
-            console.log(institution);
-
-            dispatch(setInstitution(institution));
-
-            history.push("/dashboard/reservas");
+            setShowMessageError(true);
           } catch (error) {
-            console.log("Catcheando el error de la institucion");
-            console.log(error);
+            handleMessageError(
+              `${err.data.error}. Hubo un error al enviar tu correo de confirmacion, por favor intenta mas tarde`
+            );
+            setShowMessageError(true);
           }
-
-          break;
-        case "ROLE_EMPLOYEE":
-          console.log("ROLE_EMPLOYEE");
-          break;
-        case "ROLE_COACH":
-          console.log("ROLE_COACH");
-          break;
-        case "ROLE_SUPER_ADMIN":
-          console.log("ROLE_SUPER_ADMIN");
-          break;
-        default:
-          console.log(
-            `Lo sentimos, no existen permisos para este rol > ${userRole}.`
-          );
-      }
-    } catch (err) {
-      console.error("error al obtener usuario");
-      console.log(err);
-
-      if (err.data.error === "Esta cuenta no esta habilitada") {
-        //Renviar link de confirmacion
-        console.error("La cuenta no esta habilidata - reenviar correo");
-
-        try {
-          const emailReSended = await EmailService.sendVerificationEmail(
-            data.get("username")
-          ).then((data) => data);
-
-          handleMessageError(
-            `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
-          );
-          setShowMessageError(true);
-        } catch (error) {
-          handleMessageError(
-            `${err.data.error}. Por Favor, Revisa tu correo y hace Click en el link que te enviamos para habilitar tu cuenta`
-          );
+        } else {
+          handleMessageError(err.data.error);
           setShowMessageError(true);
         }
-      } else {
-        handleMessageError(err.data.error);
-        setShowMessageError(true);
+      });
+  };
+
+  useEffect(() => {
+    console.log("ACTUALIZAR EL ESTADO DE LA CUENTA");
+    if (accountState !== undefined) {
+      if (accountState.accountEnable) {
+        setOpenSnackbar({
+          open: true,
+          autoHideDuration: 10000,
+          severity: "success",
+          message:
+            "Tu cuenta se encuentra habilidata. Ya podes ingresar con tu usuario y contraseña",
+        });
+      } else if (!accountState.accountEnable) {
+        setOpenSnackbar({
+          open: true,
+          autoHideDuration: 10000,
+          severity: "error",
+          message:
+            "Tu cuenta aun no ha sido habilidata. Hubo un error al enviar tu correo de confirmacion, por favor intenta mas tarde",
+        });
       }
     }
-  };
+  }, [accountState]);
 
   return (
     <React.Fragment>
@@ -292,7 +336,6 @@ const SignIn = (props) => {
                   id="outlined-adornment-password"
                   type={values.showPassword ? "text" : "password"}
                   value={values.password}
-                  //onChange={handleChange('password')}
                   onChange={handleUserInput}
                   onBlur={handleUserInput}
                   endAdornment={
@@ -341,6 +384,27 @@ const SignIn = (props) => {
         handleClose={handleClose}
         errorMessage={errorMessage}
       />
+      <div>
+        <Stack spacing={2} sx={{ width: "100%" }}>
+          <Snackbar
+            autoHideDuration={openSnackbar.autoHideDuration}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+            open={openSnackbar.open}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert
+              severity={openSnackbar.severity}
+              onClose={handleCloseSnackbar}
+              sx={{ width: "100%" }}
+            >
+              {openSnackbar.message}
+            </Alert>
+          </Snackbar>
+        </Stack>
+      </div>
     </React.Fragment>
   );
 };

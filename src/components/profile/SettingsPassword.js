@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -6,27 +5,28 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  TextField,
 } from "@mui/material";
+import { useEffect, useState } from "react";
 
-import IconButton from "@mui/material/IconButton";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
-import EmailService from "../../services/email/EmailService";
 import Grid from "@mui/material/Grid";
-import { set } from "date-fns";
-import UserService from "../../services/user.service";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputLabel from "@mui/material/InputLabel";
+import OutlinedInput from "@mui/material/OutlinedInput";
 import { useConfirm } from "material-ui-confirm";
+import { useDispatch } from "react-redux";
 import CustomizedSnackbars from "../ui/CustomizedSnackbars";
+import { updateAppUser } from "../../actions/institution";
 
 export const SettingsPassword = (props) => {
   const { user } = props;
   const confirm = useConfirm();
+
+  const dispatch = useDispatch();
 
   const [enabledModify, setEnabledModify] = useState(true);
 
@@ -142,9 +142,9 @@ export const SettingsPassword = (props) => {
     console.log("handleUserInput");
     console.log(
       "[e.target.name]: " +
-      [e.target.name] +
-      " [e.target.value]: " +
-      [e.target.value]
+        [e.target.name] +
+        " [e.target.value]: " +
+        [e.target.value]
     );
     console.log("handleUserInput");
 
@@ -185,12 +185,15 @@ export const SettingsPassword = (props) => {
   const handleSubmitChanges = async (values) => {
     console.log("handleSubmitChanges");
 
-    try {
+    return dispatch(updateAppUser({ ...user, password: values.newPassword }))
+      .then((data) => data)
+      .catch((error) => error);
+    /* try {
       const updateUserPass = await UserService.updatePassword(
         user.id,
         values.newPassword
       );
-    } catch (error) { }
+    } catch (error) { } */
   };
 
   useEffect(() => {

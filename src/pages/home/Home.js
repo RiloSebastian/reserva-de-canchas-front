@@ -1,21 +1,21 @@
-import React, { useState, useReducer } from "react";
-import Paper from "@mui/material/Paper";
-import { styled } from "@mui/material/styles";
-import CardCanchaLista from "../../components/CardCanchaLista";
-import FormularioFiltroCanchas from "./../../components/formularios-datos/FormularioFiltroCanchas";
 import {
-  Container,
-  Stack,
-  Typography,
   Box,
+  Card,
+  CardContent,
+  Container,
   Grid,
   Pagination,
+  Stack,
+  Typography,
 } from "@mui/material";
-import { institutionsFounded as i } from "./../../assets/mocks/institutionsFounded";
-import CardCancha from "../../components/items/CardCancha";
+import Paper from "@mui/material/Paper";
+import { styled } from "@mui/material/styles";
+import { useReducer, useState } from "react";
 import CourtFilterSideBar from "../../components/courts/CourtFilterSideBar";
 import CourtSort from "../../components/courts/CourtSort";
-import { Card, CardContent } from "@mui/material";
+import CardCancha from "../../components/items/CardCancha";
+import { institutionsFounded as i } from "./../../assets/mocks/institutionsFounded";
+import FormularioFiltroCanchas from "./../../components/formularios-datos/FormularioFiltroCanchas";
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,

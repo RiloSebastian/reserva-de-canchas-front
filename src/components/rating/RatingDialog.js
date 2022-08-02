@@ -64,6 +64,7 @@ const RatingDialog = ({
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const handleClickOpen = () => {

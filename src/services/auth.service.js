@@ -17,15 +17,11 @@ const login = async (username, password) => {
           "user",
           JSON.stringify({
             ...response.data,
-            photo:
-              "https://upload.wikimedia.org/wikipedia/commons/e/e4/Roger_Federer_%2818566686046%29.jpg",
           })
         );
       }
       return {
         ...response.data,
-        photo:
-          "https://upload.wikimedia.org/wikipedia/commons/e/e4/Roger_Federer_%2818566686046%29.jpg",
       };
     })
     .catch((err) => {
@@ -36,6 +32,7 @@ const login = async (username, password) => {
 };
 
 const logout = () => {
+  localStorage.removeItem("userPending");
   localStorage.removeItem("user");
   localStorage.removeItem("institution");
   localStorage.removeItem("token");
@@ -62,6 +59,7 @@ const register = async (
     .then((response) => {
       console.log("registrnado usuario");
       console.log(response);
+      localStorage.setItem("userPending", JSON.stringify(response.data));
       if (response.data.token) {
         localStorage.setItem("user", JSON.stringify(response.data));
       }
@@ -74,32 +72,33 @@ const register = async (
     });
 };
 
-const getCurrentUser = () => {
-  return JSON.stringify(localStorage.getItem("user"));
-  //return localStorage.getItem('user');
-};
+const enable = async (userToken) => {
+  console.log("ENVIANDO TOKEN CONVERTIDO A STRINGS");
+  console.log(typeof userToken);
 
-const sendVerificationEmail = async (email) => {
   return await axios
-    .post(API_URL + "verification", {
-      email,
-    })
+    .post(API_URL + "enable-user", { userToken })
     .then((response) => {
-      console.log("email enviado correctamente al usuario");
+      console.log("habilitando usuario");
       console.log(response);
       return response.data;
     })
     .catch((err) => {
-      console.log("error al enviar email al usuario");
+      console.log("error al habilitar el usuario catch");
       console.log(err.response);
       return Promise.reject(err.response);
     });
 };
 
+const getCurrentUser = () => {
+  return JSON.stringify(localStorage.getItem("user"));
+  //return localStorage.getItem('user');
+};
+
 export default {
   register,
+  enable,
   login,
   logout,
   getCurrentUser,
-  sendVerificationEmail,
 };

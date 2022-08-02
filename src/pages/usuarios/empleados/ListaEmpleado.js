@@ -1,5 +1,4 @@
-import MaterialTable from "material-table";
-import React, { useState, forwardRef } from "react";
+import { Delete } from "@material-ui/icons";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -15,18 +14,28 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import { Delete } from "@material-ui/icons";
+import { Stack } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import FormularioHorarioPrecioCancha from "../../../components/formularios-datos/FormularioHorarioPrecioCancha";
+import Snackbar from "@mui/material/Snackbar";
+import { createTheme } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
-import Chip from "@mui/material/Chip";
-import DoneIcon from "@mui/icons-material/Done";
-import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
-import ChipState from "../../../components/employees/ChipState";
-import { TextField } from "@material-ui/core";
-import authService from "../../../services/auth.service";
-import EmailService from "../../../services/email/EmailService";
+import MaterialTable from "material-table";
+import React, { forwardRef, Fragment, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createUserForInstitution,
+  deleteAppUser,
+  retrieveUsers,
+  updateAppUser,
+} from "../../../actions/institution";
+import ChipEmployeesState from "../../../components/employees/ChipEmployeesState";
 import { USER_ROLE } from "../../../constants/userRole";
+import Utils from "../../../utils/utils";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const theme = createTheme({
   components: {
@@ -68,6 +77,9 @@ const tableIcons = {
 };
 
 const ListaEmpleado = () => {
+  const { user } = useSelector((state) => state.auth);
+  const institution = useSelector((state) => state.institution);
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
 
   const [openSnackbar, setOpenSnackbar] = useState({
@@ -76,6 +88,7 @@ const ListaEmpleado = () => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const [activo, setActivo] = useState(false);
@@ -83,11 +96,11 @@ const ListaEmpleado = () => {
   const [columns, setColumns] = useState([
     {
       title: "Nombre",
-      field: "firstName",
+      field: "name",
       validate: (rowData) =>
-        rowData.firstName === undefined ||
-        rowData.firstName === "" ||
-        rowData.firstName.trim() === ""
+        rowData.name === undefined ||
+        rowData.name === "" ||
+        rowData.name.trim() === ""
           ? {
               isValid: false,
               helperText: "El nombre del usuario no puede estar vacio",
@@ -139,14 +152,14 @@ const ListaEmpleado = () => {
     //{ title: 'Birth Year', field: 'birthYear', type: 'numeric' },
     {
       title: "Tipo",
-      field: "userRole",
+      field: "roles",
       lookup: {
         ROLE_EMPLOYEE: "Empleado",
         ROLE_ADMIN: "Administrador",
         ROLE_COACH: "Entrenador",
       },
       validate: (rowData) =>
-        rowData.userRole === undefined || rowData.userRole === ""
+        rowData.roles === undefined || rowData.roles === ""
           ? {
               isValid: false,
               helperText: "El tipo de usuario debe estar seleccionado",
@@ -155,121 +168,184 @@ const ListaEmpleado = () => {
     },
     {
       title: "Estado",
-      field: "estado",
+      field: "state",
       editComponent: (rowData) => {
+        console.log(rowData);
         return (
           <FormControlLabel
             control={
               <Switch
-                onChange={(e) => rowData.onChange(e.target.checked)}
-                checked={rowData.value}
+                onChange={(e) =>
+                  rowData.onChange(e.target.checked ? "ACTIVE" : "SUSPENDED")
+                }
+                checked={rowData.value === "ACTIVE"}
               />
             }
-            label={rowData.value ? "Activo" : "Inactivo"}
+            label={rowData.value === "ACTIVE" ? "Activo" : "Inactivo"}
           />
         );
       },
       render: (rowData, renderType) => (
-        <ChipState rowData={rowData} renderType={renderType} />
+        <ChipEmployeesState rowData={rowData} renderType={renderType} />
       ),
       editable: "onUpdate",
     },
   ]);
 
-  const [data, setData] = useState([
-    {
-      firstName: "Marcos",
-      lastName: "Gonzalez",
-      email: "marcos@email.com",
-      description: "Cancha de Polvo de Ladrillos",
-      userRole: "ROLE_EMPLOYEE",
-      estado: true,
-    },
-    {
-      firstName: "Claudia",
-      lastName: "Solis",
-      email: "claudia@email.com",
-      description: "Cancha de Cemento",
-      userRole: "ROLE_EMPLOYEE",
-      estado: true,
-    },
-    {
-      firstName: "Raul",
-      lastName: "Perez",
-      email: "raul@email.com",
-      description: "Cancha de 5 Sintetica",
-      userRole: "ROLE_ADMIN",
-      estado: false,
-    },
-    {
-      firstName: "Susana",
-      lastName: "Carbone",
-      email: "susana@email.com",
-      description: "Cancha de 9 de pasto natural",
-      userRole: "ROLE_ADMIN",
-      estado: true,
-    },
-    {
-      firstName: "Vanina",
-      lastName: "Sanchez",
-      email: "vaninca@email.com",
-      description: "Cancha de Cemento",
-      userRole: USER_ROLE.ADMIN.role,
-      estado: false,
-    },
-  ]);
+  const [data, setData] = useState([]);
 
-  const desplegarModal = () => {
-    setOpen(true);
+  const handleCloseSnackbar = (event, reason) => {
+    setOpenSnackbar((prevState) => {
+      return { ...prevState, open: false };
+    });
   };
 
-  const handleChange = () => {
-    setActivo(true);
-  };
-
-  const createNewUser = async (newUser) => {
+  const createNewUser = (newUser) => {
     console.log("newUser");
     console.log(newUser);
 
-    let user = { newUser };
+    let roles = [];
+    roles.push(newUser.roles);
 
-    try {
-      const registerUser = await authService
-        .register(
-          data.firstName,
-          data.lastName,
-          data.userRole,
-          data.email,
-          data.password
-        )
-        .then((data) => data);
+    let newUserAdapted = [];
+    newUserAdapted.push({
+      ...newUser,
+      telephone: "(11)3231-1234",
+      password: Utils.genPassword(),
+      state: "SUSPENDED",
+      roles,
+    });
 
-      console.log("usuario Creado");
-      console.log(registerUser);
+    let role_type = "";
 
-      //pegarle al endpo email
+    switch (newUser.roles) {
+      case USER_ROLE.COACH.role:
+        role_type = "coaches";
+        break;
+      case USER_ROLE.EMPLOYEE.role:
+        role_type = "employees";
+        break;
+      case USER_ROLE.ADMIN.role:
+        role_type = "managers";
+        break;
+      default:
+        break;
+    }
+    console.log(newUserAdapted);
+    return dispatch(
+      createUserForInstitution(institution.id, role_type, newUserAdapted)
+    );
+  };
 
-      const emailSended = await EmailService.sendVerificationEmail(
-        registerUser.email
-      ).then((data) => data);
-
-      console.log("usuario creado");
-      console.log(registerUser);
-
-      console.log("email de confirmacion enviado");
-      console.log(emailSended);
-
-      return registerUser;
-    } catch (error) {
-      return Promise.reject(error.data);
+  const updateUser = async (userUpdated) => {
+    console.log("userUpdated");
+    if (!Array.isArray(userUpdated.roles)) {
+      let roles = [];
+      roles.push(userUpdated.roles);
+      return dispatch(
+        updateAppUser({
+          ...userUpdated,
+          roles,
+        })
+      );
+    } else {
+      return dispatch(updateAppUser(userUpdated));
     }
   };
+
+  const deleteUser = async (userId) => {
+    console.log("userId");
+    console.log(userId);
+
+    return dispatch(deleteAppUser(userId));
+  };
+
+  useEffect(() => {
+    //DEVOLVER LOS EMPLEADOS DE LA INSTITUCION
+    let institutionUsers = [];
+    dispatch(retrieveUsers(institution.id))
+      .then((data) => {
+        console.log("DEVOLVIENDO MANAGERS");
+        console.log(data);
+        if (data) {
+          setData((prevState) => {
+            return [...prevState, ...data];
+          });
+        }
+      })
+      .catch((error) => {
+        setOpenSnackbar({
+          open: true,
+          severity: "error",
+          message: Object.values(error.data).map((error, idx) => (
+            <Fragment key={error}>
+              {error}
+              {<br />}
+            </Fragment>
+          )),
+        });
+      });
+    /* dispatch(retrieveEmployees(institution.id))
+      .then((data) => {
+        console.log("DEVOLVIENDO EMPLOYEES");
+        console.log(data);
+        if (data) {
+          institutionUsers.push(...data);
+        }
+      })
+      .catch();
+    dispatch(retrieveCoches(institution.id))
+      .then((data) => {
+        console.log("DEVOLVIENDO COACHES");
+        console.log(data);
+        if (data) {
+          institutionUsers.push(...data);
+        }
+      })
+      .catch(); */
+  }, []);
 
   return (
     <>
       <MaterialTable
         icons={tableIcons}
         title="Listado de Empleados"
+        localization={{
+          pagination: {
+            labelDisplayedRows: "{from}-{to} de {count}",
+            labelRowsSelect: "empleados",
+            nextTooltip: "Proxima Pagina",
+            previousTooltip: "Pagina Previa",
+            firstTooltip: "Primer Pagina",
+            lastTooltip: "Ultima Pagina",
+          },
+          toolbar: {
+            nRowsSelected: "{0} empleado(s) seleccionado(s)",
+            searchTooltip: "Buscar",
+            searchPlaceholder: "Buscar Empleado",
+          },
+          header: {
+            actions: "Opciones",
+          },
+          body: {
+            addTooltip: "Agregar Nuevo Usuario",
+            editTooltip: "Editar Usuario",
+            deleteTooltip: "Eliminar Usuario",
+            emptyDataSourceMessage:
+              "Aun no existen empleados, entrenadores u otros administradores asociados a la institucion",
+            filterRow: {
+              filterTooltip: "Filtro",
+            },
+            editRow: {
+              saveTooltip: "Confirmar",
+              cancelTooltip: "Cancelar",
+              deleteText: "Esta seguro que desea Eliminar esta Usuario?",
+            },
+          },
+          grouping: {
+            placeholder: "Arrastre los encabezados aquí para agruparlos",
+          },
+        }}
         columns={columns}
         data={data}
         options={{
@@ -311,6 +387,11 @@ const ListaEmpleado = () => {
           },
         ]}
         editable={{
+          isEditable: (rowData) => rowData.id !== user.id,
+          isEditHidden: (rowData) => rowData.id === user.id,
+          isDeletable: (rowData) => rowData.id !== user.id,
+          isDeleteHidden: (rowData) => rowData.id === user.id,
+
           onRowAdd: (newData) =>
             new Promise(async (resolve, reject) => {
               const user = await createNewUser(newData)
@@ -318,7 +399,7 @@ const ListaEmpleado = () => {
                   console.log("agregar usuario a la institucion");
                   console.log(user);
 
-                  setData([...data, user]);
+                  setData([...data, user[0]]);
 
                   setOpenSnackbar({
                     open: true,
@@ -328,44 +409,107 @@ const ListaEmpleado = () => {
 
                   resolve();
                 })
-                .catch((err) => {
+                .catch((error) => {
                   console.log(
                     "error al agregar un nuevo usuario a la institucion"
                   );
-                  console.log(err);
+                  console.log(error);
                   setOpenSnackbar({
                     open: true,
                     severity: "error",
-                    message: err.message,
+                    message: Object.values(error.data).map((error, idx) => (
+                      <Fragment key={error}>
+                        {error}
+                        {<br />}
+                      </Fragment>
+                    )),
                   });
                   reject();
                 });
             }),
           onRowUpdate: (newData, oldData) =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                const dataUpdate = [...data];
-                const index = oldData.tableData.id;
-                dataUpdate[index] = newData;
-                setData([...dataUpdate]);
+            new Promise(async (resolve, reject) => {
+              const user = await updateUser(newData)
+                .then((user) => {
+                  console.log("actualizar user");
+                  console.log(user);
 
-                resolve();
-              }, 1000);
+                  const dataUpdate = [...data];
+                  const index = oldData.tableData.id;
+                  dataUpdate[index] = user;
+                  setData([...dataUpdate]);
+
+                  resolve();
+                })
+                .catch((error) => {
+                  console.log("error al editar el user seleccionado");
+                  console.log(error);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: Object.values(error.data).map((error, idx) => (
+                      <Fragment key={error}>
+                        {error}
+                        {<br />}
+                      </Fragment>
+                    )),
+                  });
+                  reject();
+                });
             }),
           onRowDelete: (oldData) =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                const dataDelete = [...data];
-                const index = oldData.tableData.id;
-                dataDelete.splice(index, 1);
-                setData([...dataDelete]);
+            new Promise(async (resolve, reject) => {
+              console.log("eliminando usuario");
+              console.log(oldData);
 
-                resolve();
-              }, 1000);
+              const user = await deleteUser(oldData.id)
+                .then((userDeleted) => {
+                  const dataDelete = [...data];
+                  const index = oldData.tableData.id;
+                  dataDelete.splice(index, 1);
+                  setData([...dataDelete]);
+
+                  resolve();
+                })
+                .catch((error) => {
+                  console.log("error al eliminar el user de la institucion");
+                  console.log(error);
+                  setOpenSnackbar({
+                    open: true,
+                    severity: "error",
+                    message: Object.values(error.data).map((error, idx) => (
+                      <Fragment key={error}>
+                        {error}
+                        {<br />}
+                      </Fragment>
+                    )),
+                  });
+                  reject();
+                });
             }),
         }}
       />
-      {open && <FormularioHorarioPrecioCancha open={open} setOpen={setOpen} />}
+      <div>
+        <Stack spacing={2} sx={{ width: "100%" }}>
+          <Snackbar
+            autoHideDuration={4000}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+            open={openSnackbar.open}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert
+              severity={openSnackbar.severity}
+              onClose={handleCloseSnackbar}
+              sx={{ width: "100%" }}
+            >
+              {openSnackbar.message}
+            </Alert>
+          </Snackbar>
+        </Stack>
+      </div>
     </>
   );
 };

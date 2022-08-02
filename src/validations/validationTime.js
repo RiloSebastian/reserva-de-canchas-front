@@ -1,12 +1,23 @@
 export function getNextFromTime(dateTimes) {
   const maxDateTime = new Date(
-    Math.max(...dateTimes.map((e) => new Date(e.to)))
+    Math.max(...dateTimes.map((e) => new Date(e.timeFrame.to)))
   );
 
-  console.log("MAXIMO DIA ENCONTRADO");
+  console.log("MAXIMO HORARIO ENCONTRADO");
   console.log(maxDateTime);
 
   return maxDateTime;
+}
+
+export function getNextUpToTime(dateTimes) {
+  const minDateTime = new Date(
+    Math.min(...dateTimes.map((e) => new Date(e.timeFrame.from)))
+  );
+
+  console.log("MINIMO HORARIO ENCONTRADO");
+  console.log(minDateTime);
+
+  return minDateTime;
 }
 
 export function validateStartDayTime(startDayHour, startDayTime) {

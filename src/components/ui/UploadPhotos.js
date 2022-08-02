@@ -1,22 +1,9 @@
-import React, { useState } from "react";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import IconButton from "@mui/material/IconButton";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
-import ImageListItemBar from "@mui/material/ImageListItemBar";
-import ListSubheader from "@mui/material/ListSubheader";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import { styled } from "@mui/material/styles";
-import CloudDoneIcon from "@mui/icons-material/CloudDone";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import Typography from "@mui/material/Typography";
-import { DropzoneDialog } from "material-ui-dropzone";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import { DropzoneDialogBase, DropzoneAreaBase } from "material-ui-dropzone";
+import { styled } from "@mui/material/styles";
+import { DropzoneAreaBase, DropzoneDialogBase } from "material-ui-dropzone";
+import React from "react";
+import { useDispatch } from "react-redux";
+import { uploadPhotos } from "../../actions/photos";
 
 const Input = styled("input")({
   display: "none",
@@ -32,16 +19,9 @@ const UploadPhotos = ({
   setFileObjects,
   filesLimit,
   isModal,
+  entityId,
 }) => {
-  /* function uploadSingleFile(e) {
-    let ImagesArray = Object.entries(e.target.files).map((e) =>
-      URL.createObjectURL(e[1])
-    );
-    console.log(ImagesArray);
-    setImages([...images, ...ImagesArray]);
-    console.log("images", images);
-  }
- */
+  const dispatch = useDispatch();
   function uploadSingleFile(files) {
     let ImagesArray = Object.entries(files).map((e) =>
       URL.createObjectURL(e[1])
@@ -90,6 +70,7 @@ const UploadPhotos = ({
       onClose={handleClose}
       onSave={(files) => {
         console.log("onSave", fileObjects);
+        handleUploadImage(fileObjects);
         handleClose();
       }}
       onAdd={(newFileObjs) => {
@@ -126,6 +107,7 @@ const UploadPhotos = ({
       onClose={handleClose}
       onSave={(files) => {
         console.log("onSave", fileObjects);
+        handleUploadImage(files);
         handleClose();
       }}
       onAdd={(newFileObjs) => {

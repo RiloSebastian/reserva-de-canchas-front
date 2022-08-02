@@ -1,63 +1,55 @@
 import {
-  SET_INSTITUTION,
-  UPDATE_INSTITUTION,
+  DELETE_INSTITUTION_SCHEDULES,
+  GET_INSTITUTION_SCHEDULES_FAILED,
+  LOAD_INSTITUTION_DAYSOFF,
   LOAD_INSTITUTION_SCHEDULES,
   LOAD_INSTITUTION_TIMES,
+  RETRIEVE_INSTITUTION,
+  UPDATE_INSTITUTION,
+  UPLOAD_INSTITUTION_PHOTOS,
 } from "../actions/types";
 
-const initialState = {
-  id: "",
-  name: "",
-  address: {
-    langAddress: "",
-    geometry: {
-      coordinates: [0, 0],
-      type: "Point",
-    },
-  },
-  description: "",
-  email: "",
-  institutionTel: "",
-  manager: "",
-  schedules: [],
-  times: {},
-};
+const initialState = {};
 
-export default function (state = initialState, action) {
+export default function (institution = initialState, action) {
   const { type, payload } = action;
 
-  console.log("actualizando intitucion");
-  console.log(payload);
-
   switch (type) {
-    case SET_INSTITUTION:
-      return {
-        ...state,
-        id: payload.id,
-        name: payload.name,
-        description: payload.description,
-        institutionTel: payload.institutionTel,
-        address: payload.address,
-        schedules: payload.schedules,
-        scheduleMinTime: payload.scheduleMinTime,
-        scheduleMaxTime: payload.scheduleMaxTime,
-      };
+    case RETRIEVE_INSTITUTION:
+      return payload;
     case UPDATE_INSTITUTION:
+      return payload;
+    case LOAD_INSTITUTION_DAYSOFF:
       return {
-        ...state,
-        [payload.type]: payload.data,
+        ...institution,
+        freeDays: payload,
       };
     case LOAD_INSTITUTION_SCHEDULES:
       return {
-        ...state,
+        ...institution,
         schedules: payload,
+      };
+    case DELETE_INSTITUTION_SCHEDULES:
+      return {
+        ...institution,
+        schedules: [],
+      };
+    case GET_INSTITUTION_SCHEDULES_FAILED:
+      return {
+        ...institution,
+        schedules: [],
       };
     case LOAD_INSTITUTION_TIMES:
       return {
-        ...state,
+        ...institution,
         times: payload,
       };
+    case UPLOAD_INSTITUTION_PHOTOS:
+      return {
+        ...institution,
+        pictures: payload,
+      };
     default:
-      return state;
+      return institution;
   }
 }

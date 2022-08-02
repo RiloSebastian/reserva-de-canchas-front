@@ -13,13 +13,13 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import Select from "@mui/material/Select";
 import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
-import React, { useReducer, useState } from "react";
 import moment from "moment";
+import React, { useState } from "react";
 import CanchaService from "../../services/canchas/CanchaService";
 
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 import { Stack } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -65,11 +65,7 @@ function getStyles(name, selected, theme) {
 const FormularioFiltroCanchas = ({ state, dispatch, setInstitutions }) => {
   const theme = useTheme();
 
-  const [deporte, setDeporte] = useState();
   const [ubicacion, setUbicacion] = useState([]);
-  const [institucion, setInstitucion] = useState();
-  const [value, setValue] = useState(new Date());
-  const [checked, setChecked] = useState(true);
 
   const [openSnackbar, setOpenSnackbar] = useState({
     open: false,
@@ -77,6 +73,7 @@ const FormularioFiltroCanchas = ({ state, dispatch, setInstitutions }) => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const handleCloseSnackbar = (event, reason) => {
@@ -97,24 +94,6 @@ const FormularioFiltroCanchas = ({ state, dispatch, setInstitutions }) => {
 
   const handleDatePickerChange = (e) => {
     dispatch({ type: "reservation_date", data: e });
-  };
-
-  const handleUbicacion = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setUbicacion(
-      // On autofill we get a the stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
-  };
-
-  const handleInstitucion = (event) => {
-    //setDeporte(event.target.value);
-  };
-
-  const handleCheck = (event) => {
-    setChecked(event.target.checked);
   };
 
   const handleSubmit = async (event) => {

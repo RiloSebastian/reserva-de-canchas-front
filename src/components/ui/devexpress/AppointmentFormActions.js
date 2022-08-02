@@ -86,6 +86,7 @@ const AppointmentFormActions = ({
   target,
   onHide,
   commitChanges,
+  onEditingAppointmentChange,
 }) => {
   const [open, setOpen] = React.useState(false);
   const theme = useTheme();

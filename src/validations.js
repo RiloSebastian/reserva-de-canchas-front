@@ -1,6 +1,7 @@
 import moment from "moment";
 
 export function stripeCardNumberValidation(cardNumber) {
+  return "";
   const regexPattern = {
     MASTERCARD: /^5[1-5][0-9]{1,}|^2[2-7][0-9]{1,}$/,
     VISA: /^4[0-9]{2,}$/,
@@ -8,6 +9,7 @@ export function stripeCardNumberValidation(cardNumber) {
     DISCOVER: /^6(?:011|5[0-9]{2})[0-9]{3,}$/,
     DINERS_CLUB: /^3(?:0[0-5]|[68][0-9])[0-9]{4,}$/,
     JCB: /^(?:2131|1800|35[0-9]{3})[0-9]{3,}$/,
+    RANDOM: /^[0-9]{2,}$/,
   };
   for (const card in regexPattern) {
     if (cardNumber.replace(/[^\d]/g, "").match(regexPattern[card])) {

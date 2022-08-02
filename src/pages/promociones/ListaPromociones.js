@@ -16,9 +16,7 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import MaterialTable from "material-table";
-import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
-import OutlinedInput from "@mui/material/OutlinedInput";
+import MaterialTable, { MTableEditField } from "material-table";
 //import InputLabel from "@mui/material/InputLabel";
 //import MenuItem from "@mui/material/MenuItem";
 //import FormControl from "@mui/material/FormControl";
@@ -46,7 +44,7 @@ import PromocionService from "../../services/promociones/PromocionService";
 
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { Stack } from "@mui/material";
+import { Autocomplete, Stack } from "@mui/material";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -108,6 +106,11 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
+const usersLookUp = [
+  { title: "CLIENTE", year: 1994 },
+  { title: "ENTRENADOR", year: 1972 },
+];
+
 const ListaPromociones = () => {
   const institution = useSelector((state) => state.institution);
   const [data, setData] = useState([
@@ -118,6 +121,7 @@ const ListaPromociones = () => {
       from: moment().format("L"),
       to: moment().format("L"),
       state: true,
+      beneficiarios: [1, 2],
     },
   ]);
 
@@ -127,6 +131,7 @@ const ListaPromociones = () => {
     horizontal: "center",
     message: "",
     severity: "",
+    autoHideDuration: 4000,
   });
 
   const [personName, setPersonName] = useState([]);
@@ -155,6 +160,15 @@ const ListaPromociones = () => {
 
   const [open, setOpen] = useState(false);
 
+  const [values, setValues] = useState([]);
+
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setValues(typeof value === "string" ? value.split(",") : value);
+  };
+
   const [columns, setColumns] = useState([
     {
       title: "Nombre Promocion",
@@ -181,6 +195,32 @@ const ListaPromociones = () => {
               helperText: "La descripcion de la promo no puede estar vacia",
             }
           : true,
+    },
+    {
+      title: "Beneficiarios",
+      field: "beneficiarios",
+      lookup: { 1: "CLIENTES", 2: "ENTRENADORES" },
+      editComponent: (props) => (
+        <Autocomplete
+          multiple
+          id="tags-standard"
+          options={usersLookUp}
+          getOptionLabel={(option) => option.title}
+          defaultValue={[usersLookUp[0]]}
+          renderInput={(params) => (
+            <TextField {...params} variant="standard" label="Beneficiarios" />
+          )}
+        />
+      ),
+      render: (rowData) => (
+        <Autocomplete
+          multiple
+          id="tags-readOnly"
+          options={rowData}
+          readOnly
+          renderInput={(params) => <TextField {...params} variant="standard" />}
+        />
+      ),
     },
     {
       title: "Valido a Partir De",
@@ -277,7 +317,7 @@ const ListaPromociones = () => {
         />
       ),
     },
-    {
+    /* {
       title: "Beneficiarios",
       field: "beneficiarios",
       editComponent: (props) => {
@@ -328,7 +368,7 @@ const ListaPromociones = () => {
           </FormControl>
         );
       },
-    },
+    }, */
   ]);
 
   const createPromo = async (newPromo) => {

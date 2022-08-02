@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -9,18 +8,21 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
+import { useEffect, useState } from "react";
 
 import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import es from "react-phone-input-2/lang/es.json";
 import ar from "react-phone-input-2/lang/ar.json";
+import "react-phone-input-2/lib/style.css";
 
-import UserService from "../../services/user.service";
 import { useConfirm } from "material-ui-confirm";
+import { useDispatch } from "react-redux";
 import CustomizedSnackbars from "../ui/CustomizedSnackbars";
+import { updateAppUser } from "../../actions/institution";
 
 export const AccountProfileDetails = (props) => {
   const { user } = props;
+
+  const dispatch = useDispatch();
 
   const confirm = useConfirm();
   const [open, setOpen] = useState(false);
@@ -134,7 +136,7 @@ export const AccountProfileDetails = (props) => {
     console.log("CONFIRMAR LOS CAMBIOS");
 
     confirm({
-      title: "¿Esta Seguro que desea Cambiar la Contraseña?",
+      title: "¿Esta Seguro que desea Modificar los Datos?",
       cancellationText: "Cancelar",
     })
       .then(() => {
@@ -148,13 +150,16 @@ export const AccountProfileDetails = (props) => {
 
   const handleSubmitChanges = async (values) => {
     console.log("handleSubmitChanges");
+    return dispatch(updateAppUser({ ...user, ...values }))
+      .then((data) => data)
+      .catch((error) => error);
 
-    try {
+    /* try {
       const updateUserPass = await UserService.updatePassword(
         user.id,
         values.newPassword
       );
-    } catch (error) {}
+    } catch (error) {} */
   };
 
   const validateErrors = () => {
@@ -175,6 +180,10 @@ export const AccountProfileDetails = (props) => {
   useEffect(() => {
     validateErrors();
   }, [errors]);
+
+  useEffect(() => {
+    setValues(user);
+  }, [user]);
 
   return (
     <>
@@ -239,7 +248,7 @@ export const AccountProfileDetails = (props) => {
                     borderRadius: "5px",
                   }}
                   placeholder="+54 (11) 1234-1234"
-                  value={user.phone}
+                  value={user.telephone}
                   localization={ar}
                   country="ar"
                   enableAreaCodes={["ar"]}

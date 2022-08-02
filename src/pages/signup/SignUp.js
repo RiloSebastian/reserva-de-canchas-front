@@ -35,6 +35,9 @@ import "react-phone-input-2/lib/style.css";
 import es from "react-phone-input-2/lang/es.json";
 import ar from "react-phone-input-2/lang/ar.json";
 
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
@@ -87,6 +90,8 @@ const SignUp = () => {
     telephone: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
   const [showMessageError, setShowMessageError] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -235,6 +240,8 @@ const SignUp = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    setLoading(true);
+    setStatusMessage("Creando Usuario");
     //Validar la DATA
 
     let validationErrors = {};
@@ -275,18 +282,35 @@ const SignUp = () => {
         console.log(registerUser);
 
         //pegarle al endpoint email async
-
+        setStatusMessage("Enviando Email de Confirmacion");
         const emailSended = await EmailService.sendVerificationEmail(
           registerUser.email
-        ).then((data) => data);
-
-        history.push({
-          pathname: "/account-confirmation",
-          state: registerUser,
-        });
+        )
+          .then((data) => {
+            setLoading(false);
+            history.push({
+              pathname: "/account-confirmation",
+              state: registerUser,
+            });
+          })
+          .catch((err) => {
+            setLoading(false);
+            setShowMessageError(true);
+            handleMessageError(
+              "Error al Enviar Mail de Confirmacion, por favor intente nuevamente mas tarde"
+            );
+            history.push({
+              pathname: "/login",
+              state: {
+                accountEnable: false,
+              },
+            });
+          });
       } catch (err) {
         console.error("error al registrar usuario");
         console.log(err);
+
+        setLoading(false);
 
         handleMessageError(
           Object.values(err.data).map((error, idx) => (
@@ -302,53 +326,6 @@ const SignUp = () => {
     }
 
     return;
-
-    const data = new FormData(event.currentTarget);
-
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-      role: data.get("userRole"),
-    });
-
-    try {
-      const registerUser = await AuthService.register(
-        data.get("firstName"),
-        data.get("lastName"),
-        data.get("userRole"),
-        data.get("email"),
-        data.get("password")
-      ).then((data) => data);
-
-      console.log("usuario Creado");
-      console.log(registerUser);
-
-      //pegarle al endpo email
-
-      const emailSended = await AuthService.sendVerificationEmail(
-        registerUser.email
-      ).then((data) => data);
-
-      history.push({
-        pathname: "/account-confirmation",
-        state: data.get("firstName"),
-      });
-    } catch (err) {
-      console.error("error al registrar usuario");
-      console.log(err);
-
-      handleMessageError(
-        Object.values(err.data).map((error, idx) => (
-          <Fragment key={error}>
-            {<br />}
-            {error}
-            {<br />}
-          </Fragment>
-        ))
-      );
-      setShowMessageError(true);
-    }
   };
 
   return (
@@ -561,6 +538,32 @@ const SignUp = () => {
         handleClose={handleClose}
         errorMessage={errorMessage}
       />
+
+      {loading && (
+        <Box sx={{ display: "flex" }}>
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loading}
+          >
+            <Grid
+              container
+              spacing={0}
+              direction="column"
+              alignItems="center"
+              justify="center"
+            >
+              <Grid item>
+                <Typography variant="h6" textAlign="center">
+                  {statusMessage}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <CircularProgress color="inherit" disableShrink />
+              </Grid>
+            </Grid>
+          </Backdrop>
+        </Box>
+      )}
     </React.Fragment>
   );
 };

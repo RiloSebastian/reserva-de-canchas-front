@@ -17,12 +17,12 @@ const getAll = async (institution_id) => {
   }
 };
 
+const getAllByInstitutionId = async (institution_id) => {
+  return await http.get(`/reservations/customers/${institution_id}`);
+};
+
 const getAllByCustomerId = async (customer_id) => {
-  try {
-    return await http.get(`/reservations/customers/${customer_id}`);
-  } catch (err) {
-    console.log(err);
-  }
+  return await http.get(`/reservations/customers/${customer_id}`);
 };
 
 const get = async (institution_id, court_id) => {
@@ -34,35 +34,20 @@ const get = async (institution_id, court_id) => {
 };
 
 const create = async (reservationData) => {
-  console.log("crear reserva");
-  console.log(reservationData);
-  return await http
-    .post(`/reservations`, reservationData)
-    .then((response) => {
-      console.log("reserva creada correctamente");
-      console.log(response);
-      return response.data;
-    })
-    .catch((err) => {
-      console.log("error al crear la reserva");
-      console.log(err.response);
-      return Promise.reject(err.response);
-      //return { message: "Por el momento forzamos la respuesta ok !" };
-    });
+  return await http.post(
+    `courts/${reservationData.courtId}/reservation`,
+    reservationData
+  );
 };
 
-const update = async (institution_id, data) => {
-  try {
-    return await http.patch(
-      `/institutions/${institution_id}/courts/${data.id}`,
-      data,
-      {
-        headers: AuthHeader(),
-      }
-    );
-  } catch (err) {
-    console.log(err);
-  }
+const update = async (data) => {
+  return await http.put(`/reservations/${data.id}`, data);
+};
+
+const cancel = async (id, client_choice) => {
+  return await http.post(
+    `/reservations/cancel/${id}?clientChoice=${client_choice}`
+  );
 };
 
 const remove = async (institution_id, court_id) => {
@@ -130,10 +115,12 @@ export default {
   getAll,
   get,
   getAllByCustomerId,
+  getAllByInstitutionId,
   create,
   update,
   remove,
   removeAll,
+  cancel,
   validateAvailableReservation,
   validateDepositShouldBeReturned,
 };

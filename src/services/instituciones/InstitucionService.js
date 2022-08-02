@@ -1,4 +1,3 @@
-import React from "react";
 import http from "../../http-common";
 
 const getAll = () => {
@@ -6,76 +5,52 @@ const getAll = () => {
 };
 
 const get = async (institution_id) => {
-  return await http
-    .get(`/institutions/${institution_id}`)
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err));
+  return await http.get(`/institutions/${institution_id}`);
 };
 
 const getByAdminEmail = async (admin_email) => {
-  return await http
-    .get(`/institutions/admin/${admin_email}`)
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err));
+  return await http.get(`/institutions/admin/${admin_email}`);
 };
 
-/* const getByAdminEmail = async (admin_email) => {
-  return await http
-    .get(`/institutions/admin/${admin_email}`)
-    .then((response) => response.data)
-    .then(async (institution) => {
-      console.log("institution obtenida");
+const getAllUsers = async (institution_id) => {
+  return await http.get(`/institutions/${institution_id}/users`);
+};
 
-      console.log(institution);
+const getAllManagers = async (institution_id) => {
+  return await http.get(`/institutions/${institution_id}/managers`);
+};
 
-      const schedules = await getInstitutionSchedules(institution.id)
-        .then((schedules) => {
-          console.log("horarios obtenidos");
+const getAllEmployees = async (institution_id) => {
+  return await http.get(`/institutions/${institution_id}/employees`);
+};
 
-          console.log(schedules);
-          return schedules;
-        })
-        .catch((err) => []);
-      //.catch((err) => Promise.reject(err));
-
-      const institutionWithSchedules = {
-        ...institution,
-        schedules,
-      };
-
-      if (institution) {
-        localStorage.setItem(
-          "institution",
-          JSON.stringify(institutionWithSchedules)
-        );
-      }
-
-      return institutionWithSchedules;
-    })
-    .catch((err) => Promise.reject(err));
-}; */
+const getAllCoaches = async (institution_id) => {
+  return await http.get(`/institutions/${institution_id}/coaches`);
+};
 
 const getInstitutionSchedules = async (institution_id) => {
-  return await http
-    .get(`/institutions/${institution_id}/schedules`)
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err));
+  return await http.get(`/institutions/${institution_id}/schedules`);
 };
 
-const createInstitutionSchedules = async (institution_id, data) => {
-  return await http
-    .post(`/institutions/${institution_id}/schedules`, data)
-    .then((response) => {
-      console.log("CREANDO HORARIO PARA INSTITUCION");
-      console.log(response.data);
-      return response.data;
-    })
-    .catch((err) => {
-      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
-      console.log(err.response);
+const updateInstitutionSchedules = async (institution_id, data, force) => {
+  return await http.put(
+    `/institutions/${institution_id}/schedules?force=${force}`,
+    data
+  );
+};
 
-      return Promise.reject(err.response);
-    });
+const uploadNonWorkingDays = async (institution_id, data, force) => {
+  return await http.put(
+    `/institutions/${institution_id}/daysoff?force=${force}`,
+    data
+  );
+};
+
+const uploadAdvancePayment = async (institution_id, data) => {
+  return await http.post(
+    `/institutions/${institution_id}/advance-payment`,
+    data
+  );
 };
 
 const uploadImages = async (institution_id, data) => {
@@ -110,44 +85,16 @@ const uploadFeriados = async (institution_id, data) => {
     }); */
 };
 
-const uploadNonWorkingDays = async (institution_id, data) => {
-  /* return await http
-    .post(`/institutions/${institution_id}/images`, data)
-    .then((response) => {
-      console.log("CREANDO HORARIO PARA INSTITUCION");
-      console.log(response.data);
-      return response.data;
-    })
-    .catch((err) => {
-      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
-      console.log(err.response);
-
-      return Promise.reject(err.response);
-    }); */
+const create = async (data) => {
+  return await http.post(`/institutions`, data);
 };
 
-const uploadAdvancePayment = async (institution_id, data) => {
-  /* return await http
-    .post(`/institutions/${institution_id}/images`, data)
-    .then((response) => {
-      console.log("CREANDO HORARIO PARA INSTITUCION");
-      console.log(response.data);
-      return response.data;
-    })
-    .catch((err) => {
-      console.log("ERROR AL CREAR HORARIO PARA INSTITUCION");
-      console.log(err.response);
-
-      return Promise.reject(err.response);
-    }); */
+const createUserForInstitution = async (institution_id, role_type, data) => {
+  return await http.post(`/institutions/${institution_id}/${role_type}`, data);
 };
 
-const create = (data) => {
-  return http.post(`/institutions`, data);
-};
-
-const update = (institution_id, data) => {
-  return http.put(`/institutions/${institution_id}`, data);
+const update = async (institution_id, data) => {
+  return await http.put(`/institutions/${institution_id}`, data);
 };
 
 const remove = (institution_id) => {
@@ -156,6 +103,10 @@ const remove = (institution_id) => {
 
 const removeAll = () => {
   return http.delete(`/institutions`);
+};
+
+const deleteAllInstitutionSchedules = (institution_id) => {
+  return http.delete(`/institutions/${institution_id}/schedules`);
 };
 
 export default {
@@ -167,9 +118,15 @@ export default {
   remove,
   removeAll,
   getInstitutionSchedules,
-  createInstitutionSchedules,
+  updateInstitutionSchedules,
   uploadImages,
   uploadFeriados,
   uploadNonWorkingDays,
   uploadAdvancePayment,
+  deleteAllInstitutionSchedules,
+  createUserForInstitution,
+  getAllCoaches,
+  getAllEmployees,
+  getAllManagers,
+  getAllUsers,
 };
