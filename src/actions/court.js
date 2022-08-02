@@ -6,7 +6,9 @@ import {
   UPDATE_COURT,
   DELETE_COURT,
   CLEAN_COURTS,
+  UPDATE_COURT_SCHEDULES,
 } from "./types";
+import { useSelector } from "react-redux";
 
 export const retrieveCourts = (institution_id) => async (dispatch) => {
   try {
@@ -42,7 +44,6 @@ export const createCourt = (institution_id, data) => async (dispatch) => {
           .catch();
       } catch (error) {}
     } else {
-      console.log("DIRECTO AL ELSE");
       dispatch({
         type: CREATE_COURT,
         payload: res.data[0],
@@ -80,3 +81,14 @@ export const deleteCourt = (id) => async (dispatch) => {
     return Promise.reject(err);
   }
 };
+
+export const setCourtSchedules =
+  (court_id, data, force) => async (dispatch) => {
+    try {
+      const res = await CanchaService.setCourtSchedules(court_id, data, force);
+
+      return Promise.resolve(res.data);
+    } catch (err) {
+      return Promise.reject(err.response);
+    }
+  };

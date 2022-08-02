@@ -19,6 +19,13 @@ const create = async (institution_id, data) => {
 const update = async (data) => {
   return await http.put(`/courts/${data.id}`, data);
 };
+const setCourtSchedules = (court_id, data, force) => {
+  console.log("ENVIANDO INFO AL BACK");
+  console.log(court_id);
+  console.log(data);
+  console.log(force);
+  return http.put(`/courts/${court_id}/schedules?force=${force}`, data);
+};
 const remove = async (court_id) => {
   return await http.delete(`/courts/${court_id}`);
 };
@@ -60,5 +67,6 @@ export default {
   update,
   remove,
   removeAll,
+  setCourtSchedules,
   findCourtsByCustomerPreferences,
 };

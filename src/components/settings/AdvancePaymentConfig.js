@@ -72,8 +72,12 @@ const AdvancePaymentConfig = ({ props, institution }) => {
     })
       .then(() => {
         console.log("subiendo horarios de la institucion");
+        console.log({ ...institution, cancelationTimeInHours: value * 24 });
 
-        handleUploadChanges(value);
+        handleUploadChanges({
+          ...institution,
+          cancelationTimeInHours: value * 24,
+        });
       })
       .catch(() => console.log("Deletion cancelled."));
   };
@@ -86,7 +90,7 @@ const AdvancePaymentConfig = ({ props, institution }) => {
         );
         console.log(data);
         setSnackbar({
-          message: "Los Horarios se han Guardado Exitosamente!",
+          message: "La cantidad Dias se han Guardado Exitosamente!",
           severity: "success",
         });
         setOpen(true);

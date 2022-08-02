@@ -4,6 +4,7 @@ import {
   UPDATE_COURT,
   DELETE_COURT,
   CLEAN_COURTS,
+  UPDATE_COURT_SCHEDULES,
 } from "../actions/types";
 
 const initialState = [];
@@ -23,6 +24,14 @@ export default function (courts = initialState, action) {
             ...court,
             ...payload,
           };
+        } else {
+          return court;
+        }
+      });
+    case UPDATE_COURT_SCHEDULES:
+      return courts.map((court) => {
+        if (court.id === payload.id) {
+          return payload;
         } else {
           return court;
         }

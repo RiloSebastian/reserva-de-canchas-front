@@ -166,12 +166,9 @@ export const updateInstitutionSchedules =
 export const uploadAdvancePayment =
   (institution_id, data) => async (dispatch) => {
     try {
-      const res = await InstitucionService.uploadAdvancePayment(
-        institution_id,
-        data
-      );
+      const res = await InstitucionService.update(institution_id, data);
       dispatch({
-        type: LOAD_INSTITUTION_ADVANCE_PAYMENT,
+        type: UPDATE_INSTITUTION,
         payload: res.data,
       });
       return Promise.resolve(res.data);
@@ -228,6 +225,19 @@ export const retrieveInstitutionByAdmainEmail =
       return Promise.reject(err.response);
     }
   };
+
+export const retrieveUsers = (institution_id) => async (dispatch) => {
+  try {
+    const res = await InstitucionService.getAllUsers(institution_id);
+    dispatch({
+      type: RETRIEVE_MANAGERS,
+      payload: res.data,
+    });
+    return Promise.resolve(res.data);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
 
 export const retrieveManagers = (institution_id) => async (dispatch) => {
   try {
