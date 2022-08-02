@@ -28,24 +28,20 @@ import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import MaterialTable from "material-table";
-import React, {
-  forwardRef,
-  Fragment,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { forwardRef, Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { createCourt, deleteCourt, updateCourt } from "../../actions/court";
-import { uploadPhotos } from "../../actions/photos";
+import {
+  createCourt,
+  deleteCourt,
+  setCourtSchedules,
+  updateCourt,
+} from "../../actions/court";
 import { retrieveSports } from "../../actions/sports";
+import { UPDATE_COURT_SCHEDULES } from "../../actions/types";
 import ChipCourtState from "../../components/employees/ChipCourtState";
-import ChipState from "../../components/employees/ChipState";
 import FormularioHorarioPrecioCancha from "../../components/formularios-datos/FormularioHorarioPrecioCancha";
 import UploadPhotos from "../../components/ui/UploadPhotos";
-import CanchaService from "../../services/canchas/CanchaService";
-import DeporteService from "../../services/deportes/DeporteService";
 import CourtsDetails from "./CourtsDetails";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -96,6 +92,7 @@ const ListaCanchas = ({ institutionId }) => {
     )),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
   };
+  const editActionRef = React.useRef();
 
   const dispatch = useDispatch();
 
@@ -178,6 +175,7 @@ const ListaCanchas = ({ institutionId }) => {
     {
       title: "Deporte",
       field: "sport",
+      editable: "onAdd",
       validate: (rowData) =>
         rowData.sport === undefined
           ? {
@@ -186,14 +184,16 @@ const ListaCanchas = ({ institutionId }) => {
             }
           : true,
       lookup: sport,
-      render: (rowData) => rowData.sport,
+      render: (rowData, renderType) =>
+        renderType === "group" ? rowData : rowData["sport"],
       editComponent: (rowData) => (
         <Select
           value={rowData.value || undefined}
-          onChange={(e) => {
+          onChange={(e) => rowData.onChange(String(e.target.value))}
+          /*  onChange={(e) => {
             setSportSelected(e.target.value);
             rowData.onChange(String(e.target.value));
-          }}
+          }} */
         >
           {sportsData.map((type) => (
             <MenuItem value={type.name}>{type.name}</MenuItem>
@@ -212,8 +212,9 @@ const ListaCanchas = ({ institutionId }) => {
             }
           : true,
       lookup: surfaces,
-      render: (rowData) => rowData.courtType,
+      render: (rowData, renderType) => rowData.courtType,
       editComponent: (rowData) => {
+        console.log("CUANDO AGRUPPO");
         let surfacesArrayFilteredBySport = sportsData.filter(
           (s) => s.name === rowData.rowData.sport
         );
@@ -241,6 +242,7 @@ const ListaCanchas = ({ institutionId }) => {
     {
       title: "Descripcion",
       field: "description",
+      grouping: false,
       validate: (rowData) =>
         rowData.description === undefined || rowData.description === ""
           ? {
@@ -253,6 +255,7 @@ const ListaCanchas = ({ institutionId }) => {
       title: "Seña",
       field: "signPorcentage",
       type: "numeric",
+      grouping: false,
       validate: (rowData) =>
         rowData.signPorcentage < 0 ||
         rowData.signPorcentage > 100 ||
@@ -346,29 +349,60 @@ const ListaCanchas = ({ institutionId }) => {
     {
       field: "schedules",
       filtering: false,
-      lookup: schedules,
+      grouping: false,
+      //lookup: schedules,
       render: () => {},
       editComponent: (props) => {
-        return (
-          <>
-            <Button color="info" variant="contained" onClick={desplegarModal}>
-              Horarios y Precios
-            </Button>
-            <FormularioHorarioPrecioCancha
-              open={open}
-              setOpen={setOpen}
-              schedules={schedules}
-              setSchedules={setSchedules}
-              isMultipleEdit={isMultipleEdit}
-              onChange={props.onChange}
-            />
-          </>
-        );
+        console.log("PROPS");
+        console.log(props);
+        if (props.value === undefined || props.value.length === 0) {
+          return (
+            <>
+              <Button
+                color="info"
+                variant="contained"
+                onClick={() => desplegarModalToEdit(props)}
+              >
+                Agregar Horarios y Precios
+              </Button>
+
+              {/*  <FormularioHorarioPrecioCancha
+                open={open}
+                setOpen={setOpen}
+                schedules={schedules}
+                setSchedules={setSchedules}
+                isMultipleEdit={isMultipleEdit}
+                onChange={props.onChange}
+              /> */}
+            </>
+          );
+        } else {
+          return (
+            <>
+              <Button
+                color="info"
+                variant="contained"
+                onClick={() => desplegarModalToEdit(props)}
+              >
+                Modificar Horarios y Precios
+              </Button>
+              {/* <FormularioHorarioPrecioCancha
+                open={open}
+                setOpen={setOpen}
+                schedules={schedules}
+                setSchedules={setSchedules}
+                isMultipleEdit={isMultipleEdit}
+                onChange={props.onChange}
+              /> */}
+            </>
+          );
+        }
       },
     },
     {
       field: "pictures",
       filtering: false,
+      grouping: false,
       render: () => {},
       editComponent: (props) => {
         const handleUploadImage = (e) => {
@@ -419,6 +453,29 @@ const ListaCanchas = ({ institutionId }) => {
       });
   };
 
+  const handleSechueduleChanges = (props) => {
+    console.log("DESPLEGAR FORM DE HORARIOS Y PRECIOS");
+    setIsMultipleEdit(false);
+    setOpen(true);
+  };
+
+  const [handleChangeSchedules, setHandleChangeSchedules] = useState();
+  const [isEdit, setIsEdit] = useState(true);
+  const [rowData, setRowData] = useState({});
+
+  const desplegarModalToEdit = (props) => {
+    console.log("DESPLEGAR FORM DE HORARIOS Y PRECIOS TO EDIT");
+    console.log(props);
+    console.log(props.onChange);
+    setHandleChangeSchedules(() => props.onChange);
+    setSchedules(props.value);
+    setIsEdit(props.rowData !== undefined && props.rowData.id);
+    if (props.rowData !== undefined && props.rowData.id) {
+      setRowData(props.rowData);
+    }
+    setOpen(true);
+  };
+
   const desplegarModal = (props) => {
     console.log("DESPLEGAR FORM DE HORARIOS Y PRECIOS");
     setIsMultipleEdit(false);
@@ -426,6 +483,7 @@ const ListaCanchas = ({ institutionId }) => {
   };
 
   const desplegarModalForMultipleEdit = (props) => {
+    console.log("DESPLEGAR FORM DE HORARIOS Y PRECIOS PARA MULTIPLES CANCHAS");
     setIsMultipleEdit(true);
     setOpen(true);
   };
@@ -465,12 +523,55 @@ const ListaCanchas = ({ institutionId }) => {
       cancelationTimeInHours: 1,
       institutionId: institution.id,
       state: canchaToUpdated.state ? "ENABLED" : "DISABLED",
-      //  schedules: canchaToUpdated.schedules,
+      schedules: canchaToUpdated.schedules,
     };
 
     console.log(cancha);
 
     return dispatch(updateCourt(cancha));
+  };
+
+  const handleUploadSchedules = (court_id, schedules, force) => {
+    dispatch(setCourtSchedules(court_id, schedules, force))
+      .then((schedules) => {
+        const courtToUpdate = courts.filter(
+          (court) => court.id === court_id
+        )[0];
+        dispatch({
+          type: UPDATE_COURT_SCHEDULES,
+          payload: { ...courtToUpdate, schedules },
+        });
+
+        setOpenSnackbar({
+          open: true,
+          severity: "success",
+          message: "Horarios Actualizados Exitosamente!",
+        });
+      })
+      .catch((error) => {
+        console.log("CATCHEANDO ERROR");
+        console.log(error);
+        if (error.data.status === 400 && error.data.error === "Bad Request") {
+          setOpenSnackbar({
+            open: true,
+            severity: "error",
+            message:
+              "Error al intentar cargar los datos, por favor revisar que todos los campos esten completos",
+          });
+        } else {
+          setOpenSnackbar({
+            open: true,
+            severity: "error",
+            message: Object.values(error.data).map((error, idx) => (
+              <Fragment key={error}>
+                {<br />}
+                {error}
+                {<br />}
+              </Fragment>
+            )),
+          });
+        }
+      });
   };
 
   const deleteCancha = (id) => {
@@ -483,13 +584,18 @@ const ListaCanchas = ({ institutionId }) => {
     setData(courts);
   };
 
-  const firstUpdate = useRef(true);
+  useEffect(() => {
+    retrieveCourts();
+  }, [courts]);
+  /* const firstUpdate = useRef(true);
   useEffect(() => {
     if (firstUpdate.current) {
       firstUpdate.current = false;
       return;
     }
 
+    console.log("RENDERIZANDO ON SPORT SELECTED");
+    console.log(sportsData);
     const surfacesArrayFilteredBySport = sportsData.filter(
       (s) => s.name === sportSelected
     )[0].courtTypes;
@@ -503,8 +609,7 @@ const ListaCanchas = ({ institutionId }) => {
     } else {
       console.log("no hay superficies cargadas");
     }
-    //getSportSurfaces(sportSelected);
-  }, [sportSelected]);
+  }, [sportSelected]); */
 
   useEffect(() => {
     //DEVOLVER LAS CANCHAS DE LA INSTITUCION
@@ -709,6 +814,19 @@ const ListaCanchas = ({ institutionId }) => {
           </Snackbar>
         </Stack>
       </div>
+      {open && (
+        <FormularioHorarioPrecioCancha
+          open={open}
+          setOpen={setOpen}
+          schedules={schedules}
+          setSchedules={setSchedules}
+          isMultipleEdit={isMultipleEdit}
+          onChange={handleChangeSchedules}
+          isEdit={isEdit}
+          rowData={rowData}
+          handleUploadSchedules={handleUploadSchedules}
+        />
+      )}
     </>
   );
 };

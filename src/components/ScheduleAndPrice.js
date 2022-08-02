@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -69,8 +69,6 @@ const ScheduleAndPrice = ({
   horario,
   diaYHorarioId,
   setHorarios,
-  min,
-  max,
   fieldsToShow,
   handleDeleteHorarios,
   details,
@@ -90,9 +88,9 @@ const ScheduleAndPrice = ({
   const handleChange = (e) => {
     if (e.target) {
       dispatch({ type: e.target.name, data: e.target.value });
+      //  handleChangeHorarios(diaYHorarioId, state);
     }
 
-    handleChangeHorarios(diaYHorarioId, state);
     /* if (e.target.type === "checkbox") {
       setHorarios((horarios) => {
         let horariosUpdated = horarios.map((horario) =>
@@ -121,13 +119,13 @@ const ScheduleAndPrice = ({
   const handleChangeFrom = (e) => {
     console.log("HANDLE CHANGE FROM HORARIO");
     dispatch({ type: "from", data: e });
-    handleChangeHorarios(diaYHorarioId, state);
+    //(diaYHorarioId, state);
   };
 
   const handleChangeTo = (e) => {
     console.log("HANDLE CHANGE TO HORARIO");
     dispatch({ type: "to", data: e });
-    handleChangeHorarios(diaYHorarioId, state);
+    //handleChangeHorarios(diaYHorarioId, state);
   };
 
   const removeHorario = (horarioId, diaYHorarioId) => {
@@ -144,6 +142,11 @@ const ScheduleAndPrice = ({
       })
       .catch(() => console.log("Deletion cancelled."));
   };
+
+  useEffect(() => {
+    console.log("ACTUALIZANDO HORARIOS Y PRECIOS CADA VEZ QUE SE MODIFICA");
+    handleChangeHorarios(diaYHorarioId, state);
+  }, [state]);
 
   useEffect(() => {
     console.log("RENDERIZANDO HORARIOS Y PRECIOS");
@@ -176,7 +179,7 @@ const ScheduleAndPrice = ({
             //onChange={handleChange}
             onChange={handleChangeFrom}
             renderInput={(params) => <TextField {...params} />}
-            //minTime={min}
+            //minTime={horario.min}
           />
         </Grid>
         <Grid item xs>
@@ -194,8 +197,8 @@ const ScheduleAndPrice = ({
 
               return false;
             }} */
-            //maxTime={max}
-            //minTime={min}
+            //maxTime={horario.max}
+            //minTime={horario.timeFrame.to}
           />
         </Grid>
       </LocalizationProvider>

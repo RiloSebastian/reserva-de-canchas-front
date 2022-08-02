@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import startOfDay from "date-fns/startOfDay";
-import React, { useEffect, useState, Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -201,6 +201,7 @@ export const NonWorkingDays = ({ props, institution }) => {
                           <StaticDatePicker
                             displayStaticWrapperAs="desktop"
                             label="Week picker"
+                            minDate={new Date()}
                             value={values}
                             onChange={(newValue) => {
                               //copying the values array

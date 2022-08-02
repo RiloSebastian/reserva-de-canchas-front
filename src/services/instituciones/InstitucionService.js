@@ -12,6 +12,10 @@ const getByAdminEmail = async (admin_email) => {
   return await http.get(`/institutions/admin/${admin_email}`);
 };
 
+const getAllUsers = async (institution_id) => {
+  return await http.get(`/institutions/${institution_id}/users`);
+};
+
 const getAllManagers = async (institution_id) => {
   return await http.get(`/institutions/${institution_id}/managers`);
 };
@@ -124,4 +128,5 @@ export default {
   getAllCoaches,
   getAllEmployees,
   getAllManagers,
+  getAllUsers,
 };

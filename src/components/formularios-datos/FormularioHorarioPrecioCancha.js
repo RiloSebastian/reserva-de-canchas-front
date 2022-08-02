@@ -14,8 +14,8 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import moment from "moment";
-import React, { useEffect, useRef, useState, useReducer } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useReducer, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { days } from "../../utils/days/days";
 import ScheduleAndPrice from "./../ScheduleAndPrice";
@@ -30,13 +30,17 @@ import ButtonAddMoreDatesAndTime from "../ui/datesAndTimes/ButtonAddMoreDatesAnd
 import { pink } from "@mui/material/colors";
 import FormControl from "@mui/material/FormControl";
 import { useConfirm } from "material-ui-confirm";
-import { getNextFromTime } from "../../validations/validationTime";
+import {
+  getNextFromTime,
+  getNextUpToTime,
+} from "../../validations/validationTime";
 
 import { CardContent } from "@mui/material";
 import CardActions from "@mui/material/CardActions";
 import Typography from "@mui/material/Typography";
-import { BASE_URL_INSTITUTIONS } from "../../pages/routes";
 import { useHistory } from "react-router-dom";
+import { BASE_URL_INSTITUTIONS } from "../../pages/routes";
+import CustomizedSnackbars from "../ui/CustomizedSnackbars";
 
 const useStyles = makeStyles((theme) => ({
   ...theme.typography.body2,
@@ -67,8 +71,15 @@ const FormularioHorarioPrecioCancha = ({
   setSchedules,
   isMultipleEdit,
   onChange,
+  isEdit,
+  rowData,
+  handleUploadSchedules,
 }) => {
   let history = useHistory();
+
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+
+  const dispatcher = useDispatch();
 
   const confirm = useConfirm();
   const institution = useSelector((state) => state.institution);
@@ -101,6 +112,8 @@ const FormularioHorarioPrecioCancha = ({
 
   const [withSenia, setWithSenia] = useState(false);
 
+  const [snackbar, setSnackbar] = useState({});
+
   const [fieldsToShow, setFieldsToShow] = useState({
     delete: false,
     enabled: false,
@@ -124,7 +137,7 @@ const FormularioHorarioPrecioCancha = ({
   const nuevoHorario = {
     id: "",
     timeFrame: { from: min, to: max },
-    costPerSlot: 0,
+    costPerSlot: "",
     enabled: true,
   };
 
@@ -170,10 +183,16 @@ const FormularioHorarioPrecioCancha = ({
         details.push({ timeFrame });
       }); */
 
+      const details = diaYHorario.details.map((detail) => {
+        return {
+          ...detail,
+          state: detail.state ? "ACTIVE" : "SUSPENDED",
+        };
+      });
+
       diasYhorariosToUpload.push({
         daysAvailable: daysOfTheWeek,
-        details: diaYHorario.details,
-        //state: "DISABLED",
+        details,
       });
     });
 
@@ -183,14 +202,31 @@ const FormularioHorarioPrecioCancha = ({
   const handleGuardarHorariosYPrecios = () => {
     console.log("GUARDANDO PRECIOS Y HORARIOS DE LA CANCHA");
 
-    const data = handleAddDaysAvailable();
-    console.log(data);
+    const schedules = handleAddDaysAvailable();
+    console.log(schedules);
+    if (isEdit) {
+      //ACTUALIZAMOS CANCHA
+      confirm({
+        title: "¿Esta Seguro que desea Actualizar Precios y Horarios?",
+        cancellationText: "Cancelar",
+      })
+        .then(async () => {
+          setOpen(false);
 
-    onChange(data);
-    setOpen(false);
+          handleUploadSchedules(rowData.id, schedules, false);
+        })
+        .catch(() => {
+          setOpen(false);
+          console.log("Deletion cancelled.");
+        });
+    } else {
+      onChange(schedules);
+      setOpen(false);
+    }
   };
 
   const handleClose = () => {
+    setSchedules([]);
     setLoading(true);
     setOpen(false);
   };
@@ -218,25 +254,6 @@ const FormularioHorarioPrecioCancha = ({
     setDiasYHorarios(newDayAndSchedule);
   };
 
-  const removeDaysAndSchedule = (diaYHorarioId) => {
-    if (
-      window.confirm(
-        "Esta Seguro que desea eliminar estos dias y horarios?" + diaYHorarioId
-      )
-    ) {
-      console.log("removiendo dias y horarios");
-      console.log(diasYHorarios);
-      const diasYHorariosUpdated = diasYHorarios.filter(
-        (diaYHorario) => diaYHorario.id !== diaYHorarioId
-      );
-
-      console.log("y quedan !!! ");
-      console.log(diasYHorariosUpdated);
-
-      setDiasYHorarios(diasYHorariosUpdated);
-    }
-  };
-
   const handleAddNewSchedule = (id) => {
     console.log("agregando nuevo horario para la card -> " + id);
 
@@ -244,6 +261,9 @@ const FormularioHorarioPrecioCancha = ({
       (diaYHorario) => diaYHorario.id === id
     );
     const from = getNextFromTime(diaYHorario[0].details);
+    const upTo = getNextUpToTime(diaYHorario[0].details);
+
+    setMin(from);
 
     const nuevoHorario = {
       id: uuidv4(),
@@ -251,6 +271,10 @@ const FormularioHorarioPrecioCancha = ({
         from,
         to: new Date(new Date(from).setHours(new Date(from).getHours() + 1)),
       },
+      costPerSlot: "",
+      state: "",
+      min: from,
+      max: null,
     };
 
     console.log(nuevoHorario);
@@ -330,7 +354,13 @@ const FormularioHorarioPrecioCancha = ({
           if (horario.id === horarioUpdated.id) {
             return horarioUpdated;
           }
-          return horario;
+          const from = getNextFromTime(
+            day.details.filter((detail) => detail.id !== horario.id)
+          );
+          const upTo = getNextUpToTime(
+            day.details.filter((detail) => detail.id !== horario.id)
+          );
+          return { ...horario, min: from, max: upTo };
         });
 
         return {
@@ -546,6 +576,8 @@ const FormularioHorarioPrecioCancha = ({
   }, [institution.schedules]);
 
   useEffect(() => {
+    console.log("RENDERIZANDO FORMULARIO DE HORARIOS Y PRECIOS DE LAS CANCHAS");
+    console.log(schedules);
     const minTime = new Date(
       new Date(
         new Date().setHours(moment(institution.scheduleMinTime).hour())
@@ -592,21 +624,30 @@ const FormularioHorarioPrecioCancha = ({
           </DialogContentText>
 
           {isMultipleEdit && (
-            <Box textAlign="left" sx={{ m: 4 }}>
-              <TextField
-                disabled={withSenia}
-                label="Porcentaje de Seña"
-                id="porcentaje"
-                sx={{ m: 1, width: "25ch" }}
-                name="senia"
-                onChange={handleChange}
-                value={senia}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">%</InputAdornment>
-                  ),
-                }}
-              />
+            <Box textAlign="left" sx={{ mt: 4 }}>
+              <p>Seña requerida para las canchas</p>
+              <Box textAlign="left" sx={{ m: 4 }}>
+                <TextField
+                  id="standard-start-adornment"
+                  type="number"
+                  size="small"
+                  value={senia}
+                  helperText={
+                    senia < 0 || senia > 100
+                      ? "La Seña debe ser entre 0 y 100"
+                      : ""
+                  }
+                  error={senia < 0 || senia > 100 || senia === undefined}
+                  onChange={(e) => setSenia(e.target.value)}
+                  InputProps={{
+                    inputProps: { min: 0, max: 100 },
+                    startAdornment: (
+                      <InputAdornment position="start">%</InputAdornment>
+                    ),
+                  }}
+                  variant="standard"
+                />
+              </Box>
             </Box>
           )}
 
@@ -723,10 +764,18 @@ const FormularioHorarioPrecioCancha = ({
               .map((daySelected) => daySelected.selected)
               .every((d) => d === false)}
           >
-            Guardar Horarios y Precios
+            {isEdit
+              ? "Actualizar Horarios y Precios"
+              : "Setear Horarios y Precios"}
           </LoadingButton>
         </Box>
       </Dialog>
+      <CustomizedSnackbars
+        message={snackbar.message}
+        severity={snackbar.severity}
+        setOpen={setOpenSnackBar}
+        openSnackBar={openSnackBar}
+      />
     </div>
   ) : (
     <Dialog open={open} onClose={handleClose} maxWidth="xl">

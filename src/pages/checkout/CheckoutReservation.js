@@ -117,16 +117,13 @@ const CheckoutReservation = ({ reservation, setReservation }) => {
     if (activeStep === steps.length - 1) {
       console.log("generar la reserva");
 
-      const reservationCreated = createReservation(reservation);
+      //  const reservationCreated = createReservation(reservation);
 
-      const data = reservationCreated;
+      //  const data = reservationCreated;
 
       console.log("reserva generada");
-      console.log(data);
-
-      if (data) {
-        //setActiveStep(activeStep + 1);
-      }
+      //  console.log(data);
+      setActiveStep(activeStep + 1);
     }
   };
 
@@ -142,27 +139,38 @@ const CheckoutReservation = ({ reservation, setReservation }) => {
     history.push(BASE_URL_CUSTOMERS.base + path);
   };
 
-  const handleMisReservas = () => {
-    let path = "/mis-reservas";
-    history.push(BASE_URL_CUSTOMERS.base + path);
+  const handleClosed = () => {
+    window.opener = null;
+    window.open("", "_self");
+    window.close();
   };
 
   const handlePaymentValidation = async () => {
-    console.log("mandando a validar el medio de pago");
-    console.log(reservation.checkout);
+    console.log("MANDAR A VALIDAR MEDIO DE PAGO Y MONTO A PAGAR");
+    console.log(reservation);
+
+    const paymentDetails = {
+      amountToPay: reservation.priceToPay,
+      cardScrtyKey: reservation.checkout.securityCode,
+      cardSrlNum: reservation.checkout.cardNumber.replace(/ /g, ""),
+      userEmail: reservation.reservedFor.email,
+    };
 
     try {
       const validatedPaymentMethod = await PaymentService.validatePaymentMethod(
-        reservation.checkout
+        reservation.id,
+        paymentDetails
       ).then((data) => data);
 
       console.log("DEVOLVIENDO VALIDAR MEDIO DE PAGO");
       console.log(validatedPaymentMethod);
 
+      setReservation({ ...reservation, validatedPaymentMethod });
+
       setOpenSnackbar({
         open: true,
         severity: "success",
-        message: validatedPaymentMethod.message,
+        message: "MEDIO DE PAGO Validado Correctamente",
       });
 
       setActiveStep(activeStep + 1);
@@ -170,11 +178,11 @@ const CheckoutReservation = ({ reservation, setReservation }) => {
       console.log("DEVOLVIENDO ERROR AL CHECKOUT");
       console.log(error);
 
-      setOpenSnackbar({
+      /*  setOpenSnackbar({
         open: true,
         severity: "error",
         message: error.data.message,
-      });
+      }); */
     }
   };
 
@@ -244,26 +252,20 @@ const CheckoutReservation = ({ reservation, setReservation }) => {
               {activeStep === steps.length ? (
                 <React.Fragment>
                   <Typography variant="h5" gutterBottom>
-                    Gracias Martiniano!
+                    Muchas Gracias, {reservation.reservedFor.name}!
                   </Typography>
                   <Typography variant="subtitle1">
-                    Tu Reserva ha sido Confirmada.
+                    Tu Reserva ha sido Confirmada, te esperamos.
                   </Typography>
                   <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                    {activeStep !== 0 && (
-                      <Button onClick={handleBackToHome} sx={{ mt: 3, ml: 1 }}>
-                        Volver al Inicio
-                      </Button>
-                    )}
-
                     <Button
                       variant="contained"
-                      onClick={handleMisReservas}
+                      onClick={handleClosed}
                       sx={{ mt: 3, ml: 1 }}
                     >
                       {activeStep === steps.length - 1
                         ? "Volver al Inicio"
-                        : "Ir a Mis Reservas"}
+                        : "Cerrar Ventana de Pago"}
                     </Button>
                   </Box>
                 </React.Fragment>

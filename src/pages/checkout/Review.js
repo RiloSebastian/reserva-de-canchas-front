@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -36,6 +36,12 @@ const Review = ({ reservation }) => {
     },
   ]);
 
+  useEffect(() => {
+    console.log("unica vez");
+    console.log("CARGANDO REVIEW");
+    console.log(reservation);
+  }, []);
+
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
@@ -45,7 +51,7 @@ const Review = ({ reservation }) => {
         <ListItem key={reservation.name} sx={{ py: 1, px: 0 }}>
           <ListItemText
             primary={reservation.name}
-            secondary={reservation.institution.institution_name}
+            // secondary={reservation.institution.institution_name}
           />
           <Typography variant="body2">$ {reservation.priceToPay}</Typography>
         </ListItem>

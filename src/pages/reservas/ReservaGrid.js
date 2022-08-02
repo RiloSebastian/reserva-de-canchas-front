@@ -30,11 +30,13 @@ import esMessages from "devextreme/localization/messages/es.json";
 import { locale, loadMessages } from "devextreme/localization";
 import moment from "moment";
 import {
+  cancelReservation,
   createReservation,
   updateReservation,
 } from "../../actions/reservations.js";
 import { useConfirm } from "material-ui-confirm";
 import { retrieveInstitutionReservations } from "../../actions/reservations";
+import { reservations } from "./appointments/appointments";
 
 const PREFIX = "Demo";
 
@@ -103,6 +105,7 @@ function ReservaGrid() {
   const [loading, setLoading] = useState(true);
   const [isAdminRole, setIsAdminRole] = useState(false);
   const { user } = useSelector((state) => state.auth);
+  const reservations = useSelector((state) => state.reservations);
   const institution = useSelector((state) => state.institution);
   const courtList = useSelector((state) => state.court);
 
@@ -130,7 +133,7 @@ function ReservaGrid() {
   });
 
   const onAppointmentFormOpening = (e) => {
-    /* console.log("ABRIENDO FORM");
+    console.log("ABRIENDO FORM");
     console.log(e);
     console.log(
       e.form
@@ -141,7 +144,7 @@ function ReservaGrid() {
         .editorOptions.dataSource.filter(
           (court) => court.id === e.appointmentData.courtId
         )[0]
-    ); */
+    );
     const courtDetails = e.form
       .itemOption("mainGroup")
       .items.filter((mainGroupItem) => mainGroupItem.dataField === "courtId")[0]
@@ -283,24 +286,12 @@ function ReservaGrid() {
       return;
     }
 
-    const reservationData = {
-      reservedFor: {
-        name: appointmentData.text,
-        email: appointmentData.email,
-      },
-      institutionId: institution.id,
-      courtId: appointmentData.courtId,
-      durationRange: {
-        from: appointmentData.startDate,
-        to: appointmentData.endDate,
-      },
-      paymentMethod: "CREDITO",
-    };
-
     const cancel = new Promise(async (resolve, reject) => {
       console.log("creando reserva");
 
-      const created = await dispatch(createReservation(reservationData))
+      const created = await dispatch(
+        createReservation(institution.id, appointmentData)
+      )
         .then((data) => {
           console.log("RESERVA CREADA CORRECTAMENTE");
           notifySuccessMessage("Reserva creada correctamente");
@@ -333,24 +324,11 @@ function ReservaGrid() {
         .then(() => {
           console.log("CANCELANDO RESERVA");
           let { appointmentData } = e;
+          console.log(appointmentData);
 
-          const reservationData = {
-            //id: appointmentData.id,
-            id: "appointmentData.id",
-            reservedFor: {
-              name: appointmentData.text,
-              email: appointmentData.email,
-            },
-            institutionId: institution.id,
-            courtId: appointmentData.courtId,
-            durationRange: {
-              from: appointmentData.startDate,
-              to: appointmentData.endDate,
-            },
-            paymentMethod: "CREDITO",
-          };
-
-          const isCanceled = dispatch(updateReservation(reservationData))
+          const isCanceled = dispatch(
+            cancelReservation(appointmentData.id, false)
+          )
             .then((data) => {
               console.log("RESERVA CANCELADA");
               notifySuccessMessage("Reserva Cancelada correctamente");
@@ -360,9 +338,16 @@ function ReservaGrid() {
               console.log("ERROR AL CANCELAR LA RESERVA");
               console.log(error);
 
-              let errorMessage = Object.entries(error.data)
-                .map((x) => x.join(":"))
-                .join("\n");
+              let errorMessage =
+                "Error al Cancelar, por favor vuelva a intentar mas tarde";
+
+              if (error.data !== undefined) {
+                errorMessage = Object.entries(error.data)
+                  .map((x) => x.join(":"))
+                  .join("\n");
+                console.log(errorMessage);
+              }
+
               notifyErrorMessage(errorMessage);
               return true;
             });
@@ -461,6 +446,17 @@ function ReservaGrid() {
 
     setCourts(courtFilteredBySport);
   }, [sportSelected]);
+
+  const [dataSource, setDataSource] = useState([]);
+  useEffect(() => {
+    console.log("COMPARANDO OBJETOS");
+
+    const reservationsFiltered = reservations.filter((r) =>
+      r.hasOwnProperty("reservedFor")
+    );
+    console.log(reservationsFiltered);
+    setDataSource(reservationsFiltered);
+  }, [reservations]);
 
   useEffect(() => {
     loadMessages(esMessages);
@@ -637,7 +633,7 @@ function ReservaGrid() {
                 )}
               </div>
               <Scheduler
-                dataSource={data}
+                dataSource={dataSource}
                 groups={groups}
                 views={views}
                 defaultCurrentDate={currentDate}

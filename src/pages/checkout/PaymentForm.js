@@ -115,6 +115,8 @@ const PaymentForm = ({ setValidatedPaymentMethod, setReservation }) => {
 
   useEffect(() => {
     console.log("unica vez");
+    console.log("CARGANDO PAYMENT FORM");
+
     setValidatedPaymentMethod(true);
   }, []);
 

@@ -44,6 +44,12 @@ const update = async (data) => {
   return await http.put(`/reservations/${data.id}`, data);
 };
 
+const cancel = async (id, client_choice) => {
+  return await http.post(
+    `/reservations/cancel/${id}?clientChoice=${client_choice}`
+  );
+};
+
 const remove = async (institution_id, court_id) => {
   try {
     return await http.delete(
@@ -114,6 +120,7 @@ export default {
   update,
   remove,
   removeAll,
+  cancel,
   validateAvailableReservation,
   validateDepositShouldBeReturned,
 };

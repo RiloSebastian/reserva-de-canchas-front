@@ -26,7 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   createUserForInstitution,
   deleteAppUser,
-  retrieveManagers,
+  retrieveUsers,
   updateAppUser,
 } from "../../../actions/institution";
 import ChipEmployeesState from "../../../components/employees/ChipEmployeesState";
@@ -263,7 +263,7 @@ const ListaEmpleado = () => {
   useEffect(() => {
     //DEVOLVER LOS EMPLEADOS DE LA INSTITUCION
     let institutionUsers = [];
-    dispatch(retrieveManagers(institution.id))
+    dispatch(retrieveUsers(institution.id))
       .then((data) => {
         console.log("DEVOLVIENDO MANAGERS");
         console.log(data);
@@ -388,9 +388,9 @@ const ListaEmpleado = () => {
         ]}
         editable={{
           isEditable: (rowData) => rowData.id !== user.id,
-          isEditHidden: (rowData) => rowData.id !== user.id,
+          isEditHidden: (rowData) => rowData.id === user.id,
           isDeletable: (rowData) => rowData.id !== user.id,
-          isDeleteHidden: (rowData) => rowData.id !== user.id,
+          isDeleteHidden: (rowData) => rowData.id === user.id,
 
           onRowAdd: (newData) =>
             new Promise(async (resolve, reject) => {
