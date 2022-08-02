@@ -35,7 +35,11 @@ export default function AccountConfirmation(props) {
   console.log(user);
 
   const content = {
-    header: `${user ? user.name : "Usuario"}, Ya casi terminamos...`,
+    header: `${
+      user !== undefined && user.name !== undefined
+        ? user.name || user.firstName
+        : "Usuario"
+    }, Ya casi terminamos...`,
     description:
       "Para completar el alta de tu cuenta, por favor, dirigite a la casilla de correo que agregaste previamente y hace click en el link que te enviamos para Activar tu cuenta.",
     "primary-action": "Volver al LogIn",

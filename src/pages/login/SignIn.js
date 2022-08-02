@@ -209,7 +209,7 @@ const SignIn = (props) => {
             break;
           case "ROLE_EMPLOYEE":
             console.log("ROLE_EMPLOYEE");
-            dispatch(retrieveInstitutionByAdmainEmail(user.email));
+            dispatch(retrieveInstitutionByAdmainEmail(user.id));
 
             console.log("Abrir dashboard");
             history.push("/dashboard/reservas");
@@ -266,6 +266,7 @@ const SignIn = (props) => {
 
   useEffect(() => {
     console.log("ACTUALIZAR EL ESTADO DE LA CUENTA");
+    setAccountState(undefined);
     if (accountState !== undefined) {
       if (accountState.accountEnable) {
         setOpenSnackbar({

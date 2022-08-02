@@ -1,6 +1,6 @@
+import React, { forwardRef, useState, useEffect, Fragment } from "react";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
-import React, { forwardRef, useState } from "react";
 import Check from "@material-ui/icons/Check";
 import ChevronLeft from "@material-ui/icons/ChevronLeft";
 import ChevronRight from "@material-ui/icons/ChevronRight";
@@ -43,7 +43,7 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
-const HistoryReservations = () => {
+const HistoryReservations = ({ historyReservations }) => {
   const [openFeedbackModal, setOpenFeedbackModal] = useState(false);
 
   //const [feedbackSended, setFeedbackSended] = useState(false);
@@ -125,6 +125,10 @@ const HistoryReservations = () => {
       });
     });
   };
+
+  useEffect(() => {
+    //setData(historyReservations);
+  }, [historyReservations]);
 
   return (
     <>

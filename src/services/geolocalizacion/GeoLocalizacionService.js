@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../http-common";
 
 const API_URL =
   "https://api.locationiq.com/v1/autocomplete?key=pk.41bea2e968099330596a319f3318662b&q=";
@@ -22,6 +23,11 @@ const getGeoLocalization = async (address) => {
     });
 };
 
+const getAllLocations = () => {
+  return http.get(`/locations`);
+};
+
 export default {
   getGeoLocalization,
+  getAllLocations,
 };

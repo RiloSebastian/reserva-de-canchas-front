@@ -15,6 +15,11 @@ export default class Utils {
     return moment(new Date()).isAfter(date);
   }
 
+  static isAfterTWoWeeks(date) {
+    const localeDate = date.toLocaleDateString();
+    return moment(new Date(Date.now() + 12096e5)).isBefore(date);
+  }
+
   static isHoliday(date, holidays) {
     const localeDate = date.toLocaleDateString();
     return (
@@ -117,6 +122,7 @@ export default class Utils {
 
   static isValidAppointmentDate(date, workingDays, holidays, busyTime) {
     return (
+      !Utils.isAfterTWoWeeks(date) &&
       !Utils.isBeforeNow(date) &&
       !Utils.isHoliday(date, holidays) &&
       !Utils.isDinner(date, busyTime) &&

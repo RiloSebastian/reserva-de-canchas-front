@@ -23,6 +23,9 @@ import Box from "@mui/material/Box";
 import CancelReservationDialog from "./CancelReservationDialog";
 import ReservationService from "../../services/reservations/ReservationService";
 import SnackbarAlertMessageComponent from "./../ui/SnackbarAlertMessageComponent";
+import { cancelReservation } from "../../actions/reservations";
+import { useDispatch } from "react-redux";
+import moment from "moment";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -48,13 +51,17 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
-const NextReservations = () => {
+const NextReservations = ({ nextReservations }) => {
   const [openCancelReservationModal, setOpenCancelReservationModal] =
     useState(false);
 
   const [selectedReservation, setSelectedReservation] = useState(null);
 
   const [loading, setLoading] = useState(false);
+
+  const [returnDepositPaid, setReturnDepositPaid] = useState(false);
+
+  const dispatch = useDispatch();
 
   const [openSnackbar, setOpenSnackbar] = useState({
     open: false,
@@ -84,7 +91,7 @@ const NextReservations = () => {
 
   const [data, setData] = useState([
     {
-      reservation_id: 1,
+      id: 1,
       name: "Cancha 1",
       date: "27/5 15:00",
       birthYear: "10:00",
@@ -97,7 +104,7 @@ const NextReservations = () => {
       returnableDeposit: true,
     },
     {
-      reservation_id: 2,
+      id: 2,
       name: "Cancha 5",
       date: "25/5 19:00",
       birthYear: "18:30",
@@ -111,48 +118,54 @@ const NextReservations = () => {
     },
   ]);
 
-  const handleCheckCancellationFee = async (reservation_id) => {
-    console.log("VERIFICAR SI SE LE DEBE DEVOLVER LA SEñA");
-    console.log(reservation_id);
+  const confirmCancelation = (reservation_id) => {
+    dispatch(cancelReservation(reservation_id, true))
+      .then((data) => {
+        console.log("RESERVA CANCELADA");
+        setOpenSnackbar({
+          open: true,
+          severity: "success",
+          message: "Reserva Cancelada",
+        });
+        setOpenCancelReservationModal(false);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log("ERROR AL CANCELAR LA RESERVA");
+        console.log(error);
 
-    try {
-      const mustReturnDeposit =
-        await ReservationService.validateDepositShouldBeReturned(
-          reservation_id
-        ).then((data) => data);
-
-      console.log(
-        "LA VALIDACION SI SE DEBE DEVOLVER LA SEñA FUE REALIZADA CORRECTAMENTE"
-      );
-      console.log(mustReturnDeposit);
-      return mustReturnDeposit;
-    } catch (error) {
-      console.log(
-        "MANEJANDO EL ERROR SI NO SE PUDO VALIDAR SI SE DEBE DEVOLVER LA SEñA"
-      );
-      console.log(error);
-      setOpenSnackbar({
-        open: true,
-        severity: "error",
-        message: Object.values(error.data).map((error, idx) => (
+        let errorMessage = Object.values(error.data).map((error, idx) => (
           <Fragment key={error}>
-            {<br />}
             {error}
             {<br />}
           </Fragment>
-        )),
+        ));
+
+        setOpenSnackbar({
+          open: true,
+          severity: "error",
+          message: errorMessage
+            ? errorMessage
+            : "Error al Cancelar, por favor vuelva a intentar mas tarde",
+        });
+        setOpenCancelReservationModal(false);
+        setLoading(false);
       });
-      return null;
-    }
+  };
+
+  const handleCheckCancellationFee = async (reservation) => {
+    console.log("VERIFICAR SI SE LE DEBE DEVOLVER LA SEñA");
+
+    return moment(new Date()).isAfter(reservation.cancelationTime);
   };
 
   const handleCancelReservation = async (rowData) => {
     console.log("handleCancelReservation");
     console.log(rowData);
 
-    const returnDepositPaid = await handleCheckCancellationFee(
-      rowData.reservation_id
-    );
+    setSelectedReservation(rowData);
+
+    const returnDepositPaid = await handleCheckCancellationFee(rowData);
 
     console.log("MANEJAR REPUESTA PARA DEVOLVER SEñA");
     console.log(returnDepositPaid);
@@ -162,11 +175,12 @@ const NextReservations = () => {
       setOpenCancelReservationModal(true);
     } */
 
-    if (returnDepositPaid) {
+    if (true) {
       console.log(
         "MOSTRAMOS EL MODAL CON EL MENSAJE SI SE DEVUELVE O NO LA SEñA AL CLIENTE"
       );
       setLoading(true);
+      setReturnDepositPaid(returnDepositPaid);
       setOpenCancelReservationModal(true);
     } else {
     }
@@ -184,6 +198,10 @@ const NextReservations = () => {
       });
     });
   };
+
+  useEffect(() => {
+    //setData(nextReservations);
+  }, [nextReservations]);
 
   return (
     <>
@@ -248,6 +266,8 @@ const NextReservations = () => {
         setOpenCancelReservationModal={setOpenCancelReservationModal}
         updateRervationStatus={updateRervationStatus}
         setLoading={setLoading}
+        returnDepositPaid={returnDepositPaid}
+        confirmCancelation={confirmCancelation}
       />
       <SnackbarAlertMessageComponent
         openSnackbar={openSnackbar}

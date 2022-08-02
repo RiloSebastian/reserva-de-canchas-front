@@ -31,6 +31,8 @@ const CancelReservationDialog = ({
   setOpenCancelReservationModal,
   updateRervationStatus,
   setLoading,
+  returnDepositPaid,
+  confirmCancelation,
 }) => {
   const [fullWidth, setFullWidth] = useState(true);
   const [maxWidth, setMaxWidth] = useState("sm");
@@ -48,7 +50,7 @@ const CancelReservationDialog = ({
     console.log("handleCancelReservation");
     console.log(selectedReservation);
 
-    updateRervationStatus(selectedReservation.reservation_id);
+    updateRervationStatus(selectedReservation.id);
     //setFeedbackSended(true);
     /* setselectedReservation((prevState) => {
       return {
@@ -70,7 +72,7 @@ const CancelReservationDialog = ({
     >
       <DialogTitle>Cancelar Reserva </DialogTitle>
       <DialogContent>
-        <AlertInformation returnableDeposit={selectedReservation && selectedReservation.returnableDeposit} />
+        <AlertInformation returnableDeposit={returnDepositPaid} />
         <Box sx={{ m: 1 }} />
         <Box sx={{ m: 2 }} />
         <DialogContentText>
@@ -79,7 +81,9 @@ const CancelReservationDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>No, Mantener Reserva</Button>
-        <Button onClick={handleCancelReservation}>Si, Cancelar Reserva</Button>
+        <Button onClick={() => confirmCancelation(selectedReservation.id)}>
+          Si, Cancelar Reserva
+        </Button>
       </DialogActions>
     </Dialog>
   );

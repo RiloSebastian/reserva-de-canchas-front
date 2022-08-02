@@ -218,7 +218,7 @@ const ScheduleAndPrice = ({
           }}
         />
       </Grid>
-      <Grid hidden={fieldsToShow.enabled} item xs>
+      {/* <Grid hidden={fieldsToShow.enabled} item xs>
         <FormControlLabel
           control={
             <Switch
@@ -231,7 +231,7 @@ const ScheduleAndPrice = ({
           label={state.enabled ? "Activo" : "Inactivo"}
           labelPlacement="activo"
         />
-      </Grid>
+      </Grid> */}
       <Grid hidden={fieldsToShow.delete} item xs>
         <IconButton
           disabled={details.length === 1}

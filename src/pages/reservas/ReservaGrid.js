@@ -37,6 +37,7 @@ import {
 import { useConfirm } from "material-ui-confirm";
 import { retrieveInstitutionReservations } from "../../actions/reservations";
 import { reservations } from "./appointments/appointments";
+import { setSportsByInstitution } from "../../actions/sports.js";
 
 const PREFIX = "Demo";
 
@@ -538,6 +539,8 @@ function ReservaGrid() {
         .filter((value, index, self) => self.indexOf(value) === index);
 
       setSportSelected(sportsByInstitutions[0]);
+
+      dispatch(setSportsByInstitution(sportsByInstitutions));
 
       setSports(sportsByInstitutions);
 

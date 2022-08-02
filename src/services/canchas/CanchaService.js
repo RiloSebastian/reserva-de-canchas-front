@@ -42,6 +42,7 @@ const removeAll = async (institution_id) => {
 
 const findCourtsByCustomerPreferences = async (customer_preferences) => {
   console.log("DENTRO DE CANCHA SERVICE => findCourtsByCustomerPreferences");
+  console.log(customer_preferences);
   try {
     const canchasEncontradas = await http.post(
       `/search/courts`,

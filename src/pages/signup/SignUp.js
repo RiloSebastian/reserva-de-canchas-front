@@ -67,7 +67,7 @@ const SignUp = () => {
   const theme = useTheme();
 
   const [values, setValues] = useState({
-    firstName: "",
+    name: "",
     lastName: "",
     userRole: "",
     email: "",
@@ -79,7 +79,7 @@ const SignUp = () => {
   });
 
   const [errors, setErrors] = useState({
-    firstName: "",
+    name: "",
     lastName: "",
     userRole: "",
     email: "",
@@ -124,7 +124,7 @@ const SignUp = () => {
 
   const validate = (name, value) => {
     switch (name) {
-      case "firstName":
+      case "name":
         if (!value || value.trim() === "") {
           return "Nombre es Requerido";
         } else {
@@ -256,9 +256,9 @@ const SignUp = () => {
       setErrors({ errors: validationErrors });
       return;
     }
-    if (values.firstName && values.email && values.password) {
+    if (values.name && values.email && values.password) {
       const data = {
-        firstName: values.firstName,
+        name: values.name,
         lastName: values.lastName,
         email: values.email,
         password: values.password,
@@ -270,7 +270,7 @@ const SignUp = () => {
 
       try {
         const registerUser = await AuthService.register(
-          data.firstName,
+          data.name,
           data.lastName,
           data.userRole,
           data.email,
@@ -358,16 +358,16 @@ const SignUp = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     autoComplete="given-name"
-                    name="firstName"
+                    name="name"
                     required
                     fullWidth
-                    id="firstName"
+                    id="name"
                     label="Nombre"
                     autoFocus
                     onChange={handleUserInput}
                     onBlur={handleUserInput}
-                    helperText={errors.firstName}
-                    error={errors.firstName}
+                    helperText={errors.name}
+                    error={errors.name}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>

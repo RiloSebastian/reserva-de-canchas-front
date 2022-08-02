@@ -111,7 +111,11 @@ const usersLookUp = [
   { title: "ENTRENADOR", year: 1972 },
 ];
 
+const paymentMethodsLookUp = [{ title: "TARJETA DE CREDITO", year: 1994 }];
+
 const ListaPromociones = () => {
+  const [sport, setSports] = useState({});
+  const dispatch = useDispatch();
   const institution = useSelector((state) => state.institution);
   const [data, setData] = useState([
     {
@@ -122,6 +126,26 @@ const ListaPromociones = () => {
       to: moment().format("L"),
       state: true,
       beneficiarios: [1, 2],
+      discountPercentage: 50,
+    },
+    {
+      description: "string",
+      discountPercentage: 50,
+      id: "string",
+      institutionId: "string",
+      intervalsReq: ["string"],
+      minimunTimeReservedMinutesReq: 0,
+      name: "string",
+      paymentMethodsReq: ["string"],
+      sportsReq: ["string"],
+      state: "ACTIVE",
+      timeFrameReq: {
+        from: "2022-08-02T09:32:08.288Z",
+        fromTime: 0,
+        to: "2022-08-02T09:32:08.288Z",
+        toTime: 0,
+      },
+      userRole: "ROLE_ADMIN",
     },
   ]);
 
@@ -223,6 +247,32 @@ const ListaPromociones = () => {
       ),
     },
     {
+      title: "Deportes",
+      field: "sportsReq",
+      lookup: sport,
+      editComponent: (props) => (
+        <Autocomplete
+          multiple
+          id="tags-standard"
+          options={usersLookUp}
+          getOptionLabel={(option) => option.title}
+          defaultValue={[usersLookUp[0]]}
+          renderInput={(params) => (
+            <TextField {...params} variant="standard" label="Deportes" />
+          )}
+        />
+      ),
+      render: (rowData) => (
+        <Autocomplete
+          multiple
+          id="tags-readOnly"
+          options={rowData}
+          readOnly
+          renderInput={(params) => <TextField {...params} variant="standard" />}
+        />
+      ),
+    },
+    {
       title: "Valido a Partir De",
       field: "from",
       type: "date",
@@ -290,9 +340,10 @@ const ListaPromociones = () => {
             }
           : true,
       render: (rowData) =>
-        rowData.signPercentage === undefined || rowData.signPercentage === 0
-          ? "no requiere seña"
-          : "% " + rowData.signPercentage,
+        rowData.discountPercentage === undefined ||
+        rowData.discountPercentage === 0
+          ? "porcentaje nulo"
+          : "% " + rowData.discountPercentage,
       editComponent: (props) => (
         <TextField
           id="standard-start-adornment"
@@ -314,6 +365,32 @@ const ListaPromociones = () => {
             startAdornment: <InputAdornment position="start">%</InputAdornment>,
           }}
           variant="standard"
+        />
+      ),
+    },
+    {
+      title: "Metodos de Pago",
+      field: "paymentMethodsReq",
+      lookup: { 1: "CLIENTES", 2: "ENTRENADORES" },
+      editComponent: (props) => (
+        <Autocomplete
+          multiple
+          id="tags-standard"
+          options={paymentMethodsLookUp}
+          getOptionLabel={(option) => option.title}
+          defaultValue={[paymentMethodsLookUp[0]]}
+          renderInput={(params) => (
+            <TextField {...params} variant="standard" label="Medio de Pago" />
+          )}
+        />
+      ),
+      render: (rowData) => (
+        <Autocomplete
+          multiple
+          id="tags-readOnly"
+          options={rowData}
+          readOnly
+          renderInput={(params) => <TextField {...params} variant="standard" />}
         />
       ),
     },
@@ -376,6 +453,8 @@ const ListaPromociones = () => {
     console.log(newPromo);
 
     let promo = { newPromo };
+
+    return dispatch(createPromo(institution.id, promo));
 
     try {
       const promoCreated = await PromocionService.create(institution.id, promo);

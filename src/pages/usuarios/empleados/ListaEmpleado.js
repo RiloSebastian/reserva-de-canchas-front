@@ -96,11 +96,11 @@ const ListaEmpleado = () => {
   const [columns, setColumns] = useState([
     {
       title: "Nombre",
-      field: "name",
+      field: "firstName",
       validate: (rowData) =>
-        rowData.name === undefined ||
-        rowData.name === "" ||
-        rowData.name.trim() === ""
+        rowData.firstName === undefined ||
+        rowData.firstName === "" ||
+        rowData.firstName.trim() === ""
           ? {
               isValid: false,
               helperText: "El nombre del usuario no puede estar vacio",
@@ -210,7 +210,7 @@ const ListaEmpleado = () => {
     let newUserAdapted = [];
     newUserAdapted.push({
       ...newUser,
-      telephone: "(11)3231-1234",
+      //  telephone: "(11)3231-1234",
       password: Utils.genPassword(),
       state: "SUSPENDED",
       roles,

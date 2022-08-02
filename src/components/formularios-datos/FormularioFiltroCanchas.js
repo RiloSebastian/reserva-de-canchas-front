@@ -14,12 +14,15 @@ import Select from "@mui/material/Select";
 import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CanchaService from "../../services/canchas/CanchaService";
 
 import { Stack } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import { retrieveSports } from "../../actions/sports";
+import { useDispatch, useSelector } from "react-redux";
+import { retrieveLocations } from "../../actions/locations";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -64,6 +67,12 @@ function getStyles(name, selected, theme) {
 
 const FormularioFiltroCanchas = ({ state, dispatch, setInstitutions }) => {
   const theme = useTheme();
+
+  const [sports, setSports] = useState([]);
+
+  const [locations, setLocations] = useState([]);
+
+  const dispatcher = useDispatch();
 
   const [ubicacion, setUbicacion] = useState([]);
 
@@ -117,6 +126,36 @@ const FormularioFiltroCanchas = ({ state, dispatch, setInstitutions }) => {
     }
   };
 
+  useEffect(() => {
+    dispatcher(retrieveSports())
+      .then((sportsList) => {
+        const dynamicLookupObject = sportsList.map((sport) => {
+          return {
+            name: sport.name,
+          };
+        });
+        console.log(dynamicLookupObject);
+        setSports(dynamicLookupObject);
+      })
+      .catch((error) => {
+        setSports([]);
+      });
+
+    dispatcher(retrieveLocations())
+      .then((locationsList) => {
+        const dynamicLookupObject = locationsList.map((location) => {
+          return {
+            name: location,
+          };
+        });
+        console.log(dynamicLookupObject);
+        setLocations(locationsList);
+      })
+      .catch((error) => {
+        setLocations([]);
+      });
+  }, []);
+
   return (
     <>
       <Box>
@@ -144,9 +183,9 @@ const FormularioFiltroCanchas = ({ state, dispatch, setInstitutions }) => {
                         label="Deporte"
                         onChange={handleChange}
                       >
-                        <MenuItem value={10}>Futbol</MenuItem>
-                        <MenuItem value={20}>Tenis</MenuItem>
-                        <MenuItem value={30}>Padel</MenuItem>
+                        {sports.map((type) => (
+                          <MenuItem value={type.name}>{type.name}</MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                   </Grid>
@@ -179,7 +218,7 @@ const FormularioFiltroCanchas = ({ state, dispatch, setInstitutions }) => {
                         )}
                         MenuProps={MenuProps}
                       >
-                        {ubicaciones.map((name) => (
+                        {locations.map((name) => (
                           <MenuItem
                             key={name}
                             value={name}
