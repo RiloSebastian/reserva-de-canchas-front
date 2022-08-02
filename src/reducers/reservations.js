@@ -29,7 +29,7 @@ export default function (reservations = initialState, action) {
         }
       });
     case CANCEL_RESERVATION:
-      return reservations.filter(({ id }) => id !== payload.id);
+      return reservations.filter(({ id }) => id !== payload);
     case DELETE_RESERVATION:
       return reservations.filter(({ id }) => id !== payload.id);
     case CLEAN_RESERVATIONS:

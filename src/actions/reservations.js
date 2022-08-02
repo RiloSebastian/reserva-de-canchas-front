@@ -68,7 +68,7 @@ export const createReservation =
         type: CREATE_RESERVATION,
         payload: { ...appointmentData, ...res.data },
       });
-      return Promise.resolve({ ...appointmentData, ...res.data });
+      return Promise.resolve(res.data);
     } catch (err) {
       return Promise.reject(err.response);
     }
@@ -103,6 +103,25 @@ export const updateReservation =
       return Promise.reject(err.response);
     }
   };
+
+export const cancelReservation = (id, client_choice) => async (dispatch) => {
+  try {
+    const res = await ReservationService.cancel(id, client_choice);
+    dispatch({
+      type: CANCEL_RESERVATION,
+      payload: id,
+    });
+    return Promise.resolve(id);
+  } catch (err) {
+    if (err.response.status === 404) {
+      dispatch({
+        type: CANCEL_RESERVATION,
+        payload: id,
+      });
+    }
+    return Promise.reject(err.response);
+  }
+};
 
 export const deleteReservation = (id) => async (dispatch) => {
   try {

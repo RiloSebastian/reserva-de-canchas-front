@@ -40,6 +40,7 @@ const PaymentPage = () => {
         console.log(moment(d));
 
         const reservation = {
+          ...payment,
           sport: payment.courtSport,
           price: payment.finalCost,
           name: payment.courtId,

@@ -30,6 +30,7 @@ import esMessages from "devextreme/localization/messages/es.json";
 import { locale, loadMessages } from "devextreme/localization";
 import moment from "moment";
 import {
+  cancelReservation,
   createReservation,
   updateReservation,
 } from "../../actions/reservations.js";
@@ -326,7 +327,7 @@ function ReservaGrid() {
           console.log(appointmentData);
 
           const isCanceled = dispatch(
-            updateReservation(institution.id, appointmentData)
+            cancelReservation(appointmentData.id, false)
           )
             .then((data) => {
               console.log("RESERVA CANCELADA");
@@ -337,9 +338,16 @@ function ReservaGrid() {
               console.log("ERROR AL CANCELAR LA RESERVA");
               console.log(error);
 
-              let errorMessage = Object.entries(error.data)
-                .map((x) => x.join(":"))
-                .join("\n");
+              let errorMessage =
+                "Error al Cancelar, por favor vuelva a intentar mas tarde";
+
+              if (error.data !== undefined) {
+                errorMessage = Object.entries(error.data)
+                  .map((x) => x.join(":"))
+                  .join("\n");
+                console.log(errorMessage);
+              }
+
               notifyErrorMessage(errorMessage);
               return true;
             });
@@ -438,6 +446,17 @@ function ReservaGrid() {
 
     setCourts(courtFilteredBySport);
   }, [sportSelected]);
+
+  const [dataSource, setDataSource] = useState([]);
+  useEffect(() => {
+    console.log("COMPARANDO OBJETOS");
+
+    const reservationsFiltered = reservations.filter((r) =>
+      r.hasOwnProperty("reservedFor")
+    );
+    console.log(reservationsFiltered);
+    setDataSource(reservationsFiltered);
+  }, [reservations]);
 
   useEffect(() => {
     loadMessages(esMessages);
@@ -614,7 +633,7 @@ function ReservaGrid() {
                 )}
               </div>
               <Scheduler
-                dataSource={reservations}
+                dataSource={dataSource}
                 groups={groups}
                 views={views}
                 defaultCurrentDate={currentDate}
