@@ -72,6 +72,12 @@ const InstitutionRoutes = [
     exact: true,
   },
   {
+    id: "mis-reservas",
+    path: "/mis-reservas",
+    component: MisReservas,
+    exact: true,
+  },
+  {
     id: "reservas",
     path: "/reservas",
     //component: ReservaGridCustom2,

@@ -38,6 +38,7 @@ import { useConfirm } from "material-ui-confirm";
 import { retrieveInstitutionReservations } from "../../actions/reservations";
 import { reservations } from "./appointments/appointments";
 import { setSportsByInstitution } from "../../actions/sports.js";
+import { email } from "../home/modules/form/validation";
 
 const PREFIX = "Demo";
 
@@ -288,10 +289,16 @@ function ReservaGrid() {
     }
 
     const cancel = new Promise(async (resolve, reject) => {
-      console.log("creando reserva");
+      console.log("CREANDO RESERVA");
+      console.log(appointmentData);
+      console.log(institution);
+
+      let courtDetails = courtList.filter(
+        (court) => court.id === appointmentData.courtId
+      )[0];
 
       const created = await dispatch(
-        createReservation(institution.id, appointmentData)
+        createReservation(institution, courtDetails.name, appointmentData)
       )
         .then((data) => {
           console.log("RESERVA CREADA CORRECTAMENTE");
@@ -466,16 +473,52 @@ function ReservaGrid() {
       "[CONSTRUCTOR] DEVUELVO LAS CANCHAS PARA EL DEPORTE " + sportSelected
     );
     const role = user.roles[0];
-    if (role === "ROLE_ADMIN") {
-      setIsAdminRole(true);
-    } else {
-      setIsAdminRole(false);
+
+    switch (role) {
+      case "ROLE_ADMIN":
+        setIsAdminRole(true);
+        break;
+
+      case "ROLE_COACH":
+        setEditingState({
+          allowAdding: true,
+          allowDeleting: false,
+          allowResizing: false,
+          allowDragging: false,
+          allowUpdating: false,
+        });
+        break;
+
+      case "ROLE_EMPLOYEE":
+        break;
+
+      default:
+        break;
     }
 
     //OBTENER TODAS LAS RESERVAS DE LA INSTITUCION
     dispatch(retrieveInstitutionReservations(institution.id))
       .then((data) => {
         //ARMO LAS RESERVAS CON EL FORMATO ESPERADO
+        console.log("RESERVAS ENCONTRADAS");
+
+        const reservationsFounded = data.map((r) => {
+          if (r.state !== "CANCELADA") {
+            return {
+              ...r,
+              text: r.reservedFor.firstName,
+              price: r.finalCost,
+              allDay: false,
+              courtId: r.courtId,
+              endDate: r.durationRange.to,
+              startDate: r.durationRange.from,
+              email: r.reservedFor.email,
+            };
+          }
+          return {};
+        });
+        console.log(reservationsFounded);
+        setDataSource(reservationsFounded);
       })
       .catch((error) => {
         console.log("ERROR AL OBTENER LAS RESERVAS DE LA INSTITUCION");

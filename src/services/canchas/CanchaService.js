@@ -45,7 +45,7 @@ const findCourtsByCustomerPreferences = async (customer_preferences) => {
   console.log(customer_preferences);
   try {
     const canchasEncontradas = await http.post(
-      `/search/courts`,
+      `/search/available-slots`,
       customer_preferences,
       {
         headers: AuthHeader(),

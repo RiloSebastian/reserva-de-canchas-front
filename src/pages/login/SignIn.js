@@ -31,6 +31,7 @@ import Snackbar from "@mui/material/Snackbar";
 import { login, logout, retrieveUser } from "../../actions/auth";
 import { retrieveInstitutionByAdmainEmail } from "../../actions/institution";
 import { retrieveCourts } from "../../actions/court";
+import { retrieveInstitutionReservations } from "../../actions/reservations";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -183,7 +184,7 @@ const SignIn = (props) => {
           case "ROLE_ADMIN":
             console.log("ROLE_ADMIN");
 
-            return dispatch(retrieveInstitutionByAdmainEmail(user.id))
+            return dispatch(retrieveInstitutionByAdmainEmail(user.email))
               .then((data) => {
                 return dispatch(retrieveCourts(data.id))
                   .then((data) => {
@@ -216,10 +217,28 @@ const SignIn = (props) => {
             break;
           case "ROLE_COACH":
             console.log("ROLE_COACH");
-            dispatch(retrieveInstitutionByAdmainEmail(user.email));
-
-            console.log("Abrir dashboard");
-            history.push("/dashboard/reservas");
+            return dispatch(retrieveInstitutionByAdmainEmail(user.email))
+              .then((data) => {
+                return dispatch(retrieveCourts(data.id))
+                  .then((data) => {
+                    console.log("Abrir dashboard");
+                    history.push("/dashboard/reservas");
+                  })
+                  .catch((err) => {
+                    console.log("Abrir dashboard");
+                    history.push("/dashboard/reservas");
+                    //dispatch(logout());
+                    //return Promise.reject(err);
+                  });
+              })
+              .catch((err) => {
+                if (err.status === 404) {
+                  handleMessageError(err.data.message);
+                  setShowMessageError(true);
+                }
+                dispatch(logout());
+                return Promise.reject(err);
+              });
             break;
           case "ROLE_SUPER_ADMIN":
             console.log("ROLE_SUPER_ADMIN");

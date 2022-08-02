@@ -48,9 +48,9 @@ const Review = ({ reservation }) => {
         Tu Reserva
       </Typography>
       <List disablePadding>
-        <ListItem key={reservation.name} sx={{ py: 1, px: 0 }}>
+        <ListItem key={reservation.courtName} sx={{ py: 1, px: 0 }}>
           <ListItemText
-            primary={reservation.name}
+            primary={reservation.courtName}
             // secondary={reservation.institution.institution_name}
           />
           <Typography variant="body2">$ {reservation.priceToPay}</Typography>

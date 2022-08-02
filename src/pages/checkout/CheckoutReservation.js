@@ -252,7 +252,7 @@ const CheckoutReservation = ({ reservation, setReservation }) => {
               {activeStep === steps.length ? (
                 <React.Fragment>
                   <Typography variant="h5" gutterBottom>
-                    Muchas Gracias, {reservation.reservedFor.name}!
+                    Muchas Gracias, {reservation.reservedFor.firstName}!
                   </Typography>
                   <Typography variant="subtitle1">
                     Tu Reserva ha sido Confirmada, te esperamos.

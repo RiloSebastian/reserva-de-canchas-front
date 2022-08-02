@@ -18,7 +18,7 @@ const getAll = async (institution_id) => {
 };
 
 const getAllByInstitutionId = async (institution_id) => {
-  return await http.get(`/reservations/customers/${institution_id}`);
+  return await http.get(`/institutions/${institution_id}/reservations`);
 };
 
 const getAllByCustomerId = async (customer_id) => {

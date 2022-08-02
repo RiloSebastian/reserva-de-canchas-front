@@ -83,7 +83,8 @@ const PreReview = ({ reservation, setReservation }) => {
   const [percentages, setPercentages] = useState(
     Array.from({ length: 3 }, (_, i) => {
       console.log("cargando porcentaje de señas");
-      const percentage = 0.25 * i + TAX_RATE_1;
+      //const percentage = 0.25 * i + TAX_RATE_1;
+      const percentage = 0.25 * i + reservation.signPorcentage / 100;
       console.log(percentage);
       return percentage;
     })
@@ -137,6 +138,10 @@ const PreReview = ({ reservation, setReservation }) => {
         debToPay: ccyFormat(invoiceSubtotal - invoiceTotal),
       };
     });
+
+    if (!percentages.includes(1)) {
+      setPercentages([...percentages, 1]);
+    }
   }, []);
 
   return (
@@ -171,7 +176,7 @@ const PreReview = ({ reservation, setReservation }) => {
             ))*/}
             <TableRow key={reservation.name}>
               <TableCell>{reservation.sport}</TableCell>
-              <TableCell>{reservation.name}</TableCell>
+              <TableCell>{reservation.courtName}</TableCell>
               <TableCell>{reservation.fecha}</TableCell>
               <TableCell>{reservation.horario}</TableCell>
               <TableCell align="right">

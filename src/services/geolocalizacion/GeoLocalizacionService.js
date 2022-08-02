@@ -24,7 +24,7 @@ const getGeoLocalization = async (address) => {
 };
 
 const getAllLocations = () => {
-  return http.get(`/locations`);
+  return http.get(`/search/barriosCaba`);
 };
 
 export default {

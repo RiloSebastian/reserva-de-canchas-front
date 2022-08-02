@@ -1,3 +1,4 @@
+import court from "../reducers/court";
 import ReservationService from "../services/reservations/ReservationService";
 import {
   CLEAN_RESERVATIONS,
@@ -47,15 +48,17 @@ export const retrieveCustomerReservations =
   };
 
 export const createReservation =
-  (institutionId, appointmentData) => async (dispatch) => {
+  (institution, courtName, appointmentData) => async (dispatch) => {
     try {
       const reservationData = {
         reservedFor: {
-          name: appointmentData.text,
+          firstName: appointmentData.text,
           email: appointmentData.email,
         },
-        institutionId,
+        institutionId: institution.id,
+        institutionName: institution.name,
         courtId: appointmentData.courtId,
+        courtName,
         durationRange: {
           from: appointmentData.startDate,
           to: appointmentData.endDate,
@@ -81,7 +84,7 @@ export const updateReservation =
         //id: appointmentData.id,
         id: appointmentData.id,
         reservedFor: {
-          name: appointmentData.text,
+          firstName: appointmentData.text,
           email: appointmentData.email,
         },
         institutionId,
