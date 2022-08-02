@@ -82,9 +82,9 @@ const ConfiguracionInstituciones = () => {
                 <Box sx={{ pt: 3 }}>
                   <NonWorkingDays institution={institution} />
                 </Box>
-                <Box sx={{ pt: 3 }}>
+                {/* <Box sx={{ pt: 3 }}>
                   <Holidays institution={institution} />
-                </Box>
+                </Box> */}
                 <Box sx={{ pt: 3 }}>
                   <AdvancePaymentConfig institution={institution} />
                 </Box>

@@ -186,7 +186,7 @@ const FormularioHorarioPrecioCancha = ({
       const details = diaYHorario.details.map((detail) => {
         return {
           ...detail,
-          state: detail.state ? "ACTIVE" : "SUSPENDED",
+          state: "ACTIVE",
         };
       });
 

@@ -1,50 +1,31 @@
 import http from "../../http-common";
-import AuthHeader from "../auth-header";
 
-const getAll = async () => {
-  return await http
-    .get(`/promotions`)
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err));
+const getAll = () => {
+  return http.get(`/promotions`);
 };
 
-const getAllByInstitutionId = async (institution_id) => {
-  return await http
-    .get(`/promotions/${institution_id}`)
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err));
+const getAllByInstitutionId = (institution_id) => {
+  return http.get(`/promotions/${institution_id}`);
 };
 
-const get = async (institution_id, court_id) => {
-  return await http.get(`/institutions/${institution_id}/courts/${court_id}`);
+const get = (institution_id, court_id) => {
+  return http.get(`/institutions/${institution_id}/courts/${court_id}`);
 };
 
-const create = async (institution_id, data) => {
-  return await http
-    .post(`/promotions`, { ...data, institutionId: institution_id })
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err.response));
+const create = (institution_id, data) => {
+  return http.post(`/promotions`, { ...data, institutionId: institution_id });
 };
 
-const update = async (promo_id, data) => {
-  return await http
-    .put(`/promotions/${promo_id}/courts`, data)
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err.response));
+const update = (promo_id, data) => {
+  return http.put(`/promotions/${promo_id}/courts`, data);
 };
 
 const remove = async (promo_id) => {
-  return await http
-    .delete(`/promotions/${promo_id}`)
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err.response));
+  return http.delete(`/promotions/${promo_id}`);
 };
 
-const removeAllById = async (promos_ids) => {
-  return await http
-    .delete(`/promotions/`, promos_ids)
-    .then((response) => response.data)
-    .catch((err) => Promise.reject(err.response));
+const removeAllById = (institution_id) => {
+  return http.delete(`institutions/promotions/`, institution_id);
 };
 
 export default {

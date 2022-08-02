@@ -42,7 +42,7 @@ export const AccountProfileDetails = (props) => {
   }); */
 
   const [errors, setErrors] = useState({
-    name: "",
+    firstName: "",
     lastName: "",
     email: "",
     phone: "",
@@ -166,7 +166,7 @@ export const AccountProfileDetails = (props) => {
     console.log("VALIDANDO SI TODOS LOS INPUTS SON CORRECTOS");
     console.log(errors);
     if (
-      errors.name === "" &&
+      errors.firstName === "" &&
       errors.lastName === "" &&
       errors.email === "" &&
       errors.phone === ""
@@ -200,14 +200,14 @@ export const AccountProfileDetails = (props) => {
                 <TextField
                   fullWidth
                   label="Nombre"
-                  name="name"
+                  name="firstName"
                   onChange={handleChange}
                   onBlur={handleChange}
                   required
-                  value={values.name}
+                  value={values.firstName}
                   variant="outlined"
-                  helperText={errors.name}
-                  error={errors.name}
+                  helperText={errors.firstName}
+                  error={errors.firstName}
                 />
               </Grid>
               <Grid item md={6} xs={12}>

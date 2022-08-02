@@ -24,7 +24,7 @@ import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { pink } from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
-import { getNextFromTime } from "../../../validations/validationTime";
+import { getNextFromTimeForInstitution } from "../../../validations/validationTime";
 
 const useStyles = makeStyles((theme) => ({
   ...theme.typography.body2,
@@ -60,7 +60,7 @@ const DaysAndSchedulePaper = ({
   const handleAddNewSchedule = (id) => {
     console.log("agregando nuevo horario para la card -> " + id);
 
-    const from = getNextFromTime(diaYHorario.details);
+    const from = getNextFromTimeForInstitution(diaYHorario.details);
 
     const nuevoHorario = {
       id: uuidv4(),

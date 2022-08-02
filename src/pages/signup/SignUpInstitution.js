@@ -122,8 +122,7 @@ const SignUpInstitution = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    showPassword: false,
-    showConfirmPassword: false,
+
     telephone: "",
   });
 

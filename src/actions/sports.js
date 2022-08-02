@@ -1,5 +1,9 @@
 import DeporteService from "../services/deportes/DeporteService";
-import { RETRIEVE_SPORTS, CLEAN_SPORTS } from "./types";
+import {
+  RETRIEVE_SPORTS,
+  CLEAN_SPORTS,
+  RETRIEVE_INSTITUTION_SPORTS,
+} from "./types";
 
 export const retrieveSports = (institution_id) => async (dispatch) => {
   try {
@@ -17,3 +21,11 @@ export const retrieveSports = (institution_id) => async (dispatch) => {
     return Promise.reject(err);
   }
 };
+
+export const setSportsByInstitution =
+  (sportsByInstitutions) => async (dispatch) => {
+    dispatch({
+      type: RETRIEVE_INSTITUTION_SPORTS,
+      payload: sportsByInstitutions,
+    });
+  };
