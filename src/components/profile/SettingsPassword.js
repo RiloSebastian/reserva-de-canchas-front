@@ -177,7 +177,22 @@ export const SettingsPassword = (props) => {
         console.log("actualizando contraseña");
         console.log(values);
 
-        handleSubmitChanges(values);
+        handleSubmitChanges(values)
+          .then((data) => {
+            setSnackbar({
+              message: "La Contraseña se han modificado Exitasamente!",
+              severity: "success",
+            });
+            setOpen(true);
+          })
+          .catch((error) => {
+            setSnackbar({
+              message:
+                "Erro al modifcar contraseña, revise los datos ingresados y vuelva intentar",
+              severity: "success",
+            });
+            setOpen(true);
+          });
       })
       .catch(() => console.log("Deletion cancelled."));
   };

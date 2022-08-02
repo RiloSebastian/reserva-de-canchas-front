@@ -210,10 +210,28 @@ const SignIn = (props) => {
             break;
           case "ROLE_EMPLOYEE":
             console.log("ROLE_EMPLOYEE");
-            dispatch(retrieveInstitutionByAdmainEmail(user.id));
-
-            console.log("Abrir dashboard");
-            history.push("/dashboard/reservas");
+            return dispatch(retrieveInstitutionByAdmainEmail(user.email))
+              .then((data) => {
+                return dispatch(retrieveCourts(data.id))
+                  .then((data) => {
+                    console.log("Abrir dashboard");
+                    history.push("/dashboard/reservas");
+                  })
+                  .catch((err) => {
+                    console.log("Abrir dashboard");
+                    history.push("/dashboard/reservas");
+                    //dispatch(logout());
+                    //return Promise.reject(err);
+                  });
+              })
+              .catch((err) => {
+                if (err.status === 404) {
+                  handleMessageError(err.data.message);
+                  setShowMessageError(true);
+                }
+                dispatch(logout());
+                return Promise.reject(err);
+              });
             break;
           case "ROLE_COACH":
             console.log("ROLE_COACH");
